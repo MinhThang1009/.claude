@@ -20,3 +20,6 @@ plans/
 plugins/
 ide/
 .vscode/
+
+# Transient session state (audit workflow)
+HANDOFF.md

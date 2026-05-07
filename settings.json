@@ -77,7 +77,9 @@
       "Bash(gh pr diff:*)",
       "Bash(gh pr list:*)",
       "Bash(gh repo view:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "WebFetch(domain:platform.claude.com)",
+      "WebFetch(domain:code.claude.com)"
     ],
     "ask": [
       "Bash(git commit:*)",
