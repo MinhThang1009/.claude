@@ -116,10 +116,10 @@ Tôi sẽ commit với message:
 OK chứ?
 ```
 
-Nếu OK → chạy:
+Nếu OK → chạy (Claude tự generate command thực với value cụ thể):
 ```bash
-!`git add <files cụ thể>`
-!`git commit -m "<subject>" -m "<body>" -m "<footer>"`
+git add <files cụ thể>
+git commit -m "<subject>" -m "<body>" -m "<footer>"
 ```
 
 ## Quy tắc bắt buộc
