@@ -184,7 +184,28 @@
 | `--fallback-model <alias>` | Fallback khi default overload (chỉ print mode)                                                                       |
 | `--betas <header>`         | Beta header cho API (chỉ API key user)                                                                               |
 
-**Model aliases**: `default` = reset về model recommended cho account type. `best` = model mạnh nhất (currently equivalent to `opus`). `opusplan` = Opus cho plan mode, Sonnet cho execution. `[1m]` = 1M context window (chỉ Opus 4.7/4.6, Sonnet 4.6). Trên Anthropic API: `opus` → Opus 4.7, `sonnet` → Sonnet 4.6. Trên Bedrock/Vertex/Foundry: `opus` → Opus 4.6, `sonnet` → Sonnet 4.5 (pin bằng `ANTHROPIC_DEFAULT_OPUS_MODEL`/`_SONNET_MODEL` để control version). Default model theo plan: **Max/Team Premium** → Opus 4.7; **Pro/Team Standard/Enterprise/Anthropic API** → Sonnet 4.6; **Bedrock/Vertex/Foundry** → Sonnet 4.5.
+**Model aliases**:
+
+| Alias      | Ý nghĩa                                          |
+| ---------- | ------------------------------------------------ |
+| `default`  | Reset về model recommended cho account type      |
+| `best`     | Model mạnh nhất (currently = `opus`)             |
+| `opusplan` | Opus cho plan mode, Sonnet cho execution         |
+| `[1m]`     | 1M context window (chỉ Opus 4.7/4.6, Sonnet 4.6) |
+
+**Provider mapping**:
+
+| Provider                   | `opus`   | `sonnet`   |
+| -------------------------- | -------- | ---------- |
+| Anthropic API              | Opus 4.7 | Sonnet 4.6 |
+| Bedrock / Vertex / Foundry | Opus 4.6 | Sonnet 4.5 |
+
+> Pin version: `ANTHROPIC_DEFAULT_OPUS_MODEL` / `ANTHROPIC_DEFAULT_SONNET_MODEL`.
+
+**Default model theo plan**:
+- **Max / Team Premium** → Opus 4.7
+- **Pro / Team Standard / Enterprise / Anthropic API** → Sonnet 4.6
+- **Bedrock / Vertex / Foundry** → Sonnet 4.5
 
 #### Models hiện được hỗ trợ (Anthropic API, tính đến 2026-05)
 
@@ -218,15 +239,15 @@
 - Claude 3.x family (3 Haiku/Sonnet/Opus, 3.5, 3.7) đã retire — không liệt kê.
 
 ### 2.3 Permission & tool
-| Flag                                   | Mục đích                                                    |
-| -------------------------------------- | ----------------------------------------------------------- |
+| Flag                                   | Mục đích                                                                 |
+| -------------------------------------- | ------------------------------------------------------------------------ |
 | `--permission-mode <mode>`             | `default`, `acceptEdits`, `auto`, `plan`, `dontAsk`, `bypassPermissions` |
-| `--dangerously-skip-permissions`       | = `--permission-mode bypassPermissions` ⚠️ chỉ trong sandbox |
-| `--allow-dangerously-skip-permissions` | Cho phép `bypassPermissions` trong Shift+Tab cycle          |
-| `--allowedTools "<rules>"`             | Pre-approve tool/lệnh không hỏi                             |
-| `--disallowedTools "<rules>"`          | Loại tool khỏi context                                      |
-| `--tools "<rules>"`                    | Giới hạn tool có thể dùng                                   |
-| `--disable-slash-commands`             | Tắt mọi skill + command                                     |
+| `--dangerously-skip-permissions`       | = `--permission-mode bypassPermissions` ⚠️ chỉ trong sandbox              |
+| `--allow-dangerously-skip-permissions` | Cho phép `bypassPermissions` trong Shift+Tab cycle                       |
+| `--allowedTools "<rules>"`             | Pre-approve tool/lệnh không hỏi                                          |
+| `--disallowedTools "<rules>"`          | Loại tool khỏi context                                                   |
+| `--tools "<rules>"`                    | Giới hạn tool có thể dùng                                                |
+| `--disable-slash-commands`             | Tắt mọi skill + command                                                  |
 
 ### 2.4 System prompt
 | Flag                                       | Mục đích                                                                                     |
@@ -497,7 +518,7 @@ MCP server có thể expose prompt thành command: `/mcp__<server>__<prompt>`.
 | Phím        | Tác dụng                                         |
 | ----------- | ------------------------------------------------ |
 | `[`         | Ghi conversation vào scrollback (dùng Cmd+F tìm) |
-| `/`         | Search trong transcript (v2.1+)               |
+| `/`         | Search trong transcript (v2.1+)                  |
 | `v`         | Mở trong `$VISUAL`/`$EDITOR`                     |
 | `q` / `Esc` | Thoát viewer                                     |
 

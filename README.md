@@ -209,7 +209,7 @@ Câu hỏi thường gặp:
 A: Vì baseline context = mỗi message phải trả tiền. 4 rules = thêm ~6000 tokens × mỗi turn × cả phiên = lãng phí. Chỉ import 2 rule thực sự áp dụng MỌI turn (communication, security). Còn lại để Claude tự đọc khi cần (qua REFERENCE hoặc khi user `@`-reference).
 
 **Q: Sao không gộp REFERENCE vào CLAUDE.md?**  
-A: REFERENCE.md = ~1655 dòng, ~117k chars → ~40k tokens (Vietnamese prose ~2.3 chars/token, code blocks/tables ~3-4 chars/token, mix ~2.9). Nếu auto-load thì hết ~20% context window Sonnet 200k (hoặc ~4% Opus 1M) mỗi session. REFERENCE để **NGƯỜI** tra cứu (mở trên màn hình thứ 2 / web), KHÔNG để Claude đọc.
+A: REFERENCE.md = ~1677 dòng, ~118k chars → ~41k tokens (Vietnamese prose ~2.3 chars/token, code blocks/tables ~3-4 chars/token, mix ~2.9). Nếu auto-load thì hết ~20% context window Sonnet 200k (hoặc ~4% Opus 1M) mỗi session. REFERENCE để **NGƯỜI** tra cứu (mở trên màn hình thứ 2 / web), KHÔNG để Claude đọc.
 
 **Q: Sao có cả `/init-context` lẫn `/init`?**  
 A: Cũ rồi — đã bỏ `/init-context` (overlap với `/init` built-in của Claude Code v2.1+).
