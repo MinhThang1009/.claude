@@ -672,8 +672,20 @@ keep-coding-instructions: true        # default: false; true → giữ default c
     "command": "~/.claude/statusline.sh"
   },
 
-  // Auth
-  "apiKeyHelper": "~/.claude/get-api-key.sh",  // Script trả về API key (thay vì hardcode)
+  // Auth & model routing
+  "apiKeyHelper": "~/.claude/get-api-key.sh",  // Script trả về API key
+  "agent": "my-custom-agent",          // Chạy main thread như subagent cụ thể
+  "modelOverrides": {                  // Map model → provider-specific ID
+    "claude-opus-4-7": "arn:aws:bedrock:..."
+  },
+  "alwaysThinkingEnabled": false,      // true = force extended thinking mọi response
+  "preferredNotifChannel": "auto",     // auto|terminal_bell|iterm2|notifications_disabled
+
+  // Worktree
+  "worktree": {
+    "symlinkDirectories": ["node_modules", ".cache"],  // Symlink thay vì copy
+    "sparsePaths": ["src/", "tests/"]  // Sparse checkout cho monorepo
+  },
 
   // Proxy & network
   "skipWebFetchPreflight": false,      // true = skip WebFetch domain safety check
@@ -760,6 +772,26 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `DISABLE_ERROR_REPORTING` | Tắt Sentry error reporting |
 | `DISABLE_PROMPT_CACHING` | `1` = tắt prompt caching |
 | `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` | `1` = bật agent teams (experimental) |
+| `ANTHROPIC_VERTEX_PROJECT_ID` | GCP project ID cho Vertex AI |
+| `CLOUD_ML_REGION` | Region cho Vertex AI (vd: `us-east5`, `global`) |
+| `ANTHROPIC_FOUNDRY_RESOURCE` | Azure Foundry resource name |
+| `ANTHROPIC_FOUNDRY_API_KEY` | Azure Foundry API key |
+| `ANTHROPIC_BEDROCK_BASE_URL` | Override Bedrock endpoint URL |
+| `ANTHROPIC_VERTEX_BASE_URL` | Override Vertex AI endpoint URL |
+| `ANTHROPIC_FOUNDRY_BASE_URL` | Override Foundry endpoint URL |
+| `ANTHROPIC_CUSTOM_MODEL_OPTION` | Custom model ID cho `/model` picker |
+| `ANTHROPIC_CUSTOM_MODEL_OPTION_NAME` | Display name cho custom model |
+| `ANTHROPIC_BETAS` | Comma-separated beta header values |
+| `ANTHROPIC_CUSTOM_HEADERS` | Custom HTTP headers (`Name: Value`) |
+| `CLAUDE_CODE_CLIENT_CERT` | Path tới mTLS client certificate |
+| `CLAUDE_CODE_CLIENT_KEY` | Path tới mTLS client key |
+| `CLAUDE_CODE_DISABLE_FAST_MODE` | `1` = tắt fast mode hoàn toàn |
+| `CLAUDE_CODE_DISABLE_1M_CONTEXT` | `1` = tắt 1M context window |
+| `CLAUDE_CODE_SIMPLE_SYSTEM_PROMPT` | `1` = system prompt ngắn hơn (Opus 4.7) |
+| `CLAUDE_CODE_SKIP_PROMPT_HISTORY` | `1` = không lưu transcript ra disk |
+| `BASH_MAX_OUTPUT_LENGTH` | Max ký tự bash output |
+| `CLAUDE_CODE_FILE_READ_MAX_OUTPUT_TOKENS` | Token limit cho file reads |
+| `CLAUDE_CODE_DEBUG_LOG_LEVEL` | Log level: `verbose`\|`debug`\|`info`\|`warn`\|`error` |
 
 ---
 
