@@ -634,6 +634,8 @@ ${CLAUDE_EFFORT}                      # Effort level hiện tại
 ${CLAUDE_SKILL_DIR}                   # Thư mục chứa SKILL.md
 ```
 
+> Template skill chính thức + Agent Skills specification: <https://github.com/anthropics/skills> (`template/` cho skeleton, `spec/` cho schema reference).
+
 **Rules**:
 - `name`: lowercase-kebab-case, NO consecutive hyphens, NO leading/trailing hyphen.
 - `description` + `when_to_use`: combined cap **1,536 ký tự** trong skill listing (ưu tiên use case quan trọng nhất ở đầu).
@@ -1595,6 +1597,8 @@ Cách xử lý:
 ### 20.20 Cộng đồng tham khảo
 
 - Anthropics Claude Code repo: <https://github.com/anthropics/claude-code>
+- Official plugin marketplace (Anthropic-curated): <https://github.com/anthropics/claude-plugins-official> — cài bằng `/plugin install <name>@claude-plugins-official` (chứa `code-review`, `commit-commands`, `feature-dev`, `mcp-server-dev`, `plugin-dev`, `pr-review-toolkit`, `frontend-design`, các LSP plugin)
+- Anthropic skills examples + spec: <https://github.com/anthropics/skills> — `/plugin marketplace add anthropics/skills` rồi install `document-skills` hoặc `example-skills`. Có `spec/` (Agent Skills specification) và `template/` (skill template chính thức)
 - Awesome Claude Code: <https://github.com/hesreallyhim/awesome-claude-code>
 - ClaudeLog: <https://claudelog.com>
 - ClaudeFast guides: <https://claudefa.st/blog>
