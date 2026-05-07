@@ -555,7 +555,7 @@ ${CLAUDE_SKILL_DIR}                   # Thư mục chứa SKILL.md
 ---
 name: <kebab-case>                    # Required
 description: <khi nào delegate>       # Required
-tools: Read, Grep, Glob, Bash         # Optional — comma-separated tên tool thuần. Omit = inherit. KHÔNG hỗ trợ cú pháp Bash(pattern) ở đây
+tools: Read, Grep, Glob, Bash         # Optional — comma-separated tên tool thuần. Omit = inherit. Exception: Agent(worker, researcher) cho phép allowlist subagent types (chỉ khi run as main thread qua --agent)
 model: opus|sonnet|haiku|inherit      # Optional, default inherit. Cũng accept full ID (claude-opus-4-7)
 isolation: worktree                   # Optional — copy isolated repo qua git worktree
 skills: [my-skill, another-skill]     # Optional — pre-load full skill content vào subagent context lúc startup
@@ -563,6 +563,8 @@ disallowedTools: [WebFetch]           # Optional — deny tools cụ thể (lo�
 maxTurns: 20                          # Optional — giới hạn số agentic turn
 permissionMode: plan                  # Optional — default|acceptEdits|auto|dontAsk|bypassPermissions|plan
 mcpServers: [slack]                   # Optional — MCP servers scoped cho subagent (string ref hoặc inline def)
+hooks:                                # Optional — lifecycle hooks scoped riêng cho subagent. Plugin subagent IGNORE field này
+  PreToolUse: [...]
 memory: project                       # Optional — user|project|local. Bật persistent memory
 background: false                     # Optional — true = run as background task mặc định
 effort: high                          # Optional — low|medium|high|xhigh|max (model-dependent)
@@ -691,6 +693,7 @@ keep-coding-instructions: true        # default: false; true → giữ default c
   "awaySummaryEnabled": true,         // Session recap sau idle (default true)
   "showThinkingSummaries": false,     // Show extended thinking summaries
   "showTurnDuration": true,
+  "teammateMode": "auto",             // "auto" | "in-process" | "tmux" — agent team display mode (auto = tmux nếu trong tmux session, ngược lại in-process). Chỉ effect khi CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
 
   // Memory
   "autoMemoryDirectory": "~/.claude/memory",
@@ -745,6 +748,8 @@ keep-coding-instructions: true        # default: false; true → giữ default c
 - `WebFetch(domain:example.com)` — domain cụ thể
 - `Agent(Explore)` — subagent type cụ thể
 - `Agent(my-custom-agent)` — custom subagent
+
+> **Note**: `Task` tool đã rename thành `Agent` từ v2.1.63. `Task(...)` rules cũ vẫn work như alias, nhưng nên dùng tên mới `Agent(<type>)`.
 
 Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Process wrapper (`timeout`, `nice`, `nohup`, `stdbuf`, `xargs`) tự strip khi match.
 
@@ -862,8 +867,8 @@ Hook chạy DETERMINISTIC (KHÔNG phụ thuộc Claude nhớ rule). Định ngh�
 |---|---|---|
 | `SubagentStart` | Subagent spawn | agent type (`Explore`, `Plan`, `general-purpose`, custom) |
 | `SubagentStop` | Subagent finish | agent type |
-| `TaskCreated` | Task được tạo qua TaskCreate | (none) |
-| `TaskCompleted` | Task được mark complete | (none) |
+| `TaskCreated` | Task được tạo trong shared task list của agent team | (none) — exit code 2 = block creation + send feedback |
+| `TaskCompleted` | Task được mark complete | (none) — exit code 2 = block completion + send feedback |
 
 ### Compact
 | Event | Khi fire | Matcher |
@@ -875,7 +880,7 @@ Hook chạy DETERMINISTIC (KHÔNG phụ thuộc Claude nhớ rule). Định ngh�
 | Event | Khi fire | Matcher |
 |---|---|---|
 | `Notification` | Claude gửi notification | `permission_prompt`, `idle_prompt`, `auth_success`, `elicitation_dialog`, `elicitation_complete`, `elicitation_response` |
-| `TeammateIdle` | Agent team teammate idle | (none) |
+| `TeammateIdle` | Agent team teammate sắp idle | (none) — exit code 2 = giữ teammate tiếp tục làm việc thay vì idle |
 | `InstructionsLoaded` | CLAUDE.md / `.claude/rules/*.md` được load | `session_start`, `nested_traversal`, `path_glob_match`, `include`, `compact` |
 | `ConfigChange` | Config file thay đổi trong session | `user_settings`, `project_settings`, `local_settings`, `policy_settings`, `skills` |
 | `CwdChanged` | Working dir thay đổi (`cd`) | (none) — useful cho direnv |
