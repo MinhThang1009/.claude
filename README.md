@@ -37,10 +37,11 @@
     └── HANDOFF.md                  # → <project>/.claude/HANDOFF.md (gitignored)
 ```
 
-**Triết lý baseline tokens** (token cố định mỗi session):
-- `CLAUDE.md` global ≈ 1,500 tokens
-- 2 rules auto-import (`communication`, `security`) ≈ 2,200 tokens
-- **Tổng baseline ≈ 5,000 tokens** (cao hơn Boris Cherny ~2,500 do Vietnamese tokenize kém hiệu quả + skill/agent descriptions load lúc startup; vẫn hợp lý)
+**Triết lý baseline tokens** (token cố định mỗi session, đo bằng `/context`):
+- `CLAUDE.md` global ≈ 1,900 tokens
+- 2 rules auto-import (`communication`, `security`) ≈ 3,100 tokens
+- Skill descriptions ≈ 940 tokens, agent descriptions ≈ 470 tokens
+- **Tổng memory+skills+agents ≈ 6,400 tokens** (~0.6% Opus 1M). Cao hơn Boris Cherny ~2,500 do Vietnamese tokenize kém hiệu quả; vẫn hợp lý
 - 2 references còn lại chỉ load khi `@`-reference → KHÔNG ăn baseline
 
 ## 2. Cài đặt
