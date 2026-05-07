@@ -131,7 +131,7 @@ Cao → thấp khi xung đột:
 
 ## 5. Triết lý sử dụng
 
-| Thứ                    | Khi nào dùng                                                                  |
+| Cơ chế                 | Mục đích                                                                      |
 | ---------------------- | ----------------------------------------------------------------------------- |
 | **CLAUDE.md**          | Hướng dẫn cần load **MỌI session** — giữ ngắn (<100 dòng)                     |
 | **rules/** auto-import | Rule áp dụng MỌI session — chỉ 1-2 file thật cần                              |

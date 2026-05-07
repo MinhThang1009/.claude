@@ -40,7 +40,7 @@ Nếu user không có instruction đặc biệt → 1 commit/PR scope nhỏ thì
 
 Đọc `git diff --staged` chi tiết, suy ra:
 
-| Type       | Khi nào dùng                                              |
+| Type       | Tình huống áp dụng                                        |
 | ---------- | --------------------------------------------------------- |
 | `feat`     | Thêm chức năng người dùng cảm nhận được                   |
 | `fix`      | Sửa bug có ảnh hưởng đến hành vi                          |

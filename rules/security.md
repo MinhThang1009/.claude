@@ -18,7 +18,7 @@
 
 ## Injection prevention
 
-| Loại              | Phòng                                                                   |
+| Loại lỗ hổng      | Cách phòng                                                              |
 | ----------------- | ----------------------------------------------------------------------- |
 | SQL injection     | Prepared statement / ORM với binding                                    |
 | Command injection | KHÔNG `eval`, KHÔNG `shell=True` ghép user input                        |

@@ -10,9 +10,9 @@ model: inherit
 
 Theo nghiên cứu của Anthropic (`claude.com/blog/using-claude-code-session-management-and-1m-context`) và kinh nghiệm cộng đồng: **resume một session dài thường tệ hơn brief-injection vào session mới** — vì resume kéo theo stale environment data (tool output cũ, file content cũ) còn brief chỉ mang quyết định và trạng thái hiện tại.
 
-## Khi nào dùng skill này
+## Tình huống áp dụng
 
-| Tình huống                                                | Cách dùng                                         |
+| Tình huống                                                | Hành động                                         |
 | --------------------------------------------------------- | ------------------------------------------------- |
 | Sắp `/compact` (context >60%) — vẫn làm tiếp cùng task    | `/handoff` rồi `/compact <chỉ dẫn>`               |
 | Sắp `/clear` — chuyển sang task mới nhưng cần nhớ vài thứ | `/handoff --save` rồi `/clear`                    |

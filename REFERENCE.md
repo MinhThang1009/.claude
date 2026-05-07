@@ -49,7 +49,7 @@
    - [7.4 Session memory (auto, đọc-only)](#74-session-memory-auto-đọc-only)
 8. [SKILL.md frontmatter](#8-skillmd-frontmatter)
 9. [Subagent frontmatter](#9-subagent-frontmatter)
-   - [9.1 Agent teams (experimental, v2.1+)](#91-agent-teams-experimental-v21)
+   - [9.1 Agent teams (experimental, v2.1.32+)](#91-agent-teams-experimental-v2132)
 10. [Output styles](#10-output-styles-built-in)
 11. [settings.json — keys hay dùng](#11-settingsjson--keys-hay-dùng)
    - [11.1 Permission rule syntax](#111-permission-rule-syntax)
@@ -208,6 +208,8 @@
 - **Bedrock / Vertex / Foundry** → Sonnet 4.5
 
 #### Models hiện được hỗ trợ (Anthropic API, tính đến 2026-05)
+
+> Source chính thức: [platform.claude.com/docs/en/about-claude/models/overview](https://platform.claude.com/docs/en/about-claude/models/overview)
 
 **Latest**:
 | Model      | Alias    | Model ID            | Context | Max output | Effort levels          | Pricing (in/out per MTok) |
@@ -711,7 +713,7 @@ Lưu ý:
 - Khi `isolation: worktree`, subagent chạy trong git worktree riêng → không ảnh hưởng main working tree.
 - Model override chỉ áp dụng trong turn đó, không lưu vào settings.
 
-### 9.1 Agent teams (experimental, v2.1+)
+### 9.1 Agent teams (experimental, v2.1.32+)
 
 Khác subagent (chỉ report về main agent), agent teams cho phép multiple teammates chạy parallel **trong cùng session**, communicate trực tiếp với nhau qua shared task list + mailbox. Use case: parallel review, debugging với competing hypotheses, cross-layer coordination.
 
@@ -1385,7 +1387,7 @@ Claude Code dùng prompt caching tự động để giảm cost cho conversation
 Sắp đầy context, vẫn làm tiếp cùng task ──► /compact (có instructions)
 Sắp đầy context, sang task khác ──────────► /handoff --save → /clear → brief mới
 Câu hỏi nhanh không cần lưu ──────────────► /btw
-Một message bị sai hướng ─────────────────► Esc Esc → mở rewind menu (4 options)
+Một message bị sai hướng ─────────────────► Esc Esc → mở rewind menu (5 options)
 Khôi phục trạng thái phiên trước ─────────► claude --continue (rủi ro stale data)
                                           HOẶC brief-injection (sạch hơn)
 Fan-out task song song ───────────────────► claude -p ... background

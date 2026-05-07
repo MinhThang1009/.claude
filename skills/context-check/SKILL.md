@@ -33,7 +33,7 @@ Sau khi user gửi output `/context`, tôi phân tích.
 
 `/context` chia output theo nhóm (system, memory/CLAUDE.md, skills, MCP tools, conversation, file content). Tôi tìm thủ phạm:
 
-| Nhóm chiếm nhiều                | Nguyên nhân                         | Cách giảm                                                 |
+| Nhóm tiêu thụ cao               | Nguyên nhân                         | Cách giảm                                                 |
 | ------------------------------- | ----------------------------------- | --------------------------------------------------------- |
 | Memory (CLAUDE.md + rules) >10% | CLAUDE.md / rules quá dài           | Prune lại, tách phần ít dùng vào REFERENCE.md             |
 | MCP tools >15%                  | Bật quá nhiều MCP server không dùng | `claude mcp` list rồi disable cái không cần cho phiên này |
@@ -48,9 +48,9 @@ Sau khi user gửi output `/context`, tôi phân tích.
 Ví dụ output của tôi:
 > Context đang ở 73%. Conversation history chiếm 45% — chủ yếu do tool output dài từ phiên debug ban nãy. **Đề xuất**: chạy `/handoff` để mình tóm tắt 5 dòng key decision, rồi `/compact giữ lại brief, drop debug log`. Sau đó tiếp tục task hiện tại trong session này. Estimate context sau compact: ~25%.
 
-## Khi nào nên `/clear` thay vì `/compact`
+## Lựa chọn `/compact` vs `/clear`
 
-| Dùng `/compact` khi                            | Dùng `/clear` khi                       |
+| Tình huống dùng `/compact`                     | Tình huống dùng `/clear`                |
 | ---------------------------------------------- | --------------------------------------- |
 | Đang giữa 1 task, cần giữ thread               | Hoàn thành 1 task, chuyển task khác hẳn |
 | Quyết định và file path quan trọng cần survive | Không cần lịch sử                       |
