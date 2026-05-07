@@ -330,22 +330,22 @@
 > Type `/` để xem full list, `/<letters>` để filter. `<arg>` = required, `[arg]` = optional. Marked **[Skill]** = bundled skill (Claude có thể auto-invoke).
 
 ### 3.1 Quản lý session & context
-| Lệnh                      | Mục đích                                                                                |
-| ------------------------- | --------------------------------------------------------------------------------------- |
-| `/help`                   | List commands                                                                           |
-| `/clear`                  | XÓA HẲN context, reset session. Aliases: `/reset`, `/new`                               |
-| `/compact [instructions]` | Nén context. VD: `/compact giữ phần API change, drop test debug`                        |
-| `/context`                | Visualize context usage + tối ưu suggestion                                             |
-| `/rewind`                 | Rollback conversation/code, hoặc "Summarize from here" (alias `Esc Esc`, `/checkpoint`) |
-| `/branch [name]`          | Phân nhánh session (giữ nguyên session cũ). Alias `/fork`                               |
-| `/btw <question>`         | Hỏi nhanh không vào history (overlay dismissible)                                       |
-| `/resume [session]`       | Resume theo ID/name. Alias `/continue`                                                  |
-| `/rename [name]`          | Đặt tên session (auto-gen nếu để trống)                                                 |
-| `/exit`                   | Thoát CLI. Alias `/quit`                                                                |
-| `/desktop`                | Continue trong Desktop app (macOS/Windows). Alias `/app`                                |
-| `/teleport`               | Pull web session vào terminal. Alias `/tp`                                              |
-| `/copy [N]`               | Copy response thứ N gần nhất (mặc định 1)                                               |
-| `/export [filename]`      | Export conversation thành plain text                                                    |
+| Lệnh                      | Mục đích                                                                                                     |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `/help`                   | List commands                                                                                                |
+| `/clear`                  | XÓA HẲN context, reset session. Aliases: `/reset`, `/new`                                                    |
+| `/compact [instructions]` | Nén context. VD: `/compact giữ phần API change, drop test debug`                                             |
+| `/context`                | Visualize context usage + tối ưu suggestion                                                                  |
+| `/rewind`                 | Rollback conversation/code, hoặc "Summarize from here". Aliases: `/checkpoint`, `/undo`. Phím tắt: `Esc Esc` |
+| `/branch [name]`          | Phân nhánh session (giữ nguyên session cũ). Alias `/fork`                                                    |
+| `/btw <question>`         | Hỏi nhanh không vào history (overlay dismissible)                                                            |
+| `/resume [session]`       | Resume theo ID/name. Alias `/continue`                                                                       |
+| `/rename [name]`          | Đặt tên session (auto-gen nếu để trống)                                                                      |
+| `/exit`                   | Thoát CLI. Alias `/quit`                                                                                     |
+| `/desktop`                | Continue trong Desktop app (macOS/Windows). Alias `/app`                                                     |
+| `/teleport`               | Pull web session vào terminal. Alias `/tp`                                                                   |
+| `/copy [N]`               | Copy response thứ N gần nhất (mặc định 1)                                                                    |
+| `/export [filename]`      | Export conversation thành plain text                                                                         |
 
 ### 3.2 Memory & rules
 | Lệnh      | Mục đích                                                                 |
@@ -354,27 +354,27 @@
 | `/init`   | Tạo CLAUDE.md cho project (`CLAUDE_CODE_NEW_INIT=1` để interactive flow) |
 
 ### 3.3 Cấu hình
-| Lệnh                 | Mục đích                                                                                              |
-| -------------------- | ----------------------------------------------------------------------------------------------------- |
-| `/config`            | Settings UI (theme, model, output style…). Alias `/settings`                                          |
-| `/permissions`       | Sửa allow/ask/deny rule. Alias `/allowed-tools`                                                       |
-| `/hooks`             | Xem hook configurations                                                                               |
-| `/mcp`               | Manage MCP server, OAuth                                                                              |
-| `/skills`            | List skill có sẵn                                                                                     |
-| `/agents`            | Manage subagent (interactive create/edit)                                                             |
-| `/model [model]`     | Đổi model. Mũi tên trái/phải để adjust effort                                                         |
-| `/effort [level]`    | `low`/`medium`/`high`/`xhigh`/`max`/`auto`. `low`/`medium`/`high`/`xhigh` persist; `max` session-only |
-| `/output-style`      | Đổi output style                                                                                      |
-| `/output-style:new`  | Tạo style mới với Claude help                                                                         |
-| `/keybindings`       | Sửa keybindings                                                                                       |
-| `/terminal-setup`    | Cấu hình Shift+Enter cho terminal                                                                     |
-| `/sandbox`           | Toggle sandbox mode                                                                                   |
-| `/theme`             | Đổi color theme                                                                                       |
-| `/color [name\|hex]` | Set màu prompt bar                                                                                    |
-| `/statusline`        | Cấu hình status line                                                                                  |
-| `/fast [on\|off]`    | Toggle fast mode (chỉ Opus 4.6, giá 2.5× standard)                                                    |
-| `/voice`             | Toggle voice dictation                                                                                |
-| `/privacy-settings`  | View/update privacy (Pro/Max)                                                                         |
+| Lệnh                      | Mục đích                                                                                              |
+| ------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `/config`                 | Settings UI (theme, model, output style…). Alias `/settings`                                          |
+| `/permissions`            | Sửa allow/ask/deny rule. Alias `/allowed-tools`                                                       |
+| `/hooks`                  | Xem hook configurations                                                                               |
+| `/mcp`                    | Manage MCP server, OAuth                                                                              |
+| `/skills`                 | List skill có sẵn                                                                                     |
+| `/agents`                 | Manage subagent (interactive create/edit)                                                             |
+| `/model [model]`          | Đổi model. Mũi tên trái/phải để adjust effort                                                         |
+| `/effort [level]`         | `low`/`medium`/`high`/`xhigh`/`max`/`auto`. `low`/`medium`/`high`/`xhigh` persist; `max` session-only |
+| `/output-style`           | Đổi output style                                                                                      |
+| `/output-style:new`       | Tạo style mới với Claude help                                                                         |
+| `/keybindings`            | Sửa keybindings                                                                                       |
+| `/terminal-setup`         | Cấu hình Shift+Enter cho terminal                                                                     |
+| `/sandbox`                | Toggle sandbox mode                                                                                   |
+| `/theme`                  | Đổi color theme                                                                                       |
+| `/color [name\|hex]`      | Set màu prompt bar                                                                                    |
+| `/statusline`             | Cấu hình status line                                                                                  |
+| `/fast [on\|off]`         | Toggle fast mode (chỉ Opus 4.6, tốc độ 2.5× nhanh hơn, giá $30/$150 per MTok ≈ 6× standard)           |
+| `/voice [hold\|tap\|off]` | Toggle voice dictation, hoặc enable theo mode. Requires Claude.ai account                             |
+| `/privacy-settings`       | View/update privacy (Pro/Max)                                                                         |
 
 ### 3.4 Plan & workflow
 | Lệnh                  | Mục đích                                  |
@@ -408,15 +408,13 @@
 | `/setup-vertex`           | Cấu hình Google Vertex AI                                |
 
 ### 3.7 Tasks & monitoring
-| Lệnh        | Mục đích                                         |
-| ----------- | ------------------------------------------------ |
-| `/tasks`    | List/manage background tasks. Alias `/bashes`    |
-| `/diff`     | Interactive diff viewer (uncommitted + per-turn) |
-| `/cost`     | Token usage statistics                           |
-| `/usage`    | Plan limit + rate limit                          |
-| `/stats`    | Daily usage, sessions, streaks                   |
-| `/status`   | Settings (Status tab)                            |
-| `/insights` | Report sessions, friction patterns               |
+| Lệnh        | Mục đích                                                                             |
+| ----------- | ------------------------------------------------------------------------------------ |
+| `/tasks`    | List/manage background tasks. Alias `/bashes`                                        |
+| `/diff`     | Interactive diff viewer (uncommitted + per-turn)                                     |
+| `/usage`    | Session cost, plan limits, activity stats. Aliases: `/cost`, `/stats` (mở Stats tab) |
+| `/status`   | Settings (Status tab)                                                                |
+| `/insights` | Report sessions, friction patterns                                                   |
 
 ### 3.8 Plugin
 | Lệnh              | Mục đích                    |
@@ -473,15 +471,15 @@ MCP server có thể expose prompt thành command: `/mcp__<server>__<prompt>`.
 | `Ctrl+D` | Logout / exit             |
 
 ### 4.2 Soạn message
-| Phím                                  | Tác dụng                                 |
-| ------------------------------------- | ---------------------------------------- |
-| `Shift+Enter` (sau `/terminal-setup`) | Newline                                  |
-| `\` + `Enter`                         | Newline (universal fallback)             |
-| `Ctrl+J`                              | Insert newline                           |
-| `Option+Enter` (macOS)                | Newline                                  |
-| `Ctrl+G`                              | Mở `$EDITOR` để soạn message dài         |
-| `Ctrl+V`                              | Paste image từ clipboard (KHÔNG `Cmd+V`) |
-| `Shift+drag`                          | Drag file vào input                      |
+| Phím                                            | Tác dụng                                          |
+| ----------------------------------------------- | ------------------------------------------------- |
+| `Shift+Enter` (sau `/terminal-setup`)           | Newline                                           |
+| `\` + `Enter`                                   | Newline (universal fallback)                      |
+| `Ctrl+J`                                        | Insert newline                                    |
+| `Option+Enter` (macOS)                          | Newline                                           |
+| `Ctrl+G`                                        | Mở `$EDITOR` để soạn message dài                  |
+| `Ctrl+V` / `Cmd+V` (iTerm2) / `Alt+V` (Windows) | Paste image từ clipboard — chèn `[Image #N]` chip |
+| `Shift+drag`                                    | Drag file vào input                               |
 
 ### 4.3 Modes (Shift+Tab cycle)
 | Mode                                                                 | Mô tả                   |
@@ -820,7 +818,7 @@ keep-coding-instructions: true        # default: false; true → giữ default c
     "ask":     ["Bash(git push:*)", "Edit(**)"],
     "deny":    ["Bash(rm -rf /*)", "Read(.env)"],
     "additionalDirectories": ["~/shared-libs"],  // Thêm dir vào allowlist (ngoài cwd)
-    "disableBypassPermissionsMode": false       // (managed) chặn user bật bypass
+    "disableBypassPermissionsMode": "disable"    // (managed) value `"disable"` string (không phải boolean) — chặn user bật bypass
   },
 
   "hooks": {
