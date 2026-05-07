@@ -1332,61 +1332,143 @@ Cách xử lý:
 
 ## 20. Tài liệu chính thức
 
-### Anthropic docs
+### Setup & onboarding
 - Overview: <https://code.claude.com/docs/en/overview>
+- Quickstart: <https://code.claude.com/docs/en/quickstart>
+- How Claude Code works: <https://code.claude.com/docs/en/how-claude-code-works>
+- Features overview: <https://code.claude.com/docs/en/features-overview>
+- Platforms: <https://code.claude.com/docs/en/platforms>
+- Setup: <https://code.claude.com/docs/en/setup>
+- `.claude` directory: <https://code.claude.com/docs/en/claude-directory>
 - Best practices: <https://code.claude.com/docs/en/best-practices>
+
+### Memory & context
 - Memory: <https://code.claude.com/docs/en/memory>
+- Checkpointing: <https://code.claude.com/docs/en/checkpointing>
+- Manage sessions: <https://code.claude.com/docs/en/sessions>
+- Reduce token usage: <https://code.claude.com/docs/en/costs#reduce-token-usage>
+- Context window (platform API): <https://platform.claude.com/docs/en/build-with-claude/context-windows>
+- Prompt caching (platform): <https://platform.claude.com/docs/en/build-with-claude/prompt-caching>
+
+### Models, effort & fast mode
+- Model config & effort: <https://code.claude.com/docs/en/model-config>
+- Models overview (platform): <https://platform.claude.com/docs/en/about-claude/models/overview>
+- Fast mode: <https://code.claude.com/docs/en/fast-mode>
+
+### Skills, subagents & output styles
 - Skills: <https://code.claude.com/docs/en/skills>
 - Subagents: <https://code.claude.com/docs/en/sub-agents>
+- Agent teams: <https://code.claude.com/docs/en/agent-teams>
+- Output styles: <https://code.claude.com/docs/en/output-styles>
+
+### Hooks, permissions & sandboxing
 - Hooks: <https://code.claude.com/docs/en/hooks>
 - Hooks guide: <https://code.claude.com/docs/en/hooks-guide>
-- Settings: <https://code.claude.com/docs/en/settings>
 - Permissions: <https://code.claude.com/docs/en/permissions>
-- Output styles: <https://code.claude.com/docs/en/output-styles>
-- Model config & effort: <https://code.claude.com/docs/en/model-config>
-- Prompt caching (platform): <https://platform.claude.com/docs/en/build-with-claude/prompt-caching>
-- Models overview (platform): <https://platform.claude.com/docs/en/about-claude/models/overview>
-- MCP: <https://code.claude.com/docs/en/mcp>
+- Permission modes: <https://code.claude.com/docs/en/permission-modes>
+- Sandboxing: <https://code.claude.com/docs/en/sandboxing>
+- Auto mode config: <https://code.claude.com/docs/en/auto-mode-config>
+
+### Configuration
+- Settings: <https://code.claude.com/docs/en/settings>
+- Environment variables: <https://code.claude.com/docs/en/env-vars>
+- Keybindings: <https://code.claude.com/docs/en/keybindings>
+- Statusline: <https://code.claude.com/docs/en/statusline>
+- Terminal config: <https://code.claude.com/docs/en/terminal-config>
+- Network config: <https://code.claude.com/docs/en/network-config>
+- LLM gateway: <https://code.claude.com/docs/en/llm-gateway>
+
+### Commands & CLI
 - CLI reference: <https://code.claude.com/docs/en/cli-reference>
 - Commands reference: <https://code.claude.com/docs/en/commands>
-- Environment variables: <https://code.claude.com/docs/en/env-vars>
 - Tools reference: <https://code.claude.com/docs/en/tools-reference>
 - Interactive mode: <https://code.claude.com/docs/en/interactive-mode>
-- Checkpointing: <https://code.claude.com/docs/en/checkpointing>
-- Reduce token usage: <https://code.claude.com/docs/en/costs#reduce-token-usage>
-- How Claude Code works: <https://code.claude.com/docs/en/how-claude-code-works>
-- Manage sessions: <https://code.claude.com/docs/en/sessions>
-- Plugins reference: <https://code.claude.com/docs/en/plugins-reference>
-- Agent SDK: <https://code.claude.com/docs/en/agent-sdk/overview>
-- Slash commands SDK: <https://code.claude.com/docs/en/agent-sdk/slash-commands>
-- `.claude` directory: <https://code.claude.com/docs/en/claude-directory>
-- Auto mode config: <https://code.claude.com/docs/en/auto-mode-config>
-- Permission modes: <https://code.claude.com/docs/en/permission-modes>
+- Voice dictation: <https://code.claude.com/docs/en/voice-dictation>
+- Fullscreen rendering: <https://code.claude.com/docs/en/fullscreen>
 - Common workflows: <https://code.claude.com/docs/en/common-workflows>
 - Ultraplan: <https://code.claude.com/docs/en/ultraplan>
 - Ultrareview: <https://code.claude.com/docs/en/ultrareview>
 - Routines: <https://code.claude.com/docs/en/routines>
-- Agent teams: <https://code.claude.com/docs/en/agent-teams>
+- Code review: <https://code.claude.com/docs/en/code-review>
+
+### MCP & plugins
+- MCP: <https://code.claude.com/docs/en/mcp>
+- Plugins: <https://code.claude.com/docs/en/plugins>
+- Plugins reference: <https://code.claude.com/docs/en/plugins-reference>
+- Discover plugins: <https://code.claude.com/docs/en/discover-plugins>
+- Plugin marketplaces: <https://code.claude.com/docs/en/plugin-marketplaces>
 - Channels: <https://code.claude.com/docs/en/channels>
-- Fast mode: <https://code.claude.com/docs/en/fast-mode>
+- Channels reference: <https://code.claude.com/docs/en/channels-reference>
+
+### Cloud, web & UI
 - Desktop app: <https://code.claude.com/docs/en/desktop>
+- Desktop quickstart: <https://code.claude.com/docs/en/desktop-quickstart>
 - Claude Code on the web: <https://code.claude.com/docs/en/claude-code-on-the-web>
+- Web quickstart: <https://code.claude.com/docs/en/web-quickstart>
 - Remote control: <https://code.claude.com/docs/en/remote-control>
 - Computer use (CLI): <https://code.claude.com/docs/en/computer-use>
-- Keybindings: <https://code.claude.com/docs/en/keybindings>
-- Voice dictation: <https://code.claude.com/docs/en/voice-dictation>
-- Fullscreen rendering: <https://code.claude.com/docs/en/fullscreen>
-- Sandboxing: <https://code.claude.com/docs/en/sandboxing>
-- Plugins: <https://code.claude.com/docs/en/plugins>
+- Chrome (beta): <https://code.claude.com/docs/en/chrome>
+- Slack: <https://code.claude.com/docs/en/slack>
 - Scheduled tasks: <https://code.claude.com/docs/en/scheduled-tasks>
+- Desktop scheduled tasks: <https://code.claude.com/docs/en/desktop-scheduled-tasks>
+- Web scheduled tasks: <https://code.claude.com/docs/en/web-scheduled-tasks>
+
+### IDE integration
+- VS Code: <https://code.claude.com/docs/en/vs-code>
+- JetBrains: <https://code.claude.com/docs/en/jetbrains>
+
+### CI/CD & deployment
+- GitHub Actions: <https://code.claude.com/docs/en/github-actions>
+- GitHub Enterprise Server: <https://code.claude.com/docs/en/github-enterprise-server>
+- GitLab CI/CD: <https://code.claude.com/docs/en/gitlab-ci-cd>
+- Devcontainer: <https://code.claude.com/docs/en/devcontainer>
+- Headless: <https://code.claude.com/docs/en/headless>
+
+### Cloud providers
+- Amazon Bedrock: <https://code.claude.com/docs/en/amazon-bedrock>
+- Google Vertex AI: <https://code.claude.com/docs/en/google-vertex-ai>
+- Microsoft Foundry: <https://code.claude.com/docs/en/microsoft-foundry>
+
+### SDK
+- Agent SDK overview: <https://code.claude.com/docs/en/agent-sdk/overview>
+- Slash commands SDK: <https://code.claude.com/docs/en/agent-sdk/slash-commands>
+
+### Enterprise & admin
+- Admin setup: <https://code.claude.com/docs/en/admin-setup>
+- Authentication: <https://code.claude.com/docs/en/authentication>
+- Analytics: <https://code.claude.com/docs/en/analytics>
+- Manage costs: <https://code.claude.com/docs/en/costs>
+- Monitoring usage: <https://code.claude.com/docs/en/monitoring-usage>
+- Server-managed settings: <https://code.claude.com/docs/en/server-managed-settings>
+- Third-party integrations: <https://code.claude.com/docs/en/third-party-integrations>
+- Code review (CI integration): <https://code.claude.com/docs/en/code-review>
+
+### Security & compliance
+- Security: <https://code.claude.com/docs/en/security>
+- Zero data retention: <https://code.claude.com/docs/en/zero-data-retention>
+- Data usage: <https://code.claude.com/docs/en/data-usage>
+- Legal and compliance: <https://code.claude.com/docs/en/legal-and-compliance>
+
+### Troubleshooting & errors
+- Errors reference: <https://code.claude.com/docs/en/errors>
+- Troubleshooting: <https://code.claude.com/docs/en/troubleshooting>
+- Troubleshoot install: <https://code.claude.com/docs/en/troubleshoot-install>
+
+### Manage Claude (platform API)
+- Rate limits API: <https://platform.claude.com/docs/en/manage-claude/rate-limits-api>
+- Usage cost API: <https://platform.claude.com/docs/en/manage-claude/usage-cost-api>
+- Claude Code analytics API: <https://platform.claude.com/docs/en/manage-claude/claude-code-analytics-api>
+
+### Index & release notes
 - Changelog: <https://code.claude.com/docs/en/changelog>
 - What's new: <https://code.claude.com/docs/en/whats-new/index>
-- Errors reference: <https://code.claude.com/docs/en/errors>
-- LLM-friendly index: <https://code.claude.com/docs/llms.txt>
-- Context window — Anthropic API: <https://platform.claude.com/docs/en/build-with-claude/context-windows>
+- LLM-friendly index (Claude Code): <https://code.claude.com/docs/llms.txt>
+- LLM-friendly index (platform): <https://docs.anthropic.com/llms.txt>
+
+### Blogs & engineering writing
 - Engineering blog: <https://www.anthropic.com/engineering>
 - Session management blog: <https://claude.com/blog/using-claude-code-session-management-and-1m-context>
-- Prompting best practices: <https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices>
+- Prompting best practices (platform): <https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices>
 
 ### Cộng đồng tham khảo
 
