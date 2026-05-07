@@ -27,7 +27,7 @@
    - [3.7 Tasks & monitoring](#37-tasks--monitoring)
    - [3.8 Plugin](#38-plugin)
    - [3.9 Khác](#39-khác)
-   - [3.10 Thêm lệnh mới (v2.1.83+)](#310-thêm-lệnh-mới-v2183)
+   - [3.10 Thêm lệnh mới (v2.1+)](#310-thêm-lệnh-mới-v21)
    - [3.11 Đã loại bỏ / deprecated](#311-đã-loại-bỏ--deprecated)
    - [3.12 MCP prompts](#312-mcp-prompts)
 4. [Phím tắt](#4-phím-tắt)
@@ -38,7 +38,7 @@
    - [4.5 Khác](#45-khác)
    - [4.6 Transcript viewer (khi `Ctrl+O` mở)](#46-transcript-viewer-khi-ctrlo-mở)
 5. [Prefix message](#5-prefix-trong-message)
-   - [5.1 Tính năng input mới (v2.1.83+)](#51-tính-năng-input-mới-v2183)
+   - [5.1 Tính năng input mới (v2.1+)](#51-tính-năng-input-mới-v21)
 6. [Magic words & effort levels](#6-magic-words--effort-levels)
    - [6.1 Magic words trong prompt](#61-magic-words-trong-prompt)
    - [6.2 `/effort` levels (chính thức 2026)](#62-effort-levels-chính-thức-2026)
@@ -49,7 +49,7 @@
    - [7.4 Session memory (auto, đọc-only)](#74-session-memory-auto-đọc-only)
 8. [SKILL.md frontmatter](#8-skillmd-frontmatter)
 9. [Subagent frontmatter](#9-subagent-frontmatter)
-   - [9.1 Agent teams (experimental, v2.1.32+)](#91-agent-teams-experimental-v2132)
+   - [9.1 Agent teams (experimental, v2.1+)](#91-agent-teams-experimental-v21)
 10. [Output styles](#10-output-styles-built-in)
 11. [settings.json — keys hay dùng](#11-settingsjson--keys-hay-dùng)
    - [11.1 Permission rule syntax](#111-permission-rule-syntax)
@@ -416,7 +416,7 @@
 | `/ide`               | Manage IDE integrations                                    |
 | `/chrome`            | Cấu hình Claude in Chrome                                  |
 
-### 3.10 Thêm lệnh mới (v2.1.83+)
+### 3.10 Thêm lệnh mới (v2.1+)
 | Lệnh                         | Mục đích                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------ |
 | `/add-dir <path>`            | Thêm thư mục làm việc cho session hiện tại                               |
@@ -497,7 +497,7 @@ MCP server có thể expose prompt thành command: `/mcp__<server>__<prompt>`.
 | Phím        | Tác dụng                                         |
 | ----------- | ------------------------------------------------ |
 | `[`         | Ghi conversation vào scrollback (dùng Cmd+F tìm) |
-| `/`         | Search trong transcript (v2.1.83+)               |
+| `/`         | Search trong transcript (v2.1+)               |
 | `v`         | Mở trong `$VISUAL`/`$EDITOR`                     |
 | `q` / `Esc` | Thoát viewer                                     |
 
@@ -514,7 +514,7 @@ MCP server có thể expose prompt thành command: `/mcp__<server>__<prompt>`.
 | `#<note>`       | Save vào memory (deprecated v2.1+, dùng `/memory`) |
 | `&<task>`       | Background task trên Cloud Code (Pro/Max)          |
 
-### 5.1 Tính năng input mới (v2.1.83+)
+### 5.1 Tính năng input mới (v2.1+)
 
 - **Shell mode**: gõ `!` ở đầu prompt → chạy lệnh trực tiếp, real-time output, không cần Claude approve. `Ctrl+B` để background. `Escape`/`Backspace` thoát.
 - **Prompt suggestions**: gợi ý xám xuất hiện sau khi mở session hoặc Claude trả lời. `Tab`/`→` accept, `Enter` accept + submit. Tắt: `CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=false` hoặc `/config`.
@@ -681,7 +681,7 @@ Lưu ý:
 - Khi `isolation: worktree`, subagent chạy trong git worktree riêng → không ảnh hưởng main working tree.
 - Model override chỉ áp dụng trong turn đó, không lưu vào settings.
 
-### 9.1 Agent teams (experimental, v2.1.32+)
+### 9.1 Agent teams (experimental, v2.1+)
 
 Khác subagent (chỉ report về main agent), agent teams cho phép multiple teammates chạy parallel **trong cùng session**, communicate trực tiếp với nhau qua shared task list + mailbox. Use case: parallel review, debugging với competing hypotheses, cross-layer coordination.
 
@@ -884,7 +884,7 @@ keep-coding-instructions: true        # default: false; true → giữ default c
 
   // Proxy & network
   "skipWebFetchPreflight": false,      // true = skip WebFetch domain safety check
-  "disableRemoteControl": false,       // (v2.1.128+) tắt Remote Control feature từ claude.ai/app
+  "disableRemoteControl": false,       // (v2.1+) tắt Remote Control feature từ claude.ai/app
 
   // Hook safety (managed-only)
   "disableAllHooks": false,             // Tắt mọi hook (debug)
@@ -924,7 +924,7 @@ keep-coding-instructions: true        # default: false; true → giữ default c
 
 **Evaluation order** (first match wins): `deny` → `ask` → `allow` → default.
 
-> **Note**: `Task` tool đã rename thành `Agent` từ v2.1.63. `Task(...)` rules cũ vẫn work như alias, nhưng nên dùng tên mới `Agent(<type>)`.
+> **Note**: `Task` tool đã rename thành `Agent` (rename trong v2.1.x). `Task(...)` rules cũ vẫn work như alias, nhưng nên dùng tên mới `Agent(<type>)`.
 
 Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Process wrapper (`timeout`, `time`, `nice`, `nohup`, `stdbuf`, `xargs`) tự strip khi match.
 
