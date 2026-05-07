@@ -210,7 +210,7 @@
 | `/skills` | List skill có sẵn |
 | `/agents` | Manage subagent (interactive create/edit) |
 | `/model [model]` | Đổi model. Mũi tên trái/phải để adjust effort |
-| `/effort [level]` | `low`/`medium`/`high`/`xhigh`/`max`/`auto`. `low|medium|high` persist; `xhigh|max` session-only |
+| `/effort [level]` | `low`/`medium`/`high`/`xhigh`/`max`/`auto`. `low|medium|high|xhigh` persist; `max` session-only |
 | `/output-style` | Đổi output style |
 | `/output-style:new` | Tạo style mới với Claude help |
 | `/keybindings` | Sửa keybindings |
