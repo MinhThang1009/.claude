@@ -731,10 +731,14 @@ Khác subagent (chỉ report về main agent), agent teams cho phép multiple te
 - **Task list**: shared, file-locking khi claim → tránh race condition
 - **Mailbox**: inter-teammate messaging tự động delivery (no polling)
 
-**Display modes** (`teammateMode` setting):
-- `"auto"` (default): tmux nếu trong tmux session, ngược lại in-process
-- `"in-process"`: tất cả teammates trong main terminal (mọi terminal đều work)
-- `"tmux"`: split panes (yêu cầu tmux hoặc iTerm2 + `it2` CLI)
+**Display modes** — 2 modes chính thức (theo docs `agent-teams`):
+- **In-process**: tất cả teammates render trong main terminal (mọi terminal đều work)
+- **Split panes**: tách pane riêng cho mỗi teammate (yêu cầu tmux HOẶC iTerm2 + `it2` CLI; iTerm2 cần enable Python API trong Settings → General → Magic)
+
+**Setting `teammateMode`** — 3 values control routing logic:
+- `"auto"` (default): split panes nếu trong tmux/iTerm2, ngược lại in-process
+- `"in-process"`: force in-process
+- `"tmux"`: force split panes
 
 CLI override 1 session: `claude --teammate-mode in-process`.
 
@@ -762,7 +766,7 @@ CLI override 1 session: `claude --teammate-mode in-process`.
 - `/resume` và `/rewind` KHÔNG restore in-process teammates → nói lead spawn lại
 - Permissions set lúc spawn (inherit lead) — đổi từng teammate sau spawn được, nhưng không set per-teammate lúc spawn
 - Split panes KHÔNG support trong VS Code integrated terminal, Windows Terminal, Ghostty
-- Token cost cao: mỗi teammate là full Claude instance — recommended 3-5 teammates per team
+- Token cost cao: mỗi teammate là full Claude instance — recommended 3-5 teammates/team, 5-6 tasks/teammate
 
 **Plan-approval flow**: nếu yêu cầu teammate plan trước (vd "require plan approval"), teammate work trong read-only plan mode → submit plan → lead review (autonomously, có thể guide qua prompt vd "only approve plans with test coverage") → approve/reject → revise loop.
 
@@ -1397,7 +1401,7 @@ Bulk migration nhiều file ────────────────► 
 
 ### 17.2 Anti-pattern resume long session
 
-Theo Anthropic blog `using-claude-code-session-management-and-1m-context`:
+Theo Anthropic blog [Using Claude Code session management and 1M context](https://claude.com/blog/using-claude-code-session-management-and-1m-context):
 - Session dài tích lũy nhiều **noise > signal** (stale `ls`, file content cũ, deliberation đã đóng).
 - `--continue` kéo theo cả mớ noise đó. Model treat tất cả là current.
 - **Brief-injection**: viết 5-7 dòng (state, decisions+why, constraints, open items, next), inject vào session mới.

@@ -74,7 +74,7 @@ Triệu chứng:
 
 ## Tip dài hạn
 
-- Đặt status line custom hiển thị % context: `code.claude.com/docs/en/statusline`.
+- Đặt status line custom hiển thị % context: [code.claude.com/docs/en/statusline](https://code.claude.com/docs/en/statusline).
 - Audit `~/.claude/CLAUDE.md` định kỳ (mỗi tháng): xóa dòng không còn cần.
 - Project lớn: dùng subagent (`use a subagent to investigate ...`) để giữ main context sạch.
 - Tool output lớn (build log, JSON dump >5KB): redirect vào file thay vì dump vào chat: `npm test > /tmp/test.log 2>&1 && tail -50 /tmp/test.log`.

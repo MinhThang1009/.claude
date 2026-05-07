@@ -8,7 +8,7 @@ model: inherit
 
 # Skill: Handoff giữa các session
 
-Theo nghiên cứu của Anthropic (`claude.com/blog/using-claude-code-session-management-and-1m-context`) và kinh nghiệm cộng đồng: **resume một session dài thường tệ hơn brief-injection vào session mới** — vì resume kéo theo stale environment data (tool output cũ, file content cũ) còn brief chỉ mang quyết định và trạng thái hiện tại.
+Theo nghiên cứu của Anthropic ([Using Claude Code session management and 1M context](https://claude.com/blog/using-claude-code-session-management-and-1m-context)) và kinh nghiệm cộng đồng: **resume một session dài thường tệ hơn brief-injection vào session mới** — vì resume kéo theo stale environment data (tool output cũ, file content cũ) còn brief chỉ mang quyết định và trạng thái hiện tại.
 
 ## Tình huống áp dụng
 
