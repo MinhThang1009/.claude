@@ -528,6 +528,13 @@ tools: Read, Grep, Glob, Bash         # Optional — omit thì inherit thread to
 model: opus|sonnet|haiku|inherit      # Optional, default inherit
 isolation: worktree                   # Optional — copy isolated repo qua git worktree
 skills: [my-skill, another-skill]     # Optional — pre-load skills vào subagent
+disallowedTools: [WebFetch]           # Optional — block tools cụ thể
+maxTurns: 20                          # Optional — giới hạn số turn
+permissionMode: plan                  # Optional — default|acceptEdits|plan|auto|bypassPermissions
+memory: project                       # Optional — user|project|local
+background: false                     # Optional — true = non-blocking execution
+effort: high                          # Optional — low|medium|high|xhigh|max
+color: "#4A90D9"                      # Optional — màu hiển thị trong UI
 ---
 
 System prompt cho subagent (toàn bộ markdown body sau frontmatter).
@@ -665,6 +672,12 @@ keep-coding-instructions: true        # default: false; true → giữ default c
     "command": "~/.claude/statusline.sh"
   },
 
+  // Auth
+  "apiKeyHelper": "~/.claude/get-api-key.sh",  // Script trả về API key (thay vì hardcode)
+
+  // Proxy & network
+  "skipWebFetchPreflight": false,      // true = skip WebFetch domain safety check
+
   // Hook safety (managed-only)
   "disableAllHooks": false,             // Tắt mọi hook (debug)
   "allowManagedHooksOnly": false,       // (managed) chỉ managed hooks
@@ -721,7 +734,7 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `CLAUDE_CODE_DISABLE_THINKING` | Tắt extended thinking |
 | `CLAUDE_CODE_SHELL` | Override shell detection |
 | `CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION` | Bật/tắt prompt suggestions (default `true`) |
-| `ENABLE_TOOL_SEARCH` | MCP tool search: `auto` (default) hoặc `false` (load hết) |
+| `ENABLE_TOOL_SEARCH` | MCP tool search: `true` (always on), `auto` (>10% context), `auto:N` (custom %), `false` (load hết) |
 | `CLAUDE_CODE_MAX_TOOL_USE_CONCURRENCY` | Max parallel tool execution (default 10) |
 | `API_TIMEOUT_MS` | API timeout (default 600000 = 10 phút) |
 | `BASH_DEFAULT_TIMEOUT_MS` | Bash timeout (default 120000 = 2 phút) |
@@ -737,6 +750,16 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN` | `1` = force classic renderer |
 | `CLAUDE_CODE_SCROLL_SPEED` | Tốc độ cuộn mouse (1-20, default auto) |
 | `CLAUDE_CODE_DISABLE_MOUSE` | `1` = tắt mouse capture (giữ flicker-free, cho phép native text select) |
+| `HTTPS_PROXY` / `HTTP_PROXY` | Proxy cho network requests |
+| `NO_PROXY` | Domains bỏ qua proxy (space hoặc comma-separated) |
+| `CLAUDE_CODE_CERT_STORE` | CA cert source: `bundled` (default), `system`, `both` |
+| `NODE_EXTRA_CA_CERTS` | Path tới custom CA cert file |
+| `CLAUDE_CONFIG_DIR` | Override đường dẫn ~/.claude |
+| `CLAUDE_CODE_MAX_RETRIES` | Số lần retry khi API fail (default 10) |
+| `DISABLE_TELEMETRY` | Tắt toàn bộ telemetry/metrics |
+| `DISABLE_ERROR_REPORTING` | Tắt Sentry error reporting |
+| `DISABLE_PROMPT_CACHING` | `1` = tắt prompt caching |
+| `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` | `1` = bật agent teams (experimental) |
 
 ---
 
