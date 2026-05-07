@@ -18,15 +18,15 @@
 
 ## Injection prevention
 
-| Loại | Phòng |
-|---|---|
-| SQL injection | Prepared statement / ORM với binding |
-| Command injection | KHÔNG `eval`, KHÔNG `shell=True` ghép user input |
-| Path traversal | Resolve `path.resolve()`, check prefix trong allowed dir |
-| XSS | Escape output, dùng template engine có auto-escape |
-| SSRF | Validate URL host, allowlist domain, deny private IP range |
-| XXE | Tắt external entity trong XML parser |
-| Deserialization | KHÔNG `pickle.loads`, `unserialize`, `Marshal.load` từ untrusted source |
+| Loại              | Phòng                                                                   |
+| ----------------- | ----------------------------------------------------------------------- |
+| SQL injection     | Prepared statement / ORM với binding                                    |
+| Command injection | KHÔNG `eval`, KHÔNG `shell=True` ghép user input                        |
+| Path traversal    | Resolve `path.resolve()`, check prefix trong allowed dir                |
+| XSS               | Escape output, dùng template engine có auto-escape                      |
+| SSRF              | Validate URL host, allowlist domain, deny private IP range              |
+| XXE               | Tắt external entity trong XML parser                                    |
+| Deserialization   | KHÔNG `pickle.loads`, `unserialize`, `Marshal.load` từ untrusted source |
 
 ## Crypto
 

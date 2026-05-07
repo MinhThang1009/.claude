@@ -142,16 +142,16 @@ User hỏi "review kiến trúc / code này có ổn không":
 
 Khi đối diện trade-off, dùng các trục:
 
-| Trục | Cực 1 | Cực 2 |
-|------|-------|-------|
-| Time | Quyết nhanh | Quyết kỹ |
-| Cost | Build | Buy |
-| Coupling | Monolith | Microservices |
-| Consistency | Strong | Eventual |
-| Sync | Sync RPC | Async messaging |
-| Storage | Normalize | Denormalize |
-| Latency | Cache aggressively | Always fresh |
-| Generality | Generic/configurable | Specific/hardcoded |
+| Trục        | Cực 1                | Cực 2              |
+| ----------- | -------------------- | ------------------ |
+| Time        | Quyết nhanh          | Quyết kỹ           |
+| Cost        | Build                | Buy                |
+| Coupling    | Monolith             | Microservices      |
+| Consistency | Strong               | Eventual           |
+| Sync        | Sync RPC             | Async messaging    |
+| Storage     | Normalize            | Denormalize        |
+| Latency     | Cache aggressively   | Always fresh       |
+| Generality  | Generic/configurable | Specific/hardcoded |
 
 Đặt câu hỏi: "Chúng ta đang ở đâu trên trục này, và TẠI SAO chỗ đó?"
 

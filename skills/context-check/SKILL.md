@@ -23,25 +23,25 @@ Sau khi user gửi output `/context`, tôi phân tích.
 
 ### Bước 2 — Phân tích theo ngưỡng
 
-| % context | Trạng thái | Hành động đề xuất |
-|---|---|---|
-| <30% | 🟢 Sạch | Tiếp tục bình thường |
-| 30-50% | 🟢 Tốt | Tiếp tục, để ý task lớn sắp tới |
-| 50-70% | 🟡 Cần để ý | Nếu sắp xong 1 phase → `/compact` luôn. Nếu task mới → cân nhắc `/clear` |
-| 70-85% | 🟠 Hành động ngay | `/handoff` → `/compact <brief>` HOẶC `/clear` + brief mới |
-| >85% | 🔴 Nguy hiểm | DỪNG mọi task lớn. Brief + new session ngay |
+| % context | Trạng thái        | Hành động đề xuất                                                        |
+| --------- | ----------------- | ------------------------------------------------------------------------ |
+| <30%      | 🟢 Sạch           | Tiếp tục bình thường                                                     |
+| 30-50%    | 🟢 Tốt            | Tiếp tục, để ý task lớn sắp tới                                          |
+| 50-70%    | 🟡 Cần để ý       | Nếu sắp xong 1 phase → `/compact` luôn. Nếu task mới → cân nhắc `/clear` |
+| 70-85%    | 🟠 Hành động ngay | `/handoff` → `/compact <brief>` HOẶC `/clear` + brief mới                |
+| >85%      | 🔴 Nguy hiểm      | DỪNG mọi task lớn. Brief + new session ngay                              |
 
 ### Bước 3 — Phân tích từng nhóm
 
 `/context` chia output theo nhóm (system, memory/CLAUDE.md, skills, MCP tools, conversation, file content). Tôi tìm thủ phạm:
 
-| Nhóm chiếm nhiều | Nguyên nhân | Cách giảm |
-|---|---|---|
-| Memory (CLAUDE.md + rules) >10% | CLAUDE.md / rules quá dài | Prune lại, tách phần ít dùng vào REFERENCE.md |
-| MCP tools >15% | Bật quá nhiều MCP server không dùng | `claude mcp` list rồi disable cái không cần cho phiên này |
-| Skill descriptions >5% | Quá nhiều skill auto-discover | Set `disable-model-invocation: true` cho skill ít dùng |
-| Conversation history >40% | Nhiều tool output / dead-end | `/compact` ngay |
-| File content >25% | Đã `@` quá nhiều file lớn | `/clear` + chỉ ref file cần thiết |
+| Nhóm chiếm nhiều                | Nguyên nhân                         | Cách giảm                                                 |
+| ------------------------------- | ----------------------------------- | --------------------------------------------------------- |
+| Memory (CLAUDE.md + rules) >10% | CLAUDE.md / rules quá dài           | Prune lại, tách phần ít dùng vào REFERENCE.md             |
+| MCP tools >15%                  | Bật quá nhiều MCP server không dùng | `claude mcp` list rồi disable cái không cần cho phiên này |
+| Skill descriptions >5%          | Quá nhiều skill auto-discover       | Set `disable-model-invocation: true` cho skill ít dùng    |
+| Conversation history >40%       | Nhiều tool output / dead-end        | `/compact` ngay                                           |
+| File content >25%               | Đã `@` quá nhiều file lớn           | `/clear` + chỉ ref file cần thiết                         |
 
 ### Bước 4 — Đề xuất hành động
 
@@ -52,12 +52,12 @@ Ví dụ output của tôi:
 
 ## Khi nào nên `/clear` thay vì `/compact`
 
-| Dùng `/compact` khi | Dùng `/clear` khi |
-|---|---|
-| Đang giữa 1 task, cần giữ thread | Hoàn thành 1 task, chuyển task khác hẳn |
-| Quyết định và file path quan trọng cần survive | Không cần lịch sử |
-| Context 50-80% | Context >85% hoặc đã rối |
-| Nhiều dead-end debugging cần dọn | Đã commit xong, sang feature mới |
+| Dùng `/compact` khi                            | Dùng `/clear` khi                       |
+| ---------------------------------------------- | --------------------------------------- |
+| Đang giữa 1 task, cần giữ thread               | Hoàn thành 1 task, chuyển task khác hẳn |
+| Quyết định và file path quan trọng cần survive | Không cần lịch sử                       |
+| Context 50-80%                                 | Context >85% hoặc đã rối                |
+| Nhiều dead-end debugging cần dọn               | Đã commit xong, sang feature mới        |
 
 **Nguyên tắc vàng**: `/compact` = nén, `/clear` = xóa hẳn. Nhầm `/clear` với `/compact` = mất context phải re-explain. Nhầm `/compact` với `/clear` = giữ rác cho task mới.
 

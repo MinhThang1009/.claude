@@ -1,6 +1,6 @@
 # Bộ cấu hình Global cho Claude Code (`~/.claude/`)
 
-> Tổng hợp từ tài liệu chính thức Anthropic (`code.claude.com`, `platform.claude.com`), Engineering Blog, blog `claude.com`, MindStudio, ClaudeFast, và best practices cộng đồng GitHub. Áp dụng MỌI project. Tối ưu cho **dev người Việt** — tiếng Việt cho comment/log/commit, tiếng Anh chuẩn convention cho identifier.
+> Tổng hợp từ tài liệu chính thức Anthropic ([code.claude.com](https://code.claude.com/docs), [platform.claude.com](https://platform.claude.com/docs)), [Engineering Blog](https://www.anthropic.com/engineering), [blog claude.com](https://www.claude.com/blog), [MindStudio](https://www.mindstudio.ai/blog), [ClaudeFast](https://claudefa.st/blog), và best practices cộng đồng GitHub. Áp dụng MỌI project. Tối ưu cho **dev người Việt** — tiếng Việt cho comment/log/commit, tiếng Anh chuẩn convention cho identifier.
 
 ## 1. Cấu trúc thư mục sau khi cài
 
@@ -106,15 +106,15 @@ Sau đó sửa `CLAUDE.md` mô tả: tech stack, lệnh build/test/lint, convent
 
 ## 3. File nào KHÔNG đặt ở `~/.claude/` global
 
-| File | Vị trí đúng | Lý do |
-|------|-------------|-------|
-| `CLAUDE.md` (project) | `<project>/CLAUDE.md` | Context riêng từng repo, COMMIT |
-| `CLAUDE.local.md` | `<project>/CLAUDE.local.md` | Note cá nhân, **GITIGNORE** |
-| `.mcp.json` (team) | `<project>/.mcp.json` | MCP team-share, COMMIT |
-| `.claudeignore` | `<project>/.claudeignore` | File Claude bỏ qua, COMMIT |
-| `settings.local.json` | `<project>/.claude/settings.local.json` | Override cá nhân, GITIGNORE |
-| `HANDOFF.md` | `<project>/.claude/HANDOFF.md` | Brief chuyển session, GITIGNORE |
-| `managed-settings.json` | OS path | Chỉ admin enterprise |
+| File                    | Vị trí đúng                             | Lý do                           |
+| ----------------------- | --------------------------------------- | ------------------------------- |
+| `CLAUDE.md` (project)   | `<project>/CLAUDE.md`                   | Context riêng từng repo, COMMIT |
+| `CLAUDE.local.md`       | `<project>/CLAUDE.local.md`             | Note cá nhân, **GITIGNORE**     |
+| `.mcp.json` (team)      | `<project>/.mcp.json`                   | MCP team-share, COMMIT          |
+| `.claudeignore`         | `<project>/.claudeignore`               | File Claude bỏ qua, COMMIT      |
+| `settings.local.json`   | `<project>/.claude/settings.local.json` | Override cá nhân, GITIGNORE     |
+| `HANDOFF.md`            | `<project>/.claude/HANDOFF.md`          | Brief chuyển session, GITIGNORE |
+| `managed-settings.json` | OS path                                 | Chỉ admin enterprise            |
 
 ## 4. Thứ tự ưu tiên (precedence)
 
@@ -131,16 +131,16 @@ Cao → thấp khi xung đột:
 
 ## 5. Triết lý sử dụng
 
-| Thứ | Khi nào dùng |
-|-----|--------------|
-| **CLAUDE.md** | Hướng dẫn cần load **MỌI session** — giữ ngắn (<100 dòng) |
-| **rules/** auto-import | Rule áp dụng MỌI session — chỉ 1-2 file thật cần |
-| **references/** | Rule theo chủ đề — `@`-reference khi cần (tiết kiệm context) |
-| **skills/** | Workflow tái sử dụng — load **ON-DEMAND** khi gọi |
-| **agents/** | Task chuyên biệt cần **context window riêng** |
-| **hooks** | Hành động **BẮT BUỘC** chạy mỗi lần (CLAUDE.md là gợi ý, hooks deterministic) |
-| **MCP** | Tool ngoài (Notion, Figma, DB, GitHub…) |
-| **`.claudeignore`** | Loại file Claude không nên đọc (build output, lockfile lớn, asset) |
+| Thứ                    | Khi nào dùng                                                                  |
+| ---------------------- | ----------------------------------------------------------------------------- |
+| **CLAUDE.md**          | Hướng dẫn cần load **MỌI session** — giữ ngắn (<100 dòng)                     |
+| **rules/** auto-import | Rule áp dụng MỌI session — chỉ 1-2 file thật cần                              |
+| **references/**        | Rule theo chủ đề — `@`-reference khi cần (tiết kiệm context)                  |
+| **skills/**            | Workflow tái sử dụng — load **ON-DEMAND** khi gọi                             |
+| **agents/**            | Task chuyên biệt cần **context window riêng**                                 |
+| **hooks**              | Hành động **BẮT BUỘC** chạy mỗi lần (CLAUDE.md là gợi ý, hooks deterministic) |
+| **MCP**                | Tool ngoài (Notion, Figma, DB, GitHub…)                                       |
+| **`.claudeignore`**    | Loại file Claude không nên đọc (build output, lockfile lớn, asset)            |
 
 **Quy tắc vàng**: Mỗi dòng trong CLAUDE.md trả lời được câu hỏi *"Nếu xóa dòng này, Claude có làm sai không?"*. Nếu KHÔNG → xóa.
 

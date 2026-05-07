@@ -41,19 +41,19 @@ Nếu user không có instruction đặc biệt → 1 commit/PR scope nhỏ thì
 
 Đọc `git diff --staged` chi tiết, suy ra:
 
-| Type | Khi nào dùng |
-|---|---|
-| `feat` | Thêm chức năng người dùng cảm nhận được |
-| `fix` | Sửa bug có ảnh hưởng đến hành vi |
-| `refactor` | Sửa code KHÔNG đổi behavior |
-| `perf` | Tối ưu performance |
-| `docs` | Chỉ docs (`*.md`, comment, JSDoc) |
-| `test` | Chỉ test |
-| `style` | Format, lint (không đổi logic) |
-| `build` | Build system, dependency |
-| `ci` | CI/CD config |
-| `chore` | Task vặt khác (rename file, dọn comment, update lockfile) |
-| `revert` | Revert commit |
+| Type       | Khi nào dùng                                              |
+| ---------- | --------------------------------------------------------- |
+| `feat`     | Thêm chức năng người dùng cảm nhận được                   |
+| `fix`      | Sửa bug có ảnh hưởng đến hành vi                          |
+| `refactor` | Sửa code KHÔNG đổi behavior                               |
+| `perf`     | Tối ưu performance                                        |
+| `docs`     | Chỉ docs (`*.md`, comment, JSDoc)                         |
+| `test`     | Chỉ test                                                  |
+| `style`    | Format, lint (không đổi logic)                            |
+| `build`    | Build system, dependency                                  |
+| `ci`       | CI/CD config                                              |
+| `chore`    | Task vặt khác (rename file, dọn comment, update lockfile) |
+| `revert`   | Revert commit                                             |
 
 `<scope>` = module/component bị ảnh hưởng (`auth`, `api`, `ui`, `db`, `parser`...). Optional nếu thay đổi rộng.
 

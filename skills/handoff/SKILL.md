@@ -14,12 +14,12 @@ Theo nghiên cứu của Anthropic (`claude.com/blog/using-claude-code-session-m
 
 ## Khi nào dùng skill này
 
-| Tình huống | Cách dùng |
-|---|---|
-| Sắp `/compact` (context >60%) — vẫn làm tiếp cùng task | `/handoff` rồi `/compact <chỉ dẫn>` |
-| Sắp `/clear` — chuyển sang task mới nhưng cần nhớ vài thứ | `/handoff --save` rồi `/clear` |
-| Bắt đầu session mới sau khi nghỉ | Mở session mới, paste handoff vào prompt đầu tiên |
-| Sau crash / session lỗi | `claude --continue` → `/handoff` để xem state |
+| Tình huống                                                | Cách dùng                                         |
+| --------------------------------------------------------- | ------------------------------------------------- |
+| Sắp `/compact` (context >60%) — vẫn làm tiếp cùng task    | `/handoff` rồi `/compact <chỉ dẫn>`               |
+| Sắp `/clear` — chuyển sang task mới nhưng cần nhớ vài thứ | `/handoff --save` rồi `/clear`                    |
+| Bắt đầu session mới sau khi nghỉ                          | Mở session mới, paste handoff vào prompt đầu tiên |
+| Sau crash / session lỗi                                   | `claude --continue` → `/handoff` để xem state     |
 
 ## Quy trình
 
