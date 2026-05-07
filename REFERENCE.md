@@ -231,7 +231,10 @@
 | Opus 4   | `claude-opus-4-0`   | 200k    | 32k        |
 
 **Ghi chú**:
-- Opus 4.7 có **adaptive thinking** mặc định (không có extended thinking riêng); Sonnet 4.6, Haiku 4.5 có cả hai.
+- **Thinking modes** (theo docs `models/overview`):
+  - Opus 4.7: chỉ adaptive (không extended thinking)
+  - Sonnet 4.6: có cả adaptive + extended
+  - Haiku 4.5: chỉ extended (không adaptive)
 - Effort levels chỉ hỗ trợ Opus 4.7, Opus 4.6, Sonnet 4.6. Model khác bỏ qua flag `--effort`.
 - 1M context: chỉ Opus 4.7/4.6, Sonnet 4.6. Append `[1m]` khi muốn dùng (vd `claude-opus-4-7[1m]`).
 - Trên Bedrock/Vertex/Foundry: alias `opus` → Opus 4.6, `sonnet` → Sonnet 4.5 (không phải latest). Pin bằng `ANTHROPIC_DEFAULT_OPUS_MODEL`/`_SONNET_MODEL` để control version.
