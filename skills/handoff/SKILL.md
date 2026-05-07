@@ -24,10 +24,10 @@ Theo nghiên cứu của Anthropic ([Using Claude Code session management and 1M
 ### Bước 1 — Kiểm tra context hiện tại
 
 ```bash
-# Người dùng tự xem qua /context. Tôi (Claude) tự đọc git để biết state code:
-!`git status --short`
-!`git log --oneline -5`
-!`git diff --stat HEAD`
+# Người dùng tự xem qua /context. Tôi (Claude) tự đọc git để biết state code (skip nếu không phải git repo):
+!`git rev-parse --git-dir >/dev/null 2>&1 && git status --short || echo "(not a git repo — skip git context)"`
+!`git rev-parse --git-dir >/dev/null 2>&1 && git log --oneline -5 || true`
+!`git rev-parse --git-dir >/dev/null 2>&1 && git diff --stat HEAD || true`
 ```
 
 ### Bước 2 — Soạn handoff brief

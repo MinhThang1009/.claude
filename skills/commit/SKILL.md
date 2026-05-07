@@ -16,9 +16,9 @@ Mục đích: tạo 1 commit chuẩn Conventional Commits với subject **tiến
 ### Bước 1 — Đọc trạng thái
 
 ```bash
-!`git status --short`
-!`git diff --stat`
-!`git log --oneline -5`
+!`git rev-parse --git-dir >/dev/null 2>&1 && git status --short || echo "(không phải git repo — không thể commit)"`
+!`git rev-parse --git-dir >/dev/null 2>&1 && git diff --stat || true`
+!`git rev-parse --git-dir >/dev/null 2>&1 && git log --oneline -5 || true`
 ```
 
 Phân loại file thành nhóm logic (ví dụ: file auth, file test, file docs). 1 commit = 1 chủ đề.
