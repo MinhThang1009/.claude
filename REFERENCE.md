@@ -126,6 +126,9 @@
 
 ## 1. Lệnh CLI
 
+> Source chính thức: [code.claude.com/docs/en/cli-reference](https://code.claude.com/docs/en/cli-reference)
+
+
 | Lệnh                                         | Mục đích                                                                                       |
 | -------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | `claude`                                     | Mở session interactive trong thư mục hiện tại                                                  |
@@ -162,6 +165,9 @@
 ---
 
 ## 2. CLI flags
+
+> Source chính thức: [code.claude.com/docs/en/cli-reference](https://code.claude.com/docs/en/cli-reference)
+
 
 ### 2.1 Khởi tạo & input
 | Flag                        | Mục đích                                                                                           |
@@ -329,6 +335,9 @@
 
 ## 3. Slash commands trong session
 
+> Source chính thức: [code.claude.com/docs/en/commands](https://code.claude.com/docs/en/commands)
+
+
 > Type `/` để xem full list, `/<letters>` để filter. `<arg>` = required, `[arg]` = optional. Marked **[Skill]** = bundled skill (Claude có thể auto-invoke).
 
 ### 3.1 Quản lý session & context
@@ -464,6 +473,9 @@ MCP server có thể expose prompt thành command: `/mcp__<server>__<prompt>`.
 
 ## 4. Phím tắt
 
+> Source chính thức: [code.claude.com/docs/en/interactive-mode](https://code.claude.com/docs/en/interactive-mode)
+
+
 ### 4.1 Điều hướng & ngắt
 | Phím     | Tác dụng                  |
 | -------- | ------------------------- |
@@ -547,6 +559,9 @@ MCP server có thể expose prompt thành command: `/mcp__<server>__<prompt>`.
 
 ## 6. Magic words & effort levels
 
+> Source chính thức: [code.claude.com/docs/en/model-config](https://code.claude.com/docs/en/model-config)
+
+
 ### 6.1 Magic words trong prompt
 
 Chỉ **`ultrathink`** được nhận diện là keyword — Claude Code thêm in-context instruction request deeper reasoning **cho turn đó**, KHÔNG đổi effort level gửi lên API. Các cụm `think`, `think hard`, `megathink`… là **plain text**, không trigger gì đặc biệt — dùng `/effort` thay.
@@ -576,6 +591,9 @@ Opus 4.7 dùng **adaptive reasoning** (thinking tùy bước, không cố địn
 ---
 
 ## 7. Cấu trúc `.claude/`
+
+> Source chính thức: [code.claude.com/docs/en/claude-directory](https://code.claude.com/docs/en/claude-directory)
+
 
 ### 7.1 Project (`<project>/`)
 ```text
@@ -635,6 +653,9 @@ managed-mcp.json                 # MCP server bắt buộc
 
 ## 8. SKILL.md frontmatter
 
+> Source chính thức: [code.claude.com/docs/en/skills](https://code.claude.com/docs/en/skills)
+
+
 ```yaml
 ---
 name: <kebab-case>                    # Optional (default = tên folder). Lowercase, số, hyphen, max 64 ký tự
@@ -683,6 +704,9 @@ ${CLAUDE_SKILL_DIR}                   # Thư mục chứa SKILL.md
 ---
 
 ## 9. Subagent frontmatter
+
+> Source chính thức: [code.claude.com/docs/en/sub-agents](https://code.claude.com/docs/en/sub-agents)
+
 
 ```yaml
 ---
@@ -778,6 +802,9 @@ CLI override 1 session: `claude --teammate-mode in-process`.
 
 ## 10. Output styles (built-in)
 
+> Source chính thức: [code.claude.com/docs/en/output-styles](https://code.claude.com/docs/en/output-styles)
+
+
 3 style mặc định (set qua `/output-style <name>` hoặc `outputStyle` trong settings):
 
 | Style         | Mô tả                                                                 | Token cost |
@@ -805,6 +832,9 @@ force-for-plugin: false               # Plugin only: true → auto-apply khi plu
 ---
 
 ## 11. settings.json — keys hay dùng
+
+> Source chính thức: [code.claude.com/docs/en/settings](https://code.claude.com/docs/en/settings)
+
 
 ```jsonc
 {
@@ -840,7 +870,7 @@ force-for-plugin: false               # Plugin only: true → auto-apply khi plu
 
   "env": {
     "MAX_THINKING_TOKENS": "0",
-    "MAX_MCP_OUTPUT_TOKENS": "10000"   // default 10k, tăng nếu cần (max 500k)
+    "MAX_MCP_OUTPUT_TOKENS": "50000"   // default 25k (docs MCP), warning threshold 10k. Set 50k+ nếu nhiều MCP tools output dài
   },
 
   // Memory / context
@@ -972,6 +1002,9 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 
 ## 12. Environment variables
 
+> Source chính thức: [code.claude.com/docs/en/env-vars](https://code.claude.com/docs/en/env-vars)
+
+
 | Var                                        | Mục đích                                                                                                                                       |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ANTHROPIC_API_KEY`                        | API key (nếu không OAuth)                                                                                                                      |
@@ -979,7 +1012,7 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `ANTHROPIC_DEFAULT_SONNET_MODEL`           | Override alias `sonnet`                                                                                                                        |
 | `ANTHROPIC_DEFAULT_HAIKU_MODEL`            | Override alias `haiku`                                                                                                                         |
 | `MAX_THINKING_TOKENS`                      | Cap thinking tokens (0 = disable)                                                                                                              |
-| `MAX_MCP_OUTPUT_TOKENS`                    | Cap MCP output (default 10k, tăng nếu cần)                                                                                                     |
+| `MAX_MCP_OUTPUT_TOKENS`                    | Cap MCP output (default **25k**, warning threshold 10k). Tools có `anthropic/maxResultSizeChars` riêng override                                |
 | `MCP_TIMEOUT`                              | Timeout MCP server start (ms)                                                                                                                  |
 | `CLAUDE_PROJECT_DIR`                       | Path project root (set tự động trong hook context, dùng trong hook script)                                                                     |
 | `CLAUDE_CODE_SESSION_ID`                   | ID session hiện tại (set trong Bash/PowerShell tool subprocesses; cũng dùng trong skill `${CLAUDE_SESSION_ID}` substitution)                   |
@@ -1055,6 +1088,9 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 ---
 
 ## 13. Hook events — đầy đủ 29 event
+
+> Source chính thức: [code.claude.com/docs/en/hooks](https://code.claude.com/docs/en/hooks)
+
 
 Hook chạy DETERMINISTIC (KHÔNG phụ thuộc Claude nhớ rule). Định nghĩa trong `settings.json`, plugin, hoặc skill/agent frontmatter.
 
@@ -1136,6 +1172,9 @@ Trong hook handler, dùng `if` (permission rule syntax):
 ---
 
 ## 14. Hook handler types (5 loại)
+
+> Source chính thức: [code.claude.com/docs/en/hooks](https://code.claude.com/docs/en/hooks)
+
 
 ```jsonc
 {
@@ -1276,6 +1315,9 @@ claude --worktree feat-auth
 ---
 
 ## 16. Quản lý context window — chi tiết
+
+> Source chính thức: [code.claude.com/docs/en/memory](https://code.claude.com/docs/en/memory) + [platform.claude.com/docs/en/build-with-claude/prompt-caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)
+
 
 ### 16.1 Tầm quan trọng
 
