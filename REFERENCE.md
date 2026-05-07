@@ -1686,6 +1686,12 @@ Cách xử lý:
 - Engineering blog: <https://www.anthropic.com/engineering>
 - Session management blog: <https://claude.com/blog/using-claude-code-session-management-and-1m-context>
 - Prompting best practices (platform): <https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices>
+- Prompt caching deep-dive: <https://claude.com/blog/lessons-from-building-claude-code-prompt-caching-is-everything>
+- Multi-agent coordination patterns: <https://claude.com/blog/multi-agent-coordination-patterns>
+- Subagents in Claude Code: <https://claude.com/blog/subagents-in-claude-code>
+- Best practices Opus 4.7 + Claude Code: <https://claude.com/blog/best-practices-for-using-claude-opus-4-7-with-claude-code>
+- Auto mode introduction: <https://claude.com/blog/auto-mode>
+- Blog index (Claude Code category): <https://claude.com/blog/category/claude-code>
 
 ### 20.20 Cộng đồng tham khảo
 
