@@ -2,7 +2,6 @@
 name: handoff
 description: Tạo handoff brief để compact session hiện tại HOẶC chuyển sang session mới. Gọi khi user nói "handoff", "chuyển session", "compact với note", "ghi lại trước khi clear", hoặc context >70%.
 allowed-tools: Read Write Bash(git status:*) Bash(git log:*) Bash(git diff:*)
-user-invocable: true
 argument-hint: "[--save | --inject]"
 model: inherit
 ---
