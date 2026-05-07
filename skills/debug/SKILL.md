@@ -1,8 +1,8 @@
 ---
 name: debug
 description: Hỗ trợ debug bug có hệ thống. Yêu cầu reproduce trước, viết failing test, rồi mới fix. Dùng khi user nói "debug", "fix bug", "lỗi này không hiểu", "sao chạy không được", hoặc gọi /debug.
-allowed-tools: Read, Grep, Glob, Bash, Edit
-argument-hint: [tùy chọn — mô tả bug]
+allowed-tools: Read Grep Glob Bash Edit
+argument-hint: "[tùy chọn — mô tả bug]"
 ---
 
 # Skill: Debug có hệ thống

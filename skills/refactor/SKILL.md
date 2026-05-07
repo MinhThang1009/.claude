@@ -1,8 +1,8 @@
 ---
 name: refactor
 description: Refactor code không thay đổi behavior. Yêu cầu có test trước, refactor từng bước nhỏ, verify sau mỗi bước. Dùng khi user nói "refactor", "tái cấu trúc", "code này khó đọc quá", hoặc gọi /refactor.
-allowed-tools: Read, Grep, Glob, Edit, Bash
-argument-hint: [đường dẫn file hoặc mô tả phạm vi]
+allowed-tools: Read Grep Glob Edit Bash
+argument-hint: "[đường dẫn file hoặc mô tả phạm vi]"
 ---
 
 # Skill: Refactor an toàn
