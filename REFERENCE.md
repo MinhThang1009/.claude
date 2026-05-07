@@ -76,6 +76,7 @@
     - [15.7 Pattern 7 — Brief-injection (long-running task)](#157-pattern-7--brief-injection-long-running-task)
     - [15.8 Pattern 8 — Bulk migration (`/batch`)](#158-pattern-8--bulk-migration-batch)
     - [15.9 Pattern 9 — Loop monitoring](#159-pattern-9--loop-monitoring)
+    - [15.10 Quyết định multi-agent vs single-agent](#1510-quyết-định-multi-agent-vs-single-agent)
 16. [Quản lý context window — chi tiết](#16-quản-lý-context-window--chi-tiết)
     - [16.1 Tầm quan trọng](#161-tầm-quan-trọng)
     - [16.2 Ngưỡng hành động](#162-ngưỡng-hành-động)
@@ -156,7 +157,11 @@
 | `claude mcp get <name>`                      | Lấy chi tiết MCP server (config, transport, scope)                                             |
 | `claude mcp serve`                           | Expose Claude Code như MCP server                                                              |
 | `claude plugin install <name>@<marketplace>` | Cài plugin từ marketplace                                                                      |
-| `claude plugin list`                         | List plugin đã cài                                                                             |
+| `claude plugin list [--json]`                | List plugin đã cài. `--json` parse được programmatic                                           |
+| `claude plugin uninstall <name> [--prune]`   | Gỡ plugin. `--prune` xóa luôn orphaned auto-installed deps                                     |
+| `claude plugin marketplace add <repo>`       | Add marketplace mới                                                                            |
+| `claude plugin tag [--push] [--dry-run]`     | (Author) Tag release `{plugin}--v{version}` theo manifest. v2.1.110+                           |
+| `claude plugin prune [--scope X] [--dry-run] [-y]` | Xóa orphaned auto-installed deps (sau khi uninstall plugin chính). v2.1.121+             |
 | `claude project purge [path]`                | Xóa local state của project (transcripts, debug log…). Flags: `--dry-run`, `-y`, `-i`, `--all` |
 | `claude remote-control`                      | Chạy server mode cho Remote Control từ claude.ai/app                                           |
 | `claude setup-token`                         | Tạo long-lived OAuth token cho CI                                                              |
@@ -359,7 +364,7 @@
 | `/exit`                   | Thoát CLI. Alias `/quit`                                                                                     |
 | `/desktop`                | Continue trong Desktop app (macOS/Windows). Alias `/app`                                                     |
 | `/teleport`               | Pull web session vào terminal. Alias `/tp`                                                                   |
-| `/copy [N]`               | Copy response thứ N gần nhất (mặc định 1)                                                                    |
+| `/copy [N]`               | Copy response thứ N gần nhất. Có code block → mở picker (Enter copy, `w` ghi ra file — hữu ích cho SSH)      |
 | `/export [filename]`      | Export conversation thành plain text                                                                         |
 
 ### 3.2 Memory & rules
@@ -375,17 +380,15 @@
 | `/permissions`            | Sửa allow/ask/deny rule. Alias `/allowed-tools`                                                       |
 | `/hooks`                  | Xem hook configurations                                                                               |
 | `/mcp`                    | Manage MCP server, OAuth                                                                              |
-| `/skills`                 | List skill có sẵn                                                                                     |
+| `/skills`                 | List skill có sẵn. `t` sort theo token count, `Space` ẩn skill khỏi Claude/`/`-menu, `Enter` save     |
 | `/agents`                 | Manage subagent (interactive create/edit)                                                             |
 | `/model [model]`          | Đổi model. Mũi tên trái/phải để adjust effort                                                         |
 | `/effort [level]`         | `low`/`medium`/`high`/`xhigh`/`max`/`auto`. `low`/`medium`/`high`/`xhigh` persist; `max` session-only |
-| `/output-style`           | Đổi output style                                                                                      |
-| `/output-style:new`       | Tạo style mới với Claude help                                                                         |
 | `/keybindings`            | Sửa keybindings                                                                                       |
 | `/terminal-setup`         | Cấu hình Shift+Enter cho terminal                                                                     |
 | `/sandbox`                | Toggle sandbox mode                                                                                   |
 | `/theme`                  | Đổi color theme                                                                                       |
-| `/color [name\|hex]`      | Set màu prompt bar                                                                                    |
+| `/color [name\|default]`  | Set màu prompt bar — 8 màu: `red`/`blue`/`green`/`yellow`/`purple`/`orange`/`pink`/`cyan`. Không arg = random |
 | `/statusline`             | Cấu hình status line                                                                                  |
 | `/fast [on\|off]`         | Toggle fast mode (chỉ Opus 4.6, tốc độ 2.5× nhanh hơn, giá $30/$150 per MTok ≈ 6× standard)           |
 | `/voice [hold\|tap\|off]` | Toggle voice dictation, hoặc enable theo mode. Requires Claude.ai account                             |
@@ -402,7 +405,7 @@
 | Lệnh                        | Mục đích                                                                            |
 | --------------------------- | ----------------------------------------------------------------------------------- |
 | `/batch <instruction>`      | **[Skill]** Orchestrate large-scale change song song qua git worktree               |
-| `/claude-api`               | **[Skill]** Load API reference cho ngôn ngữ project                                 |
+| `/claude-api [migrate\|managed-agents-onboard]` | **[Skill]** Load API reference (Py/TS/Java/Go/Ruby/C#/PHP/cURL) + Managed Agents. Auto khi code import `anthropic`/`@anthropic-ai/sdk` |
 | `/debug [description]`      | **[Skill]** Bật debug logging + troubleshoot                                        |
 | `/loop [interval] [prompt]` | **[Skill]** Chạy prompt lặp định kỳ. VD `/loop 5m check deploy`. Alias `/proactive` |
 | `/simplify [focus]`         | **[Skill]** Spawn 3 review agent, fix issue                                         |
@@ -469,6 +472,7 @@
 ### 3.11 Đã loại bỏ / deprecated
 - `/vim` — Removed v2.1.92. Dùng `/config` → Editor mode
 - `/pr-comments` — Removed v2.1.91. Hỏi Claude trực tiếp xem PR comments
+- `/output-style`, `/output-style:new` — Đổi style nay qua `/config` → Output style. Tạo custom style: file markdown trong `~/.claude/output-styles/` (user) hoặc `.claude/output-styles/` (project). Hoặc set `outputStyle` trong settings.json
 
 ### 3.12 MCP prompts
 MCP server có thể expose prompt thành command: `/mcp__<server>__<prompt>`.
@@ -531,6 +535,7 @@ MCP server có thể expose prompt thành command: `/mcp__<server>__<prompt>`.
 | `Ctrl+B`                 | Background task đang chạy (tmux user: nhấn 2 lần)      |
 | `Ctrl+L`                 | Redraw screen                                          |
 | `Ctrl+X Ctrl+K` (chord)  | Kill mọi background agent (action `chat:killAgents`)   |
+| `Ctrl+X Ctrl+E` (chord)  | Mở external editor (`$VISUAL`/`$EDITOR`) cho prompt hiện tại — match readline |
 | `Alt+T`                  | Toggle extended thinking                               |
 | `Alt+O`                  | Toggle fast mode                                       |
 | `Cmd/Ctrl+Click` PR link | Mở PR trong browser                                    |
@@ -539,7 +544,7 @@ MCP server có thể expose prompt thành command: `/mcp__<server>__<prompt>`.
 | Phím        | Tác dụng                                         |
 | ----------- | ------------------------------------------------ |
 | `[`         | Ghi conversation vào scrollback (dùng Cmd+F tìm) |
-| `/`         | Search trong transcript (v2.1+)                  |
+| `/`         | Search trong transcript (v2.1+). `n` next match, `N` previous |
 | `v`         | Mở trong `$VISUAL`/`$EDITOR`                     |
 | `q` / `Esc` | Thoát viewer                                     |
 
@@ -709,6 +714,10 @@ ${CLAUDE_SKILL_DIR}                   # Thư mục chứa SKILL.md
 **Tip giảm context**:
 - Set `disable-model-invocation: true` cho skill ít dùng → chỉ load khi user gọi explicit (description + body đều không vào context startup).
 - Skill có `disable-model-invocation: false` (default): description vào context lúc startup, body load on-demand khi Claude quyết định gọi.
+
+**Khi nào (KHÔNG) tạo skill**:
+- TẠO khi: workflow lặp lại, domain expertise, procedural knowledge cần dùng nhiều lần. SKILL.md ngắn → reference docs/scripts on-demand (progressive disclosure).
+- KHÔNG tạo cho task one-off, hoặc khi `CLAUDE.md` + slash command đủ. Tránh duplicate info giữa SKILL.md và reference files.
 
 ---
 
@@ -1127,6 +1136,7 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `CLAUDE_CODE_DISABLE_AUTO_MEMORY`          | Tắt auto memory                                                                                                                                |
 | `CLAUDE_CODE_GIT_BASH_PATH`                | Path tới Git Bash (Windows)                                                                                                                    |
 | `CLAUDE_CODE_NO_FLICKER`                   | `1` = bật fullscreen rendering mặc định                                                                                                        |
+| `CLAUDE_CODE_PERFORCE_MODE`                | `1` = Edit/Write fail trên read-only files với `p4 edit` hint thay vì silent overwrite (Perforce workflow)                                     |
 | `CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN`     | `1` = force classic renderer                                                                                                                   |
 | `CLAUDE_CODE_SCROLL_SPEED`                 | Tốc độ cuộn mouse (1-20, default auto)                                                                                                         |
 | `CLAUDE_CODE_DISABLE_MOUSE`                | `1` = tắt mouse capture (giữ flicker-free, cho phép native text select)                                                                        |
@@ -1430,7 +1440,7 @@ Exit `0` = OK. Exit `2` = block tool, stderr → Claude. Stdout JSON cho control
   "additionalContext": "...",
   "hookSpecificOutput": {
     "hookEventName": "PreToolUse",
-    "permissionDecision": "deny",
+    "permissionDecision": "deny",          // "allow" | "deny" | "defer" (defer: với `-p` non-interactive → exit `deferred_tool_use` payload, resume bằng `--resume`)
     "permissionDecisionReason": "...",
     "updatedToolOutput": "..."          // (PostToolUse v2.1.121+) replace tool output text trước khi vào context
   }
@@ -1500,6 +1510,17 @@ claude --worktree feat-auth
 ```text
 /loop 5m check if deploy finished, alert me when status changes
 ```
+
+### 15.10 Quyết định multi-agent vs single-agent
+
+Default: **single-agent**. Multi-agent (subagent / `/batch`) tốn **3-10× token** vì context duplication + coordination + summarization. Chỉ chuyển sang multi-agent khi:
+- **Context pollution**: data subtask này làm bẩn subtask khác (vd: log 2K token làm giảm khả năng analyze code)
+- **Parallelization**: subtask thực sự độc lập, latency là bottleneck
+- **Specialization**: cần toolset/permission khác nhau
+
+**Anti-pattern phải tránh**:
+- *Problem-centric decomposition* (planner → implementer → tester cùng feature) → mất context mỗi handoff. Thay bằng *context-centric* (chia theo file/module boundary).
+- *Early-victory verification*: subagent verify chỉ chạy 1-2 test, không full suite → false confidence.
 
 ---
 
@@ -1731,8 +1752,11 @@ Cách xử lý:
 | Auto-fix PR khi CI fail         | `/autofix-pr`                                            |
 | Watch external event            | `/loop <interval> <prompt>`                              |
 | Audit security trên diff        | `/security-review`                                       |
-| Mở Claude Code từ URL           | Deep link: `claude-cli://open?q=<prompt>&cwd=<path>`     |
+| Mở Claude Code từ URL           | Deep link: `claude-cli://open?q=<prompt>&cwd=<path>&repo=<owner/name>` — `q` URL-encoded (max 5K char, `%0A` line break), `cwd` absolute path, `repo` resolve qua local clone đã thấy. v2.1.91+ |
+| Mở deep link từ shell           | `open` (macOS) / `xdg-open` (Linux) / `Start-Process` (PS) / `start "" "..."` (cmd)  |
 | Tắt deep link handler           | `disableDeepLinkRegistration: "disable"` trong settings  |
+| Plugin dependency với version   | `dependencies` trong `.claude-plugin/plugin.json`: `[{ "name": "x", "version": "~2.1.0", "marketplace": "y" }]`. Cross-marketplace cần `allowCrossMarketplaceDependenciesOn` trong `marketplace.json`. v2.1.110+ |
+| Plugin executable trên Bash PATH | Đặt binary vào `bin/` ở plugin root → auto add vào PATH khi plugin enabled. Claude gọi binary như bare command từ Bash tool. v2.1.91+ |
 
 ---
 
@@ -1796,6 +1820,7 @@ Cách xử lý:
 - Ultrareview: <https://code.claude.com/docs/en/ultrareview>
 - Routines: <https://code.claude.com/docs/en/routines>
 - Code review: <https://code.claude.com/docs/en/code-review>
+- Deep links: <https://code.claude.com/docs/en/deep-links>
 
 ### 20.8 MCP & plugins
 - MCP: <https://code.claude.com/docs/en/mcp>
@@ -1803,6 +1828,7 @@ Cách xử lý:
 - Plugins reference: <https://code.claude.com/docs/en/plugins-reference>
 - Discover plugins: <https://code.claude.com/docs/en/discover-plugins>
 - Plugin marketplaces: <https://code.claude.com/docs/en/plugin-marketplaces>
+- Plugin dependencies (version constraint): <https://code.claude.com/docs/en/plugin-dependencies>
 - Channels: <https://code.claude.com/docs/en/channels>
 - Channels reference: <https://code.claude.com/docs/en/channels-reference>
 
@@ -1896,6 +1922,7 @@ Cách xử lý:
 - Errors reference: <https://code.claude.com/docs/en/errors>
 - Troubleshooting: <https://code.claude.com/docs/en/troubleshooting>
 - Troubleshoot install: <https://code.claude.com/docs/en/troubleshoot-install>
+- Debug your config: <https://code.claude.com/docs/en/debug-your-config>
 
 ### 20.17 Manage Claude (platform API)
 - Rate limits API: <https://platform.claude.com/docs/en/manage-claude/rate-limits-api>
@@ -1905,6 +1932,7 @@ Cách xử lý:
 ### 20.18 Index & release notes
 - Changelog: <https://code.claude.com/docs/en/changelog>
 - What's new: <https://code.claude.com/docs/en/whats-new/index>
+- Glossary: <https://code.claude.com/docs/en/glossary>
 - LLM-friendly index (Claude Code): <https://code.claude.com/docs/llms.txt>
 - LLM-friendly index (platform): <https://docs.anthropic.com/llms.txt>
 
@@ -1914,6 +1942,9 @@ Cách xử lý:
 - Prompting best practices (platform): <https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices>
 - Prompt caching deep-dive: <https://claude.com/blog/lessons-from-building-claude-code-prompt-caching-is-everything>
 - Multi-agent coordination patterns: <https://claude.com/blog/multi-agent-coordination-patterns>
+- Multi-agent — when & how to use: <https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them>
+- Skills design — equipping agents: <https://claude.com/blog/building-agents-with-skills-equipping-agents-for-specialized-work>
+- Harnessing Claude's intelligence (cache + tool design): <https://claude.com/blog/harnessing-claudes-intelligence>
 - Subagents in Claude Code: <https://claude.com/blog/subagents-in-claude-code>
 - Best practices Opus 4.7 + Claude Code: <https://claude.com/blog/best-practices-for-using-claude-opus-4-7-with-claude-code>
 - Auto mode introduction: <https://claude.com/blog/auto-mode>
