@@ -192,7 +192,7 @@ Cụ thể các tính năng cần:
 - ✅ v2.1.0+: skills system
 - ✅ v2.1.59+: auto memory, plan mode v2
 - ✅ v2.1.101+: skills+commands merge, output styles built-in
-- ✅ v2.2.x+: MCP tool deferred load (giảm baseline lớn)
+- ✅ v2.1.110+: MCP tool deferred load (giảm baseline lớn)
 
 ## 8. Tài liệu tham khảo
 
