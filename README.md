@@ -38,10 +38,10 @@
 ```
 
 **Triết lý baseline tokens** (token cố định mỗi session, đo bằng `/context`):
-- `CLAUDE.md` global ≈ 1,900 tokens
-- 2 rules auto-import (`communication`, `security`) ≈ 3,100 tokens
-- Skill descriptions ≈ 940 tokens, agent descriptions ≈ 470 tokens
-- **Tổng memory+skills+agents ≈ 6,400 tokens** (~0.6% Opus 1M). Cao hơn Boris Cherny ~2,500 do Vietnamese tokenize kém hiệu quả; vẫn hợp lý
+- `CLAUDE.md` global ≈ 2,300 tokens
+- 2 rules auto-import (`communication`, `security`) ≈ 3,800 tokens
+- Skill descriptions ≈ 939 tokens, agent descriptions ≈ 590 tokens
+- **Tổng memory+skills+agents ≈ 7,700 tokens** (~0.8% Opus 1M). Cao hơn Boris Cherny ~2,500 do Vietnamese tokenize kém hiệu quả (~2.3 chars/token); vẫn hợp lý
 - 2 references còn lại chỉ load khi `@`-reference → KHÔNG ăn baseline
 
 ## 2. Cài đặt
@@ -209,7 +209,7 @@ Câu hỏi thường gặp:
 A: Vì baseline context = mỗi message phải trả tiền. 4 rules = thêm ~6000 tokens × mỗi turn × cả phiên = lãng phí. Chỉ import 2 rule thực sự áp dụng MỌI turn (communication, security). Còn lại để Claude tự đọc khi cần (qua REFERENCE hoặc khi user `@`-reference).
 
 **Q: Sao không gộp REFERENCE vào CLAUDE.md?**  
-A: REFERENCE.md = ~1655 dòng, ~25k tokens. Nếu auto-load thì hết ~12% context window Sonnet 200k (hoặc ~2.5% Opus 1M) mỗi session. REFERENCE để **NGƯỜI** tra cứu (mở trên màn hình thứ 2 / web), KHÔNG để Claude đọc.
+A: REFERENCE.md = ~1655 dòng, ~117k chars → ~40k tokens (Vietnamese prose ~2.3 chars/token, code blocks/tables ~3-4 chars/token, mix ~2.9). Nếu auto-load thì hết ~20% context window Sonnet 200k (hoặc ~4% Opus 1M) mỗi session. REFERENCE để **NGƯỜI** tra cứu (mở trên màn hình thứ 2 / web), KHÔNG để Claude đọc.
 
 **Q: Sao có cả `/init-context` lẫn `/init`?**  
 A: Cũ rồi — đã bỏ `/init-context` (overlap với `/init` built-in của Claude Code v2.1+).
