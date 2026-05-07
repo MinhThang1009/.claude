@@ -80,7 +80,7 @@ Tôi viết brief **NGẮN** (5-10 dòng, ≤300 từ) theo format dưới đây
 - Session mới sẽ tự đọc khi user nói "đọc HANDOFF.md".
 
 **Nếu user chạy `/handoff --inject`** → in 1 dòng paste-ready để user paste vào session mới:
-```
+```text
 Tiếp tục từ handoff: [brief inline 5-7 dòng]. File chính: <list>. Bước tiếp: <action>.
 ```
 
@@ -95,7 +95,7 @@ Tiếp tục từ handoff: [brief inline 5-7 dòng]. File chính: <list>. Bướ
 ## Tích hợp với `/compact`
 
 Sau khi tôi soạn brief, người dùng có thể chạy:
-```
+```text
 /compact Giữ lại brief tôi vừa cho, drop debugging history và tool output cũ.
 ```
 Câu chỉ dẫn này giúp Claude compact có hướng, brief survives cao hơn auto-summary.

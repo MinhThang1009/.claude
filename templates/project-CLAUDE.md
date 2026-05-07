@@ -31,7 +31,7 @@
 
 ## Cấu trúc thư mục
 
-```
+```text
 src/
 ├── <module-1>/   # mô tả ngắn
 ├── <module-2>/   # mô tả ngắn

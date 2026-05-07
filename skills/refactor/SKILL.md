@@ -40,7 +40,7 @@ Hỏi user nếu cần:
    - Verify được bằng test sau mỗi bước
 
    Ví dụ:
-   ```
+   ```text
    Bước 1: Extract function `validateEmail` ra khỏi `signupUser`
    Bước 2: Đổi tên `data` → `userInput` (4 chỗ)
    Bước 3: Tách type `User` thành 2 type: `UserInput` và `UserRecord`
@@ -90,7 +90,7 @@ Nếu code quá rối, không có test, người viết đã nghỉ:
 
 Sau khi xong, báo cáo:
 
-```
+```text
 Đã refactor xong: [phạm vi]
 
 Các bước đã thực hiện:

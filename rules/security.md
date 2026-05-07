@@ -68,7 +68,7 @@
 ## Khi audit
 
 Báo cáo theo format:
-```
+```text
 🔴 CRITICAL — RCE/SQLi/auth bypass/secret leak (CVSS ≥9)
 🟠 HIGH      — XSS/SSRF/IDOR/crypto sai (CVSS 7-8.9)
 🟡 MEDIUM    — info disclosure/missing rate limit (CVSS 4-6.9)

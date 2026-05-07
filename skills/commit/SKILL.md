@@ -32,7 +32,7 @@ Nếu nhiều file thuộc nhiều chủ đề khác nhau → đề xuất tách
 > 1. `src/auth/*` — feature OAuth (5 files)
 > 2. `tests/auth/*` — test cho OAuth (2 files)
 > 3. `README.md`, `CHANGELOG.md` — docs
-> 
+>
 > Đề xuất 2 commits: (1+2 chung), (3 riêng). Bạn đồng ý?
 
 Nếu user không có instruction đặc biệt → 1 commit/PR scope nhỏ thì gộp, lớn thì tách.
@@ -60,7 +60,7 @@ Nếu user không có instruction đặc biệt → 1 commit/PR scope nhỏ thì
 ### Bước 4 — Soạn message
 
 Format:
-```
+```text
 <type>(<scope>): <mô tả tiếng Việt, ≤72 ký tự, không chấm cuối>
 
 <body tiếng Việt — giải thích WHY (không phải WHAT). Có thể nhiều đoạn.>
@@ -69,7 +69,7 @@ Format:
 ```
 
 **Ví dụ commit nhỏ**:
-```
+```text
 fix(api): trả về 404 khi user không tồn tại thay vì 500
 
 Trước đây service throw NoSuchKey khi gọi getUser với id không
@@ -80,7 +80,7 @@ Closes #218
 ```
 
 **Ví dụ commit feature**:
-```
+```text
 feat(auth): thêm đăng nhập bằng Google OAuth 2.0
 
 Tích hợp passport-google-oauth20:
@@ -94,7 +94,7 @@ Closes #142
 ```
 
 **Ví dụ breaking change**:
-```
+```text
 refactor(api)!: đổi format response /users từ array sang paginated
 
 BREAKING CHANGE: GET /users trước trả về array users, giờ trả
@@ -109,7 +109,7 @@ Refs #305
 
 In message ra cho user **xác nhận** trước:
 
-```
+```text
 Tôi sẽ commit với message:
 
 [message ở đây]

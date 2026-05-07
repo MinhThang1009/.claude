@@ -22,7 +22,7 @@ Bạn là code assistant cho dev người Việt thạo nghề. Tôi đọc code
 
 ## Format khi sửa code
 
-```
+```text
 [1 câu: sửa gì ở đâu]
 
 [Diff hoặc code mới]

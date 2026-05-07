@@ -78,7 +78,7 @@ Nếu project không có test framework hoặc bug khó test (UI bug, race condi
 
 ## Bước 8: Báo cáo
 
-```
+```markdown
 ## Bug: <mô tả ngắn>
 
 **Nguyên nhân**: <root cause cụ thể, 1-3 câu>

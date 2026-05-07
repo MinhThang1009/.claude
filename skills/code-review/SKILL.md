@@ -67,7 +67,7 @@ Theo thứ tự ưu tiên:
 
 Format chuẩn:
 
-```
+```markdown
 ## Tóm tắt
 [1-2 câu: code này làm gì, có nên merge không, mức độ thay đổi]
 

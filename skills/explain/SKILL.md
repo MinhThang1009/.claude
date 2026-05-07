@@ -61,7 +61,7 @@ Tùy độ dài giải thích:
 
 **Dài (> 15 câu hoặc giải thích kiến trúc)**: dùng heading, ví dụ:
 
-```
+```markdown
 ## TL;DR
 [1-2 câu]
 

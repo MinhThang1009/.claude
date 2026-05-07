@@ -6,7 +6,7 @@
 
 **Format**: Conventional Commits, **subject TIẾNG VIỆT**.
 
-```
+```text
 <type>(<scope>): <mô tả ngắn bằng tiếng Việt, không chấm cuối, ≤72 ký tự>
 
 <body — giải thích WHY, có thể nhiều đoạn, tiếng Việt>
@@ -17,7 +17,7 @@
 **Type** (giữ tiếng Anh để tool parse được): `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
 
 **Ví dụ đúng**:
-```
+```text
 feat(auth): thêm đăng nhập bằng Google OAuth
 
 Tích hợp passport-google-oauth20 để hỗ trợ SSO. Người dùng
@@ -26,7 +26,7 @@ có thể chọn login bằng email hoặc Google account.
 Closes #142
 ```
 
-```
+```text
 fix(api): sửa lỗi 500 khi user không có avatar
 
 S3 trả về NoSuchKey khi avatar key không tồn tại. Fallback
