@@ -1251,6 +1251,33 @@ cmd="$CLAUDE_TOOL_INPUT_COMMAND"  # → empty, hook silently no-op
 - `CLAUDE_ENV_FILE` — chỉ trong `SessionStart`/`Setup`/`CwdChanged`/`FileChanged`
 - `CLAUDE_CODE_REMOTE` — set trong web session
 
+**Setup jq** (KHÔNG pre-installed trên Windows/macOS/Linux mặc định — hook silently no-op nếu thiếu):
+
+| Platform           | Install command                                |
+| ------------------ | ---------------------------------------------- |
+| macOS              | `brew install jq`                              |
+| Debian / Ubuntu    | `sudo apt install jq`                          |
+| Fedora / RHEL      | `sudo dnf install jq`                          |
+| Arch / Manjaro     | `sudo pacman -S jq`                            |
+| Alpine             | `apk add jq`                                   |
+| Windows (winget)   | `winget install jqlang.jq` — xem caveat dưới   |
+| Windows (scoop)    | `scoop install jq`                             |
+| Windows (choco)    | `choco install jq`                             |
+
+**Windows winget caveat**: WinGet KHÔNG tự tạo shim trong `WinGet/Links/` cho portable .exe → PATH không pick up. Workaround:
+```bash
+cp ~/AppData/Local/Microsoft/WinGet/Packages/jqlang.jq_*/jq.exe ~/bin/jq.exe
+```
+(`~/bin/` là ví dụ — bất kỳ dir nào đã trong PATH đều OK; trên Git Bash mặc định có `/c/Users/<user>/bin`)
+
+**Windows binary note**: Git Bash spawn executables qua Windows API (CreateProcess), KHÔNG qua POSIX exec — phải dùng `jq.exe` (Windows native binary). KHÔNG copy/symlink Linux ELF binary từ WSL hoặc MSYS2 vì sẽ fail load. Download từ [jqlang.org](https://jqlang.org) chọn `jq-windows-amd64.exe`, hoặc dùng package manager ở bảng trên.
+
+**Sau install** (mọi platform):
+1. Restart Claude Code (đóng app rồi mở lại — không phải `/clear`) để session pick PATH mới
+2. Verify: `which jq && jq --version` → expect `jq-1.x.x`
+
+**Pattern matching pitfall** — pattern shell case (vd `*"rm -rf"*"/"*`) match toàn bộ command string, kể cả khi `rm -rf /` chỉ là **string literal** (`echo "rm -rf /"`, `grep "rm -rf /" log`). Đây là false-positive có chủ ý (security > convenience). Workaround khi cần thao tác string literal: tách ký tự (`echo "rm -""rf /"`) hoặc dùng biến (`X="rm -rf"; echo "$X /"`).
+
 ### 14.2 Hook output (command/http)
 
 Exit `0` = OK. Exit `2` = block tool, stderr → Claude. Stdout JSON cho control flow:
