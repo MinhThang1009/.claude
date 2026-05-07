@@ -401,6 +401,7 @@ MCP server có thể expose prompt thành command: `/mcp__<server>__<prompt>`.
 | Phím | Tác dụng |
 |---|---|
 | `[` | Ghi conversation vào scrollback (dùng Cmd+F tìm) |
+| `/` | Search trong transcript (v2.1.83+) |
 | `v` | Mở trong `$VISUAL`/`$EDITOR` |
 | `q` / `Esc` | Thoát viewer |
 
