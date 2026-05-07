@@ -888,6 +888,9 @@ force-for-plugin: false               # Plugin only: true → auto-apply khi plu
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": ["memory", "github"],
   "disabledMcpjsonServers": ["filesystem"],
+  "mcpServers": {
+    "<server-name>": { "alwaysLoad": true }    // (v2.1.121+) Skip tool-search deferral — full schema vào context start
+  },
 
   // Sandbox
   "sandbox": { "enabled": false },
@@ -903,6 +906,7 @@ force-for-plugin: false               # Plugin only: true → auto-apply khi plu
   "plansDirectory": "./plans",            // Default: ~/.claude/plans
   "showClearContextOnPlanAccept": true,   // Default: false
   "autoUpdatesChannel": "latest",         // "stable" | "latest"
+  "minimumVersion": "2.1.100",            // Pin floor — auto-update KHÔNG hạ version dưới mức này (tự set khi user từ chối downgrade qua /config)
 
   // Auto mode
   "autoMode": {
@@ -1056,9 +1060,15 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `CLAUDE_CODE_ENABLE_TELEMETRY`             | `1` = bật telemetry (default tùy plan/region). Override `DISABLE_TELEMETRY`                                                                    |
 | `OTEL_METRICS_EXPORTER`                    | OpenTelemetry metrics exporter (vd `otlp`, `prometheus`)                                                                                       |
 | `OTEL_EXPORTER_OTLP_ENDPOINT`              | OpenTelemetry endpoint URL                                                                                                                     |
-| `DISABLE_AUTOUPDATER`                      | `1` = tắt auto-update CLI                                                                                                                      |
+| `DISABLE_AUTOUPDATER`                      | `1` = tắt background auto-update check (`claude update` và `claude install` vẫn work)                                                          |
+| `DISABLE_UPDATES`                          | `1` = chặn MỌI update path (kể cả manual `claude update`). Dùng khi distribute Claude Code qua channel riêng                                   |
+| `CLAUDE_CODE_PACKAGE_MANAGER_AUTO_UPDATE`  | `1` = tự chạy `brew upgrade` / `winget upgrade` cho package manager install (apt/dnf/apk vẫn manual vì cần sudo)                               |
+| `USE_BUILTIN_RIPGREP`                      | `0` = dùng system `ripgrep` thay bundled (Alpine/musl, hoặc khi search fail). Mặc định `1`                                                     |
+| `CLAUDE_CODE_FORCE_SYNC_OUTPUT`            | `1` = synchronized output (đảm bảo output không interleave từ multiple processes; v2.1.129+)                                                   |
+| `CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY` | `1` = opt-in gateway model discovery (LLM gateway tự liệt kê models; v2.1.129+, default off)                                                 |
 | `CLAUDE_CODE_API_KEY_HELPER_TTL_MS`        | Refresh interval (ms) cho `apiKeyHelper` script (default tùy script return)                                                                    |
 | `CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS`     | `1` = bỏ git workflow khỏi system prompt (giảm baseline)                                                                                       |
+| `CLAUDE_CODE_HIDE_CWD`                     | `1` = ẩn working directory trong UI (privacy khi screen-share; v2.1.119+)                                                                      |
 | `DISABLE_ERROR_REPORTING`                  | Tắt Sentry error reporting                                                                                                                     |
 | `DISABLE_PROMPT_CACHING`                   | `1` = tắt prompt caching (ưu tiên hơn per-model)                                                                                               |
 | `DISABLE_PROMPT_CACHING_OPUS`              | `1` = tắt prompt caching cho Opus                                                                                                              |
@@ -1070,6 +1080,7 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `ANTHROPIC_FOUNDRY_RESOURCE`               | Azure Foundry resource name                                                                                                                    |
 | `ANTHROPIC_FOUNDRY_API_KEY`                | Azure Foundry API key                                                                                                                          |
 | `ANTHROPIC_BEDROCK_BASE_URL`               | Override Bedrock endpoint URL                                                                                                                  |
+| `ANTHROPIC_BEDROCK_SERVICE_TIER`           | Bedrock service tier: `default` \| `flex` \| `priority` (v2.1.122+)                                                                            |
 | `ANTHROPIC_VERTEX_BASE_URL`                | Override Vertex AI endpoint URL                                                                                                                |
 | `ANTHROPIC_FOUNDRY_BASE_URL`               | Override Foundry endpoint URL                                                                                                                  |
 | `ANTHROPIC_CUSTOM_MODEL_OPTION`            | Custom model ID cho `/model` picker                                                                                                            |
@@ -1290,7 +1301,8 @@ Exit `0` = OK. Exit `2` = block tool, stderr → Claude. Stdout JSON cho control
   "hookSpecificOutput": {
     "hookEventName": "PreToolUse",
     "permissionDecision": "deny",
-    "permissionDecisionReason": "..."
+    "permissionDecisionReason": "...",
+    "updatedToolOutput": "..."          // (PostToolUse v2.1.121+) replace tool output text trước khi vào context
   }
 }
 ```
