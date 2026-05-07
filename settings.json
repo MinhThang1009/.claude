@@ -162,7 +162,7 @@
           {
             "type": "command",
             "shell": "bash",
-            "command": "bash -c 'cd \"${CLAUDE_PROJECT_DIR:-.}\" && git rev-parse --git-dir >/dev/null 2>&1 && { echo \"=== Git status ===\"; git status -s; echo \"=== Branch ===\"; git rev-parse --abbrev-ref HEAD; }'"
+            "command": "bash -c 'cd \"${CLAUDE_PROJECT_DIR:-.}\" 2>/dev/null; git rev-parse --git-dir >/dev/null 2>&1 && { echo \"=== Git status ===\"; git status -s; echo \"=== Branch ===\"; git rev-parse --abbrev-ref HEAD; }; exit 0'"
           }
         ]
       }
