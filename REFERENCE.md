@@ -790,9 +790,10 @@ Custom style trong `~/.claude/output-styles/<name>.md` hoặc `<project>/.claude
 
 ```yaml
 ---
-name: My Style
+name: My Style                        # Optional, default = filename
 description: Brief description shown in /config picker
 keep-coding-instructions: true        # default: false; true → giữ default coding instructions
+force-for-plugin: false               # Plugin only: true → auto-apply khi plugin enabled, override user `outputStyle`
 ---
 
 # Hướng dẫn style
