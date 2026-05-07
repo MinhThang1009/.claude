@@ -83,10 +83,43 @@
 ### Model & effort
 | Flag | Mục đích |
 |---|---|
-| `--model <alias\|id>` | `opus`, `sonnet`, `haiku`, hoặc full ID (`claude-opus-4-7`) |
-| `--effort <level>` | `low`, `medium`, `high`, `xhigh`, `max` (max chỉ Opus 4.6+) |
+| `--model <alias\|id>` | `opus`, `sonnet`, `haiku`, `best`, `default`, `opusplan`, `opus[1m]`, `sonnet[1m]`, hoặc full ID (`claude-opus-4-7`) |
+| `--effort <level>` | `low`, `medium`, `high`, `xhigh`, `max` |
 | `--fallback-model <alias>` | Fallback khi default overload (chỉ print mode) |
 | `--betas <header>` | Beta header cho API (chỉ API key user) |
+
+**Model aliases**: `default` = reset về model mặc định theo plan. `best` = model mạnh nhất (hiện = `opus`). `opusplan` = Opus cho plan mode, Sonnet cho execution. `[1m]` = 1M context window (chỉ Opus 4.7/4.6, Sonnet 4.6). Trên Anthropic API: `opus` → Opus 4.7, `sonnet` → Sonnet 4.6. Default theo plan: Max/Team Premium → Opus 4.7; Pro/Team Standard/Enterprise/API → Sonnet 4.6.
+
+#### Models hiện được hỗ trợ (Anthropic API, tính đến 2026-05)
+
+**Latest**:
+| Model | Alias | Model ID | Context | Max output | Effort levels | Pricing (in/out per MTok) |
+|---|---|---|---|---|---|---|
+| Opus 4.7 | `opus` | `claude-opus-4-7` | 1M | 128k | low/med/high/xhigh/max | $5 / $25 |
+| Sonnet 4.6 | `sonnet` | `claude-sonnet-4-6` | 1M | 64k | low/med/high/max | $3 / $15 |
+| Haiku 4.5 | `haiku` | `claude-haiku-4-5` | 200k | 64k | — | $1 / $5 |
+
+**Legacy (vẫn hỗ trợ, nên migrate)**:
+| Model | Model ID | Context | Max output | Effort | Pricing |
+|---|---|---|---|---|---|
+| Opus 4.6 | `claude-opus-4-6` | 1M | 128k | low/med/high/max | $5 / $25 |
+| Opus 4.5 | `claude-opus-4-5` | 200k | 64k | — | $5 / $25 |
+| Opus 4.1 | `claude-opus-4-1` | 200k | 32k | — | $15 / $75 |
+| Sonnet 4.5 | `claude-sonnet-4-5` | 200k | 64k | — | $3 / $15 |
+
+**Deprecated (sẽ retire 2026-06-15)**:
+| Model | Model ID | Context | Max output |
+|---|---|---|---|
+| Sonnet 4 | `claude-sonnet-4-0` | 200k | 64k |
+| Opus 4 | `claude-opus-4-0` | 200k | 32k |
+
+**Ghi chú**:
+- Opus 4.7 có **adaptive thinking** mặc định (không có extended thinking riêng); Sonnet 4.6, Haiku 4.5 có cả hai.
+- Effort levels chỉ hỗ trợ Opus 4.7, Opus 4.6, Sonnet 4.6. Model khác bỏ qua flag `--effort`.
+- 1M context: chỉ Opus 4.7/4.6, Sonnet 4.6. Append `[1m]` khi muốn dùng (vd `claude-opus-4-7[1m]`).
+- Trên Bedrock/Vertex/Foundry: alias `opus` → Opus 4.6, `sonnet` → Sonnet 4.5 (không phải latest). Pin bằng `ANTHROPIC_DEFAULT_OPUS_MODEL`/`_SONNET_MODEL` để control version.
+- Set model trong settings.json: `"model": "claude-opus-4-1"` hoặc `"model": "opus"` (alias auto-update).
+- Claude 3.x family (3 Haiku/Sonnet/Opus, 3.5, 3.7) đã retire — không liệt kê.
 
 ### Permission & tool
 | Flag | Mục đích |
@@ -404,7 +437,7 @@ Chỉ **`ultrathink`** được nhận diện là keyword (kích hoạt budget ~
 | `medium` | — | Thinking nhẹ |
 | `high` | Opus 4.6, Sonnet 4.6 | Default cho hầu hết model |
 | `xhigh` | Opus 4.7 | Chỉ Opus 4.7; model khác fallback → `high` |
-| `max` | — | Tối đa, chỉ Opus 4.6+ session, session-only |
+| `max` | — | Tối đa (Opus 4.7/4.6/Sonnet 4.6), session-only |
 | `auto` | — | Reset model default |
 
 `low`/`medium`/`high`/`xhigh` persist qua session; `max` session-only (trừ khi set qua `CLAUDE_CODE_EFFORT_LEVEL` env var). `Alt+T` toggle thinking. `Alt+O` toggle fast mode. `MAX_THINKING_TOKENS=0` để tắt hoàn toàn. `CLAUDE_CODE_EFFORT_LEVEL` env var override tất cả.
@@ -649,7 +682,7 @@ keep-coding-instructions: true        # default: false; true → giữ default c
 
   // Editor & UI
   "editorMode": "normal",             // "normal" | "vim"
-  "effortLevel": "high",              // "low" | "medium" | "high" | "xhigh"
+  "effortLevel": "high",              // "low" | "medium" | "high" | "xhigh" | "max"
   "tui": "default",                   // "default" | "fullscreen" (alt-screen)
   "viewMode": "default",              // "default" | "verbose" | "focus"
   "defaultShell": "bash",             // "bash" | "powershell"
@@ -661,7 +694,8 @@ keep-coding-instructions: true        # default: false; true → giữ default c
   "autoMemoryDirectory": "~/.claude/memory",
 
   // Voice + UI
-  "voiceEnabled": false,              // DEPRECATED — dùng voice.enabled
+  "voice": { "enabled": true, "mode": "tap", "autoSubmit": false },  // /voice tự ghi
+  // "voiceEnabled": false,           // DEPRECATED — dùng voice object ở trên
   "spinnerVerbs": { "mode": "append", "verbs": ["Cooking", "Architecting"] },
   "spinnerTipsEnabled": true,
   "prefersReducedMotion": false,
@@ -770,7 +804,10 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `CLAUDE_CODE_MAX_RETRIES` | Số lần retry khi API fail (default 10) |
 | `DISABLE_TELEMETRY` | Tắt toàn bộ telemetry/metrics |
 | `DISABLE_ERROR_REPORTING` | Tắt Sentry error reporting |
-| `DISABLE_PROMPT_CACHING` | `1` = tắt prompt caching |
+| `DISABLE_PROMPT_CACHING` | `1` = tắt prompt caching (ưu tiên hơn per-model) |
+| `DISABLE_PROMPT_CACHING_OPUS` | `1` = tắt prompt caching cho Opus |
+| `DISABLE_PROMPT_CACHING_SONNET` | `1` = tắt prompt caching cho Sonnet |
+| `DISABLE_PROMPT_CACHING_HAIKU` | `1` = tắt prompt caching cho Haiku |
 | `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` | `1` = bật agent teams (experimental) |
 | `ANTHROPIC_VERTEX_PROJECT_ID` | GCP project ID cho Vertex AI |
 | `CLOUD_ML_REGION` | Region cho Vertex AI (vd: `us-east5`, `global`) |

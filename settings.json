@@ -1,27 +1,21 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-
-  "effortLevel": "high",
+  "effortLevel": "xhigh",
   "autoUpdatesChannel": "latest",
   "theme": "light",
-  "model": "claude-opus-4-6[1m]",
-
+  "model": "opus[1m]",
   "//": "Settings global cho ~/.claude/settings.json. Override bằng settings.json của project khi cần.",
-
   "attribution": {
     "//": "Tắt attribution để commit message không có Co-Authored-By Claude",
     "commit": "",
     "pr": ""
   },
-
   "permissions": {
     "//": "Mặc định cho global. Project có thể override hoặc thêm allow/deny.",
-
     "allow": [
       "Read(**)",
       "Glob(**)",
       "Grep(**)",
-
       "Bash(ls:*)",
       "Bash(pwd)",
       "Bash(cat:*)",
@@ -33,7 +27,6 @@
       "Bash(file:*)",
       "Bash(find:*)",
       "Bash(tree:*)",
-
       "Bash(git status)",
       "Bash(git status:*)",
       "Bash(git diff)",
@@ -47,7 +40,6 @@
       "Bash(git stash list)",
       "Bash(git rev-parse:*)",
       "Bash(git ls-files:*)",
-
       "Bash(node --version)",
       "Bash(npm --version)",
       "Bash(pnpm --version)",
@@ -58,7 +50,6 @@
       "Bash(go version)",
       "Bash(cargo --version)",
       "Bash(rustc --version)",
-
       "Bash(npm run lint:*)",
       "Bash(npm run typecheck:*)",
       "Bash(npm run test:*)",
@@ -70,31 +61,26 @@
       "Bash(yarn typecheck:*)",
       "Bash(yarn test:*)",
       "Bash(bun test:*)",
-
       "Bash(pytest:*)",
       "Bash(ruff:*)",
       "Bash(mypy:*)",
       "Bash(black:*)",
-
       "Bash(go test:*)",
       "Bash(go vet:*)",
       "Bash(gofmt:*)",
-
       "Bash(cargo test:*)",
       "Bash(cargo check:*)",
       "Bash(cargo clippy:*)",
       "Bash(cargo fmt:*)",
-
       "Bash(gh issue view:*)",
       "Bash(gh pr view:*)",
       "Bash(gh pr diff:*)",
       "Bash(gh pr list:*)",
-      "Bash(gh repo view:*)"
+      "Bash(gh repo view:*)",
+      "Bash(git push:*)"
     ],
-
     "ask": [
       "Bash(git commit:*)",
-      "Bash(git push:*)",
       "Bash(git rebase:*)",
       "Bash(git cherry-pick:*)",
       "Bash(git reset:*)",
@@ -102,7 +88,6 @@
       "Bash(git checkout:*)",
       "Bash(git branch -d:*)",
       "Bash(git branch -D:*)",
-
       "Bash(npm install:*)",
       "Bash(pnpm add:*)",
       "Bash(pnpm install:*)",
@@ -110,12 +95,10 @@
       "Bash(pip install:*)",
       "Bash(cargo add:*)",
       "Bash(go get:*)",
-
       "WebFetch(*)",
       "Edit(**)",
       "Write(**)"
     ],
-
     "deny": [
       "Bash(rm -rf /*)",
       "Bash(rm -rf ~)",
@@ -128,12 +111,10 @@
       "Bash(wget -O - * | bash)",
       "Bash(wget -O - * | sh)",
       "Bash(eval:*)",
-
       "Bash(git push --force:*)",
       "Bash(git push -f:*)",
       "Bash(git reset --hard:*)",
       "Bash(git clean -fdx:*)",
-
       "Read(.env)",
       "Read(.env.local)",
       "Read(.env.production)",
@@ -143,10 +124,8 @@
       "Read(**/id_ed25519)"
     ]
   },
-
   "hooks": {
     "//": "Hook chạy mọi project. Hook đặc thù project đặt trong <project>/.claude/settings.json.",
-
     "PreToolUse": [
       {
         "matcher": "Bash",
@@ -159,7 +138,6 @@
         ]
       }
     ],
-
     "PostToolUse": [
       {
         "//": "Auto-format file sau Edit/Write. Mỗi project bật command phù hợp với toolchain.",
@@ -173,7 +151,6 @@
         ]
       }
     ],
-
     "SessionStart": [
       {
         "//": "Hiển thị git status khi mở session để Claude biết trạng thái repo",
@@ -187,15 +164,12 @@
       }
     ]
   },
-
   "env": {
     "//": "Tăng MAX_MCP_OUTPUT_TOKENS để MCP server (như filesystem, GitHub) không bị truncate khi trả về dữ liệu hữu ích. Mặc định 10k thường thấp.",
     "MAX_MCP_OUTPUT_TOKENS": "50000",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "0"
   },
-
   "autoMemoryEnabled": true,
-
   "claudeMdExcludes": [
     "**/node_modules/**/CLAUDE.md",
     "**/.next/**/CLAUDE.md",
