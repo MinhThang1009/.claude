@@ -288,12 +288,12 @@
 | `--output-format json\|stream-json\|text` | Format output (chỉ `-p` mode)                    |
 | `--include-hook-events`                   | Include hook events trong stream (`stream-json`) |
 | `--include-partial-messages`              | Include partial streaming events                 |
-
-> **Stream-json events** (cần `--verbose --include-partial-messages`): `system/init` (session metadata, tools, plugins, plugin_errors), `system/api_retry` (attempt/max_retries/retry_delay_ms/error_status/error category), `system/plugin_install` (chỉ khi `CLAUDE_CODE_SYNC_PLUGIN_INSTALL=1` — status: `started`/`installed`/`failed`/`completed`). Stdin pipe cap **10MB** (v2.1.128+) — vượt → exit non-zero.
 | `--verbose`                               | Verbose logging, show full turn-by-turn output   |
 | `--debug [<categories>]`                  | Bật debug — vd `"api,mcp,!file"`                 |
 | `--debug-file <path>`                     | Ghi debug log vào file                           |
 | `--mcp-debug`                             | Debug MCP riêng                                  |
+
+> **Stream-json events** (cần `--verbose --include-partial-messages`): `system/init` (session metadata, tools, plugins, plugin_errors), `system/api_retry` (attempt/max_retries/retry_delay_ms/error_status/error category), `system/plugin_install` (chỉ khi `CLAUDE_CODE_SYNC_PLUGIN_INSTALL=1` — status: `started`/`installed`/`failed`/`completed`). Stdin pipe cap **10MB** (v2.1.128+) — vượt → exit non-zero.
 
 ### 2.7 IDE & integration
 | Flag          | Mục đích                           |
@@ -1234,10 +1234,6 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `OTEL_EXPORTER_OTLP_HEADERS`               | OTel headers (vd `Authorization=Bearer your-token`)                                                                                            |
 | `OTEL_METRIC_EXPORT_INTERVAL`              | Metrics export interval (ms, default 60000)                                                                                                    |
 | `OTEL_LOGS_EXPORT_INTERVAL`                | Logs export interval (ms, default 5000)                                                                                                        |
-
-> **Authentication precedence** (highest → lowest): (1) Cloud provider khi `CLAUDE_CODE_USE_BEDROCK/VERTEX/FOUNDRY=1`, (2) `ANTHROPIC_AUTH_TOKEN` (Bearer header — LLM gateway), (3) `ANTHROPIC_API_KEY` (X-Api-Key — Console), (4) `apiKeyHelper` script output, (5) `CLAUDE_CODE_OAUTH_TOKEN` (long-lived, inference-only), (6) Subscription OAuth từ `/login` (default Pro/Max/Team/Enterprise). Run `/status` để confirm. `--bare` mode KHÔNG read `CLAUDE_CODE_OAUTH_TOKEN`.
->
-> **Credential storage**: macOS Keychain (encrypted) | Linux/Windows `~/.claude/.credentials.json` (mode `0600`). Override location bằng `CLAUDE_CONFIG_DIR`.
 | `CLAUDE_CODE_CLIENT_KEY_PASSPHRASE`        | Passphrase cho encrypted mTLS client private key                                                                                               |
 | `CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR` | `1` = mỗi Bash call reset về project dir (TẮT `cd` carry-over giữa các call)                                                                   |
 | `CLAUDE_CODE_TASK_LIST_ID`                 | Share task list giữa các session: `CLAUDE_CODE_TASK_LIST_ID=my-project claude` → `~/.claude/tasks/my-project/`                                 |
@@ -1251,6 +1247,10 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `CCR_FORCE_BUNDLE`                         | `1` = force bundle local repo (kể cả khi GitHub connected) — `claude --remote` dùng khi repo không trên GitHub                                  |
 | `CLAUDE_CODE_REMOTE_SESSION_ID`            | Chỉ set trong cloud session — link back tới transcript: `https://claude.ai/code/${CLAUDE_CODE_REMOTE_SESSION_ID/#cse_/session_}`                |
 | `CLAUDE_REMOTE_CONTROL_SESSION_NAME_PREFIX`| Prefix cho session name auto-generated (default: hostname). Cũng có CLI flag `--remote-control-session-name-prefix`                            |
+
+> **Authentication precedence** (highest → lowest): (1) Cloud provider khi `CLAUDE_CODE_USE_BEDROCK/VERTEX/FOUNDRY=1`, (2) `ANTHROPIC_AUTH_TOKEN` (Bearer header — LLM gateway), (3) `ANTHROPIC_API_KEY` (X-Api-Key — Console), (4) `apiKeyHelper` script output, (5) `CLAUDE_CODE_OAUTH_TOKEN` (long-lived, inference-only), (6) Subscription OAuth từ `/login` (default Pro/Max/Team/Enterprise). Run `/status` để confirm. `--bare` mode KHÔNG read `CLAUDE_CODE_OAUTH_TOKEN`.
+>
+> **Credential storage**: macOS Keychain (encrypted) | Linux/Windows `~/.claude/.credentials.json` (mode `0600`). Override location bằng `CLAUDE_CONFIG_DIR`.
 
 ---
 
