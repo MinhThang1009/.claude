@@ -46,7 +46,7 @@
    - [7.1 Project (`<project>/`)](#71-project-project)
    - [7.2 Global (`~/.claude/`)](#72-global-claude)
    - [7.3 Enterprise / managed](#73-enterprise--managed)
-   - [7.4 Session memory (auto, đọc-only)](#74-session-memory-auto-đọc-only)
+   - [7.4 Session storage (auto, đọc-only)](#74-session-storage-auto-đọc-only)
 8. [SKILL.md frontmatter](#8-skillmd-frontmatter)
 9. [Subagent frontmatter](#9-subagent-frontmatter)
    - [9.1 Agent teams (experimental, v2.1.32+)](#91-agent-teams-experimental-v2132)
@@ -624,9 +624,11 @@ managed-mcp.json                 # MCP server bắt buộc
 - Linux: `/etc/claude-code/`
 - Windows: `C:\ProgramData\ClaudeCode\`
 
-### 7.4 Session memory (auto, đọc-only)
+### 7.4 Session storage (auto, đọc-only)
 ```text
-~/.claude/projects/<hash>/<session>/session_memory   # Backing store cho /compact
+~/.claude/projects/<project-hash>/
+├── <session-uuid>.jsonl     # Transcript đầy đủ (tool calls, messages, hook events)
+└── memory/                  # Auto memory folder cho /compact restore
 ```
 
 ---
