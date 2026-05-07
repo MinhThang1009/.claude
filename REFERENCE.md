@@ -76,23 +76,23 @@
    - [15.8 Pattern 8 — Bulk migration (`/batch`)](#158-pattern-8--bulk-migration-batch)
    - [15.9 Pattern 9 — Loop monitoring](#159-pattern-9--loop-monitoring)
 16. [Quản lý context window — chi tiết](#16-quản-lý-context-window--chi-tiết)
-   - [16.1 Tại sao quan trọng](#161-tại-sao-quan-trọng)
+   - [16.1 Tầm quan trọng](#161-tầm-quan-trọng)
    - [16.2 Ngưỡng hành động](#162-ngưỡng-hành-động)
    - [16.3 `/compact` vs `/clear`](#163-compact-vs-clear)
    - [16.4 Customize compaction](#164-customize-compaction)
    - [16.5 Giảm baseline (token cố định mỗi session)](#165-giảm-baseline-token-cố-định-mỗi-session)
    - [16.6 Giảm runtime (token tích lũy trong session)](#166-giảm-runtime-token-tích-lũy-trong-session)
-   - [16.7 Kiểm tra cái gì đang ăn token](#167-kiểm-tra-cái-gì-đang-ăn-token)
+   - [16.7 Phân tích token usage](#167-phân-tích-token-usage)
    - [16.8 Prompt caching (auto trong Claude Code)](#168-prompt-caching-auto-trong-claude-code)
-   - [16.9 Gì survive `/compact`, gì mất](#169-gì-survive-compact-gì-mất)
+   - [16.9 Quy tắc survive sau `/compact`](#169-quy-tắc-survive-sau-compact)
 17. [Session management & handoff](#17-session-management--handoff)
-   - [17.1 Khi nào dùng cái nào](#171-khi-nào-dùng-cái-nào)
+   - [17.1 Lựa chọn `/compact` vs `/clear` vs `/handoff`](#171-lựa-chọn-compact-vs-clear-vs-handoff)
    - [17.2 Anti-pattern resume long session](#172-anti-pattern-resume-long-session)
    - [17.3 Workflow handoff khuyến nghị](#173-workflow-handoff-khuyến-nghị)
    - [17.4 Bad-compact recovery](#174-bad-compact-recovery)
    - [17.5 Lỗi context-related](#175-lỗi-context-related)
 18. [Common failures & fix](#18-common-failures--fix)
-19. [Khi nào dùng feature nào](#19-khi-nào-dùng-feature-nào)
+19. [Hướng dẫn chọn feature](#19-hướng-dẫn-chọn-feature)
 20. [Tài liệu chính thức](#20-tài-liệu-chính-thức)
    - [20.1 Setup & onboarding](#201-setup--onboarding)
    - [20.2 Memory & context](#202-memory--context)
@@ -1248,7 +1248,7 @@ git worktree add ../proj-feat-b feat/b
 
 ## 16. Quản lý context window — chi tiết
 
-### 16.1 Tại sao quan trọng
+### 16.1 Tầm quan trọng
 
 Mọi best practice xoay quanh 1 ràng buộc: **context window đầy nhanh, performance giảm khi đầy**. Mỗi message re-read toàn bộ history → cost grow exponential trong agentic session. Ở 80%+ context, Claude bắt đầu "quên" instruction sớm, lặp sai lầm cũ. Boris Cherny (tech lead Claude Code) giữ CLAUDE.md ~2,500 tokens.
 
@@ -1314,7 +1314,7 @@ Hoặc gọi runtime: `/compact tập trung phần auth, drop test debugging`.
   npm test > /tmp/test.log 2>&1; tail -50 /tmp/test.log
   ```
 
-### 16.7 Kiểm tra cái gì đang ăn token
+### 16.7 Phân tích token usage
 
 ```text
 /context
@@ -1357,7 +1357,7 @@ Claude Code dùng prompt caching tự động để giảm cost cho conversation
 - Reorder hoặc inject content vào giữa system prompt.
 - Compact xong → cache phải build lại từ đầu.
 
-### 16.9 Gì survive `/compact`, gì mất
+### 16.9 Quy tắc survive sau `/compact`
 
 - **Survive**: project-root CLAUDE.md (re-read từ disk), auto memory (re-injected từ disk; MEMORY.md cap 200 dòng/25KB lúc load)
 - **Survive (capped)**: skills đã invoke — re-attach sau summary, mỗi skill giữ **5,000 token đầu**, tổng **25,000 token** (oldest dropped first)
@@ -1370,7 +1370,7 @@ Claude Code dùng prompt caching tự động để giảm cost cho conversation
 
 ## 17. Session management & handoff
 
-### 17.1 Khi nào dùng cái nào
+### 17.1 Lựa chọn `/compact` vs `/clear` vs `/handoff`
 
 ```text
 Sắp đầy context, vẫn làm tiếp cùng task ──► /compact (có instructions)
@@ -1450,7 +1450,7 @@ Cách xử lý:
 
 ---
 
-## 19. Khi nào dùng feature nào
+## 19. Hướng dẫn chọn feature
 
 | Cần                             | Dùng                                                     |
 | ------------------------------- | -------------------------------------------------------- |
