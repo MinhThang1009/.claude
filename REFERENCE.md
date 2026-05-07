@@ -16,7 +16,7 @@
 10. [Output styles](#10-output-styles-built-in)
 11. [settings.json — keys hay dùng](#11-settingsjson--keys-hay-dùng)
 12. [Environment variables](#12-environment-variables)
-13. [Hook events đầy đủ](#13-hook-events--đầy-đủ-26-event)
+13. [Hook events đầy đủ](#13-hook-events--đầy-đủ-29-event)
 14. [Hook handler types](#14-hook-handler-types-5-loại)
 15. [Workflow patterns](#15-workflow-patterns)
 16. [Quản lý context window — chi tiết](#16-quản-lý-context-window--chi-tiết)
@@ -505,7 +505,7 @@ keep-coding-instructions: true        # default: false; true → giữ default c
     "PreToolUse":   [...],
     "PostToolUse":  [...],
     "SessionStart": [...],
-    // ... 26 events available, see Section 13
+    // ... 29 events available, see Section 13
   },
 
   "env": {
@@ -818,7 +818,7 @@ git worktree add ../proj-feat-b feat/b
 
 ### Tại sao quan trọng
 
-Mọi best practice xoay quanh 1 ràng buộc: **context window đầy nhanh, performance giảm khi đầy**. Mỗi message re-read toàn bộ history → cost grow exponential trong agentic session. Ở 80%+ context, Claude bắt đầu "quên" instruction sớm, lặp sai lầm cũ. Boris Cherny (creator Claude Code) giữ CLAUDE.md ~2,500 tokens.
+Mọi best practice xoay quanh 1 ràng buộc: **context window đầy nhanh, performance giảm khi đầy**. Mỗi message re-read toàn bộ history → cost grow exponential trong agentic session. Ở 80%+ context, Claude bắt đầu "quên" instruction sớm, lặp sai lầm cũ. Boris Cherny (tech lead Claude Code) giữ CLAUDE.md ~2,500 tokens.
 
 ### Ngưỡng hành động
 
