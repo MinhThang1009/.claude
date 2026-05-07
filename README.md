@@ -230,7 +230,7 @@ Baseline context tính tiền theo mỗi message. 4 rules = thêm ~6000 tokens �
 
 ### 9.2 Tại sao REFERENCE.md không auto-load vào CLAUDE.md?
 
-REFERENCE.md = ~1685 dòng, ~118k chars → ~41k tokens (Vietnamese prose ~2.3 chars/token, code blocks/tables ~3-4 chars/token, mix ~2.9). Auto-load = ~20% context Sonnet 200k (hoặc ~4% Opus 1M) mỗi session. REFERENCE phục vụ **NGƯỜI** tra cứu (mở trên màn hình thứ 2 / web), KHÔNG cho Claude đọc.
+REFERENCE.md = ~1693 dòng, ~118k chars → ~41k tokens (Vietnamese prose ~2.3 chars/token, code blocks/tables ~3-4 chars/token, mix ~2.9). Auto-load = ~20% context Sonnet 200k (hoặc ~4% Opus 1M) mỗi session. REFERENCE phục vụ **NGƯỜI** tra cứu (mở trên màn hình thứ 2 / web), KHÔNG cho Claude đọc.
 
 ### 9.3 Tại sao bỏ `/init-context`?
 
