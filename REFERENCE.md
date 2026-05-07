@@ -1083,7 +1083,7 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `CLAUDE_CODE_SKIP_PROMPT_HISTORY`          | `1` = không lưu transcript ra disk                                                                                                             |
 | `BASH_MAX_OUTPUT_LENGTH`                   | Max ký tự bash output                                                                                                                          |
 | `CLAUDE_CODE_FILE_READ_MAX_OUTPUT_TOKENS`  | Token limit cho file reads                                                                                                                     |
-| `CLAUDE_CODE_DEBUG_LOG_LEVEL`              | Log level: `verbose`\|`debug`\|`info`\|`warn`\|`error`                                                                                         |
+| `CLAUDE_CODE_DEBUG_LOG_LEVEL`              | Log level: `verbose`\|`debug`\|`info`\|`warn`\|`error` (default `debug`)                                                                       |
 
 ---
 
