@@ -47,7 +47,9 @@
 | `claude auth logout` | Đăng xuất |
 | `claude auth status` | Trạng thái auth (JSON; `--text` cho human-readable) |
 | `claude agents` | List subagent đã cấu hình |
-| `claude auto-mode defaults` | Print rule auto-mode classifier (JSON) |
+| `claude auto-mode defaults` | Print built-in rules auto-mode classifier (JSON) |
+| `claude auto-mode config` | Print effective config (với settings đã apply) |
+| `claude auto-mode critique` | AI feedback trên custom allow/soft_deny rules |
 | `claude mcp add <name> <url>` | Thêm MCP server |
 | `claude mcp list` | List MCP server |
 | `claude mcp remove <name>` | Xóa MCP server |
@@ -100,6 +102,8 @@
 ### System prompt
 | Flag | Mục đích |
 |---|---|
+| `--system-prompt "<text>"` | **Thay thế** toàn bộ system prompt |
+| `--system-prompt-file <path>` | Thay thế từ file |
 | `--append-system-prompt "<text>"` | Append vào default system prompt |
 | `--append-system-prompt-file <path>` | Append từ file |
 | `--exclude-dynamic-system-prompt-sections` | Move per-machine sections (cwd, env, git status) khỏi system prompt → cải thiện prompt-cache |
@@ -116,6 +120,7 @@
 | `--output-format json\|stream-json\|text` | Format output (chỉ `-p` mode) |
 | `--include-hook-events` | Include hook events trong stream (`stream-json`) |
 | `--include-partial-messages` | Include partial streaming events |
+| `--verbose` | Verbose logging, show full turn-by-turn output |
 | `--debug [<categories>]` | Bật debug — vd `"api,mcp,!file"` |
 | `--debug-file <path>` | Ghi debug log vào file |
 | `--mcp-debug` | Debug MCP riêng |
@@ -125,6 +130,39 @@
 |---|---|
 | `--ide` | Auto-connect IDE khi startup |
 | `--chrome` | Bật Chrome integration |
+| `--no-chrome` | Tắt Chrome integration cho session |
+
+### Session & execution control
+| Flag | Mục đích |
+|---|---|
+| `--name`, `-n` | Đặt tên session (hiện trong `/resume` và terminal title) |
+| `--session-id <id>` | Dùng session ID cụ thể |
+| `--max-turns <N>` | Giới hạn số agentic turn (chỉ print mode) |
+| `--max-budget-usd <N>` | Giới hạn chi phí API (USD, chỉ print mode) |
+| `--json-schema <schema>` | Output JSON theo schema (chỉ print mode) |
+| `--input-format text\|stream-json` | Format input cho print mode |
+| `--no-session-persistence` | Không lưu session ra disk (chỉ print mode) |
+| `--maintenance` | Chạy Setup hooks matcher `maintenance` (chỉ print mode) |
+| `--settings <path\|json>` | Load settings từ file hoặc inline JSON |
+| `--setting-sources <list>` | Chọn scope settings: `user`, `project`, `local` |
+
+### MCP & plugin
+| Flag | Mục đích |
+|---|---|
+| `--mcp-config <path\|json>` | Load MCP server từ file/JSON |
+| `--strict-mcp-config` | Chỉ dùng MCP từ `--mcp-config`, bỏ qua config khác |
+| `--plugin-dir <path>` | Load plugin từ thư mục hoặc `.zip` (session-only) |
+| `--plugin-url <url>` | Fetch plugin `.zip` từ URL (session-only) |
+
+### Cloud & worktree
+| Flag | Mục đích |
+|---|---|
+| `--remote "<task>"` | Tạo web session mới trên claude.ai |
+| `--remote-control`, `--rc` | Bật Remote Control cho session |
+| `--teleport` | Pull web session vào terminal local |
+| `--worktree`, `-w` | Chạy trong isolated git worktree |
+| `--tmux` | Tạo tmux session cho worktree (cần `--worktree`) |
+| `--teammate-mode auto\|in-process\|tmux` | Hiển thị agent team teammate |
 
 ### Channels (research preview)
 | Flag | Mục đích |
@@ -172,7 +210,7 @@
 | `/skills` | List skill có sẵn |
 | `/agents` | Manage subagent (interactive create/edit) |
 | `/model [model]` | Đổi model. Mũi tên trái/phải để adjust effort |
-| `/effort [level]` | `low`/`medium`/`high`/`max`/`auto`. `low|medium|high` persist; `max` session-only |
+| `/effort [level]` | `low`/`medium`/`high`/`xhigh`/`max`/`auto`. `low|medium|high` persist; `xhigh|max` session-only |
 | `/output-style` | Đổi output style |
 | `/output-style:new` | Tạo style mới với Claude help |
 | `/keybindings` | Sửa keybindings |
@@ -181,7 +219,7 @@
 | `/theme` | Đổi color theme |
 | `/color [name\|hex]` | Set màu prompt bar |
 | `/statusline` | Cấu hình status line |
-| `/fast [on\|off]` | Toggle fast mode |
+| `/fast [on\|off]` | Toggle fast mode (chỉ Opus 4.6, giá 2.5× standard) |
 | `/voice` | Toggle voice dictation |
 | `/privacy-settings` | View/update privacy (Pro/Max) |
 
@@ -210,7 +248,7 @@
 | `/web-setup` | Connect GitHub cho Claude Code on the web |
 | `/autofix-pr [prompt]` | Spawn web session auto-fix PR |
 | `/ultraplan <prompt>` | Draft plan trong browser, execute remotely |
-| `/schedule [description]` | Tạo/edit/list/run routine định kỳ |
+| `/schedule [description]` | Tạo/edit/list/run routine định kỳ. Alias `/routines` |
 | `/install-github-app` | Cài Claude GitHub Actions |
 | `/install-slack-app` | Cài Claude Slack |
 | `/setup-bedrock` | Cấu hình Amazon Bedrock |
@@ -249,10 +287,22 @@
 | `/ide` | Manage IDE integrations |
 | `/chrome` | Cấu hình Claude in Chrome |
 
+### Thêm lệnh mới (v2.1.83+)
+| Lệnh | Mục đích |
+|---|---|
+| `/add-dir <path>` | Thêm thư mục làm việc cho session hiện tại |
+| `/doctor` | Chẩn đoán cấu hình, nhấn `f` để Claude auto-fix |
+| `/fewer-permission-prompts` | **[Skill]** Scan transcript → thêm allowlist vào `.claude/settings.json` |
+| `/focus` | Toggle focus view (chỉ hiện prompt cuối + response cuối) |
+| `/heapdump` | Ghi heap snapshot + memory breakdown (debug OOM) |
+| `/recap` | Tóm tắt 1 dòng session hiện tại (auto chạy sau 3+ phút idle) |
+| `/review [PR]` | Review PR locally (nhẹ hơn `/ultrareview`) |
+| `/tui [default\|fullscreen]` | Đổi UI renderer (`fullscreen` = flicker-free alt-screen) |
+| `/ultrareview [PR]` | Multi-agent code review chạy trên cloud sandbox |
+
 ### Đã loại bỏ / deprecated
 - `/vim` — Removed v2.1.92. Dùng `/config` → Editor mode
 - `/pr-comments` — Removed v2.1.91. Hỏi Claude trực tiếp xem PR comments
-- `/review` — Deprecated. Cài plugin: `claude plugin install code-review@claude-plugins-official`
 
 ### MCP prompts
 MCP server có thể expose prompt thành command: `/mcp__<server>__<prompt>`.
@@ -288,15 +338,38 @@ MCP server có thể expose prompt thành command: `/mcp__<server>__<prompt>`.
 | Plan (`Shift+Tab`×2) | Chỉ research, không sửa |
 | `bypassPermissions` (nếu bật `--allow-dangerously-skip-permissions`) | Skip mọi permission ⚠️ |
 
+### Text editing (readline)
+| Phím | Tác dụng |
+|---|---|
+| `Ctrl+A` | Đầu dòng |
+| `Ctrl+E` | Cuối dòng |
+| `Ctrl+K` | Xóa đến cuối dòng |
+| `Ctrl+U` | Xóa đến đầu dòng |
+| `Ctrl+W` | Xóa word trước |
+| `Ctrl+Y` | Paste text đã xóa |
+| `Alt+B` / `Alt+F` | Lùi/tiến 1 word |
+
+> Vim mode: bật qua `/config` → Editor mode → `vim`. Full vi keybindings (NORMAL/INSERT/VISUAL).
+
 ### Khác
 | Phím | Tác dụng |
 |---|---|
 | `Ctrl+O` | Toggle transcript viewer |
-| `Ctrl+R` | Show stdout của hook |
-| `Ctrl+T` | Track sub-agent task |
+| `Ctrl+R` | Reverse search command history (cycle scope: `Ctrl+S`) |
+| `Ctrl+T` | Toggle task list |
+| `Ctrl+B` | Background task đang chạy (tmux user: nhấn 2 lần) |
+| `Ctrl+L` | Redraw screen |
 | `Ctrl+F` ×2 trong 3s | Kill mọi background agent |
 | `Alt+T` | Toggle extended thinking |
+| `Alt+O` | Toggle fast mode |
 | `Cmd/Ctrl+Click` PR link | Mở PR trong browser |
+
+### Transcript viewer (khi `Ctrl+O` mở)
+| Phím | Tác dụng |
+|---|---|
+| `[` | Ghi conversation vào scrollback (dùng Cmd+F tìm) |
+| `v` | Mở trong `$VISUAL`/`$EDITOR` |
+| `q` / `Esc` | Thoát viewer |
 
 ---
 
@@ -311,30 +384,32 @@ MCP server có thể expose prompt thành command: `/mcp__<server>__<prompt>`.
 | `#<note>` | Save vào memory (deprecated v2.1+, dùng `/memory`) |
 | `&<task>` | Background task trên Cloud Code (Pro/Max) |
 
+### Tính năng input mới (v2.1.83+)
+
+- **Shell mode**: gõ `!` ở đầu prompt → chạy lệnh trực tiếp, real-time output, không cần Claude approve. `Ctrl+B` để background. `Escape`/`Backspace` thoát.
+- **Prompt suggestions**: gợi ý xám xuất hiện sau khi mở session hoặc Claude trả lời. `Tab`/`→` accept, `Enter` accept + submit. Tắt: `CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=false` hoặc `/config`.
+
 ---
 
 ## 6. Magic words & effort levels
 
-### Magic words trong prompt (deprecated favor of `/effort`)
-| Keyword | Token budget | Khi dùng |
-|---|---|---|
-| `think` | ~4k | Logic phức tạp vừa |
-| `think hard` / `think harder` / `think a lot` | ~10k | Vấn đề khó hơn |
-| `megathink` | ~10k | Synonym |
-| `think harder still` | ~20k | Rất khó |
-| `ultrathink` | ~32k (max) | Architecture, debug heisenbug, edge case nhiều |
+### Magic words trong prompt
+
+Chỉ **`ultrathink`** được nhận diện là keyword (kích hoạt budget ~32k thinking tokens). Các cụm `think`, `think hard`, `megathink`… là **plain text**, không trigger thinking budget đặc biệt — dùng `/effort` thay.
 
 ### `/effort` levels (chính thức 2026)
-| Level | Tương đương cũ |
-|---|---|
-| `low` | Không thinking |
-| `medium` | Default cho Sonnet |
-| `high` | Default cho Opus 4.6 |
-| `xhigh` | Default cho Opus 4.7 |
-| `max` | Tối đa, chỉ Opus 4.6+ session |
-| `auto` | Reset model default |
+| Level | Model mặc định | Ghi chú |
+|---|---|---|
+| `low` | — | Không thinking |
+| `medium` | — | Thinking nhẹ |
+| `high` | Opus 4.6, Sonnet 4.6 | Default cho hầu hết model |
+| `xhigh` | Opus 4.7 | Chỉ Opus 4.7; model khác fallback → `high` |
+| `max` | — | Tối đa, chỉ Opus 4.6+ session, session-only |
+| `auto` | — | Reset model default |
 
-`low`/`medium`/`high` persist qua session; `max` session-only. `Alt+T` toggle thinking. `MAX_THINKING_TOKENS=0` để tắt hoàn toàn.
+`low`/`medium`/`high`/`xhigh` persist qua session; `max` session-only (trừ khi set qua `CLAUDE_CODE_EFFORT_LEVEL` env var). `Alt+T` toggle thinking. `Alt+O` toggle fast mode. `MAX_THINKING_TOKENS=0` để tắt hoàn toàn. `CLAUDE_CODE_EFFORT_LEVEL` env var override tất cả.
+
+Opus 4.7 dùng **adaptive reasoning** (thinking tùy bước, không cố định budget). Opus 4.6/Sonnet 4.6 dùng fixed budget. Tắt adaptive: `CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1`.
 
 ---
 
@@ -372,12 +447,14 @@ commands/*.md
 agents/*.md
 output-styles/*.md
 agent-memory/<name>/
+themes/<name>.json               # Custom color theme (v2.1.118+)
 projects/<project-hash>/
 └── memory/                      # Auto memory, KHÔNG sửa tay
 ```
 
 ### Enterprise / managed
 ```
+CLAUDE.md                        # Org-wide instructions, không thể exclude
 managed-settings.json            # Org-wide policy, override mọi thứ
 managed-mcp.json                 # MCP server bắt buộc
 ```
@@ -396,16 +473,22 @@ managed-mcp.json                 # MCP server bắt buộc
 
 ```yaml
 ---
-name: <kebab-case>                    # Match folder name; required
-description: <what + when>            # Required — Claude dùng để auto-invoke
-allowed-tools: Read Grep Bash(git:*)  # Space-separated hoặc comma-separated
+name: <kebab-case>                    # Optional (default = tên folder). Lowercase, số, hyphen, max 64 ký tự
+description: <what + when>            # Recommended — Claude dùng để auto-invoke
+allowed-tools: Read Grep Bash(git:*)  # Space-separated, comma-separated, hoặc YAML list
 disable-model-invocation: false       # true → chỉ user gọi (không Claude tự load)
 user-invocable: true                  # false → chỉ Claude gọi (ẩn khỏi /menu)
 argument-hint: "<gợi ý đối số>"
+arguments:                            # Named positional args → dùng $name trong body
+  - name: target
+  - name: scope
+when_to_use: "<trigger phrases>"      # Bổ sung description, giúp auto-invoke chính xác hơn
+paths: ["src/**/*.ts", "*.config.*"]  # Glob patterns giới hạn khi nào skill activate
 model: opus|sonnet|haiku|inherit
 context: fork                         # fork → run trong subagent isolated
 agent: Explore|Plan|general-purpose   # Subagent type khi context: fork
-effort: low|medium|high|max
+effort: low|medium|high|xhigh|max
+shell: bash|powershell                # Shell cho !`command` blocks
 hooks:
   PreToolUse: ...
 once: false                           # true → chạy 1 lần per session rồi remove (chỉ skill)
@@ -414,10 +497,14 @@ once: false                           # true → chạy 1 lần per session rồ
 Nội dung markdown — instructions cho Claude khi skill được gọi.
 
 $ARGUMENTS                            # Full argument string
+$ARGUMENTS[N]                         # Argument thứ N (0-based)
 $0, $1, $2                            # Positional args (shell-style quoting)
+$name                                 # Named arg (từ `arguments` frontmatter)
 !`<bash command>`                     # Chạy bash, output inject vào prompt
 @<file>                               # Reference file
 ${CLAUDE_SESSION_ID}                  # Env var substitution
+${CLAUDE_EFFORT}                      # Effort level hiện tại
+${CLAUDE_SKILL_DIR}                   # Thư mục chứa SKILL.md
 ```
 
 **Rules**:
@@ -440,6 +527,7 @@ description: <khi nào delegate>       # Required
 tools: Read, Grep, Glob, Bash         # Optional — omit thì inherit thread tools
 model: opus|sonnet|haiku|inherit      # Optional, default inherit
 isolation: worktree                   # Optional — copy isolated repo qua git worktree
+skills: [my-skill, another-skill]     # Optional — pre-load skills vào subagent
 ---
 
 System prompt cho subagent (toàn bộ markdown body sau frontmatter).
@@ -450,6 +538,7 @@ Lưu ý:
 - Subagent có **context window riêng** — không ăn context chính.
 - `cd` trong subagent KHÔNG persist qua tool call.
 - Khi `isolation: worktree`, subagent chạy trong git worktree riêng → không ảnh hưởng main working tree.
+- Model override chỉ áp dụng trong turn đó, không lưu vào settings.
 
 ---
 
@@ -510,7 +599,7 @@ keep-coding-instructions: true        # default: false; true → giữ default c
 
   "env": {
     "MAX_THINKING_TOKENS": "0",
-    "MAX_MCP_OUTPUT_TOKENS": "50000"
+    "MAX_MCP_OUTPUT_TOKENS": "10000"   // default 10k, tăng nếu cần (max 500k)
   },
 
   // Memory / context
@@ -539,13 +628,33 @@ keep-coding-instructions: true        # default: false; true → giữ default c
   },
 
   // Cleanup
-  "cleanupPeriodDays": 14,
+  "cleanupPeriodDays": 30,
   "plansDirectory": "./plans",
   "showClearContextOnPlanAccept": true,
-  "autoUpdatesChannel": "stable",       // "stable" | "latest"
+  "autoUpdatesChannel": "latest",        // "stable" | "latest"
+
+  // Auto mode
+  "autoMode": {
+    "environment": ["$defaults", "Source control: github.com/my-org"],
+    "allow": ["$defaults"],            // Override block rules
+    "soft_deny": ["$defaults"]         // Override allow rules
+  },
+
+  // Editor & UI
+  "editorMode": "normal",             // "normal" | "vim"
+  "effortLevel": "high",              // "low" | "medium" | "high" | "xhigh"
+  "tui": "default",                   // "default" | "fullscreen" (alt-screen)
+  "viewMode": "default",              // "default" | "verbose" | "focus"
+  "defaultShell": "bash",             // "bash" | "powershell"
+  "awaitSummaryEnabled": true,        // Session recap sau idle
+  "showThinkingSummaries": false,     // Show extended thinking summaries
+  "showTurnDuration": true,
+
+  // Memory
+  "autoMemoryDirectory": "~/.claude/memory",
 
   // Voice + UI
-  "voiceEnabled": false,
+  "voiceEnabled": false,              // DEPRECATED — dùng voice.enabled
   "spinnerVerbs": { "mode": "append", "verbs": ["Cooking", "Architecting"] },
   "spinnerTipsEnabled": true,
   "prefersReducedMotion": false,
@@ -572,6 +681,11 @@ keep-coding-instructions: true        # default: false; true → giữ default c
 - `Read(./secrets/**)` — recursive trong dir
 - `Edit(*.ts)` — pattern theo extension
 - `WebFetch(*)` — bất kỳ URL
+- `WebFetch(domain:example.com)` — domain cụ thể
+- `Agent(Explore)` — subagent type cụ thể
+- `Agent(my-custom-agent)` — custom subagent
+
+Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Process wrapper (`timeout`, `nice`, `nohup`, `stdbuf`, `xargs`) tự strip khi match.
 
 ---
 
@@ -599,7 +713,30 @@ keep-coding-instructions: true        # default: false; true → giữ default c
 | `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` | Disable analytics |
 | `CLAUDE_CODE_DEBUG_LOGS_DIR` | Dir cho debug logs |
 | `CLAUDE_CODE_SIMPLE` | Set bởi `--bare` flag |
-| `CLAUDE_MEM_MODE` | Mode của plugin claude-mem |
+| `ANTHROPIC_BASE_URL` | Override API endpoint (proxy/gateway) |
+| `ANTHROPIC_MODEL` | Override model mặc định |
+| `ANTHROPIC_AUTH_TOKEN` | Custom Authorization header |
+| `CLAUDE_CODE_EFFORT_LEVEL` | Override effort level (ưu tiên cao nhất) |
+| `CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1` | Tắt adaptive reasoning (Opus 4.7) |
+| `CLAUDE_CODE_DISABLE_THINKING` | Tắt extended thinking |
+| `CLAUDE_CODE_SHELL` | Override shell detection |
+| `CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION` | Bật/tắt prompt suggestions (default `true`) |
+| `ENABLE_TOOL_SEARCH` | MCP tool search: `auto` (default) hoặc `false` (load hết) |
+| `CLAUDE_CODE_MAX_TOOL_USE_CONCURRENCY` | Max parallel tool execution (default 10) |
+| `API_TIMEOUT_MS` | API timeout (default 600000 = 10 phút) |
+| `BASH_DEFAULT_TIMEOUT_MS` | Bash timeout (default 120000 = 2 phút) |
+| `BASH_MAX_TIMEOUT_MS` | Bash max timeout (default 600000) |
+| `CLAUDE_CODE_AUTO_COMPACT_WINDOW` | Context window cho auto-compaction |
+| `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` | Trigger auto-compact (default ~95%) |
+| `CLAUDE_CODE_MAX_CONTEXT_TOKENS` | Override context window size |
+| `CLAUDE_CODE_SUBAGENT_MODEL` | Model cho subagent |
+| `CLAUDECODE` | Set trong spawned shells (dùng để detect Claude env) |
+| `CLAUDE_CODE_DISABLE_AUTO_MEMORY` | Tắt auto memory |
+| `CLAUDE_CODE_GIT_BASH_PATH` | Path tới Git Bash (Windows) |
+| `CLAUDE_CODE_NO_FLICKER` | `1` = bật fullscreen rendering mặc định |
+| `CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN` | `1` = force classic renderer |
+| `CLAUDE_CODE_SCROLL_SPEED` | Tốc độ cuộn mouse (1-20, default auto) |
+| `CLAUDE_CODE_DISABLE_MOUSE` | `1` = tắt mouse capture (giữ flicker-free, cho phép native text select) |
 
 ---
 
@@ -649,7 +786,7 @@ Hook chạy DETERMINISTIC (KHÔNG phụ thuộc Claude nhớ rule). Định ngh�
 ### Async events (notification, file, config…)
 | Event | Khi fire | Matcher |
 |---|---|---|
-| `Notification` | Claude gửi notification | `permission_prompt`, `idle_prompt`, `auth_success`, `elicitation_dialog`, … |
+| `Notification` | Claude gửi notification | `permission_prompt`, `idle_prompt`, `auth_success`, `elicitation_dialog`, `elicitation_complete`, `elicitation_response` |
 | `TeammateIdle` | Agent team teammate idle | (none) |
 | `InstructionsLoaded` | CLAUDE.md / `.claude/rules/*.md` được load | `session_start`, `nested_traversal`, `path_glob_match`, `include`, `compact` |
 | `ConfigChange` | Config file thay đổi trong session | `user_settings`, `project_settings`, `local_settings`, `policy_settings`, `skills` |
@@ -896,6 +1033,14 @@ Output breakdown:
 
 Mỗi nhóm chiếm % rõ ràng — fix nhóm > 15% trước.
 
+### Gì survive `/compact`, gì mất
+
+- **Survive**: project-root CLAUDE.md (re-read từ disk), auto memory (200 dòng hoặc 25KB đầu tiên)
+- **Mất**: nested CLAUDE.md (sub-dir) — chỉ reload khi Claude đọc file trong dir đó
+- **Mất**: skill descriptions chưa invoke — chỉ skills đã gọi trong session được giữ
+- **Mất**: path-scoped rules — chỉ reload khi file matching được đọc lại
+- **Mất**: conversation-only instructions (thêm vào CLAUDE.md nếu muốn persist)
+
 ---
 
 ## 17. Session management & handoff
@@ -1000,6 +1145,8 @@ Cách xử lý:
 | Auto-fix PR khi CI fail | `/autofix-pr` |
 | Watch external event | `/loop <interval> <prompt>` |
 | Audit security trên diff | `/security-review` |
+| Mở Claude Code từ URL | Deep link: `claude-cli://open?q=<prompt>&cwd=<path>` |
+| Tắt deep link handler | `disableDeepLinkRegistration: "disable"` trong settings |
 
 ---
 
@@ -1030,6 +1177,29 @@ Cách xử lý:
 - Plugins reference: <https://code.claude.com/docs/en/plugins-reference>
 - Agent SDK: <https://code.claude.com/docs/en/agent-sdk/overview>
 - Slash commands SDK: <https://code.claude.com/docs/en/agent-sdk/slash-commands>
+- `.claude` directory: <https://code.claude.com/docs/en/claude-directory>
+- Auto mode config: <https://code.claude.com/docs/en/auto-mode-config>
+- Permission modes: <https://code.claude.com/docs/en/permission-modes>
+- Common workflows: <https://code.claude.com/docs/en/common-workflows>
+- Ultraplan: <https://code.claude.com/docs/en/ultraplan>
+- Ultrareview: <https://code.claude.com/docs/en/ultrareview>
+- Routines: <https://code.claude.com/docs/en/routines>
+- Agent teams: <https://code.claude.com/docs/en/agent-teams>
+- Channels: <https://code.claude.com/docs/en/channels>
+- Fast mode: <https://code.claude.com/docs/en/fast-mode>
+- Desktop app: <https://code.claude.com/docs/en/desktop>
+- Claude Code on the web: <https://code.claude.com/docs/en/claude-code-on-the-web>
+- Remote control: <https://code.claude.com/docs/en/remote-control>
+- Computer use (CLI): <https://code.claude.com/docs/en/computer-use>
+- Keybindings: <https://code.claude.com/docs/en/keybindings>
+- Voice dictation: <https://code.claude.com/docs/en/voice-dictation>
+- Fullscreen rendering: <https://code.claude.com/docs/en/fullscreen>
+- Sandboxing: <https://code.claude.com/docs/en/sandboxing>
+- Plugins: <https://code.claude.com/docs/en/plugins>
+- Scheduled tasks: <https://code.claude.com/docs/en/scheduled-tasks>
+- Changelog: <https://code.claude.com/docs/en/changelog>
+- What's new: <https://code.claude.com/docs/en/whats-new/index>
+- Errors reference: <https://code.claude.com/docs/en/errors>
 - LLM-friendly index: <https://code.claude.com/docs/llms.txt>
 - Context window — Anthropic API: <https://platform.claude.com/docs/en/build-with-claude/context-windows>
 - Engineering blog: <https://www.anthropic.com/engineering>
