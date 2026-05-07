@@ -1185,6 +1185,12 @@ Trong hook handler, dùng `if` (permission rule syntax):
 }
 ```
 
+**Common optional fields** cho mọi handler type:
+- `if`: permission-rule filter (chỉ chạy khi tool/path match)
+- `statusMessage`: hiển thị trong status line khi hook chạy
+- `once`: `true` = chỉ chạy 1 lần per session
+- `model` (chỉ `prompt` / `agent`): override fast model default
+
 ### 14.1 Hook output (command/http)
 
 Exit `0` = OK. Exit `2` = block tool, stderr → Claude. Stdout JSON cho control flow:
