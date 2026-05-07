@@ -205,14 +205,18 @@ Cụ thể các tính năng cần:
 
 Câu hỏi thường gặp:
 
-**Q: Sao không import cả 4 rules?**  
-A: Vì baseline context = mỗi message phải trả tiền. 4 rules = thêm ~6000 tokens × mỗi turn × cả phiên = lãng phí. Chỉ import 2 rule thực sự áp dụng MỌI turn (communication, security). Còn lại để Claude tự đọc khi cần (qua REFERENCE hoặc khi user `@`-reference).
+**Tại sao chỉ import 2 rules thay vì 4?**
 
-**Q: Sao không gộp REFERENCE vào CLAUDE.md?**  
-A: REFERENCE.md = ~1677 dòng, ~118k chars → ~41k tokens (Vietnamese prose ~2.3 chars/token, code blocks/tables ~3-4 chars/token, mix ~2.9). Nếu auto-load thì hết ~20% context window Sonnet 200k (hoặc ~4% Opus 1M) mỗi session. REFERENCE để **NGƯỜI** tra cứu (mở trên màn hình thứ 2 / web), KHÔNG để Claude đọc.
+Baseline context tính tiền theo mỗi message. 4 rules = thêm ~6000 tokens × mỗi turn × cả phiên = lãng phí. Chỉ import 2 rule áp dụng MỌI turn (`communication`, `security`); 2 rule còn lại để Claude đọc khi cần (qua REFERENCE hoặc user `@`-reference).
 
-**Q: Sao có cả `/init-context` lẫn `/init`?**  
-A: Cũ rồi — đã bỏ `/init-context` (overlap với `/init` built-in của Claude Code v2.1+).
+**Tại sao REFERENCE.md không auto-load vào CLAUDE.md?**
 
-**Q: Sao tiếng Việt cho commit nhưng tiếng Anh cho branch name?**  
-A: Branch name vào `git log --oneline`, nhiều tool (Linear, Jira, GitHub Action) parse được khi tiếng Anh chuẩn ASCII. Commit message hiển thị cho dev đọc → tiếng Việt giúp đọc nhanh. Type/scope giữ tiếng Anh để tool Conventional Commit parse được.
+REFERENCE.md = ~1685 dòng, ~118k chars → ~41k tokens (Vietnamese prose ~2.3 chars/token, code blocks/tables ~3-4 chars/token, mix ~2.9). Auto-load = ~20% context Sonnet 200k (hoặc ~4% Opus 1M) mỗi session. REFERENCE phục vụ **NGƯỜI** tra cứu (mở trên màn hình thứ 2 / web), KHÔNG cho Claude đọc.
+
+**Tại sao bỏ `/init-context`?**
+
+Overlap với `/init` built-in của Claude Code v2.1+. Đã bỏ để tránh duplicate.
+
+**Tại sao commit message tiếng Việt nhưng branch name tiếng Anh?**
+
+Branch name vào `git log --oneline` và nhiều tool (Linear, Jira, GitHub Action) parse được khi tiếng Anh chuẩn ASCII. Commit message hiển thị cho dev đọc → tiếng Việt giúp đọc nhanh. Type/scope giữ tiếng Anh để tool Conventional Commit parse được.

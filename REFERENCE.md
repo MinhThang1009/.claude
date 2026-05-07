@@ -558,7 +558,15 @@ Chỉ **`ultrathink`** được nhận diện là keyword — Claude Code thêm 
 | `max`    | —                    | Tối đa (Opus 4.7/4.6/Sonnet 4.6), session-only |
 | `auto`   | —                    | Reset model default                            |
 
-`low`/`medium`/`high`/`xhigh` persist qua session; `max` session-only (trừ khi set qua `CLAUDE_CODE_EFFORT_LEVEL` env var). `Alt+T` toggle thinking. `Alt+O` toggle fast mode. `MAX_THINKING_TOKENS=0` để tắt hoàn toàn. `CLAUDE_CODE_EFFORT_LEVEL` env var override tất cả.
+**Persistence**:
+- `low`/`medium`/`high`/`xhigh` persist qua session
+- `max` session-only (trừ khi set qua `CLAUDE_CODE_EFFORT_LEVEL` env var)
+
+**Toggle keys**: `Alt+T` thinking, `Alt+O` fast mode
+
+**Disable**: `MAX_THINKING_TOKENS=0` tắt hoàn toàn
+
+**Override**: `CLAUDE_CODE_EFFORT_LEVEL` env var ưu tiên cao nhất
 
 Opus 4.7 dùng **adaptive reasoning** (thinking tùy bước, không cố định budget). Opus 4.6/Sonnet 4.6 dùng fixed budget. Tắt adaptive: `CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1`.
 

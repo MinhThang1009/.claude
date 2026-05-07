@@ -153,7 +153,7 @@ Khi đối diện trade-off, dùng các trục:
 | Latency     | Cache aggressively   | Always fresh       |
 | Generality  | Generic/configurable | Specific/hardcoded |
 
-Đặt câu hỏi: "Chúng ta đang ở đâu trên trục này, và TẠI SAO chỗ đó?"
+Xác định vị trí team trên từng trục và lý do chọn vị trí đó.
 
 # KHÔNG làm
 
