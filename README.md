@@ -197,7 +197,7 @@ Cụ thể các tính năng cần:
 
 - Tài liệu chính thức: <https://code.claude.com/docs>
 - Best practices: <https://code.claude.com/docs/en/best-practices>
-- Cheatsheet đầy đủ: xem `REFERENCE.md`
+- Cheatsheet đầy đủ: xem [`REFERENCE.md`](REFERENCE.md)
 - Session management: <https://claude.com/blog/using-claude-code-session-management-and-1m-context>
 
 ## 9. Cấu trúc nội bộ — vì sao thiết kế thế này
