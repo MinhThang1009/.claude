@@ -576,11 +576,66 @@ System prompt cho subagent (toàn bộ markdown body sau frontmatter).
 ```
 
 Lưu ý:
-- Subagent **chỉ nhận system prompt này** (không có default Claude Code system prompt).
+- Subagent **chỉ nhận system prompt này** (không có default Claude Code system prompt; chỉ + basic env như cwd).
 - Subagent có **context window riêng** — không ăn context chính.
 - `cd` trong subagent KHÔNG persist qua tool call.
 - Khi `isolation: worktree`, subagent chạy trong git worktree riêng → không ảnh hưởng main working tree.
 - Model override chỉ áp dụng trong turn đó, không lưu vào settings.
+
+### Agent teams (experimental, v2.1.32+)
+
+Khác subagent (chỉ report về main agent), agent teams cho phép multiple teammates chạy parallel **trong cùng session**, communicate trực tiếp với nhau qua shared task list + mailbox. Use case: parallel review, debugging với competing hypotheses, cross-layer coordination.
+
+**Enable** (mặc định OFF):
+```json
+// settings.json
+{
+  "env": { "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" }
+}
+```
+
+**Architecture**:
+- **Lead**: main session điều phối — fixed cho lifetime team (không transfer leadership)
+- **Teammates**: separate Claude Code instances, mỗi teammate có context riêng (load CLAUDE.md/MCP/skills, KHÔNG inherit lead history; chỉ nhận spawn prompt)
+- **Task list**: shared, file-locking khi claim → tránh race condition
+- **Mailbox**: inter-teammate messaging tự động delivery (no polling)
+
+**Display modes** (`teammateMode` setting):
+- `"auto"` (default): tmux nếu trong tmux session, ngược lại in-process
+- `"in-process"`: tất cả teammates trong main terminal (mọi terminal đều work)
+- `"tmux"`: split panes (yêu cầu tmux hoặc iTerm2 + `it2` CLI)
+
+CLI override 1 session: `claude --teammate-mode in-process`.
+
+**Tool `SendMessage`**: chỉ available cho lead/teammates khi env var bật. Send message theo tên teammate (lead assign tên lúc spawn). Reach all = send từng message một.
+
+**Storage** (auto-managed, ĐỪNG sửa tay):
+- `~/.claude/teams/<team-name>/config.json` — runtime state (session IDs, tmux pane IDs, members array)
+- `~/.claude/tasks/<team-name>/` — shared task list
+
+**Subagent định nghĩa làm teammate**: reference subagent type khi spawn (vd "spawn teammate using security-reviewer agent type"). Honor `tools` allowlist + `model`. **Lưu ý**: `skills` và `mcpServers` trong subagent frontmatter **KHÔNG applied** khi run as teammate (teammate load skills/MCP từ project + user settings như session thường).
+
+**Hooks scoped cho team** (xem section 13):
+- `TeammateIdle`: exit code 2 = giữ teammate working thay vì idle
+- `TaskCreated`: exit code 2 = block creation + send feedback
+- `TaskCompleted`: exit code 2 = block completion + send feedback
+
+**Key bindings (UI)**:
+- `Shift+Down`: cycle teammates → wrap về lead
+- `Enter`: view teammate session
+- `Escape`: interrupt teammate's current turn
+- `Ctrl+T`: toggle shared task list
+
+**Limits**:
+- 1 team/session, no nested teams (teammate không spawn được team mới)
+- `/resume` và `/rewind` KHÔNG restore in-process teammates → nói lead spawn lại
+- Permissions set lúc spawn (inherit lead) — đổi từng teammate sau spawn được, nhưng không set per-teammate lúc spawn
+- Split panes KHÔNG support trong VS Code integrated terminal, Windows Terminal, Ghostty
+- Token cost cao: mỗi teammate là full Claude instance — recommended 3-5 teammates per team
+
+**Plan-approval flow**: nếu yêu cầu teammate plan trước (vd "require plan approval"), teammate work trong read-only plan mode → submit plan → lead review (autonomously, có thể guide qua prompt vd "only approve plans with test coverage") → approve/reject → revise loop.
+
+**Cleanup**: nói "clean up the team" với lead. KHÔNG để teammate cleanup (context không đầy đủ).
 
 ---
 
