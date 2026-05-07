@@ -193,7 +193,7 @@ Cao → thấp khi xung đột:
 
 ### Cấp 4 — Session handoff (khi compact không đủ)
 
-- Skill `/handoff` tự động tạo brief 5-10 dòng.
+- Skill [`/handoff`](skills/handoff/SKILL.md) tự động tạo brief 5-10 dòng.
 - Brief save vào `<project>/.claude/HANDOFF.md`.
 - Session mới → `Đọc .claude/HANDOFF.md và tiếp tục` thay vì `--resume`.
 - **Brief-injection > resume** vì resume kéo theo stale tool output.

@@ -34,7 +34,7 @@
 
 ## Git
 
-- KHÔNG `git commit`/`git push` trừ khi tôi yêu cầu rõ (hoặc gọi `/commit`).
+- KHÔNG `git commit`/`git push` trừ khi tôi yêu cầu rõ (hoặc gọi [`/commit`](skills/commit/SKILL.md)).
 - KHÔNG `git add .` — add từng file cụ thể.
 - KHÔNG `--force`, KHÔNG `git reset --hard` trên work của tôi.
 - KHÔNG thêm `Co-Authored-By: Claude` hay tagline `🤖 Generated with Claude Code` vào commit (đã tắt qua `attribution.commit: ""`).
@@ -63,7 +63,7 @@
 
 - Theo dõi `/context` thường xuyên. **<40% sweet spot**, **>60% nên `/compact` hoặc `/clear`**, **>80% PHẢI act**.
 - Hoàn thành 1 phase (auth xong, refactor xong) → đề xuất `/compact` ngay, đừng đợi auto-compact ở 95%.
-- Trước khi compact/clear → tôi sẽ yêu cầu bạn viết handoff brief; bạn dùng skill `/handoff`.
+- Trước khi compact/clear → tôi sẽ yêu cầu bạn viết handoff brief; bạn dùng skill [`/handoff`](skills/handoff/SKILL.md).
 - Câu hỏi nhanh không cần lưu history → tôi dùng `/btw`.
 
 ## Compact Instructions
