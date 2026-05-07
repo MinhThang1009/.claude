@@ -1067,18 +1067,18 @@ Hook chạy DETERMINISTIC (KHÔNG phụ thuộc Claude nhớ rule). Định ngh�
 | --------------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `UserPromptSubmit`    | Mỗi message user                | (none)                                                                                                                                             |
 | `UserPromptExpansion` | Khi command expand thành prompt | command names — có thể block expansion                                                                                                             |
-| `Stop`                | Claude finish response          | (none)                                                                                                                                             |
+| `Stop`                | Claude finish response          | (none) — exit code 2 = prevent stop, continue conversation                                                                                         |
 | `StopFailure`         | Turn end vì API error           | `rate_limit`, `authentication_failed`, `oauth_org_not_allowed`, `billing_error`, `invalid_request`, `server_error`, `max_output_tokens`, `unknown` |
 
 ### 13.3 Per-tool-call (agentic loop)
-| Event                | Khi fire                              | Matcher                                           |
-| -------------------- | ------------------------------------- | ------------------------------------------------- |
-| `PreToolUse`         | Trước tool call                       | tool name, vd `Bash`, `Edit\|Write`, `mcp__.*`    |
-| `PermissionRequest`  | Khi permission dialog xuất hiện       | tool name                                         |
-| `PermissionDenied`   | Khi tool bị auto-mode classifier deny | tool name — return `{retry: true}` cho phép retry |
-| `PostToolUse`        | Sau tool call thành công              | tool name                                         |
-| `PostToolUseFailure` | Sau tool call fail                    | tool name                                         |
-| `PostToolBatch`      | Sau batch tool call song song xong    | (none)                                            |
+| Event                | Khi fire                              | Matcher                                                                                      |
+| -------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `PreToolUse`         | Trước tool call                       | tool name, vd `Bash`, `Edit\|Write`, `mcp__.*`                                               |
+| `PermissionRequest`  | Khi permission dialog xuất hiện       | tool name                                                                                    |
+| `PermissionDenied`   | Khi tool bị auto-mode classifier deny | tool name — return JSON `{retry: true}` cho phép retry (exit code BỊ IGNORE, phải dùng JSON) |
+| `PostToolUse`        | Sau tool call thành công              | tool name                                                                                    |
+| `PostToolUseFailure` | Sau tool call fail                    | tool name                                                                                    |
+| `PostToolBatch`      | Sau batch tool call song song xong    | (none) — exit code 2 = STOP agentic loop trước model call kế tiếp                            |
 
 ### 13.4 Subagent & task
 | Event           | Khi fire                                            | Matcher                                                   |
