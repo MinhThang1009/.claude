@@ -88,7 +88,7 @@
 | `--fallback-model <alias>` | Fallback khi default overload (chỉ print mode) |
 | `--betas <header>` | Beta header cho API (chỉ API key user) |
 
-**Model aliases**: `default` = reset về model mặc định theo plan. `best` = model mạnh nhất (hiện = `opus`). `opusplan` = Opus cho plan mode, Sonnet cho execution. `[1m]` = 1M context window (chỉ Opus 4.7/4.6, Sonnet 4.6). Trên Anthropic API: `opus` → Opus 4.7, `sonnet` → Sonnet 4.6. Default theo plan: Max/Team Premium → Opus 4.7; Pro/Team Standard/Enterprise/API → Sonnet 4.6.
+**Model aliases**: `default` = reset về model recommended cho account type. `best` = model mạnh nhất (currently equivalent to `opus`). `opusplan` = Opus cho plan mode, Sonnet cho execution. `[1m]` = 1M context window (chỉ Opus 4.7/4.6, Sonnet 4.6). Trên Anthropic API: `opus` → Opus 4.7, `sonnet` → Sonnet 4.6. Trên Bedrock/Vertex/Foundry: `opus` → Opus 4.6, `sonnet` → Sonnet 4.5 (pin bằng `ANTHROPIC_DEFAULT_OPUS_MODEL`/`_SONNET_MODEL` để control version). Default model theo plan: **Max/Team Premium** → Opus 4.7; **Pro/Team Standard/Enterprise/Anthropic API** → Sonnet 4.6; **Bedrock/Vertex/Foundry** → Sonnet 4.5.
 
 #### Models hiện được hỗ trợ (Anthropic API, tính đến 2026-05)
 
@@ -1121,6 +1121,35 @@ Output breakdown:
 
 Mỗi nhóm chiếm % rõ ràng — fix nhóm > 15% trước.
 
+### Prompt caching (auto trong Claude Code)
+
+Claude Code dùng prompt caching tự động để giảm cost cho conversation dài. Cache prefix giống nhau giữa các turn → read **0.1× giá input** thay vì full price. Cache TTL mặc định 5 phút (sliding window — refresh mỗi lần dùng).
+
+| Cache TTL | Write cost | Read cost |
+|---|---|---|
+| 5 phút (default) | 1.25× input | 0.1× input |
+| 1 giờ | 2× input | 0.1× input |
+
+**Min cacheable size** (prompt nhỏ hơn ngưỡng = không cache, không error):
+- Opus 4.7/4.6/4.5, Haiku 4.5: **4,096 token**
+- Sonnet 4.6, Haiku 3.5: **2,048 token**
+- Model khác: **1,024 token**
+
+**Disable** (env var):
+- `DISABLE_PROMPT_CACHING=1` — tắt toàn bộ (ưu tiên hơn per-model)
+- `DISABLE_PROMPT_CACHING_OPUS=1` / `_SONNET=1` / `_HAIKU=1` — tắt theo model
+
+**Best practice cho cache hit rate cao**:
+- Static content (system prompt, tool defs, large context, CLAUDE.md) phải đứng TRƯỚC user messages — KHÔNG xen timestamp/per-request data vào giữa.
+- Conversation dài: cache breakpoint tự động dịch về turn mới nhất; content cũ read từ cache.
+- Monitor: check field `usage` trong response API — `cache_read_input_tokens` (đọc từ cache), `cache_creation_input_tokens` (viết mới), `input_tokens` (không cache, charged full price).
+
+**Khi cache hit thấp** (cost tăng bất ngờ):
+- CLAUDE.md đổi giữa session → invalidate toàn bộ cache.
+- Skill/subagent prompt thay đổi giữa turn.
+- Reorder hoặc inject content vào giữa system prompt.
+- Compact xong → cache phải build lại từ đầu.
+
 ### Gì survive `/compact`, gì mất
 
 - **Survive**: project-root CLAUDE.md (re-read từ disk), auto memory (re-injected từ disk; MEMORY.md cap 200 dòng/25KB lúc load)
@@ -1254,6 +1283,8 @@ Cách xử lý:
 - Permissions: <https://code.claude.com/docs/en/permissions>
 - Output styles: <https://code.claude.com/docs/en/output-styles>
 - Model config & effort: <https://code.claude.com/docs/en/model-config>
+- Prompt caching (platform): <https://platform.claude.com/docs/en/build-with-claude/prompt-caching>
+- Models overview (platform): <https://platform.claude.com/docs/en/about-claude/models/overview>
 - MCP: <https://code.claude.com/docs/en/mcp>
 - CLI reference: <https://code.claude.com/docs/en/cli-reference>
 - Commands reference: <https://code.claude.com/docs/en/commands>
