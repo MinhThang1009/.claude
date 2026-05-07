@@ -731,14 +731,14 @@ Khác subagent (chỉ report về main agent), agent teams cho phép multiple te
 - **Task list**: shared, file-locking khi claim → tránh race condition
 - **Mailbox**: inter-teammate messaging tự động delivery (no polling)
 
-**Display modes** — 2 modes chính thức (theo docs `agent-teams`):
+**Display modes** — 2 modes chính thức (theo [docs agent-teams](https://code.claude.com/docs/en/agent-teams)):
 - **In-process**: tất cả teammates render trong main terminal (mọi terminal đều work)
 - **Split panes**: tách pane riêng cho mỗi teammate (yêu cầu tmux HOẶC iTerm2 + `it2` CLI; iTerm2 cần enable Python API trong Settings → General → Magic)
 
 **Setting `teammateMode`** — 3 values control routing logic:
-- `"auto"` (default): split panes nếu trong tmux/iTerm2, ngược lại in-process
+- `"auto"` (default): split panes nếu đang chạy **trong tmux session**, ngược lại in-process
 - `"in-process"`: force in-process
-- `"tmux"`: force split panes
+- `"tmux"`: enable split-pane mode, **auto-detect** tmux vs iTerm2 theo terminal hiện tại
 
 CLI override 1 session: `claude --teammate-mode in-process`.
 
@@ -885,7 +885,7 @@ keep-coding-instructions: true        # default: false; true → giữ default c
   "awaySummaryEnabled": true,         // Session recap sau idle (default true)
   "showThinkingSummaries": false,     // Show extended thinking summaries
   "showTurnDuration": true,
-  "teammateMode": "auto",             // "auto" | "in-process" | "tmux" — agent team display mode (auto = tmux nếu trong tmux session, ngược lại in-process). Chỉ effect khi CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+  "teammateMode": "auto",             // "auto" | "in-process" | "tmux" — routing logic teammate (auto = split panes nếu trong tmux session, ngược lại in-process; tmux = enable split-pane, auto-detect tmux vs iTerm2). Chỉ effect khi CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
 
   // Memory
   "autoMemoryDirectory": "~/.claude/memory",
