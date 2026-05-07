@@ -220,7 +220,7 @@
 ### 2.3 Permission & tool
 | Flag                                   | Mục đích                                                    |
 | -------------------------------------- | ----------------------------------------------------------- |
-| `--permission-mode <mode>`             | `default`, `auto`, `plan`, `bypassPermissions`              |
+| `--permission-mode <mode>`             | `default`, `acceptEdits`, `auto`, `plan`, `dontAsk`, `bypassPermissions` |
 | `--dangerously-skip-permissions`       | = `--permission-mode bypassPermissions` ⚠️ chỉ trong sandbox |
 | `--allow-dangerously-skip-permissions` | Cho phép `bypassPermissions` trong Shift+Tab cycle          |
 | `--allowedTools "<rules>"`             | Pre-approve tool/lệnh không hỏi                             |
@@ -908,9 +908,10 @@ keep-coding-instructions: true        # default: false; true → giữ default c
 - `Agent(my-custom-agent)` — custom subagent
 - `MCP(github)` — MCP server theo tên
 
-**Wildcard**:
-- `*` = single segment (không cross thư mục/level)
-- `**` = recursive (mọi level con)
+**Wildcard** (semantics khác nhau theo tool):
+- `Read()`/`Edit()` (gitignore-style): `*` = single segment (không cross `/`), `**` = recursive
+- `Bash()` (glob loose): `*` = match bất kỳ chuỗi ký tự kể cả khoảng trắng, span nhiều argument
+- `WebFetch(domain:*.example.com)`: `*` = bất kỳ subdomain
 
 **Path prefix** trong `Read()`/`Edit()`:
 
@@ -925,7 +926,7 @@ keep-coding-instructions: true        # default: false; true → giữ default c
 
 > **Note**: `Task` tool đã rename thành `Agent` từ v2.1.63. `Task(...)` rules cũ vẫn work như alias, nhưng nên dùng tên mới `Agent(<type>)`.
 
-Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Process wrapper (`timeout`, `nice`, `nohup`, `stdbuf`, `xargs`) tự strip khi match.
+Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Process wrapper (`timeout`, `time`, `nice`, `nohup`, `stdbuf`, `xargs`) tự strip khi match.
 
 ---
 
