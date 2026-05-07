@@ -12,6 +12,8 @@
   },
   "permissions": {
     "//": "Mặc định cho global. Project có thể override hoặc thêm allow/deny.",
+    "//defaultMode": "acceptEdits = file edits (Edit/Write) tự apply không cần Apply diff card trong IDE. Bash/MCP nguy hiểm vẫn theo allow/ask/deny rule. Edit(**) và Write(**) trong ask list dưới có thể override mode này — nếu vẫn bị hỏi, xem xét bỏ.",
+    "defaultMode": "acceptEdits",
     "allow": [
       "Read(**)",
       "Glob(**)",
