@@ -231,7 +231,7 @@
 | Opus 4   | `claude-opus-4-0`   | 200k    | 32k        |
 
 **Ghi chú**:
-- **Thinking modes** (theo docs `models/overview`):
+- **Thinking modes** (theo [docs models/overview](https://platform.claude.com/docs/en/about-claude/models/overview)):
   - Opus 4.7: chỉ adaptive (không extended thinking)
   - Sonnet 4.6: có cả adaptive + extended
   - Haiku 4.5: chỉ extended (không adaptive)
@@ -1385,7 +1385,7 @@ Claude Code dùng prompt caching tự động để giảm cost cho conversation
 Sắp đầy context, vẫn làm tiếp cùng task ──► /compact (có instructions)
 Sắp đầy context, sang task khác ──────────► /handoff --save → /clear → brief mới
 Câu hỏi nhanh không cần lưu ──────────────► /btw
-Một message bị sai hướng ─────────────────► Esc Esc → rollback
+Một message bị sai hướng ─────────────────► Esc Esc → mở rewind menu (4 options)
 Khôi phục trạng thái phiên trước ─────────► claude --continue (rủi ro stale data)
                                           HOẶC brief-injection (sạch hơn)
 Fan-out task song song ───────────────────► claude -p ... background
@@ -1395,7 +1395,7 @@ Bulk migration nhiều file ────────────────► 
 
 ### 17.2 Anti-pattern resume long session
 
-Theo Anthropic blog `using-claude-code-session-management-and-1m-context` và bài "Stop Resuming Long Sessions, Brief Them Instead":
+Theo Anthropic blog `using-claude-code-session-management-and-1m-context`:
 - Session dài tích lũy nhiều **noise > signal** (stale `ls`, file content cũ, deliberation đã đóng).
 - `--continue` kéo theo cả mớ noise đó. Model treat tất cả là current.
 - **Brief-injection**: viết 5-7 dòng (state, decisions+why, constraints, open items, next), inject vào session mới.
