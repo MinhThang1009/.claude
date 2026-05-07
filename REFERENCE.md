@@ -150,9 +150,10 @@
 | `claude auto-mode defaults`                  | Print built-in rules auto-mode classifier (JSON)                                               |
 | `claude auto-mode config`                    | Print effective config (với settings đã apply)                                                 |
 | `claude auto-mode critique`                  | AI feedback trên custom allow/soft_deny rules                                                  |
-| `claude mcp add <name> <url>`                | Thêm MCP server                                                                                |
+| `claude mcp add <name> <url>`                | Thêm MCP server. Syntax đầy đủ: `claude mcp add --transport <stdio\|http\|sse> <name> <url> --header "Authorization: Bearer X"` |
 | `claude mcp list`                            | List MCP server                                                                                |
 | `claude mcp remove <name>`                   | Xóa MCP server                                                                                 |
+| `claude mcp get <name>`                      | Lấy chi tiết MCP server (config, transport, scope)                                             |
 | `claude mcp serve`                           | Expose Claude Code như MCP server                                                              |
 | `claude plugin install <name>@<marketplace>` | Cài plugin từ marketplace                                                                      |
 | `claude plugin list`                         | List plugin đã cài                                                                             |
@@ -282,6 +283,8 @@
 | `--output-format json\|stream-json\|text` | Format output (chỉ `-p` mode)                    |
 | `--include-hook-events`                   | Include hook events trong stream (`stream-json`) |
 | `--include-partial-messages`              | Include partial streaming events                 |
+
+> **Stream-json events** (cần `--verbose --include-partial-messages`): `system/init` (session metadata, tools, plugins, plugin_errors), `system/api_retry` (attempt/max_retries/retry_delay_ms/error_status/error category), `system/plugin_install` (chỉ khi `CLAUDE_CODE_SYNC_PLUGIN_INSTALL=1` — status: `started`/`installed`/`failed`/`completed`). Stdin pipe cap **10MB** (v2.1.128+) — vượt → exit non-zero.
 | `--verbose`                               | Verbose logging, show full turn-by-turn output   |
 | `--debug [<categories>]`                  | Bật debug — vd `"api,mcp,!file"`                 |
 | `--debug-file <path>`                     | Ghi debug log vào file                           |
@@ -319,7 +322,7 @@
 ### 2.10 Cloud & worktree
 | Flag                                     | Mục đích                                         |
 | ---------------------------------------- | ------------------------------------------------ |
-| `--remote "<task>"`                      | Tạo web session mới trên claude.ai               |
+| `--remote "<task>"`                      | Tạo web session mới trên claude.ai. Pre-fill URL params (`claude.ai/code?prompt=<text>&repositories=<owner/repo,...>&environment=<name>`, alias `q`/`repo`; `prompt_url=<url>` thay cho `prompt` cho prompt dài) |
 | `--remote-control`, `--rc`               | Bật Remote Control cho session                   |
 | `--teleport`                             | Pull web session vào terminal local              |
 | `--worktree`, `-w`                       | Chạy trong isolated git worktree                 |
@@ -516,6 +519,8 @@ MCP server có thể expose prompt thành command: `/mcp__<server>__<prompt>`.
 | `Alt+B` / `Alt+F` | Lùi/tiến 1 word   |
 
 > Vim mode: bật qua `/config` → Editor mode → `vim`. Full vi keybindings (NORMAL/INSERT/VISUAL).
+>
+> **Vim text objects** (kết hợp với `d`/`c`/`y`): `iw`/`aw` (word), `iW`/`aW` (WORD whitespace-delimited), `i"`/`a"`, `i'`/`a'`, `i(`/`a(`, `i[`/`a[`, `i{`/`a{`. Block-wise visual mode (`Ctrl+V`) KHÔNG support. NORMAL mode: `f{c}`/`F{c}`/`t{c}`/`T{c}` jump-to-char + `;`/`,` repeat. VISUAL: `r{c}` replace, `~`/`u`/`U` case toggle, `J` join, `o` swap cursor/anchor.
 
 ### 4.5 Khác
 | Phím                     | Tác dụng                                               |
@@ -637,11 +642,14 @@ projects/<project-hash>/
 ```text
 CLAUDE.md                        # Org-wide instructions, không thể exclude
 managed-settings.json            # Org-wide policy, override mọi thứ
+loop.md                          # (project `.claude/loop.md` HOẶC user `~/.claude/loop.md`) Default prompt cho bare `/loop`. Project precedence > user. Cap 25KB
+REVIEW.md                        # (Code Review) Repo-root override cho automated PR review behavior — inject vào system prompt highest priority
 managed-mcp.json                 # MCP server bắt buộc
 ```
-- macOS: `/Library/Application Support/ClaudeCode/`
-- Linux: `/etc/claude-code/`
-- Windows: `C:\ProgramData\ClaudeCode\`
+- macOS: `/Library/Application Support/ClaudeCode/managed-settings.json` (file) HOẶC plist `com.anthropic.claudecode`
+- Linux/WSL: `/etc/claude-code/managed-settings.json`
+- Windows: `C:\Program Files\ClaudeCode\managed-settings.json` (file) HOẶC registry `HKLM\SOFTWARE\Policies\ClaudeCode` (admin) / `HKCU\SOFTWARE\Policies\ClaudeCode` (user-writable)
+- Server-managed (Claude.ai admin console): highest priority, refresh hourly. Run `/status` → line `Enterprise managed settings (remote|plist|HKLM|HKCU|file)` để xem source đang active
 
 ### 7.4 Session storage (auto, đọc-only)
 ```text
@@ -859,8 +867,11 @@ force-for-plugin: false               # Plugin only: true → auto-apply khi plu
     "ask":     ["Bash(git push:*)", "Edit(**)"],
     "deny":    ["Bash(rm -rf /*)", "Read(.env)"],
     "additionalDirectories": ["~/shared-libs"],  // Thêm dir vào allowlist (ngoài cwd)
-    "disableBypassPermissionsMode": "disable"    // (managed) value `"disable"` string (không phải boolean) — chặn user bật bypass
+    "disableBypassPermissionsMode": "disable",   // (managed) value `"disable"` string (không phải boolean) — chặn user bật bypass
+    "disableAutoMode": "disable"                 // (managed) chặn user bật auto mode (admin lock-off)
   },
+  "availableModels": ["sonnet", "haiku"],         // (managed) restrict /model picker — array merge dedup. KHÔNG ảnh hưởng "Default" option
+  "forceRemoteSettingsRefresh": true,             // (managed) block CLI startup tới khi server-managed settings fetched fresh — fail-closed
 
   "hooks": {
     "PreToolUse":   [...],
@@ -892,8 +903,38 @@ force-for-plugin: false               # Plugin only: true → auto-apply khi plu
     "<server-name>": { "alwaysLoad": true }    // (v2.1.121+) Skip tool-search deferral — full schema vào context start
   },
 
-  // Sandbox
-  "sandbox": { "enabled": false },
+  // Sandbox (macOS Seatbelt / Linux+WSL2 bubblewrap+socat)
+  "sandbox": {
+    "enabled": false,                          // true = bật sandbox cho Bash tool
+    "failIfUnavailable": false,                // true = exit nếu sandbox không khả dụng (managed deployment)
+    "allowUnsandboxedCommands": true,          // false = TẮT escape hatch `dangerouslyDisableSandbox` parameter
+    "filesystem": {
+      "allowWrite": ["~/.kube", "/tmp/build"], // Dirs subprocess được write (ngoài cwd). `./` = relative project root, `~/` = home, `/` = absolute
+      "denyWrite": ["~/secrets"],
+      "allowRead": ["."],
+      "denyRead": ["~/"],
+      "allowManagedReadPathsOnly": false       // (managed) true = chỉ managed `allowRead` được respect
+    },
+    "network": {
+      "allowedDomains": ["api.example.com", "*.internal.corp"],
+      "deniedDomains": ["evil.example.com"],
+      "allowManagedDomainsOnly": false,        // (managed) true = block non-allowed domains tự động
+      "httpProxyPort": 8080,                   // Custom proxy cho TLS inspection
+      "socksProxyPort": 8081
+    },
+    "excludedCommands": ["docker *"],          // Commands chạy NGOÀI sandbox (vd: docker, watchman incompatible)
+    "allowUnixSockets": ["/var/run/myapp.sock"], // Cẩn thận: docker.sock = privilege escalation
+    "enableWeakerNestedSandbox": false         // (Linux) yếu hơn nhưng work trong Docker không cần privileged namespaces
+  },
+
+  // Skills & plugins
+  "disableSkillShellExecution": false,           // (managed) true → tắt !`command` execution trong skills/commands (user/project/plugin/--add-dir sources). Bundled/managed skills KHÔNG bị ảnh hưởng
+  "extraKnownMarketplaces": {                    // Project-level: auto-prompt install marketplace khi user trust folder
+    "my-team-tools": { "source": { "source": "github", "repo": "your-org/claude-plugins" } }
+  },
+  "enabledPlugins": {                            // Per-plugin enable/disable, scope-aware
+    "code-review@claude-plugins-official": true
+  },
 
   // File suggestion
   "fileSuggestion": {
@@ -914,6 +955,14 @@ force-for-plugin: false               # Plugin only: true → auto-apply khi plu
     "allow": ["$defaults"],            // Override block rules
     "soft_deny": ["$defaults"]         // Override allow rules
   },
+
+  // Fast mode
+  "fastMode": false,                   // true = persist fast mode across sessions (Opus 4.6 only, $30/$150 MTok)
+  "fastModePerSessionOptIn": false,    // (managed) true = mỗi session start với fast mode OFF, user phải /fast bật lại
+
+  // Auth lock (managed) — enforce login method/org
+  "forceLoginMethod": "claudeai",      // (managed) "claudeai" | "console" | "bedrock" | "vertex" | "foundry"
+  "forceLoginOrgUUID": "<org-uuid>",   // (managed) chỉ allow login vào org này
 
   // Editor & UI
   "editorMode": "normal",             // "normal" | "vim"
@@ -944,6 +993,9 @@ force-for-plugin: false               # Plugin only: true → auto-apply khi plu
 
   // Auth & model routing
   "apiKeyHelper": "~/.claude/get-api-key.sh",  // Script trả về API key
+  "awsAuthRefresh": "aws sso login --profile myprofile",  // Auto-refresh AWS SSO/corporate IdP credentials khi expire (Bedrock)
+  "awsCredentialExport": "...",                            // Alternative: command output JSON {Credentials:{AccessKeyId,SecretAccessKey,SessionToken}} (silent, không update .aws)
+  "gcpAuthRefresh": "gcloud auth application-default login", // Auto-refresh GCP credentials (Vertex). Timeout 3 phút
   "agent": "my-custom-agent",          // Chạy main thread như subagent cụ thể
   "modelOverrides": {                  // Map model → provider-specific ID
     "claude-opus-4-7": "arn:aws:bedrock:..."
@@ -964,6 +1016,11 @@ force-for-plugin: false               # Plugin only: true → auto-apply khi plu
   // Hook safety (managed-only)
   "disableAllHooks": false,             // Tắt mọi hook (debug)
   "allowManagedHooksOnly": false,       // (managed) chỉ managed hooks
+  "allowedHttpHookUrls": ["https://hooks.corp.example.com"], // (managed) restrict HTTP hook URLs
+  "allowedMcpServers": ["github", "slack"],   // (managed) MCP servers allowlist
+  "deniedMcpServers": ["filesystem"],         // (managed) MCP servers blocklist
+  "allowManagedMcpServersOnly": false,        // (managed) true = chỉ managed MCP servers
+  "wslInheritsWindowsSettings": false,        // (managed Windows HKLM) true = WSL đọc managed settings từ Windows policy chain ngoài /etc/claude-code
   "allowManagedPermissionRulesOnly": false  // (managed) chỉ managed perm rules
 }
 ```
@@ -1002,6 +1059,29 @@ force-for-plugin: false               # Plugin only: true → auto-apply khi plu
 > **Note**: `Task` tool đã rename thành `Agent` (rename trong v2.1.x). `Task(...)` rules cũ vẫn work như alias, nhưng nên dùng tên mới `Agent(<type>)`.
 
 Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Process wrapper (`timeout`, `time`, `nice`, `nohup`, `stdbuf`, `xargs`) tự strip khi match.
+
+**Protected paths** — KHÔNG bao giờ auto-approve write/edit (mọi mode trừ `bypassPermissions` từ v2.1.126+):
+- Dirs: `.git`, `.vscode`, `.idea`, `.husky`, `.claude` (trừ `.claude/{commands,agents,skills,worktrees}` Claude routinely tạo)
+- Files: `.gitconfig`, `.gitmodules`, `.bashrc`, `.bash_profile`, `.zshrc`, `.zprofile`, `.profile`, `.ripgreprc`, `.mcp.json`, `.claude.json`
+- Trong `default`/`acceptEdits`/`plan` → vẫn prompt; `auto` → route classifier; `dontAsk` → deny; `bypassPermissions` → allow (từ v2.1.126)
+- `rm -rf /` và `rm -rf ~` LUÔN prompt như circuit breaker, kể cả `bypassPermissions`
+
+### 11.2 Built-in tools — tên dùng trong permission rules / hook matchers
+
+> Source chính thức: [code.claude.com/docs/en/tools-reference](https://code.claude.com/docs/en/tools-reference)
+
+**Permission required** (Yes = cần allow/ask): `Bash`, `Edit`, `Write`, `MultiEdit`, `NotebookEdit`, `WebFetch`, `WebSearch`, `Monitor`, `PowerShell`, `ExitPlanMode`, `Skill`, `ShareOnboardingGuide`
+
+**No permission** (auto-allow): `Read`, `Glob`, `Grep`, `Agent`, `AskUserQuestion`, `LSP`, `EnterPlanMode`, `EnterWorktree`, `ExitWorktree`, `CronCreate`/`CronDelete`/`CronList`, `TaskCreate`/`TaskGet`/`TaskList`/`TaskUpdate`/`TaskStop`, `TeamCreate`/`TeamDelete`, `SendMessage`, `ListMcpResourcesTool`/`ReadMcpResourceTool`, `ToolSearch`, `TodoWrite`
+
+**Tool nổi bật**:
+- `LSP` — code intelligence (jump-to-def, find refs, type errors). Cần [code intelligence plugin](https://code.claude.com/docs/en/discover-plugins#code-intelligence)
+- `Monitor` (v2.1.98+) — watch logs/PR/CI/files trong background, react khi thay đổi. KHÔNG support Bedrock/Vertex/Foundry. Disable nếu set `DISABLE_TELEMETRY` hoặc `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC`
+- `Bash` — `cd` persist trong main session (không cross-subagent), reset về project dir nếu `cd` ra ngoài. ENV vars KHÔNG persist giữa các Bash calls. Set `CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR=1` để TẮT carry-over
+- `Skill` — execute skill trong main conversation (cần permission)
+- `Task*` (TaskCreate/Get/List/Update/Stop) — interactive task list (≠ `TodoWrite` cho non-interactive/SDK)
+- `Cron*` — session-scoped scheduled prompts, restored qua `--resume` nếu unexpired
+- `Team*` + `SendMessage` — agent teams (chỉ available với `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`)
 
 ---
 
@@ -1096,6 +1176,56 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `BASH_MAX_OUTPUT_LENGTH`                   | Max ký tự bash output                                                                                                                          |
 | `CLAUDE_CODE_FILE_READ_MAX_OUTPUT_TOKENS`  | Token limit cho file reads                                                                                                                     |
 | `CLAUDE_CODE_DEBUG_LOG_LEVEL`              | Log level: `verbose`\|`debug`\|`info`\|`warn`\|`error` (default `debug`)                                                                       |
+| `CLAUDE_CODE_MAX_OUTPUT_TOKENS`            | Cap output tokens per request (override default model max)                                                                                     |
+| `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS`     | `1` = tắt mọi background task (`/loop`, async hooks)                                                                                           |
+| `CLAUDE_CODE_DISABLE_CRON`                 | `1` = tắt scheduled tasks / Routines                                                                                                           |
+| `CLAUDE_CODE_DISABLE_ATTACHMENTS`          | `1` = tắt file attachment processing (image paste, file drag)                                                                                  |
+| `CLAUDE_CODE_DISABLE_CLAUDE_MDS`           | `1` = KHÔNG load CLAUDE.md (debug/test isolation)                                                                                              |
+| `CLAUDE_CODE_FORK_SUBAGENT`                | `1` = bật forked subagents (subagent có thể fork từ parent context)                                                                            |
+| `CLAUDE_CODE_DISABLE_VIRTUAL_SCROLL`       | `1` = render mọi message (fix blank regions trong fullscreen)                                                                                  |
+| `CLAUDE_CODE_DISABLE_TERMINAL_TITLE`       | `1` = KHÔNG update terminal title bar                                                                                                          |
+| `CLAUDE_CODE_USE_BEDROCK`                  | `1` = route requests qua Amazon Bedrock                                                                                                        |
+| `CLAUDE_CODE_USE_VERTEX`                   | `1` = route requests qua Google Vertex AI                                                                                                      |
+| `CLAUDE_CODE_USE_FOUNDRY`                  | `1` = route requests qua Microsoft Foundry                                                                                                     |
+| `CLAUDE_CODE_USE_MANTLE`                   | `1` = route qua Bedrock Mantle endpoint                                                                                                        |
+| `CLAUDE_CODE_SKIP_BEDROCK_AUTH`            | `1` = skip AWS auth (cho LiteLLM/gateway pass-through Bedrock)                                                                                 |
+| `CLAUDE_CODE_SKIP_VERTEX_AUTH`             | `1` = skip GCP auth (cho LiteLLM/gateway pass-through Vertex)                                                                                  |
+| `CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS`   | `1` = strip experimental beta headers (cần khi gateway Anthropic-format trên Bedrock/Vertex)                                                   |
+| `CLAUDE_CODE_ATTRIBUTION_HEADER`           | `0` = bỏ attribution block khỏi system prompt (cho gateway có cache theo full request body)                                                    |
+| `ANTHROPIC_BEDROCK_MANTLE_BASE_URL`        | Bedrock Mantle endpoint URL                                                                                                                    |
+| `AWS_BEARER_TOKEN_BEDROCK`                 | Bedrock API key authentication (alternative cho IAM)                                                                                           |
+| `AWS_REGION`                               | Required cho Bedrock. KHÔNG đọc từ `~/.aws/config`                                                                                             |
+| `ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION`    | Override region cho Haiku (small/fast model) — Bedrock + Mantle                                                                                |
+| `ENABLE_PROMPT_CACHING_1H`                 | `1` = request 1-hour cache TTL thay vì 5-minute default (billed cao hơn)                                                                       |
+| `CLAUDE_CODE_SKIP_MANTLE_AUTH`             | `1` = skip client-side auth khi route Mantle qua LLM gateway                                                                                   |
+| `CLAUDE_CODE_SKIP_FOUNDRY_AUTH`            | `1` = skip Azure auth (cho LLM gateway pass-through Foundry)                                                                                   |
+| `VERTEX_REGION_CLAUDE_HAIKU_4_5`           | Per-model region override (Vertex) khi `CLOUD_ML_REGION=global`                                                                                |
+| `VERTEX_REGION_CLAUDE_4_6_SONNET`          | Per-model region override (Vertex) — tương tự cho mỗi model version                                                                            |
+| `VERTEX_REGION_CLAUDE_4_7_OPUS`            | Per-model region override (Vertex) — tương tự cho mỗi model version                                                                            |
+| `GOOGLE_APPLICATION_CREDENTIALS`           | Path tới service account key file hoặc Workload Identity config (X.509 WIF v2.1.121+)                                                          |
+| `GCLOUD_PROJECT` / `GOOGLE_CLOUD_PROJECT`  | GCP project ID (override `ANTHROPIC_VERTEX_PROJECT_ID`, được resolve trước)                                                                    |
+| `OTEL_LOGS_EXPORTER`                       | OpenTelemetry logs/events exporter (`otlp` \| `console` \| `none`)                                                                             |
+| `OTEL_EXPORTER_OTLP_PROTOCOL`              | OTel protocol (`grpc` \| `http/protobuf` \| `http/json`)                                                                                       |
+| `OTEL_EXPORTER_OTLP_HEADERS`               | OTel headers (vd `Authorization=Bearer your-token`)                                                                                            |
+| `OTEL_METRIC_EXPORT_INTERVAL`              | Metrics export interval (ms, default 60000)                                                                                                    |
+| `OTEL_LOGS_EXPORT_INTERVAL`                | Logs export interval (ms, default 5000)                                                                                                        |
+
+> **Authentication precedence** (highest → lowest): (1) Cloud provider khi `CLAUDE_CODE_USE_BEDROCK/VERTEX/FOUNDRY=1`, (2) `ANTHROPIC_AUTH_TOKEN` (Bearer header — LLM gateway), (3) `ANTHROPIC_API_KEY` (X-Api-Key — Console), (4) `apiKeyHelper` script output, (5) `CLAUDE_CODE_OAUTH_TOKEN` (long-lived, inference-only), (6) Subscription OAuth từ `/login` (default Pro/Max/Team/Enterprise). Run `/status` để confirm. `--bare` mode KHÔNG read `CLAUDE_CODE_OAUTH_TOKEN`.
+>
+> **Credential storage**: macOS Keychain (encrypted) | Linux/Windows `~/.claude/.credentials.json` (mode `0600`). Override location bằng `CLAUDE_CONFIG_DIR`.
+| `CLAUDE_CODE_CLIENT_KEY_PASSPHRASE`        | Passphrase cho encrypted mTLS client private key                                                                                               |
+| `CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR` | `1` = mỗi Bash call reset về project dir (TẮT `cd` carry-over giữa các call)                                                                   |
+| `CLAUDE_CODE_TASK_LIST_ID`                 | Share task list giữa các session: `CLAUDE_CODE_TASK_LIST_ID=my-project claude` → `~/.claude/tasks/my-project/`                                 |
+| `CLAUDE_ENV_FILE`                          | Shell script để populate env vars persist giữa Bash calls (set trước khi launch Claude Code)                                                   |
+| `CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD` | `1` = load CLAUDE.md từ `--add-dir` directories (mặc định KHÔNG load để tránh inject từ shared dir)                                        |
+| `SLASH_COMMAND_TOOL_CHAR_BUDGET`           | Override budget chars cho skill descriptions trong `/` menu (default 1% context window, fallback 8000). Tăng nếu nhiều skill bị truncate         |
+| `FORCE_AUTOUPDATE_PLUGINS`                 | `1` = giữ plugin auto-update bật ngay cả khi `DISABLE_AUTOUPDATER=1` (manage Claude Code update tay nhưng plugin vẫn auto)                       |
+| `CLAUDE_CODE_SYNC_PLUGIN_INSTALL`          | `1` = block first turn cho tới khi marketplace plugins install xong (emit `system/plugin_install` events trong stream-json)                      |
+| `CLAUDE_CODE_OAUTH_TOKEN`                  | Long-lived OAuth token cho CI/headless (tạo bằng `claude setup-token`). Inference-only — KHÔNG support Remote Control                          |
+| `BROWSER`                                  | Path tới browser binary cho OAuth login (vd WSL2: `/mnt/c/Program Files/Google/Chrome/Application/chrome.exe`)                                  |
+| `CCR_FORCE_BUNDLE`                         | `1` = force bundle local repo (kể cả khi GitHub connected) — `claude --remote` dùng khi repo không trên GitHub                                  |
+| `CLAUDE_CODE_REMOTE_SESSION_ID`            | Chỉ set trong cloud session — link back tới transcript: `https://claude.ai/code/${CLAUDE_CODE_REMOTE_SESSION_ID/#cse_/session_}`                |
+| `CLAUDE_REMOTE_CONTROL_SESSION_NAME_PREFIX`| Prefix cho session name auto-generated (default: hostname). Cũng có CLI flag `--remote-control-session-name-prefix`                            |
 
 ---
 
@@ -1705,9 +1835,46 @@ Cách xử lý:
 - Google Vertex AI: <https://code.claude.com/docs/en/google-vertex-ai>
 - Microsoft Foundry: <https://code.claude.com/docs/en/microsoft-foundry>
 
-### 20.13 SDK
+### 20.13 SDK (Claude Agent SDK)
+
+> **Rebrand v0.1.0**: `@anthropic-ai/claude-code` → `@anthropic-ai/claude-agent-sdk` (TS), `claude-code-sdk` → `claude-agent-sdk` (Python). Type `ClaudeCodeOptions` → `ClaudeAgentOptions`. v0.2.111+ cần cho Opus 4.7. SDK bundles Claude Code binary — KHÔNG cần install CLI riêng.
+
+> **Breaking v0.1.0**: System prompt KHÔNG còn default trong SDK. Phải explicit `systemPrompt: { type: "preset", preset: "claude_code" }` để giữ behavior cũ; hoặc set custom string. `settingSources` mặc định load `["user", "project", "local"]` (giống CLI), pass `[]` để isolate cho CI/multi-tenant.
+
+> **Key options** (`ClaudeAgentOptions` / TS `Options`): `model`, `allowedTools`, `permissionMode` (`default`/`acceptEdits`/`dontAsk`/`auto` (TS only)/`bypassPermissions`), `mcpServers`, `hooks`, `agents`, `settingSources`, `canUseTool` (callback for permission/AskUserQuestion), `systemPrompt`, `maxTurns`, `resume`, `continue`, `cwd`, `env`.
+
+> **Custom tools** (in-process MCP): `tool(name, desc, schema, handler)` + `createSdkMcpServer({name, version, tools})`. Tool name khi expose Claude: `mcp__{server_name}__{tool_name}`. Schema TS = Zod, Python = dict hoặc full JSON Schema.
+
+> **Hosting** (production): 4 patterns (Ephemeral, Long-running, Hybrid, Single container). Sandbox providers: Modal, Cloudflare, Daytona, E2B, Fly Machines, Vercel. Resources: 1GiB RAM/5GiB disk/1 CPU minimum, ~5¢/giờ container.
+
 - Agent SDK overview: <https://code.claude.com/docs/en/agent-sdk/overview>
-- Slash commands SDK: <https://code.claude.com/docs/en/agent-sdk/slash-commands>
+- Quickstart: <https://code.claude.com/docs/en/agent-sdk/quickstart>
+- Migration guide (rebrand v0.1.0): <https://code.claude.com/docs/en/agent-sdk/migration-guide>
+- Claude Code features in SDK: <https://code.claude.com/docs/en/agent-sdk/claude-code-features>
+- Streaming vs single-turn mode: <https://code.claude.com/docs/en/agent-sdk/streaming-vs-single-mode>
+- User input/approvals (`canUseTool`): <https://code.claude.com/docs/en/agent-sdk/user-input>
+- Custom tools (in-process MCP): <https://code.claude.com/docs/en/agent-sdk/custom-tools>
+- Modify system prompts: <https://code.claude.com/docs/en/agent-sdk/modifying-system-prompts>
+- Slash commands in SDK: <https://code.claude.com/docs/en/agent-sdk/slash-commands>
+- Sessions: <https://code.claude.com/docs/en/agent-sdk/sessions>
+- Streaming output: <https://code.claude.com/docs/en/agent-sdk/streaming-output>
+- Structured outputs: <https://code.claude.com/docs/en/agent-sdk/structured-outputs>
+- MCP integration: <https://code.claude.com/docs/en/agent-sdk/mcp>
+- Tool search: <https://code.claude.com/docs/en/agent-sdk/tool-search>
+- Subagents: <https://code.claude.com/docs/en/agent-sdk/subagents>
+- Skills in SDK: <https://code.claude.com/docs/en/agent-sdk/skills>
+- Plugins in SDK: <https://code.claude.com/docs/en/agent-sdk/plugins>
+- Permissions: <https://code.claude.com/docs/en/agent-sdk/permissions>
+- Hooks (programmatic + filesystem): <https://code.claude.com/docs/en/agent-sdk/hooks>
+- File checkpointing: <https://code.claude.com/docs/en/agent-sdk/file-checkpointing>
+- Cost tracking: <https://code.claude.com/docs/en/agent-sdk/cost-tracking>
+- Observability (OpenTelemetry): <https://code.claude.com/docs/en/agent-sdk/observability>
+- Todo tracking: <https://code.claude.com/docs/en/agent-sdk/todo-tracking>
+- Hosting (Docker/cloud): <https://code.claude.com/docs/en/agent-sdk/hosting>
+- Secure deployment: <https://code.claude.com/docs/en/agent-sdk/secure-deployment>
+- TypeScript SDK reference: <https://code.claude.com/docs/en/agent-sdk/typescript>
+- Python SDK reference: <https://code.claude.com/docs/en/agent-sdk/python>
+- Demos: <https://github.com/anthropics/claude-agent-sdk-demos>
 
 ### 20.14 Enterprise & admin
 - Admin setup: <https://code.claude.com/docs/en/admin-setup>
