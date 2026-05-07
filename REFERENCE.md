@@ -983,7 +983,7 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `CLAUDE_CODE_USE_POWERSHELL_TOOL=1`        | Bật PowerShell thay bash trên Windows (cũng yêu cầu khi skill có `shell: powershell`)                                                          |
 | `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` | Disable analytics                                                                                                                              |
 | `CLAUDE_CODE_DEBUG_LOGS_DIR`               | Dir cho debug logs                                                                                                                             |
-| `CLAUDE_CODE_SIMPLE`                       | Set bởi `--bare` flag                                                                                                                          |
+| `CLAUDE_CODE_SIMPLE`                       | `1` = minimal system prompt + chỉ Bash/Read/Edit tools. Cũng tự set bởi `--bare` flag                                                          |
 | `ANTHROPIC_BASE_URL`                       | Override API endpoint (proxy/gateway)                                                                                                          |
 | `ANTHROPIC_MODEL`                          | Override model mặc định                                                                                                                        |
 | `ANTHROPIC_AUTH_TOKEN`                     | Custom Authorization header                                                                                                                    |
@@ -999,7 +999,7 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `BASH_MAX_TIMEOUT_MS`                      | Bash max timeout (default 600000)                                                                                                              |
 | `CLAUDE_CODE_AUTO_COMPACT_WINDOW`          | Context window cho auto-compaction                                                                                                             |
 | `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`          | Trigger auto-compact (default 95%)                                                                                                             |
-| `CLAUDE_CODE_MAX_CONTEXT_TOKENS`           | Override context window size                                                                                                                   |
+| `CLAUDE_CODE_MAX_CONTEXT_TOKENS`           | Override context window size — CHỈ effect khi `DISABLE_COMPACT=1` (constraint cứng từ docs)                                                    |
 | `CLAUDE_CODE_SUBAGENT_MODEL`               | Model cho subagent                                                                                                                             |
 | `CLAUDECODE`                               | Set trong spawned shells (dùng để detect Claude env)                                                                                           |
 | `CLAUDE_CODE_DISABLE_AUTO_MEMORY`          | Tắt auto memory                                                                                                                                |
@@ -1010,7 +1010,7 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `CLAUDE_CODE_DISABLE_MOUSE`                | `1` = tắt mouse capture (giữ flicker-free, cho phép native text select)                                                                        |
 | `HTTPS_PROXY` / `HTTP_PROXY`               | Proxy cho network requests                                                                                                                     |
 | `NO_PROXY`                                 | Domains bỏ qua proxy (space hoặc comma-separated)                                                                                              |
-| `CLAUDE_CODE_CERT_STORE`                   | CA cert source: `bundled` (default), `system`, `both`                                                                                          |
+| `CLAUDE_CODE_CERT_STORE`                   | CA cert source: `bundled,system` (default — load cả hai), `bundled`, `system`                                                                  |
 | `NODE_EXTRA_CA_CERTS`                      | Path tới custom CA cert file                                                                                                                   |
 | `CLAUDE_CONFIG_DIR`                        | Override đường dẫn ~/.claude                                                                                                                   |
 | `CLAUDE_CODE_MAX_RETRIES`                  | Số lần retry khi API fail (default 10)                                                                                                         |
