@@ -807,13 +807,14 @@ keep-coding-instructions: true        # default: false; true → giữ default c
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "model": "claude-opus-4-7",
-  "outputStyle": "Default",            // hoặc "Explanatory", "Learning", custom name
-  "language": "vietnamese",            // for voice dictation language
+  "outputStyle": "Default",            // values: "Default" | "Explanatory" | "Learning" | custom name (default: none)
+  "language": "vietnamese",            // Claude's preferred response language (vd "japanese", "spanish") — KHÔNG phải voice dictation
   "theme": "dark-daltonized",          // theme
 
   "attribution": {
-    "commit": "",                      // Tắt Co-Authored-By Claude
-    "pr": ""
+    // default: "🤖 Generated with Claude Code\n\nCo-Authored-By: Claude..." — set "" để tắt
+    "commit": "",                      // Tắt Co-Authored-By Claude trong commit
+    "pr": ""                           // Tắt tagline trong PR description
   },
   // "includeCoAuthoredBy": false,     // DEPRECATED — dùng attribution.commit = "" thay vì
 
@@ -891,7 +892,7 @@ keep-coding-instructions: true        # default: false; true → giữ default c
   "autoMemoryDirectory": "~/.claude/memory",
 
   // Voice + UI
-  "voice": { "enabled": true, "mode": "tap", "autoSubmit": false },  // /voice tự ghi
+  "voice": { "enabled": true, "mode": "tap", "autoSubmit": false },  // default: { enabled: false }. Set enabled: true để bật /voice
   // "voiceEnabled": false,           // DEPRECATED — dùng voice.enabled ở trên thay vì
   "spinnerVerbs": { "mode": "append", "verbs": ["Cooking", "Architecting"] },
   "spinnerTipsEnabled": true,
