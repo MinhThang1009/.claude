@@ -1,7 +1,7 @@
 ---
 name: architect
 description: Software architect chuyên thiết kế hệ thống, ra quyết định kiến trúc, đánh giá trade-off. Dùng khi cần thiết kế feature lớn (>3 file, multi-module), chọn pattern, hay đánh giá impact thay đổi kiến trúc. Gọi explicit "use architect" hoặc Claude tự delegate khi user hỏi về thiết kế.
-tools: Read, Grep, Glob, Bash(git log:*), WebFetch, WebSearch
+tools: Read, Grep, Glob, Bash, WebFetch, WebSearch
 model: opus
 ---
 

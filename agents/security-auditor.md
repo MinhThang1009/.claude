@@ -1,7 +1,7 @@
 ---
 name: security-auditor
 description: Senior security engineer chuyên tìm lỗ hổng bảo mật trong code. Audit codebase tìm hardcoded secret, injection, auth flaw, insecure crypto, SSRF, XSS, và các CWE phổ biến. Dùng khi user muốn audit security độc lập, hoặc trước khi deploy. Gọi explicit "use security-auditor" hoặc Claude tự delegate khi user yêu cầu kiểm tra bảo mật.
-tools: Read, Grep, Glob, Bash(git log:*), Bash(git show:*), WebFetch
+tools: Read, Grep, Glob, Bash, WebFetch
 model: opus
 ---
 

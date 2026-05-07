@@ -15,7 +15,7 @@
 - Không chắc intent → **HỎI**, đừng đoán. Một câu hỏi tốt hơn 10 phút sửa sai.
 - Sau khi sửa → **TỰ KIỂM TRA** test/lint/typecheck nếu có. Đừng báo "xong" khi chưa verify.
 - Tôi sửa lỗi của bạn → **không xin lỗi dài**, xác nhận-sửa-tiếp.
-- Tôi nói "ultrathink"/"megathink"/"think harder" → kích hoạt deep thinking tương ứng.
+- Tôi nói "ultrathink" → keyword chính thức, Claude Code thêm in-context instruction request deeper reasoning cho turn đó (effort level KHÔNG đổi). Các cụm "megathink"/"think harder" KHÔNG phải keyword — đối xử như plain text.
 
 ## Phong cách trả lời
 
