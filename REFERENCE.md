@@ -1246,9 +1246,13 @@ done
 
 ### 15.6 Pattern 6 — Worktree parallel
 ```bash
+# Cách classic
 git worktree add ../proj-feat-a feat/a
 git worktree add ../proj-feat-b feat/b
 # Mở 2 terminal, claude trong mỗi worktree
+
+# Hoặc shortcut Claude Code (auto tạo worktree + start session)
+claude --worktree feat-auth
 ```
 
 ### 15.7 Pattern 7 — Brief-injection (long-running task)
@@ -1400,7 +1404,7 @@ Claude Code dùng prompt caching tự động để giảm cost cho conversation
 Sắp đầy context, vẫn làm tiếp cùng task ──► /compact (có instructions)
 Sắp đầy context, sang task khác ──────────► /handoff --save → /clear → brief mới
 Câu hỏi nhanh không cần lưu ──────────────► /btw
-Một message bị sai hướng ─────────────────► Esc Esc → mở rewind menu (5 options)
+Một message bị sai hướng ─────────────────► Esc Esc → mở rewind menu (restore code/conversation/both, summarize)
 Khôi phục trạng thái phiên trước ─────────► claude --continue (rủi ro stale data)
                                           HOẶC brief-injection (sạch hơn)
 Fan-out task song song ───────────────────► claude -p ... background
