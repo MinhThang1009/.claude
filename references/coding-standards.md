@@ -1,6 +1,6 @@
 # Quy tắc Code
 
-> KHÔNG auto-import. Reference khi cần (`@~/.claude/rules/coding-standards.md`).
+> KHÔNG auto-import. Reference khi cần (`@~/.claude/references/coding-standards.md`).
 
 ## Nguyên tắc cốt lõi
 

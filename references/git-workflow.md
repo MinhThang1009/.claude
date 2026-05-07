@@ -1,6 +1,6 @@
 # Quy tắc Git
 
-> KHÔNG auto-import. Reference khi cần (`@~/.claude/rules/git-workflow.md`).
+> KHÔNG auto-import. Reference khi cần (`@~/.claude/references/git-workflow.md`).
 
 ## Commit message
 
