@@ -37,12 +37,31 @@
     └── HANDOFF.md                  # → <project>/.claude/HANDOFF.md (gitignored)
 ```
 
-**Triết lý baseline tokens** (token cố định mỗi session, đo bằng `/context`):
-- `CLAUDE.md` global ≈ 2,300 tokens
-- 2 rules auto-import (`communication`, `security`) ≈ 3,800 tokens
-- Skill descriptions ≈ 939 tokens, agent descriptions ≈ 590 tokens
-- **Tổng memory+skills+agents ≈ 7,700 tokens** (~0.8% Opus 1M). Cao hơn Boris Cherny ~2,500 do Vietnamese tokenize kém hiệu quả (~2.3 chars/token); vẫn hợp lý
-- 2 references còn lại chỉ load khi `@`-reference → KHÔNG ăn baseline
+**Baseline tokens** — đo thực tế bằng `/context` (Opus 4.7 1M context, snapshot session start):
+
+| Category                      | Tokens     | % of 1M   |
+| ----------------------------- | ---------- | --------- |
+| System prompt                 | 8,500      | 0.8%      |
+| System tools                  | 12,100     | 1.2%      |
+| Memory files                  | 6,200      | 0.6%      |
+| ├── `CLAUDE.md`               | 2,300      | —         |
+| ├── `rules/security`          | 2,100      | —         |
+| └── `rules/communication`     | 1,800      | —         |
+| Skills                        | 939        | <0.1%     |
+| Custom agents                 | 590        | <0.1%     |
+| ├── `security-auditor`        | 177        | —         |
+| ├── `architect`               | 150        | —         |
+| ├── `code-reviewer`           | 135        | —         |
+| └── `test-writer`             | 128        | —         |
+| Messages (start)              | 13         | <0.1%     |
+| **Total used (start)**        | **28,342** | **~2.8%** |
+| Autocompact buffer (reserved) | 33,000     | 3.3%      |
+| Free space                    | 938,658    | 93.9%     |
+
+**Ghi chú**:
+- Vietnamese tokenize ~2.3 chars/token cho prose (kém hiệu quả hơn English ~4 chars/token); baseline 28.3k cao hơn config English (~10-15k) là expected.
+- 2 references còn lại (`coding-standards.md`, `git-workflow.md`) chỉ load khi `@`-reference → KHÔNG ăn baseline.
+- Autocompact buffer 33k reserved (không tính vào used) — Claude Code dành chỗ cho compact summary khi context đầy.
 
 ## 2. Cài đặt
 
