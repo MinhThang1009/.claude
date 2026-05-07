@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "_comment": "Settings cho project — commit vào git. Override cá nhân để vào .claude/settings.local.json (đã gitignore tự động).",
+
+  "attribution": {
+    "_comment": "Tắt 'Co-Authored-By: Claude' và '🤖 Generated with Claude Code' trong commit/PR",
+    "commit": "",
+    "pr": ""
+  },
+
+  "permissions": {
+    "_comment_allow": "Lệnh cho phép chạy không hỏi — chỉ thêm lệnh THỰC SỰ an toàn",
+    "allow": [
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(git stash list:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(find:*)",
+      "Bash(pwd)",
+      "Bash(echo:*)",
+      "Read(**)"
+    ],
+
+    "_comment_ask": "Lệnh phải hỏi xác nhận trước khi chạy — sửa các lệnh build/test/lint của project bạn vào đây",
+    "ask": [
+      "Edit(**)",
+      "Write(**)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git rebase:*)",
+      "Bash(git merge:*)",
+      "Bash(git checkout:*)",
+      "Bash(git restore:*)",
+      "Bash(git stash:*)",
+      "Bash(npm install:*)",
+      "Bash(pnpm install:*)",
+      "Bash(yarn:*)",
+      "Bash(pip install:*)",
+      "Bash(cargo add:*)",
+      "Bash(go get:*)"
+    ],
+
+    "_comment_deny": "Lệnh CHẶN tuyệt đối — KHÔNG bao giờ chạy",
+    "deny": [
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~)",
+      "Bash(rm -rf $*)",
+      "Bash(:(){ :|:& };:)",
+      "Bash(chmod -R 777:*)",
+      "Bash(curl * | bash:*)",
+      "Bash(curl * | sh:*)",
+      "Bash(wget * | bash:*)",
+      "Bash(wget * | sh:*)",
+      "Bash(dd if=*:*)",
+      "Bash(mkfs*:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git clean -fdx:*)",
+      "Bash(git filter-repo:*)",
+      "Bash(git filter-branch:*)",
+      "Bash(npm publish:*)",
+      "Bash(pnpm publish:*)",
+      "Bash(yarn publish:*)",
+      "Bash(cargo publish:*)",
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(**/credentials.json)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/id_rsa*)",
+      "Edit(.git/**)",
+      "Edit(**/.git/**)",
+      "Write(.env)",
+      "Write(.env.*)"
+    ]
+  },
+
+  "_comment_hooks": "Hook chạy DETERMINISTIC — KHÔNG phụ thuộc Claude nhớ rule. Bỏ comment cụ thể nếu cần.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "_comment": "Chặn lệnh xóa toàn bộ trước khi tool chạy — phòng prompt injection",
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE '(rm -rf /|rm -rf \\$|rm -rf ~|chmod -R 777|curl.*\\| *bash|curl.*\\| *sh)'; then echo 'BLOCKED: dangerous command detected' >&2; exit 2; fi",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  },
+
+  "_comment_skill_overrides": "Tắt skill ít dùng để tiết kiệm context (Claude chỉ load khi user gọi explicit). Sửa list bên dưới nếu cần.",
+  "skillOverrides": {},
+
+  "_comment_excludes": "Loại CLAUDE.md trong các thư mục không cần (node_modules, vendor)",
+  "claudeMdExcludes": [
+    "**/node_modules/**/CLAUDE.md",
+    "**/vendor/**/CLAUDE.md",
+    "**/dist/**/CLAUDE.md",
+    "**/build/**/CLAUDE.md",
+    "**/.next/**/CLAUDE.md"
+  ],
+
+  "_comment_env": "Env var truyền vào sub-process. MAX_MCP_OUTPUT_TOKENS tăng khi MCP trả về nhiều dữ liệu.",
+  "env": {
+    "MAX_MCP_OUTPUT_TOKENS": "50000"
+  }
+}

@@ -1,0 +1,22 @@
+# Credentials & auth
+.credentials.json
+mcp-needs-auth-cache.json
+
+# Session & history data
+history.jsonl
+projects/
+file-history/
+sessions/
+session-env/
+
+# Auto-generated
+policy-limits.json
+remote-settings.json
+cache/
+backups/
+shell-snapshots/
+downloads/
+plans/
+plugins/
+ide/
+.vscode/
