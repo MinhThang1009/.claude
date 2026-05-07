@@ -351,27 +351,27 @@
 | `/init`   | Tạo CLAUDE.md cho project (`CLAUDE_CODE_NEW_INIT=1` để interactive flow) |
 
 ### 3.3 Cấu hình
-| Lệnh                 | Mục đích                                                     |        |      |                                    |
-| -------------------- | ------------------------------------------------------------ | ------ | ---- | ---------------------------------- |
-| `/config`            | Settings UI (theme, model, output style…). Alias `/settings` |        |      |                                    |
-| `/permissions`       | Sửa allow/ask/deny rule. Alias `/allowed-tools`              |        |      |                                    |
-| `/hooks`             | Xem hook configurations                                      |        |      |                                    |
-| `/mcp`               | Manage MCP server, OAuth                                     |        |      |                                    |
-| `/skills`            | List skill có sẵn                                            |        |      |                                    |
-| `/agents`            | Manage subagent (interactive create/edit)                    |        |      |                                    |
-| `/model [model]`     | Đổi model. Mũi tên trái/phải để adjust effort                |        |      |                                    |
-| `/effort [level]`    | `low`/`medium`/`high`/`xhigh`/`max`/`auto`. `low             | medium | high | xhigh` persist; `max` session-only |
-| `/output-style`      | Đổi output style                                             |        |      |                                    |
-| `/output-style:new`  | Tạo style mới với Claude help                                |        |      |                                    |
-| `/keybindings`       | Sửa keybindings                                              |        |      |                                    |
-| `/terminal-setup`    | Cấu hình Shift+Enter cho terminal                            |        |      |                                    |
-| `/sandbox`           | Toggle sandbox mode                                          |        |      |                                    |
-| `/theme`             | Đổi color theme                                              |        |      |                                    |
-| `/color [name\|hex]` | Set màu prompt bar                                           |        |      |                                    |
-| `/statusline`        | Cấu hình status line                                         |        |      |                                    |
-| `/fast [on\|off]`    | Toggle fast mode (chỉ Opus 4.6, giá 2.5× standard)           |        |      |                                    |
-| `/voice`             | Toggle voice dictation                                       |        |      |                                    |
-| `/privacy-settings`  | View/update privacy (Pro/Max)                                |        |      |                                    |
+| Lệnh                 | Mục đích                                                                                              |
+| -------------------- | ----------------------------------------------------------------------------------------------------- |
+| `/config`            | Settings UI (theme, model, output style…). Alias `/settings`                                          |
+| `/permissions`       | Sửa allow/ask/deny rule. Alias `/allowed-tools`                                                       |
+| `/hooks`             | Xem hook configurations                                                                               |
+| `/mcp`               | Manage MCP server, OAuth                                                                              |
+| `/skills`            | List skill có sẵn                                                                                     |
+| `/agents`            | Manage subagent (interactive create/edit)                                                             |
+| `/model [model]`     | Đổi model. Mũi tên trái/phải để adjust effort                                                         |
+| `/effort [level]`    | `low`/`medium`/`high`/`xhigh`/`max`/`auto`. `low`/`medium`/`high`/`xhigh` persist; `max` session-only |
+| `/output-style`      | Đổi output style                                                                                      |
+| `/output-style:new`  | Tạo style mới với Claude help                                                                         |
+| `/keybindings`       | Sửa keybindings                                                                                       |
+| `/terminal-setup`    | Cấu hình Shift+Enter cho terminal                                                                     |
+| `/sandbox`           | Toggle sandbox mode                                                                                   |
+| `/theme`             | Đổi color theme                                                                                       |
+| `/color [name\|hex]` | Set màu prompt bar                                                                                    |
+| `/statusline`        | Cấu hình status line                                                                                  |
+| `/fast [on\|off]`    | Toggle fast mode (chỉ Opus 4.6, giá 2.5× standard)                                                    |
+| `/voice`             | Toggle voice dictation                                                                                |
+| `/privacy-settings`  | View/update privacy (Pro/Max)                                                                         |
 
 ### 3.4 Plan & workflow
 | Lệnh                  | Mục đích                                  |
