@@ -79,7 +79,10 @@ Khi `/compact` chạy (manual hoặc auto), summary PHẢI giữ lại:
 
 ## Tham chiếu rule mở rộng
 
+<!-- Claude Code @import directives -->
+
 @~/.claude/rules/communication.md
+
 @~/.claude/rules/security.md
 
 > 2 rule còn lại (`coding-standards.md`, `git-workflow.md`) KHÔNG auto-import để tiết kiệm context. Tôi sẽ `@~/.claude/references/...` khi cần, hoặc bạn tự đọc khi gặp task tương ứng.
