@@ -419,7 +419,7 @@
 | `/web-setup`              | Connect GitHub cho Claude Code on the web                |
 | `/autofix-pr [prompt]`    | Spawn web session auto-fix PR                            |
 | `/ultraplan <prompt>`     | Draft plan trong browser, execute remotely               |
-| `/schedule [description]` | Tạo/edit/list/run routine định kỳ. Alias `/routines`     |
+| `/schedule [description]` | Tạo/edit/list/run routine định kỳ. Alias `/routines`. Trigger: scheduled (hourly/nightly/weekly), API endpoint với auth token (POST → session URL), webhook GitHub events (PR filter). Limit: Pro 5/Max 15/T+E 25 routines/day |
 | `/install-github-app`     | Cài Claude GitHub Actions                                |
 | `/install-slack-app`      | Cài Claude Slack                                         |
 | `/setup-bedrock`          | Cấu hình Amazon Bedrock                                  |
@@ -539,6 +539,8 @@ MCP server có thể expose prompt thành command: `/mcp__<server>__<prompt>`.
 | `Alt+T`                  | Toggle extended thinking                               |
 | `Alt+O`                  | Toggle fast mode                                       |
 | `Cmd/Ctrl+Click` PR link | Mở PR trong browser                                    |
+| `Cmd+;` / `Ctrl+;`       | (Desktop app) Toggle side chat                         |
+| `Cmd+/` / `Ctrl+/`       | (Desktop app) Show full keyboard shortcuts list        |
 
 ### 4.6 Transcript viewer (khi `Ctrl+O` mở)
 | Phím        | Tác dụng                                         |
@@ -716,8 +718,13 @@ ${CLAUDE_SKILL_DIR}                   # Thư mục chứa SKILL.md
 - Skill có `disable-model-invocation: false` (default): description vào context lúc startup, body load on-demand khi Claude quyết định gọi.
 
 **Khi nào (KHÔNG) tạo skill**:
-- TẠO khi: workflow lặp lại, domain expertise, procedural knowledge cần dùng nhiều lần. SKILL.md ngắn → reference docs/scripts on-demand (progressive disclosure).
+- TẠO khi: task đã làm **5+ lần** (proven pattern), domain expertise, procedural knowledge. SKILL.md ngắn → reference docs/scripts on-demand (progressive disclosure ~100 token metadata, <5K full body).
 - KHÔNG tạo cho task one-off, hoặc khi `CLAUDE.md` + slash command đủ. Tránh duplicate info giữa SKILL.md và reference files.
+
+**Design pattern**:
+- *Description* (critical) — viết với **specific verbs + use case triggers + boundaries**. Yếu: "Helps with PDFs". Mạnh: "Extract text/tables, merge/split PDFs. Use for form filling, batch ops. Not for simple viewing".
+- *Skills vs MCP boundary*: Skills own **sequencing & presentation logic**, MCP own **connectivity & data access**. Một skill có thể orchestrate nhiều MCP servers. Tránh duplicate instruction giữa 2 layer.
+- *Testing*: viết evals (test prompt + expected output), track pass rate / elapsed time / token usage; dùng **A/B comparator agent** để blind judge giữa skill versions trước khi commit.
 
 ---
 
@@ -1085,6 +1092,7 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 
 **Tool nổi bật**:
 - `LSP` — code intelligence (jump-to-def, find refs, type errors). Cần [code intelligence plugin](https://code.claude.com/docs/en/discover-plugins#code-intelligence)
+- `WebSearch`/`WebFetch` — Sonnet 4.6/Opus 4.6 default dùng **dynamic filtering** (Claude tự viết+chạy code filter results trước khi vào context, ~11% accuracy + 24% input token reduction). Tool versions: `web_search_20260209`, `web_fetch_20260209`
 - `Monitor` (v2.1.98+) — watch logs/PR/CI/files trong background, react khi thay đổi. KHÔNG support Bedrock/Vertex/Foundry. Disable nếu set `DISABLE_TELEMETRY` hoặc `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC`
 - `Bash` — `cd` persist trong main session (không cross-subagent), reset về project dir nếu `cd` ra ngoài. ENV vars KHÔNG persist giữa các Bash calls. Set `CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR=1` để TẮT carry-over
 - `Skill` — execute skill trong main conversation (cần permission)
@@ -1752,6 +1760,7 @@ Cách xử lý:
 | Auto-fix PR khi CI fail         | `/autofix-pr`                                            |
 | Watch external event            | `/loop <interval> <prompt>`                              |
 | Audit security trên diff        | `/security-review`                                       |
+| Code review GitHub PR auto      | Code Review feature (Team/Enterprise): GitHub App + repo selection. Avg $15-25/PR, ~20 min. Settings: monthly org cap để giới hạn cost |
 | Mở Claude Code từ URL           | Deep link: `claude-cli://open?q=<prompt>&cwd=<path>&repo=<owner/name>` — `q` URL-encoded (max 5K char, `%0A` line break), `cwd` absolute path, `repo` resolve qua local clone đã thấy. v2.1.91+ |
 | Mở deep link từ shell           | `open` (macOS) / `xdg-open` (Linux) / `Start-Process` (PS) / `start "" "..."` (cmd)  |
 | Tắt deep link handler           | `disableDeepLinkRegistration: "disable"` trong settings  |
@@ -1944,15 +1953,20 @@ Cách xử lý:
 - Multi-agent coordination patterns: <https://claude.com/blog/multi-agent-coordination-patterns>
 - Multi-agent — when & how to use: <https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them>
 - Skills design — equipping agents: <https://claude.com/blog/building-agents-with-skills-equipping-agents-for-specialized-work>
+- Skills — how to create (description writing, limitations): <https://claude.com/blog/how-to-create-skills-key-steps-limitations-and-examples>
+- Skills — testing/measuring/refining (evals + A/B comparator): <https://claude.com/blog/improving-skill-creator-test-measure-and-refine-agent-skills>
+- Skills + MCP integration (sequencing vs connectivity boundary): <https://claude.com/blog/extending-claude-capabilities-with-skills-mcp-servers>
 - Harnessing Claude's intelligence (cache + tool design): <https://claude.com/blog/harnessing-claudes-intelligence>
 - Subagents in Claude Code: <https://claude.com/blog/subagents-in-claude-code>
 - Best practices Opus 4.7 + Claude Code: <https://claude.com/blog/best-practices-for-using-claude-opus-4-7-with-claude-code>
 - Auto mode introduction: <https://claude.com/blog/auto-mode>
+- Compliance API audit log (admin): <https://claude.com/blog/claude-platform-compliance-api>
 - Blog index (Claude Code category): <https://claude.com/blog/category/claude-code>
 
 ### 20.20 Cộng đồng tham khảo
 
 - Anthropics Claude Code repo: <https://github.com/anthropics/claude-code>
+- Claude Code security review (GitHub Action): <https://github.com/anthropics/claude-code-security-review> — auto scan PR, post inline comments cho SQLi/XSS/auth flaws
 - Official plugin marketplace (Anthropic-curated): <https://github.com/anthropics/claude-plugins-official> — cài bằng `/plugin install <name>@claude-plugins-official` (chứa `code-review`, `commit-commands`, `feature-dev`, `mcp-server-dev`, `plugin-dev`, `pr-review-toolkit`, `frontend-design`, các LSP plugin)
 - Anthropic skills examples + spec: <https://github.com/anthropics/skills> — `/plugin marketplace add anthropics/skills` rồi install `document-skills` hoặc `example-skills`. Có `spec/` (Agent Skills specification) và `template/` (skill template chính thức)
 - Awesome Claude Code: <https://github.com/hesreallyhim/awesome-claude-code>
