@@ -554,6 +554,8 @@ MCP server có thể expose prompt thành command: `/mcp__<server>__<prompt>`.
 
 ## 5. Prefix trong message
 
+> Source chính thức: [code.claude.com/docs/en/interactive-mode](https://code.claude.com/docs/en/interactive-mode)
+
 | Prefix          | Tác dụng                                           |
 | --------------- | -------------------------------------------------- |
 | `!<command>`    | Chạy bash, output → context (không qua LLM)        |
@@ -1113,6 +1115,10 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `ANTHROPIC_DEFAULT_OPUS_MODEL`             | Override alias `opus`                                                                                                                          |
 | `ANTHROPIC_DEFAULT_SONNET_MODEL`           | Override alias `sonnet`                                                                                                                        |
 | `ANTHROPIC_DEFAULT_HAIKU_MODEL`            | Override alias `haiku`                                                                                                                         |
+| `ANTHROPIC_DEFAULT_<FAMILY>_MODEL_NAME`    | Display name pinned model trong `/model` picker. `<FAMILY>` = `OPUS`/`SONNET`/`HAIKU`. Chỉ effect trên Bedrock/Vertex/Foundry + LLM gateway    |
+| `ANTHROPIC_DEFAULT_<FAMILY>_MODEL_DESCRIPTION` | Display description pinned model. Default = `Custom <Family> model`                                                                        |
+| `ANTHROPIC_DEFAULT_<FAMILY>_MODEL_SUPPORTED_CAPABILITIES` | Capabilities comma list: `effort`, `xhigh_effort`, `max_effort`, `thinking`, `adaptive_thinking`, `interleaved_thinking`. Override built-in detection cho provider ID. Cùng suffix valid cho `ANTHROPIC_CUSTOM_MODEL_OPTION_*` |
+| `ANTHROPIC_SMALL_FAST_MODEL`               | DEPRECATED — dùng `ANTHROPIC_DEFAULT_HAIKU_MODEL` thay vì                                                                                      |
 | `MAX_THINKING_TOKENS`                      | Cap thinking tokens (0 = disable)                                                                                                              |
 | `MAX_MCP_OUTPUT_TOKENS`                    | Cap MCP output (default **25k**, warning threshold 10k). Tools có `anthropic/maxResultSizeChars` riêng override                                |
 | `MCP_TIMEOUT`                              | Timeout MCP server start (ms)                                                                                                                  |
@@ -1183,6 +1189,7 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `ANTHROPIC_FOUNDRY_BASE_URL`               | Override Foundry endpoint URL                                                                                                                  |
 | `ANTHROPIC_CUSTOM_MODEL_OPTION`            | Custom model ID cho `/model` picker                                                                                                            |
 | `ANTHROPIC_CUSTOM_MODEL_OPTION_NAME`       | Display name cho custom model                                                                                                                  |
+| `ANTHROPIC_CUSTOM_MODEL_OPTION_DESCRIPTION` | Display description custom model. Default = `Custom model (<model-id>)`                                                                       |
 | `ANTHROPIC_BETAS`                          | Comma-separated beta header values                                                                                                             |
 | `ANTHROPIC_CUSTOM_HEADERS`                 | Custom HTTP headers (`Name: Value`)                                                                                                            |
 | `CLAUDE_CODE_CLIENT_CERT`                  | Path tới mTLS client certificate                                                                                                               |
@@ -1459,6 +1466,8 @@ Exit `0` = OK. Exit `2` = block tool, stderr → Claude. Stdout JSON cho control
 
 ## 15. Workflow patterns
 
+> Tổng hợp từ: [code.claude.com/docs/en/best-practices](https://code.claude.com/docs/en/best-practices) + [code.claude.com/docs/en/common-workflows](https://code.claude.com/docs/en/common-workflows) + [claude.com/blog/multi-agent-coordination-patterns](https://claude.com/blog/multi-agent-coordination-patterns) + [claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them](https://claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them)
+
 ### 15.1 Pattern 1 — Explore → Plan → Code → Commit
 ```text
 1. Plan mode (Shift+Tab×2): "đọc src/auth, hiểu flow OAuth"
@@ -1659,6 +1668,8 @@ Claude Code dùng prompt caching tự động để giảm cost cho conversation
 
 ## 17. Session management & handoff
 
+> Source chính thức: [code.claude.com/docs/en/sessions](https://code.claude.com/docs/en/sessions)
+
 ### 17.1 Lựa chọn `/compact` vs `/clear` vs `/handoff`
 
 ```text
@@ -1724,6 +1735,8 @@ Cách xử lý:
 
 ## 18. Common failures & fix
 
+> Tổng hợp từ: [code.claude.com/docs/en/troubleshooting](https://code.claude.com/docs/en/troubleshooting) + [code.claude.com/docs/en/errors](https://code.claude.com/docs/en/errors) + [code.claude.com/docs/en/memory](https://code.claude.com/docs/en/memory)
+
 | Pattern                       | Triệu chứng                                                                             | Fix                                                                           |
 | ----------------------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | Kitchen sink session          | Context bẩn, Claude lú                                                                  | `/clear` giữa task khác nhau                                                  |
@@ -1740,6 +1753,8 @@ Cách xử lý:
 ---
 
 ## 19. Hướng dẫn chọn feature
+
+> Tổng hợp từ: [code.claude.com/docs/en/features-overview](https://code.claude.com/docs/en/features-overview) + [code.claude.com/docs/en/best-practices](https://code.claude.com/docs/en/best-practices)
 
 | Cần                             | Dùng                                                     |
 | ------------------------------- | -------------------------------------------------------- |
@@ -1977,6 +1992,8 @@ Cách xử lý:
 ---
 
 ## 21. Checklist & mẹo cuối
+
+> Tổng hợp từ: [code.claude.com/docs/en/best-practices](https://code.claude.com/docs/en/best-practices) + [code.claude.com/docs/en/setup](https://code.claude.com/docs/en/setup) + [code.claude.com/docs/en/memory](https://code.claude.com/docs/en/memory)
 
 ### 21.1 Đầu mỗi project mới
 - [ ] Copy template vào project root: `cp ~/.claude/templates/project-CLAUDE.md ./CLAUDE.md`
