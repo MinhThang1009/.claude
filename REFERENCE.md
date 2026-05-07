@@ -238,7 +238,7 @@
 | `/debug [description]` | **[Skill]** Bật debug logging + troubleshoot |
 | `/loop [interval] [prompt]` | **[Skill]** Chạy prompt lặp định kỳ. VD `/loop 5m check deploy`. Alias `/proactive` |
 | `/simplify [focus]` | **[Skill]** Spawn 3 review agent, fix issue |
-| `/security-review` | Phân tích git diff tìm lỗ hổng |
+| `/security-review` | **[Skill]** Phân tích git diff tìm lỗ hổng |
 
 ### Cloud & remote
 | Lệnh | Mục đích |
@@ -1080,7 +1080,7 @@ Context phiên này:
 ### Workflow handoff khuyến nghị
 
 1. Khi `/context` >65%, hoặc kết thúc 1 phase công việc → gọi skill `/handoff` hoặc nói "viết handoff brief".
-2. Save về `.claude/HANDOFF.md` (đã gitignored qua project settings.local.json).
+2. Save về `.claude/HANDOFF.md` (cần thêm vào `.gitignore` — xem Section 21 checklist).
 3. `/compact giữ brief, drop debugging history` HOẶC `/clear` rồi prompt mới: `Đọc .claude/HANDOFF.md và tiếp tục từ "Bước tiếp"`.
 4. Cuối ngày / cuối session → update HANDOFF.md → `git status` → commit work.
 
