@@ -777,6 +777,8 @@ keep-coding-instructions: true        # default: false; true → giữ default c
     "commit": "",                      // Tắt Co-Authored-By Claude
     "pr": ""
   },
+  // "includeCoAuthoredBy": false,     // DEPRECATED — dùng attribution.commit = "" thay vì
+
 
   "permissions": {
     "defaultMode": "default",            // default|acceptEdits|plan|auto|dontAsk|bypassPermissions
@@ -852,7 +854,7 @@ keep-coding-instructions: true        # default: false; true → giữ default c
 
   // Voice + UI
   "voice": { "enabled": true, "mode": "tap", "autoSubmit": false },  // /voice tự ghi
-  // "voiceEnabled": false,           // DEPRECATED — dùng voice object ở trên
+  // "voiceEnabled": false,           // DEPRECATED — dùng voice.enabled ở trên thay vì
   "spinnerVerbs": { "mode": "append", "verbs": ["Cooking", "Architecting"] },
   "spinnerTipsEnabled": true,
   "prefersReducedMotion": false,
@@ -880,6 +882,7 @@ keep-coding-instructions: true        # default: false; true → giữ default c
 
   // Proxy & network
   "skipWebFetchPreflight": false,      // true = skip WebFetch domain safety check
+  "disableRemoteControl": false,       // (v2.1.128+) tắt Remote Control feature từ claude.ai/app
 
   // Hook safety (managed-only)
   "disableAllHooks": false,             // Tắt mọi hook (debug)
@@ -898,8 +901,25 @@ keep-coding-instructions: true        # default: false; true → giữ default c
 - `Edit(*.ts)` — pattern theo extension
 - `WebFetch(*)` — bất kỳ URL
 - `WebFetch(domain:example.com)` — domain cụ thể
+- `WebFetch(domain:*.example.com)` — bất kỳ subdomain
 - `Agent(Explore)` — subagent type cụ thể
 - `Agent(my-custom-agent)` — custom subagent
+- `MCP(github)` — MCP server theo tên
+
+**Wildcard**:
+- `*` = single segment (không cross thư mục/level)
+- `**` = recursive (mọi level con)
+
+**Path prefix** trong `Read()`/`Edit()`:
+
+| Prefix             | Ý nghĩa                       | Ví dụ                                          |
+| ------------------ | ----------------------------- | ---------------------------------------------- |
+| `./` hoặc không có | Project-relative              | `Read(./src/**)` = file trong `<project>/src/` |
+| `/`                | Project-relative (alias `./`) | `Read(/src/**)` = giống `./src/**`             |
+| `//`               | Absolute từ filesystem root   | `Read(//etc/hosts)` = `/etc/hosts` thực        |
+| `~/`               | Home dir                      | `Read(~/.zshrc)` = `$HOME/.zshrc`              |
+
+**Evaluation order** (first match wins): `deny` → `ask` → `allow` → default.
 
 > **Note**: `Task` tool đã rename thành `Agent` từ v2.1.63. `Task(...)` rules cũ vẫn work như alias, nhưng nên dùng tên mới `Agent(<type>)`.
 
@@ -956,6 +976,12 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `CLAUDE_CONFIG_DIR`                        | Override đường dẫn ~/.claude                                                                                                                   |
 | `CLAUDE_CODE_MAX_RETRIES`                  | Số lần retry khi API fail (default 10)                                                                                                         |
 | `DISABLE_TELEMETRY`                        | Tắt toàn bộ telemetry/metrics                                                                                                                  |
+| `CLAUDE_CODE_ENABLE_TELEMETRY`             | `1` = bật telemetry (default tùy plan/region). Override `DISABLE_TELEMETRY`                                                                    |
+| `OTEL_METRICS_EXPORTER`                    | OpenTelemetry metrics exporter (vd `otlp`, `prometheus`)                                                                                       |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`              | OpenTelemetry endpoint URL                                                                                                                     |
+| `DISABLE_AUTOUPDATER`                      | `1` = tắt auto-update CLI                                                                                                                      |
+| `CLAUDE_CODE_API_KEY_HELPER_TTL_MS`        | Refresh interval (ms) cho `apiKeyHelper` script (default tùy script return)                                                                    |
+| `CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS`     | `1` = bỏ git workflow khỏi system prompt (giảm baseline)                                                                                       |
 | `DISABLE_ERROR_REPORTING`                  | Tắt Sentry error reporting                                                                                                                     |
 | `DISABLE_PROMPT_CACHING`                   | `1` = tắt prompt caching (ưu tiên hơn per-model)                                                                                               |
 | `DISABLE_PROMPT_CACHING_OPUS`              | `1` = tắt prompt caching cho Opus                                                                                                              |
