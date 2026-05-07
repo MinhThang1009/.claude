@@ -53,6 +53,7 @@
 10. [Output styles (built-in)](#10-output-styles-built-in)
 11. [settings.json — keys hay dùng](#11-settingsjson--keys-hay-dùng)
     - [11.1 Permission rule syntax](#111-permission-rule-syntax)
+    - [11.2 Built-in tools — tên dùng trong permission rules / hook matchers](#112-built-in-tools--tên-dùng-trong-permission-rules--hook-matchers)
 12. [Environment variables](#12-environment-variables)
 13. [Hook events — đầy đủ 29 event](#13-hook-events--đầy-đủ-29-event)
     - [13.1 Per-session](#131-per-session)
@@ -108,7 +109,7 @@
     - [20.10 IDE integration](#2010-ide-integration)
     - [20.11 CI/CD & deployment](#2011-cicd--deployment)
     - [20.12 Cloud providers](#2012-cloud-providers)
-    - [20.13 SDK](#2013-sdk)
+    - [20.13 SDK (Claude Agent SDK)](#2013-sdk-claude-agent-sdk)
     - [20.14 Enterprise & admin](#2014-enterprise--admin)
     - [20.15 Security & compliance](#2015-security--compliance)
     - [20.16 Troubleshooting & errors](#2016-troubleshooting--errors)
@@ -116,13 +117,14 @@
     - [20.18 Index & release notes](#2018-index--release-notes)
     - [20.19 Blogs & engineering writing](#2019-blogs--engineering-writing)
     - [20.20 Cộng đồng tham khảo](#2020-cộng-đồng-tham-khảo)
-21. [Checklist & mẹo cuối](#21-checklist--mẹo-cuối)
-    - [21.1 Đầu mỗi project mới](#211-đầu-mỗi-project-mới)
-    - [21.2 Đầu mỗi session](#212-đầu-mỗi-session)
-    - [21.3 Trong session](#213-trong-session)
-    - [21.4 Cuối session](#214-cuối-session)
-    - [21.5 Định kỳ (hàng tháng)](#215-định-kỳ-hàng-tháng)
-    - [21.6 Mẹo cuối](#216-mẹo-cuối)
+21. [SDK notes](#21-sdk-notes)
+22. [Checklist & mẹo cuối](#22-checklist--mẹo-cuối)
+    - [22.1 Đầu mỗi project mới](#221-đầu-mỗi-project-mới)
+    - [22.2 Đầu mỗi session](#222-đầu-mỗi-session)
+    - [22.3 Trong session](#223-trong-session)
+    - [22.4 Cuối session](#224-cuối-session)
+    - [22.5 Định kỳ (hàng tháng)](#225-định-kỳ-hàng-tháng)
+    - [22.6 Mẹo cuối](#226-mẹo-cuối)
 
 ---
 
@@ -1887,16 +1889,6 @@ Cách xử lý:
 
 ### 20.13 SDK (Claude Agent SDK)
 
-> **Rebrand v0.1.0**: `@anthropic-ai/claude-code` → `@anthropic-ai/claude-agent-sdk` (TS), `claude-code-sdk` → `claude-agent-sdk` (Python). Type `ClaudeCodeOptions` → `ClaudeAgentOptions`. v0.2.111+ cần cho Opus 4.7. SDK bundles Claude Code binary — KHÔNG cần install CLI riêng.
-
-> **Breaking v0.1.0**: System prompt KHÔNG còn default trong SDK. Phải explicit `systemPrompt: { type: "preset", preset: "claude_code" }` để giữ behavior cũ; hoặc set custom string. `settingSources` mặc định load `["user", "project", "local"]` (giống CLI), pass `[]` để isolate cho CI/multi-tenant.
-
-> **Key options** (`ClaudeAgentOptions` / TS `Options`): `model`, `allowedTools`, `permissionMode` (`default`/`acceptEdits`/`dontAsk`/`auto` (TS only)/`bypassPermissions`), `mcpServers`, `hooks`, `agents`, `settingSources`, `canUseTool` (callback for permission/AskUserQuestion), `systemPrompt`, `maxTurns`, `resume`, `continue`, `cwd`, `env`.
-
-> **Custom tools** (in-process MCP): `tool(name, desc, schema, handler)` + `createSdkMcpServer({name, version, tools})`. Tool name khi expose Claude: `mcp__{server_name}__{tool_name}`. Schema TS = Zod, Python = dict hoặc full JSON Schema.
-
-> **Hosting** (production): 4 patterns (Ephemeral, Long-running, Hybrid, Single container). Sandbox providers: Modal, Cloudflare, Daytona, E2B, Fly Machines, Vercel. Resources: 1GiB RAM/5GiB disk/1 CPU minimum, ~5¢/giờ container.
-
 - Agent SDK overview: <https://code.claude.com/docs/en/agent-sdk/overview>
 - Quickstart: <https://code.claude.com/docs/en/agent-sdk/quickstart>
 - Migration guide (rebrand v0.1.0): <https://code.claude.com/docs/en/agent-sdk/migration-guide>
@@ -1991,11 +1983,27 @@ Cách xử lý:
 
 ---
 
-## 21. Checklist & mẹo cuối
+## 21. SDK notes
+
+> Source chính thức: [code.claude.com/docs/en/agent-sdk/overview](https://code.claude.com/docs/en/agent-sdk/overview) + [migration guide](https://code.claude.com/docs/en/agent-sdk/migration-guide)
+
+> **Rebrand v0.1.0**: `@anthropic-ai/claude-code` → `@anthropic-ai/claude-agent-sdk` (TS), `claude-code-sdk` → `claude-agent-sdk` (Python). Type `ClaudeCodeOptions` → `ClaudeAgentOptions`. v0.2.111+ cần cho Opus 4.7. SDK bundles Claude Code binary — KHÔNG cần install CLI riêng.
+
+> **Breaking v0.1.0**: System prompt KHÔNG còn default trong SDK. Phải explicit `systemPrompt: { type: "preset", preset: "claude_code" }` để giữ behavior cũ; hoặc set custom string. `settingSources` mặc định load `["user", "project", "local"]` (giống CLI), pass `[]` để isolate cho CI/multi-tenant.
+
+> **Key options** (`ClaudeAgentOptions` / TS `Options`): `model`, `allowedTools`, `permissionMode` (`default`/`acceptEdits`/`dontAsk`/`auto` (TS only)/`bypassPermissions`), `mcpServers`, `hooks`, `agents`, `settingSources`, `canUseTool` (callback for permission/AskUserQuestion), `systemPrompt`, `maxTurns`, `resume`, `continue`, `cwd`, `env`.
+
+> **Custom tools** (in-process MCP): `tool(name, desc, schema, handler)` + `createSdkMcpServer({name, version, tools})`. Tool name khi expose Claude: `mcp__{server_name}__{tool_name}`. Schema TS = Zod, Python = dict hoặc full JSON Schema.
+
+> **Hosting** (production): 4 patterns (Ephemeral, Long-running, Hybrid, Single container). Sandbox providers: Modal, Cloudflare, Daytona, E2B, Fly Machines, Vercel. Resources: 1GiB RAM/5GiB disk/1 CPU minimum, ~5¢/giờ container.
+
+---
+
+## 22. Checklist & mẹo cuối
 
 > Tổng hợp từ: [code.claude.com/docs/en/best-practices](https://code.claude.com/docs/en/best-practices) + [code.claude.com/docs/en/setup](https://code.claude.com/docs/en/setup) + [code.claude.com/docs/en/memory](https://code.claude.com/docs/en/memory)
 
-### 21.1 Đầu mỗi project mới
+### 22.1 Đầu mỗi project mới
 - [ ] Copy template vào project root: `cp ~/.claude/templates/project-CLAUDE.md ./CLAUDE.md`
 - [ ] Sửa CLAUDE.md mô tả tech stack, lệnh build/test, convention RIÊNG project
 - [ ] Tạo `.claudeignore` loại file lớn không cần (`dist/`, `node_modules/`, `*.lock`, `coverage/`, asset binary)
@@ -2003,12 +2011,12 @@ Cách xử lý:
 - [ ] `echo "CLAUDE.local.md" >> .gitignore` + `echo ".claude/settings.local.json" >> .gitignore` + `echo ".claude/HANDOFF.md" >> .gitignore`
 - [ ] `claude doctor` để verify
 
-### 21.2 Đầu mỗi session
+### 22.2 Đầu mỗi session
 - [ ] Brief 1-2 câu mục tiêu phiên này
 - [ ] `/context` xem baseline
 - [ ] Nếu có `.claude/HANDOFF.md` từ phiên trước → đọc
 
-### 21.3 Trong session
+### 22.3 Trong session
 - [ ] Plan trước cho task >3 file (`/plan` hoặc Shift+Tab×2)
 - [ ] Verify mọi output (test, lint, screenshot)
 - [ ] Subagent cho investigation
@@ -2017,19 +2025,19 @@ Cách xử lý:
 - [ ] Sửa 2 lần vẫn sai → `/clear` + reprompt, đừng spam correction
 - [ ] `/effort high` hoặc `ultrathink` cho task khó (architecture, debug heisenbug, refactor lớn)
 
-### 21.4 Cuối session
+### 22.4 Cuối session
 - [ ] `/handoff --save` nếu việc còn dở
 - [ ] Commit work in-progress hoặc stash
 - [ ] Update `<project>/CLAUDE.md` nếu phát hiện convention mới đáng ghi
 
-### 21.5 Định kỳ (hàng tháng)
+### 22.5 Định kỳ (hàng tháng)
 - [ ] Review `~/.claude/CLAUDE.md` — bỏ dòng không còn cần
 - [ ] Review `~/.claude/skills/` — skill nào không dùng → bỏ hoặc set `disable-model-invocation: true`
 - [ ] `git log` của repo `~/.claude/` — xem evolve thế nào (worth committing)
 - [ ] `claude update`
 - [ ] `/insights` xem session pattern, friction points
 
-### 21.6 Mẹo cuối
+### 22.6 Mẹo cuối
 1. **Đầu tư vào CLAUDE.md** — file này compound theo thời gian.
 2. **Hook > rule trong CLAUDE.md** — thứ phải xảy ra MỌI lần thì hook deterministic, đừng tin LLM nhớ rule.
 3. **Plan trước cho task >3 file** — `/plan` hoặc Shift+Tab×2.
