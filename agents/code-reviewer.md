@@ -126,7 +126,7 @@ Format output:
 - [Khen ngắn gọn về 1-3 điểm tích cực — quan trọng]
 ```
 
-# Khi nào escalate lên blocking
+# Tiêu chí escalate lên blocking
 
 Một issue là **🔴 blocking** khi:
 - Có thể gây bug rõ ràng trong production
