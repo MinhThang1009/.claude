@@ -96,7 +96,7 @@
           {
             "type": "command",
             "shell": "bash",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE '(rm -rf /|rm -rf \\$|rm -rf ~|chmod -R 777|curl.*\\| *bash|curl.*\\| *sh)'; then echo 'BLOCKED: dangerous command detected' >&2; exit 2; fi",
+            "command": "cmd=$(jq -r '.tool_input.command // empty' 2>/dev/null); if echo \"$cmd\" | grep -qE '(rm -rf /|rm -rf \\$|rm -rf ~|chmod -R 777|curl.*\\| *bash|curl.*\\| *sh)'; then echo 'BLOCKED: dangerous command detected' >&2; exit 2; fi; exit 0",
             "timeout": 5
           }
         ]

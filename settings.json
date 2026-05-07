@@ -137,7 +137,7 @@
           {
             "type": "command",
             "shell": "bash",
-            "command": "bash -c 'cmd=\"$CLAUDE_TOOL_INPUT_COMMAND\"; case \"$cmd\" in *\"rm -rf\"*\"/\"*|*\":(){\"*|*\"dd if=\"*) echo \"BLOCKED: dangerous command pattern\" >&2; exit 2;; esac; exit 0'"
+            "command": "bash -c 'cmd=$(jq -r \".tool_input.command // empty\" 2>/dev/null); case \"$cmd\" in *\"rm -rf\"*\"/\"*|*\":(){\"*|*\"dd if=\"*) echo \"BLOCKED: dangerous command pattern\" >&2; exit 2;; esac; exit 0'"
           }
         ]
       }
@@ -150,7 +150,7 @@
           {
             "type": "command",
             "shell": "bash",
-            "command": "bash -c 'f=\"$CLAUDE_TOOL_INPUT_FILE_PATH\"; case \"$f\" in *.ts|*.tsx|*.js|*.jsx|*.json|*.md|*.yml|*.yaml) command -v prettier >/dev/null 2>&1 && prettier --write \"$f\" 2>/dev/null;; *.py) command -v ruff >/dev/null 2>&1 && ruff format \"$f\" 2>/dev/null;; *.go) command -v gofmt >/dev/null 2>&1 && gofmt -w \"$f\" 2>/dev/null;; *.rs) command -v rustfmt >/dev/null 2>&1 && rustfmt \"$f\" 2>/dev/null;; esac; exit 0'"
+            "command": "bash -c 'f=$(jq -r \".tool_input.file_path // empty\" 2>/dev/null); [ -z \"$f\" ] && exit 0; case \"$f\" in *.ts|*.tsx|*.js|*.jsx|*.json|*.md|*.yml|*.yaml) command -v prettier >/dev/null 2>&1 && prettier --write \"$f\" 2>/dev/null;; *.py) command -v ruff >/dev/null 2>&1 && ruff format \"$f\" 2>/dev/null;; *.go) command -v gofmt >/dev/null 2>&1 && gofmt -w \"$f\" 2>/dev/null;; *.rs) command -v rustfmt >/dev/null 2>&1 && rustfmt \"$f\" 2>/dev/null;; esac; exit 0'"
           }
         ]
       }

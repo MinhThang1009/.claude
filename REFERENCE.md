@@ -64,7 +64,8 @@
     - [13.7 Matcher syntax](#137-matcher-syntax)
     - [13.8 Filter chi tiết với `if`](#138-filter-chi-tiết-với-if)
 14. [Hook handler types (5 loại)](#14-hook-handler-types-5-loại)
-    - [14.1 Hook output (command/http)](#141-hook-output-commandhttp)
+    - [14.1 Hook input — đọc qua stdin JSON (KHÔNG env var)](#141-hook-input--đọc-qua-stdin-json-không-env-var)
+    - [14.2 Hook output (command/http)](#142-hook-output-commandhttp)
 15. [Workflow patterns](#15-workflow-patterns)
     - [15.1 Pattern 1 — Explore → Plan → Code → Commit](#151-pattern-1--explore--plan--code--commit)
     - [15.2 Pattern 2 — Writer / Reviewer (2 session)](#152-pattern-2--writer--reviewer-2-session)
@@ -1231,7 +1232,26 @@ Trong hook handler, dùng `if` (permission rule syntax):
 - `once`: `true` = chỉ chạy 1 lần per session
 - `model` (chỉ `prompt` / `agent`): override fast model default
 
-### 14.1 Hook output (command/http)
+### 14.1 Hook input — đọc qua stdin JSON (KHÔNG env var)
+
+⚠️ Hook command/http nhận tool input qua **stdin JSON**, KHÔNG phải `$CLAUDE_TOOL_INPUT_*` env vars (đó là common mistake).
+
+```bash
+# ĐÚNG — read stdin JSON với jq:
+cmd=$(jq -r '.tool_input.command // empty' 2>/dev/null)
+file=$(jq -r '.tool_input.file_path // empty' 2>/dev/null)
+
+# SAI — env var KHÔNG tồn tại:
+cmd="$CLAUDE_TOOL_INPUT_COMMAND"  # → empty, hook silently no-op
+```
+
+**Env vars hợp lệ trong hook context** (per docs `hooks`):
+- `CLAUDE_PROJECT_DIR` — path project root
+- `CLAUDE_PLUGIN_ROOT` / `CLAUDE_PLUGIN_DATA` — plugin paths
+- `CLAUDE_ENV_FILE` — chỉ trong `SessionStart`/`Setup`/`CwdChanged`/`FileChanged`
+- `CLAUDE_CODE_REMOTE` — set trong web session
+
+### 14.2 Hook output (command/http)
 
 Exit `0` = OK. Exit `2` = block tool, stderr → Claude. Stdout JSON cho control flow:
 ```json
