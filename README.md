@@ -194,15 +194,15 @@ CLAUDE.local.md
 cd C:\path\to\project
 
 :: CLAUDE.md mô tả project
-copy "%USERPROFILE%\.claude\templates\project-CLAUDE.md" ".\CLAUDE.md"
+copy /Y "%USERPROFILE%\.claude\templates\project-CLAUDE.md" ".\CLAUDE.md"
 
 :: Note cá nhân (gitignore)
-copy "%USERPROFILE%\.claude\templates\project-CLAUDE.local.md" ".\CLAUDE.local.md"
+copy /Y "%USERPROFILE%\.claude\templates\project-CLAUDE.local.md" ".\CLAUDE.local.md"
 
 :: Settings team (commit) + handoff slot (gitignore)
 if not exist ".claude" mkdir ".claude"
-copy "%USERPROFILE%\.claude\templates\project-settings.json" ".claude\settings.json"
-copy "%USERPROFILE%\.claude\templates\HANDOFF.md" ".claude\HANDOFF.md"
+copy /Y "%USERPROFILE%\.claude\templates\project-settings.json" ".claude\settings.json"
+copy /Y "%USERPROFILE%\.claude\templates\HANDOFF.md" ".claude\HANDOFF.md"
 
 :: .gitignore (append)
 (
