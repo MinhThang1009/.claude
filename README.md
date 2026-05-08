@@ -77,7 +77,7 @@
 
 ```powershell
 if (Test-Path "$env:USERPROFILE\.claude") {
-  Copy-Item -Recurse "$env:USERPROFILE\.claude" "$env:USERPROFILE\.claude.backup-$(Get-Date -Format yyyyMMdd)"
+  Copy-Item -Recurse -Force "$env:USERPROFILE\.claude" "$env:USERPROFILE\.claude.backup-$(Get-Date -Format yyyyMMdd)"
 }
 ```
 
@@ -89,7 +89,17 @@ if exist "%USERPROFILE%\.claude" xcopy /E /I /H /Y "%USERPROFILE%\.claude" "%USE
 
 > CMD không có cách lấy timestamp gọn (phụ thuộc locale `%date%`) — backup folder tên cố định `.claude.backup`. Chạy lại sẽ ghi đè. Cần timestamp → dùng PowerShell.
 
-### Bước 2 — Sao chép vào `~/.claude/`
+### Bước 2 — Clone repo
+
+Lệnh giống nhau trên cả 3 platform. Chạy ở thư mục bất kỳ — sẽ tạo folder `dotclaude/` ngay tại đó.
+
+```bash
+git clone https://github.com/MinhThang1009/dotclaude.git
+```
+
+> Sau khi sao chép xong ở Bước 3, có thể xóa `dotclaude/` — nó chỉ là staging.
+
+### Bước 3 — Sao chép vào `~/.claude/`
 
 **macOS / Linux**
 
@@ -112,7 +122,7 @@ if not exist "%USERPROFILE%\.claude" mkdir "%USERPROFILE%\.claude"
 xcopy /E /I /Y /H dotclaude\* "%USERPROFILE%\.claude\"
 ```
 
-### Bước 3 — Verify
+### Bước 4 — Verify
 
 Mở Claude Code trong project bất kỳ:
 
@@ -124,7 +134,9 @@ Mở Claude Code trong project bất kỳ:
 /doctor          # Chẩn đoán cấu hình
 ```
 
-### Bước 4 — Mỗi project mới
+### Bước 5 — Mỗi project mới
+
+**macOS / Linux**
 
 ```bash
 cd /path/to/project
@@ -148,6 +160,58 @@ CLAUDE.local.md
 .claude/settings.local.json
 .claude/HANDOFF.md
 EOF
+```
+
+**Windows (PowerShell)**
+
+```powershell
+cd C:\path\to\project
+
+# CLAUDE.md mô tả project
+Copy-Item "$env:USERPROFILE\.claude\templates\project-CLAUDE.md" ".\CLAUDE.md"
+
+# Note cá nhân (gitignore)
+Copy-Item "$env:USERPROFILE\.claude\templates\project-CLAUDE.local.md" ".\CLAUDE.local.md"
+
+# Settings team (commit) + handoff slot (gitignore)
+New-Item -ItemType Directory -Force -Path ".claude" | Out-Null
+Copy-Item "$env:USERPROFILE\.claude\templates\project-settings.json" ".claude\settings.json"
+Copy-Item "$env:USERPROFILE\.claude\templates\HANDOFF.md" ".claude\HANDOFF.md"
+
+# .gitignore (append)
+Add-Content -Path ".gitignore" -Value @"
+
+# Claude Code
+CLAUDE.local.md
+.claude/settings.local.json
+.claude/HANDOFF.md
+"@
+```
+
+**Windows (CMD)**
+
+```cmd
+cd C:\path\to\project
+
+:: CLAUDE.md mô tả project
+copy "%USERPROFILE%\.claude\templates\project-CLAUDE.md" ".\CLAUDE.md"
+
+:: Note cá nhân (gitignore)
+copy "%USERPROFILE%\.claude\templates\project-CLAUDE.local.md" ".\CLAUDE.local.md"
+
+:: Settings team (commit) + handoff slot (gitignore)
+if not exist ".claude" mkdir ".claude"
+copy "%USERPROFILE%\.claude\templates\project-settings.json" ".claude\settings.json"
+copy "%USERPROFILE%\.claude\templates\HANDOFF.md" ".claude\HANDOFF.md"
+
+:: .gitignore (append)
+(
+echo.
+echo # Claude Code
+echo CLAUDE.local.md
+echo .claude/settings.local.json
+echo .claude/HANDOFF.md
+) >> .gitignore
 ```
 
 Sau đó sửa `CLAUDE.md` mô tả: tech stack, lệnh build/test/lint, convention RIÊNG project (KHÔNG lặp lại global).
