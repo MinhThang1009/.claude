@@ -871,7 +871,7 @@ force-for-plugin: false               # Plugin only: true → auto-apply khi plu
   "model": "claude-opus-4-7",
   "outputStyle": "Default",            // values: "Default" | "Explanatory" | "Learning" | custom name (default: none)
   "language": "vietnamese",            // Claude's preferred response language (vd "japanese", "spanish") — KHÔNG phải voice dictation
-  "theme": "auto",                     // auto|dark|light|dark-daltonized|light-daltonized|dark-ansi|light-ansi|custom:<slug>. `auto` = follow terminal background. Pick qua /theme picker. v2.1.118+ custom theme JSON ở ~/.claude/themes/
+  // NOTE: `theme` KHÔNG phải settings.json key (per docs/en/settings). Đổi theme qua /config hoặc /theme — lưu vào ~/.claude.json. Custom theme JSON đặt ở ~/.claude/themes/<name>.json (v2.1.118+).
 
   "attribution": {
     // default: "🤖 Generated with Claude Code\n\nCo-Authored-By: Claude..." — set "" để tắt
