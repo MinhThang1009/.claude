@@ -2,6 +2,8 @@
 
 > Tổng hợp từ tài liệu chính thức Anthropic ([code.claude.com](https://code.claude.com/docs), [platform.claude.com](https://platform.claude.com/docs)), [Engineering Blog](https://www.anthropic.com/engineering), [blog claude.com](https://www.claude.com/blog), [MindStudio](https://www.mindstudio.ai/blog), [ClaudeFast](https://claudefa.st/blog), và best practices cộng đồng GitHub. Áp dụng MỌI project. Tối ưu cho **dev người Việt** — tiếng Việt cho comment/log/commit, tiếng Anh chuẩn convention cho identifier.
 
+> 👉 Lần đầu xem repo? Đọc [**INTRODUCTION.md**](INTRODUCTION.md) cho overview ngắn 1 phút.
+
 ## 1. Cấu trúc thư mục sau khi cài
 
 ```text
