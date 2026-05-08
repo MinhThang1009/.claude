@@ -50,12 +50,11 @@
       "Bash(go get:*)"
     ],
 
-    "_comment_deny": "Lệnh CHẶN tuyệt đối — KHÔNG bao giờ chạy",
+    "_comment_deny": "Lệnh CHẶN tuyệt đối — KHÔNG bao giờ chạy. Lưu ý: pattern phức tạp (fork bomb với ký tự đặc biệt {}();) phải chặn qua hook PreToolUse bên dưới — permission rule chỉ hỗ trợ glob đơn giản.",
     "deny": [
       "Bash(rm -rf /*)",
       "Bash(rm -rf ~)",
       "Bash(rm -rf $*)",
-      "Bash(:(){ :|:& };:)",
       "Bash(chmod -R 777:*)",
       "Bash(curl * | bash:*)",
       "Bash(curl * | sh:*)",
@@ -96,7 +95,7 @@
           {
             "type": "command",
             "shell": "bash",
-            "command": "cmd=$(jq -r '.tool_input.command // empty' 2>/dev/null); if echo \"$cmd\" | grep -qE '(rm -rf /|rm -rf \\$|rm -rf ~|chmod -R 777|curl.*\\| *bash|curl.*\\| *sh)'; then echo 'BLOCKED: dangerous command detected' >&2; exit 2; fi; exit 0",
+            "command": "cmd=$(jq -r '.tool_input.command // empty' 2>/dev/null); if echo \"$cmd\" | grep -qE '(rm -rf /|rm -rf \\$|rm -rf ~|chmod -R 777|curl.*\\| *bash|curl.*\\| *sh|:\\(\\)\\s*\\{|dd if=)'; then echo 'BLOCKED: dangerous command detected' >&2; exit 2; fi; exit 0",
             "timeout": 5
           }
         ]
