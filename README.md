@@ -111,8 +111,9 @@ cp -r dotclaude/. ~/.claude/
 **Windows (PowerShell)**
 
 ```powershell
-New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude"
-Copy-Item -Recurse -Force dotclaude\* "$env:USERPROFILE\.claude\"
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude" | Out-Null
+# -Force trên Get-ChildItem mới include được hidden file (.gitignore...)
+Get-ChildItem -Path dotclaude -Force | Copy-Item -Destination "$env:USERPROFILE\.claude\" -Recurse -Force
 ```
 
 **Windows (CMD)**
@@ -293,7 +294,7 @@ Cao → thấp khi xung đột:
 
 ## 7. Phiên bản tương thích
 
-Bộ cấu hình này test với **Claude Code v2.1.59 trở lên** (cần auto memory, plan mode v2, skills merge với commands, MCP deferred default).
+Bộ cấu hình này yêu cầu tối thiểu **Claude Code v2.1.111** (do dùng `model: opus[1m]` + `effortLevel: xhigh` — Opus 4.7 cần v2.1.111+). Khuyến nghị **v2.1.117+** để `/model` ghi vào `.claude/settings.local.json` đúng cách khi project pin model khác.
 
 ```bash
 claude --version
@@ -304,7 +305,8 @@ Cụ thể các tính năng cần:
 - ✅ v2.1.0+: skills system
 - ✅ v2.1.59+: auto memory, plan mode v2
 - ✅ v2.1.101+: skills+commands merge, output styles built-in
-- ✅ v2.1+ (giữa cycle): MCP tool deferred load (giảm baseline lớn)
+- ✅ v2.1.111+: Opus 4.7, `effortLevel: xhigh` (mặc định mới của Opus 4.7)
+- ✅ v2.1.117+: `/model` selection persist vào `settings.local.json` khi project override
 
 ## 8. Tài liệu tham khảo
 
