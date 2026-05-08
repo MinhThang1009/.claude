@@ -1,19 +1,15 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "effortLevel": "xhigh",
-  "autoUpdatesChannel": "latest",
-  "theme": "light",
-  "model": "opus[1m]",
-  "//": "Settings global cho ~/.claude/settings.json. Override bằng settings.json của project khi cần.",
+  "env": {
+    "//": "Tăng MAX_MCP_OUTPUT_TOKENS để MCP server (như filesystem, GitHub) không bị truncate khi trả về dữ liệu hữu ích. Mặc định 25k (docs MCP), warning threshold 10k.",
+    "MAX_MCP_OUTPUT_TOKENS": "50000",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "0"
+  },
   "attribution": {
-    "//": "Tắt attribution để commit message không có Co-Authored-By Claude",
     "commit": "",
     "pr": ""
   },
   "permissions": {
-    "//": "Mặc định cho global. Project có thể override hoặc thêm allow/deny.",
-    "//defaultMode": "acceptEdits = file edits (Edit/Write) tự apply không cần Apply diff card trong IDE. Bash/MCP nguy hiểm vẫn theo allow/ask/deny rule. Edit(**) và Write(**) trong ask list dưới có thể override mode này — nếu vẫn bị hỏi, xem xét bỏ.",
-    "defaultMode": "acceptEdits",
     "allow": [
       "Read(**)",
       "Glob(**)",
@@ -83,26 +79,6 @@
       "WebFetch(domain:platform.claude.com)",
       "WebFetch(domain:code.claude.com)"
     ],
-    "ask": [
-      "Bash(git commit:*)",
-      "Bash(git rebase:*)",
-      "Bash(git cherry-pick:*)",
-      "Bash(git reset:*)",
-      "Bash(git tag:*)",
-      "Bash(git checkout:*)",
-      "Bash(git branch -d:*)",
-      "Bash(git branch -D:*)",
-      "Bash(npm install:*)",
-      "Bash(pnpm add:*)",
-      "Bash(pnpm install:*)",
-      "Bash(yarn add:*)",
-      "Bash(pip install:*)",
-      "Bash(cargo add:*)",
-      "Bash(go get:*)",
-      "WebFetch(*)",
-      "Edit(**)",
-      "Write(**)"
-    ],
     "deny": [
       "Bash(rm -rf /*)",
       "Bash(rm -rf ~)",
@@ -126,53 +102,71 @@
       "Read(**/*.key)",
       "Read(**/id_rsa)",
       "Read(**/id_ed25519)"
-    ]
+    ],
+    "ask": [
+      "Bash(git commit:*)",
+      "Bash(git rebase:*)",
+      "Bash(git cherry-pick:*)",
+      "Bash(git reset:*)",
+      "Bash(git tag:*)",
+      "Bash(git checkout:*)",
+      "Bash(git branch -d:*)",
+      "Bash(git branch -D:*)",
+      "Bash(npm install:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm install:*)",
+      "Bash(yarn add:*)",
+      "Bash(pip install:*)",
+      "Bash(cargo add:*)",
+      "Bash(go get:*)",
+      "WebFetch(*)",
+      "Edit(**)",
+      "Write(**)"
+    ],
+    "defaultMode": "acceptEdits",
+    "//": "Mặc định cho global. Project có thể override hoặc thêm allow/deny.",
+    "//defaultMode": "acceptEdits = file edits (Edit/Write) tự apply không cần Apply diff card trong IDE. Bash/MCP nguy hiểm vẫn theo allow/ask/deny rule. Edit(**) và Write(**) trong ask list dưới có thể override mode này — nếu vẫn bị hỏi, xem xét bỏ."
   },
+  "model": "opus[1m]",
   "hooks": {
-    "//": "Hook chạy mọi project. Hook đặc thù project đặt trong <project>/.claude/settings.json.",
     "PreToolUse": [
       {
         "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "shell": "bash",
-            "command": "bash -c 'cmd=$(jq -r \".tool_input.command // empty\" 2>/dev/null); case \"$cmd\" in *\"rm -rf\"*\"/\"*|*\":(){\"*|*\"dd if=\"*) echo \"BLOCKED: dangerous command pattern\" >&2; exit 2;; esac; exit 0'"
+            "command": "bash -c 'cmd=$(jq -r \".tool_input.command // empty\" 2>/dev/null); case \"$cmd\" in *\"rm -rf\"*\"/\"*|*\":(){\"*|*\"dd if=\"*) echo \"BLOCKED: dangerous command pattern\" >&2; exit 2;; esac; exit 0'",
+            "shell": "bash"
           }
         ]
       }
     ],
     "PostToolUse": [
       {
-        "//": "Auto-format file sau Edit/Write. Mỗi project bật command phù hợp với toolchain.",
         "matcher": "Edit|Write|MultiEdit",
         "hooks": [
           {
             "type": "command",
-            "shell": "bash",
-            "command": "bash -c 'f=$(jq -r \".tool_input.file_path // empty\" 2>/dev/null); [ -z \"$f\" ] && exit 0; case \"$f\" in *.ts|*.tsx|*.js|*.jsx|*.json|*.md|*.yml|*.yaml) command -v prettier >/dev/null 2>&1 && prettier --write \"$f\" 2>/dev/null;; *.py) command -v ruff >/dev/null 2>&1 && ruff format \"$f\" 2>/dev/null;; *.go) command -v gofmt >/dev/null 2>&1 && gofmt -w \"$f\" 2>/dev/null;; *.rs) command -v rustfmt >/dev/null 2>&1 && rustfmt \"$f\" 2>/dev/null;; esac; exit 0'"
+            "command": "bash -c 'f=$(jq -r \".tool_input.file_path // empty\" 2>/dev/null); [ -z \"$f\" ] && exit 0; case \"$f\" in *.ts|*.tsx|*.js|*.jsx|*.json|*.md|*.yml|*.yaml) command -v prettier >/dev/null 2>&1 && prettier --write \"$f\" 2>/dev/null;; *.py) command -v ruff >/dev/null 2>&1 && ruff format \"$f\" 2>/dev/null;; *.go) command -v gofmt >/dev/null 2>&1 && gofmt -w \"$f\" 2>/dev/null;; *.rs) command -v rustfmt >/dev/null 2>&1 && rustfmt \"$f\" 2>/dev/null;; esac; exit 0'",
+            "shell": "bash"
           }
         ]
       }
     ],
     "SessionStart": [
       {
-        "//": "Hiển thị git status khi mở session để Claude biết trạng thái repo",
         "hooks": [
           {
             "type": "command",
-            "shell": "bash",
-            "command": "bash -c 'cd \"${CLAUDE_PROJECT_DIR:-.}\" 2>/dev/null; git rev-parse --git-dir >/dev/null 2>&1 && { echo \"=== Git status ===\"; git status -s; echo \"=== Branch ===\"; git rev-parse --abbrev-ref HEAD; }; exit 0'"
+            "command": "bash -c 'cd \"${CLAUDE_PROJECT_DIR:-.}\" 2>/dev/null; git rev-parse --git-dir >/dev/null 2>&1 && { echo \"=== Git status ===\"; git status -s; echo \"=== Branch ===\"; git rev-parse --abbrev-ref HEAD; }; exit 0'",
+            "shell": "bash"
           }
         ]
       }
     ]
   },
-  "env": {
-    "//": "Tăng MAX_MCP_OUTPUT_TOKENS để MCP server (như filesystem, GitHub) không bị truncate khi trả về dữ liệu hữu ích. Mặc định 25k (docs MCP), warning threshold 10k.",
-    "MAX_MCP_OUTPUT_TOKENS": "50000",
-    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "0"
-  },
+  "effortLevel": "max",
+  "autoUpdatesChannel": "latest",
   "autoMemoryEnabled": true,
   "claudeMdExcludes": [
     "**/node_modules/**/CLAUDE.md",
@@ -180,5 +174,7 @@
     "**/dist/**/CLAUDE.md",
     "**/build/**/CLAUDE.md",
     "**/.venv/**/CLAUDE.md"
-  ]
+  ],
+  "theme": "dark-ansi",
+  "//": "Settings global cho ~/.claude/settings.json. Override bằng settings.json của project khi cần."
 }
