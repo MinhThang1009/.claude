@@ -307,6 +307,19 @@ Cụ thể các tính năng cần:
 - ✅ v2.1.111+: Opus 4.7, `effortLevel: xhigh` (mặc định mới của Opus 4.7)
 - ✅ v2.1.117+: `/model` selection persist vào `settings.local.json` khi project override
 
+### 7.1 Nếu plan/account không hỗ trợ Opus 4.7 + 1M context
+
+Default repo set `model: "opus[1m]"` + `effortLevel: "xhigh"` — phù hợp Max/Team Premium plan trên Anthropic API. Account khác cần sửa `settings.json`:
+
+| Plan / Provider                | Sửa `model`                                  | Sửa `effortLevel`            |
+| ------------------------------ | -------------------------------------------- | ---------------------------- |
+| **Pro / Team Standard**        | `"sonnet"` (Opus rate-limit nhanh hơn)       | `"high"` hoặc `"xhigh"`      |
+| **Free / không Opus 1M**       | `"opus"` (bỏ `[1m]`) hoặc `"sonnet"`         | `"high"`                     |
+| **Bedrock / Vertex / Foundry** | Pin full ID: `"claude-sonnet-4-6"` hoặc `"claude-opus-4-6"` (Opus 4.7 chưa có) | `"high"` (xhigh chỉ Opus 4.7) |
+| **Account giới hạn ngân sách** | `"haiku"`                                    | `"medium"` (haiku không support effort) |
+
+Sau sửa, restart Claude Code (`exit` rồi `claude`) để apply. Verify bằng `/model` và `/effort`.
+
 ## 8. Tài liệu tham khảo
 
 - Tài liệu chính thức: <https://code.claude.com/docs>
