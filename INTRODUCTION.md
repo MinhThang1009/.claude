@@ -1,0 +1,41 @@
+# 🚀 dotclaude — Bộ cấu hình `~/.claude/` cho Claude Code, tối ưu cho dev người Việt
+
+## 📌 Repo làm gì?
+
+Cấu hình global ready-to-use cho Claude Code. Tiếng Việt cho comment/commit/log, tiếng Anh chuẩn cho identifier. Tiết kiệm 1-2 ngày setup.
+
+## ✨ Chức năng nổi bật
+
+- **7 skills** gọi qua `/<tên>`: `/commit`, `/code-review`, `/debug`, `/refactor`, `/explain`, `/handoff`, `/context-check`
+- **4 subagents** chuyên biệt: `code-reviewer` · `security-auditor` · `test-writer` · `architect`
+- **3 hook deterministic**: chặn `rm -rf` / fork bomb / `dd`, auto-format đa ngôn ngữ, hiển thị git status đầu session
+- **Permission rules** deny secrets (`.env`, `*.key`, `*.pem`) và lệnh nguy hiểm
+- **5 template** project sẵn dùng (`CLAUDE.md`, `settings.json`, `.mcp.json`, `HANDOFF.md`, `CLAUDE.local.md`)
+- **REFERENCE.md** cheatsheet 2050 dòng tổng hợp slash command, hook, env var
+
+## 🛠️ Cài đặt (3 bước)
+
+1. Backup `~/.claude/` cũ nếu có
+2. Clone repo:
+   ```bash
+   git clone https://github.com/MinhThang1009/dotclaude.git
+   ```
+3. Copy sang `~/.claude/` — script đầy đủ cho Linux/macOS, PowerShell, CMD trong [README](README.md)
+
+**Verify:** `/skills` · `/agents` · `/context` · `/doctor`
+
+## ✅ Có hữu ích không?
+
+- 🟢 **Phù hợp**: dev VN dùng Claude Code v2.1.111+, ưu tiên Max/Team Premium (Opus 4.7 + 1M context)
+- 🔴 **Không phù hợp**: dev English-only, user muốn tự config từ đầu
+- 🛡️ **Quality**: schema chuẩn Anthropic, MIT License, bảng fallback cho Pro/Bedrock/Vertex
+
+## 🔗 Repo
+
+<https://github.com/MinhThang1009/dotclaude>
+
+Issues và PR luôn welcome.
+
+---
+
+**Topics:** `claude-code` · `anthropic` · `dotfiles` · `dev-vn` · `ai-tooling`
