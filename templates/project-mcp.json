@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/mcp.json",
+  "_comment": "MCP server team-share — copy thành <project>/.mcp.json (commit). Schema: https://code.claude.com/docs/en/mcp. KHÔNG để key bắt đầu bằng '_' trong 'mcpServers' vì Claude Code sẽ parse như server name hợp lệ. Examples ở phần dưới, paste vào 'mcpServers' khi cần.",
+
+  "_examples_stdio_filesystem": "{ \"filesystem\": { \"type\": \"stdio\", \"command\": \"npx\", \"args\": [\"-y\", \"@modelcontextprotocol/server-filesystem\", \"${CLAUDE_PROJECT_DIR}/src\"] } }",
+
+  "_examples_stdio_github": "{ \"github\": { \"type\": \"stdio\", \"command\": \"npx\", \"args\": [\"-y\", \"@modelcontextprotocol/server-github\"], \"env\": { \"GITHUB_PERSONAL_ACCESS_TOKEN\": \"${GITHUB_TOKEN}\" } } }",
+
+  "_examples_http_remote": "{ \"stripe\": { \"type\": \"http\", \"url\": \"https://mcp.stripe.com\", \"headers\": { \"Authorization\": \"Bearer ${STRIPE_API_KEY}\" } } }",
+
+  "_examples_http_oauth": "{ \"notion\": { \"type\": \"http\", \"url\": \"https://mcp.notion.com/mcp\", \"oauth\": { \"callbackPort\": 8080 } } }",
+
+  "_notes": "Variable expansion: ${VAR} hoặc ${VAR:-default}. Secret KHÔNG hard-code — luôn dùng env var. Per-user override (KHÔNG commit): <project>/.claude/settings.local.json với 'enabledMcpjsonServers' / 'disabledMcpjsonServers'.",
+
+  "mcpServers": {}
+}
