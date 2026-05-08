@@ -224,7 +224,6 @@ Sau đó sửa `CLAUDE.md` mô tả: tech stack, lệnh build/test/lint, convent
 | `CLAUDE.md` (project)   | `<project>/CLAUDE.md`                   | Context riêng từng repo, COMMIT |
 | `CLAUDE.local.md`       | `<project>/CLAUDE.local.md`             | Note cá nhân, **GITIGNORE**     |
 | `.mcp.json` (team)      | `<project>/.mcp.json`                   | MCP team-share, COMMIT          |
-| `.claudeignore`         | `<project>/.claudeignore`               | File Claude bỏ qua, COMMIT      |
 | `settings.local.json`   | `<project>/.claude/settings.local.json` | Override cá nhân, GITIGNORE     |
 | `HANDOFF.md`            | `<project>/.claude/HANDOFF.md`          | Brief chuyển session, GITIGNORE |
 | `managed-settings.json` | OS path                                 | Chỉ admin enterprise            |
@@ -253,7 +252,7 @@ Cao → thấp khi xung đột:
 | **agents/**            | Task chuyên biệt cần **context window riêng**                                 |
 | **hooks**              | Hành động **BẮT BUỘC** chạy mỗi lần (CLAUDE.md là gợi ý, hooks deterministic) |
 | **MCP**                | Tool ngoài (Notion, Figma, DB, GitHub…)                                       |
-| **`.claudeignore`**    | Loại file Claude không nên đọc (build output, lockfile lớn, asset)            |
+| **`permissions.deny`** | Chặn Claude đọc file nhạy cảm (`.env`, `*.key`) hoặc thư mục lớn (build, lockfile) — đây là cách ChÍNH THỨC, không có `.claudeignore` trong docs |
 
 **Quy tắc vàng**: Mỗi dòng trong CLAUDE.md trả lời được câu hỏi *"Nếu xóa dòng này, Claude có làm sai không?"*. Nếu KHÔNG → xóa.
 
@@ -266,7 +265,7 @@ Cao → thấp khi xung đột:
 - Chỉ auto-import rule thực sự cần MỌI session.
 - Skill ít dùng → set `disable-model-invocation: true`.
 - Disable MCP server không dùng cho phiên hiện tại.
-- `.claudeignore` loại lockfile, asset lớn, `dist/`, `node_modules/`.
+- `permissions.deny` trong `settings.json` chặn Claude đọc lockfile/asset lớn/`dist/`/`node_modules/` (vd: `Read(**/node_modules/**)`, `Read(**/*.lock)`).
 
 ### Cấp 2 — Giảm runtime (token tích trong phiên)
 
@@ -325,7 +324,7 @@ Baseline context tính tiền theo mỗi message. 4 rules = thêm ~6000 tokens �
 
 ### 9.2 Tại sao REFERENCE.md không auto-load vào CLAUDE.md?
 
-REFERENCE.md = ~1693 dòng, ~118k chars → ~41k tokens (Vietnamese prose ~2.3 chars/token, code blocks/tables ~3-4 chars/token, mix ~2.9). Auto-load = ~20% context Sonnet 200k (hoặc ~4% Opus 1M) mỗi session. REFERENCE phục vụ **NGƯỜI** tra cứu (mở trên màn hình thứ 2 / web), KHÔNG cho Claude đọc.
+REFERENCE.md = ~2050 dòng, ~158k chars → ~55k tokens (Vietnamese prose ~2.3 chars/token, code blocks/tables ~3-4 chars/token, mix ~2.9). Auto-load = ~28% context Sonnet 200k (hoặc ~5.5% Opus 1M) mỗi session. REFERENCE phục vụ **NGƯỜI** tra cứu (mở trên màn hình thứ 2 / web), KHÔNG cho Claude đọc.
 
 ### 9.3 Tại sao bỏ `/init-context`?
 
