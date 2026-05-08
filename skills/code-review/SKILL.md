@@ -93,6 +93,6 @@ Quy tắc:
 
 ## Bước 5: Hỏi tiếp
 
-Sau khi đưa kết quả, hỏi: "Muốn tôi tự fix các issue 🔴 không, hay chỉ liệt kê?"
+Sau khi đưa kết quả, hỏi: "Muốn tôi đề xuất diff cụ thể cho các issue 🔴 không, hay chỉ dừng ở mức liệt kê?"
 
-KHÔNG tự sửa code. Chờ user duyệt từng item.
+Skill này read-only (frontmatter `allowed-tools` không có Edit/Write). Output diff là **text suggestion** trong chat — user tự copy/apply. Nếu muốn auto-apply, dùng skill `/refactor` hoặc subagent có Edit/Write.
