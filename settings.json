@@ -165,7 +165,7 @@
       }
     ]
   },
-  "effortLevel": "max",
+  "effortLevel": "xhigh",
   "autoUpdatesChannel": "latest",
   "autoMemoryEnabled": true,
   "claudeMdExcludes": [
@@ -175,6 +175,5 @@
     "**/build/**/CLAUDE.md",
     "**/.venv/**/CLAUDE.md"
   ],
-  "theme": "dark-ansi",
-  "//": "Settings global cho ~/.claude/settings.json. Override bằng settings.json của project khi cần."
+  "//": "Settings global cho ~/.claude/settings.json. Override bằng settings.json của project khi cần. effortLevel=xhigh persist được; nếu muốn 'max' thì set CLAUDE_CODE_EFFORT_LEVEL=max ở env shell. theme chỉnh qua /config interactive (lưu vào ~/.claude.json), không phải settings.json."
 }
