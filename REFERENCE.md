@@ -617,7 +617,6 @@ Opus 4.7 dùng **adaptive reasoning** (thinking tùy bước, không cố địn
 CLAUDE.md                        # Hướng dẫn project, COMMIT git
 CLAUDE.local.md                  # Note cá nhân, GITIGNORE
 .mcp.json                        # MCP server cho team, COMMIT
-.claudeignore                    # File Claude bỏ qua khi đọc, COMMIT
 .worktreeinclude                 # File gitignore cần copy vào worktree
 .claude/
 ├── settings.json                # Setting team, COMMIT
@@ -1596,7 +1595,7 @@ Hoặc gọi runtime: `/compact tập trung phần auth, drop test debugging`.
 | `rules/*.md` import                        | Chỉ import rule áp dụng MỌI session. Còn lại để `@`-reference khi cần                        |
 | Skill descriptions                         | `disable-model-invocation: true` cho skill ít dùng → chỉ load khi user gọi                   |
 | MCP tools                                  | Disable MCP server không dùng cho phiên này. MCP v2.1+ deferred default — chỉ tool name load |
-| `.claudeignore`                            | Loại file không bao giờ cần (lockfile, build output, asset binary...)                        |
+| `permissions.deny`                         | Chặn Claude đọc file không cần (lockfile, build output, asset binary): `Read(**/node_modules/**)`, `Read(**/*.lock)`, `Read(**/dist/**)` |
 | `--bare` flag                              | Skip auto-discovery cho script (hooks, skills, plugins, MCP, CLAUDE.md)                      |
 | `--exclude-dynamic-system-prompt-sections` | Move per-machine sections → cải thiện prompt-cache                                           |
 
@@ -1731,7 +1730,7 @@ Cách xử lý:
 | `Error during compaction: Conversation too long` | Compaction fail vì conversation quá lớn                             | `/clear` + brief-injection thay vì compact lại       |
 | `Internal server error (500)`                    | Lỗi infrastructure (KHÔNG phải do context). Retry hoặc check status | Đợi rồi retry, không phải lý do để compact           |
 | `ECONNRESET` / `EPIPE`                           | Lỗi network (KHÔNG phải context)                                    | Check kết nối, proxy, VPN                            |
-| Auto-compact "thrashing"                         | 1 file/output quá lớn → context refill ngay sau compact             | Loại file đó (`.claudeignore`) hoặc `/clear`         |
+| Auto-compact "thrashing"                         | 1 file/output quá lớn → context refill ngay sau compact             | Chặn file đó qua `permissions.deny` hoặc `/clear`    |
 
 ---
 
@@ -1772,7 +1771,7 @@ Cách xử lý:
 | Cộng tác nhiều agent            | Subagents + agent teams                                  |
 | Run khi máy tắt                 | `/schedule` (cloud routine)                              |
 | Style trả lời khác              | `/output-style` (built-in: Default/Explanatory/Learning) |
-| Loại file Claude khỏi đọc       | `.claudeignore`                                          |
+| Loại file Claude khỏi đọc       | `permissions.deny` trong `settings.json` (vd `Read(**/dist/**)`) |
 | Bulk migration parallel         | `/batch <instruction>`                                   |
 | Auto-fix PR khi CI fail         | `/autofix-pr`                                            |
 | Watch external event            | `/loop <interval> <prompt>`                              |
@@ -2006,7 +2005,7 @@ Cách xử lý:
 ### 22.1 Đầu mỗi project mới
 - [ ] Copy template vào project root: `cp ~/.claude/templates/project-CLAUDE.md ./CLAUDE.md`
 - [ ] Sửa CLAUDE.md mô tả tech stack, lệnh build/test, convention RIÊNG project
-- [ ] Tạo `.claudeignore` loại file lớn không cần (`dist/`, `node_modules/`, `*.lock`, `coverage/`, asset binary)
+- [ ] Thêm `permissions.deny` trong `<project>/.claude/settings.json` cho file/dir không cần Claude đọc: `Read(**/dist/**)`, `Read(**/node_modules/**)`, `Read(**/*.lock)`, `Read(**/coverage/**)`, asset binary
 - [ ] Tạo `<project>/.claude/settings.json` từ template
 - [ ] `echo "CLAUDE.local.md" >> .gitignore` + `echo ".claude/settings.local.json" >> .gitignore` + `echo ".claude/HANDOFF.md" >> .gitignore`
 - [ ] `claude doctor` để verify
