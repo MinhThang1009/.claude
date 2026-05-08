@@ -320,6 +320,27 @@ Default repo set `model: "opus[1m]"` + `effortLevel: "xhigh"` — phù hợp Max
 
 Sau sửa, restart Claude Code (`exit` rồi `claude`) để apply. Verify bằng `/model` và `/effort`.
 
+### 7.2 Dependency cho hooks (`settings.json`)
+
+3 hook trong `settings.json` (PreToolUse chặn lệnh nguy hiểm, PostToolUse auto-format, SessionStart show git status) gọi các tool dưới shell. Cần cài sẵn:
+
+| Tool                             | Bắt buộc                              | macOS / Linux                           | Windows                                                        |
+| -------------------------------- | ------------------------------------- | --------------------------------------- | -------------------------------------------------------------- |
+| `bash`                           | ✅ Bắt buộc (mọi hook)                | Có sẵn                                  | Cần Git Bash (đi kèm Git for Windows) hoặc WSL                 |
+| `jq`                             | ✅ Bắt buộc (parse tool input JSON)   | `brew install jq` / `apt install jq`    | `winget install jqlang.jq` hoặc download [jqlang.org](https://jqlang.org) |
+| `git`                            | ✅ Bắt buộc (SessionStart hook)       | Có sẵn                                  | Git for Windows                                                |
+| `prettier`                       | ⏸️ Optional (auto-format JS/TS/JSON/MD) | `npm i -g prettier`                     | `npm i -g prettier`                                            |
+| `ruff`                           | ⏸️ Optional (auto-format Python)       | `pip install ruff`                      | `pip install ruff`                                             |
+| `gofmt`                          | ⏸️ Optional (auto-format Go)           | Có sẵn khi cài Go                       | Có sẵn khi cài Go                                              |
+| `rustfmt`                        | ⏸️ Optional (auto-format Rust)         | `rustup component add rustfmt`          | `rustup component add rustfmt`                                 |
+
+Hook **silent skip** (không error) nếu tool optional thiếu — đã handle bằng `command -v`. Nhưng nếu thiếu `bash` hoặc `jq` thì hook fail và Claude Code sẽ log warning trong `/doctor`. Verify nhanh:
+
+```bash
+which bash jq git    # macOS/Linux
+where.exe bash jq git    # Windows
+```
+
 ## 8. Tài liệu tham khảo
 
 - Tài liệu chính thức: <https://code.claude.com/docs>
