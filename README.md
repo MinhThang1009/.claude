@@ -179,8 +179,8 @@ New-Item -ItemType Directory -Force -Path ".claude" | Out-Null
 Copy-Item "$env:USERPROFILE\.claude\templates\project-settings.json" ".claude\settings.json"
 Copy-Item "$env:USERPROFILE\.claude\templates\HANDOFF.md" ".claude\HANDOFF.md"
 
-# .gitignore (append)
-Add-Content -Path ".gitignore" -Value @"
+# .gitignore (append). -Encoding utf8 bắt buộc trên PS 5.1 (default UTF-16 LE BOM sẽ phá .gitignore).
+Add-Content -Path ".gitignore" -Encoding utf8 -Value @"
 
 # Claude Code
 CLAUDE.local.md
