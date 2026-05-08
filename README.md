@@ -67,20 +67,49 @@
 
 ### Bước 1 — Backup config cũ (nếu có)
 
+**macOS / Linux**
+
 ```bash
 [ -d ~/.claude ] && cp -r ~/.claude ~/.claude.backup-$(date +%Y%m%d)
 ```
 
+**Windows (PowerShell)**
+
+```powershell
+if (Test-Path "$env:USERPROFILE\.claude") {
+  Copy-Item -Recurse "$env:USERPROFILE\.claude" "$env:USERPROFILE\.claude.backup-$(Get-Date -Format yyyyMMdd)"
+}
+```
+
+**Windows (CMD)**
+
+```cmd
+if exist "%USERPROFILE%\.claude" xcopy /E /I /H /Y "%USERPROFILE%\.claude" "%USERPROFILE%\.claude.backup\"
+```
+
+> CMD không có cách lấy timestamp gọn (phụ thuộc locale `%date%`) — backup folder tên cố định `.claude.backup`. Chạy lại sẽ ghi đè. Cần timestamp → dùng PowerShell.
+
 ### Bước 2 — Sao chép vào `~/.claude/`
 
+**macOS / Linux**
+
 ```bash
-# macOS / Linux
 mkdir -p ~/.claude
 cp -r dotclaude/. ~/.claude/
+```
 
-# Windows (PowerShell)
+**Windows (PowerShell)**
+
+```powershell
 New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude"
 Copy-Item -Recurse -Force dotclaude\* "$env:USERPROFILE\.claude\"
+```
+
+**Windows (CMD)**
+
+```cmd
+if not exist "%USERPROFILE%\.claude" mkdir "%USERPROFILE%\.claude"
+xcopy /E /I /Y /H dotclaude\* "%USERPROFILE%\.claude\"
 ```
 
 ### Bước 3 — Verify
