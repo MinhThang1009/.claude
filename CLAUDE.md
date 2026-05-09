@@ -18,6 +18,7 @@
 - Sau khi sửa → **TỰ KIỂM TRA** test/lint/typecheck nếu có. Đừng báo "xong" khi chưa verify.
 - Tôi sửa lỗi của bạn → **không xin lỗi dài**, xác nhận-sửa-tiếp.
 - Tôi nói "ultrathink" → keyword chính thức, Claude Code thêm in-context instruction request deeper reasoning cho turn đó (effort level KHÔNG đổi). Các cụm "megathink"/"think harder" KHÔNG phải keyword — đối xử như plain text.
+- Subagent results, git state, external deps → xem chi tiết [`verification.md`](rules/verification.md).
 
 ## Phong cách trả lời
 
@@ -51,7 +52,7 @@
 ## Workflow ưu tiên
 
 - Task >3 file → đề xuất Plan Mode (`Shift+Tab×2`) hoặc `/plan`.
-- Investigate codebase rộng → đề xuất subagent ("use a subagent to investigate ...") để giữ context chính sạch.
+- Investigate codebase rộng → đề xuất subagent ("use a subagent to investigate ...") để giữ context chính sạch. Nếu không dùng subagent → scope narrow (chỉ đọc file/dir cần thiết, không explore toàn bộ).
 - Refactor lớn → tách commit nhỏ revert được độc lập.
 - Bug khó → reproduce trước, viết failing test, mới fix.
 
@@ -63,8 +64,8 @@
 
 ## Quản lý context window
 
-- Theo dõi `/context` thường xuyên. **<30% aggressive (experienced)**, **30-40% sweet spot (newcomer target)**, **40-60% "dumb zone" — degrade bắt đầu**, **60% wrap up → `/compact` hoặc `/handoff`**, **~77% (155k tokens trên window 200k) auto-compact firing**. Source: Dex Horthy (`<30/<40/60%` + "dumb zone"), Thariq Shihipar (`300-400k` 1M model), Boris Cherny (155k auto-compact). Trích dẫn đầy đủ tại [docs/REFERENCE.md §16](docs/REFERENCE.md#16-quản-lý-context-window--chi-tiết).
-- Hoàn thành 1 phase (auth xong, refactor xong) → đề xuất `/compact` ngay, đừng đợi auto-compact ở ~77%.
+- Theo dõi `/context` thường xuyên. **<40% sweet spot**, **>60% nên `/compact` hoặc `/clear`**, **>80% PHẢI act**.
+- Hoàn thành 1 phase (auth xong, refactor xong) → đề xuất `/compact` ngay, đừng đợi auto-compact ở 95%.
 - Trước khi compact/clear → tôi sẽ yêu cầu bạn viết handoff brief; bạn dùng skill [`/handoff`](skills/handoff/SKILL.md).
 - Câu hỏi nhanh không cần lưu history → tôi dùng `/btw`.
 
@@ -81,10 +82,6 @@ Khi `/compact` chạy (manual hoặc auto), summary PHẢI giữ lại:
 
 ## Tham chiếu rule mở rộng
 
-<!-- Claude Code @import directives -->
-
-@~/.claude/rules/communication.md
-
-@~/.claude/rules/security.md
-
-> 2 rule còn lại ([`coding-standards.md`](references/coding-standards.md), [`git-workflow.md`](references/git-workflow.md)) KHÔNG auto-import để tiết kiệm context. Tôi sẽ `@~/.claude/references/...` khi cần, hoặc bạn tự đọc khi gặp task tương ứng.
+> `~/.claude/rules/` (communication.md, security.md, verification.md) auto-load mọi session — không cần `@import`.
+>
+> 2 reference ([`coding-standards.md`](references/coding-standards.md), [`git-workflow.md`](references/git-workflow.md)) KHÔNG auto-load để tiết kiệm context. Tôi sẽ `@~/.claude/references/...` khi cần, hoặc bạn tự đọc khi gặp task tương ứng.
