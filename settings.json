@@ -73,6 +73,7 @@
       "Bash(git rm:*)",
       "Bash(git mv:*)",
       "Bash(git revert:*)",
+      "Bash(git push:*)",
       "Bash(npm run *)",
       "Bash(npm test *)",
       "Bash(pnpm run *)",
@@ -150,7 +151,6 @@
       "Read(~/.kube/config)"
     ],
     "ask": [
-      "Bash(git push:*)",
       "Bash(npm install:*)",
       "Bash(npm i)",
       "Bash(npm i *)",
@@ -166,6 +166,7 @@
       "Bash(go install:*)",
       "Bash(brew install:*)"
     ],
+    "additionalDirectories": [],
     "defaultMode": "acceptEdits"
   },
   "model": "opus[1m]",
