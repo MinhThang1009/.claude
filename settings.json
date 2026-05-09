@@ -76,7 +76,8 @@
       "Bash(gh pr list:*)",
       "Bash(gh repo view:*)",
       "WebFetch(domain:platform.claude.com)",
-      "WebFetch(domain:code.claude.com)"
+      "WebFetch(domain:code.claude.com)",
+      "WebFetch(domain:docs.claude.com)"
     ],
     "deny": [
       "Bash(rm -rf /*)",
