@@ -54,29 +54,31 @@
     └── skill-evals.json            # → <skill>/evals/evals.json (eval-driven optimize)
 ```
 
-**Baseline tokens** — đo thực tế bằng `/context` (Opus 4.7 1M context, snapshot session start):
+**Baseline tokens** — đo thực tế bằng `/context` (Opus 4.7 1M context, snapshot session start, 2026-05-10):
 
 | Category                      | Tokens     | % of 1M   |
 | ----------------------------- | ---------- | --------- |
-| System prompt                 | 8,500      | 0.8%      |
-| System tools                  | 12,100     | 1.2%      |
-| Memory files                  | 6,200      | 0.6%      |
-| ├── `CLAUDE.md`               | 2,300      | —         |
+| System prompt                 | 9,500      | 0.9%      |
+| System tools                  | 11,700     | 1.2%      |
+| Memory files                  | 7,000      | 0.7%      |
+| ├── `CLAUDE.md`               | 2,700      | —         |
 | ├── `rules/security`          | 2,100      | —         |
-| └── `rules/communication`     | 1,800      | —         |
+| ├── `rules/communication`     | 1,800      | —         |
+| └── `rules/verification`      | 491        | —         |
 | Skills                        | 939        | <0.1%     |
-| Custom agents                 | 590        | <0.1%     |
+| Custom agents                 | 591        | <0.1%     |
 | ├── `security-auditor`        | 177        | —         |
 | ├── `architect`               | 150        | —         |
-| ├── `code-reviewer`           | 135        | —         |
+| ├── `code-reviewer`           | 136        | —         |
 | └── `test-writer`             | 128        | —         |
-| Messages (start)              | 13         | <0.1%     |
-| **Total used (start)**        | **28,342** | **~2.8%** |
+| Messages (start)              | 160        | <0.1%     |
+| **Total used (start)**        | **29,890** | **~3.0%** |
 | Autocompact buffer (reserved) | 33,000     | 3.3%      |
-| Free space                    | 938,658    | 93.9%     |
+| Free space                    | 937,110    | 93.7%     |
 
 **Ghi chú**:
-- Vietnamese tokenize ~2.3 chars/token cho prose (kém hiệu quả hơn English ~4 chars/token); baseline 28.3k cao hơn config English (~10-15k) là expected.
+- Vietnamese tokenize ~2.3 chars/token cho prose (kém hiệu quả hơn English ~4 chars/token); baseline ~29.9k cao hơn config English (~10-15k) là expected.
+- `rules/verification.md` (491 tokens) auto-load mọi session từ snapshot 2026-05-10 — bổ sung verify cho subagent results, git state, external deps.
 - 2 references còn lại ([`coding-standards.md`](references/coding-standards.md), [`git-workflow.md`](references/git-workflow.md)) chỉ load khi `@`-reference → KHÔNG ăn baseline.
 - Autocompact buffer 33k reserved (không tính vào used) — Claude Code dành chỗ cho compact summary khi context đầy.
 
