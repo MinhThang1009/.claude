@@ -6,6 +6,19 @@ Format theo [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/), tuâ
 
 ## [Unreleased]
 
+### Changed (file structure)
+
+- Clean root cho readability: move 5 file ra subdirectory chuẩn:
+  - `CONTRIBUTING.md` → `.github/CONTRIBUTING.md` (GitHub vẫn detect)
+  - `CODE_OF_CONDUCT.md` → `.github/CODE_OF_CONDUCT.md` (GitHub vẫn detect)
+  - `SECURITY.md` → `.github/SECURITY.md` (GitHub vẫn detect)
+  - `INTRODUCTION.md` → `docs/INTRODUCTION.md`
+  - `REFERENCE.md` → `docs/REFERENCE.md`
+- Update toàn bộ cross-references trong README.md, docs/INTRODUCTION.md,
+  docs/REFERENCE.md, .github/CONTRIBUTING.md, .github/pull_request_template.md
+- Root sau cleanup: chỉ còn 5 file visible (`CHANGELOG.md`, `CLAUDE.md`,
+  `LICENSE`, `README.md`, `settings.json`) + 4 dot-config files
+
 ### Added
 
 - `CHANGELOG.md` — file ghi log thay đổi theo Keep a Changelog format.

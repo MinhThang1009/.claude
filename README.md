@@ -5,18 +5,17 @@
 
 > Tổng hợp từ tài liệu chính thức Anthropic ([code.claude.com](https://code.claude.com/docs), [platform.claude.com](https://platform.claude.com/docs)), [Engineering Blog](https://www.anthropic.com/engineering), [blog claude.com](https://www.claude.com/blog), [MindStudio](https://www.mindstudio.ai/blog), [ClaudeFast](https://claudefa.st/blog), và best practices cộng đồng GitHub. Áp dụng MỌI project. Tối ưu cho **dev người Việt** — tiếng Việt cho comment/log/commit, tiếng Anh chuẩn convention cho identifier.
 
-> 👉 Lần đầu xem repo? Đọc [**INTRODUCTION.md**](INTRODUCTION.md) cho overview ngắn 1 phút.
+> 👉 Lần đầu xem repo? Đọc [**INTRODUCTION.md**](docs/INTRODUCTION.md) cho overview ngắn 1 phút.
 
 > 📅 **Đã verify**: 2026-05-09 vs Claude Code v2.1.138 + Opus 4.7. Model ID, version-gating, env var, slash command, hook event đã cross-check với [docs Anthropic](https://code.claude.com/docs) + [raw CHANGELOG](https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md).
 >
-> ⚠️ **Một số nội dung có thể outdated** khi Anthropic ship version mới hoặc deprecate model. Phát hiện sai sót → submit issue/PR tại [github.com/MinhThang1009/dotclaude/issues](https://github.com/MinhThang1009/dotclaude/issues). Xem [CONTRIBUTING.md](CONTRIBUTING.md) cho quy trình. Lịch sử thay đổi: [CHANGELOG.md](CHANGELOG.md).
+> ⚠️ **Một số nội dung có thể outdated** khi Anthropic ship version mới hoặc deprecate model. Phát hiện sai sót → submit issue/PR tại [github.com/MinhThang1009/dotclaude/issues](https://github.com/MinhThang1009/dotclaude/issues). Xem [CONTRIBUTING.md](.github/CONTRIBUTING.md) cho quy trình. Lịch sử thay đổi: [CHANGELOG.md](CHANGELOG.md).
 
 ## 1. Cấu trúc thư mục sau khi cài
 
 ```text
 ~/.claude/
 ├── CLAUDE.md                       # Hướng dẫn global (load mọi session, ~90 dòng)
-├── REFERENCE.md                    # Cheatsheet — chỉ tra cứu, KHÔNG load
 ├── settings.json                   # Quyền, hooks, env vars
 ├── rules/
 │   ├── communication.md            # ✅ Auto-import (essential mỗi turn)
@@ -427,7 +426,7 @@ Sau khi dùng skills 1 thời gian, có thể measure xem description trigger c�
 
 - Tài liệu chính thức: <https://code.claude.com/docs>
 - Best practices: <https://code.claude.com/docs/en/best-practices>
-- Cheatsheet đầy đủ: xem [`REFERENCE.md`](REFERENCE.md)
+- Cheatsheet đầy đủ: xem [`REFERENCE.md`](docs/REFERENCE.md)
 - Session management: <https://claude.com/blog/using-claude-code-session-management-and-1m-context>
 
 ## 9. Cấu trúc nội bộ — lý do thiết kế
@@ -438,9 +437,9 @@ Câu hỏi thường gặp:
 
 Baseline context tính tiền theo mỗi message. 4 rules = thêm ~6000 tokens × mỗi turn × cả phiên = lãng phí. Chỉ import 2 rule áp dụng MỌI turn (`communication`, `security`); 2 rule còn lại để Claude đọc khi cần (qua REFERENCE hoặc user `@`-reference).
 
-### 9.2 Tại sao [REFERENCE.md](REFERENCE.md) không auto-load vào [CLAUDE.md](CLAUDE.md)?
+### 9.2 Tại sao [REFERENCE.md](docs/REFERENCE.md) không auto-load vào [CLAUDE.md](CLAUDE.md)?
 
-[REFERENCE.md](REFERENCE.md) = ~2050 dòng, ~159k chars → ~55k tokens (Vietnamese prose ~2.3 chars/token, code blocks/tables ~3-4 chars/token, mix ~2.9). Auto-load = ~28% context Sonnet 200k (hoặc ~5.5% Opus 1M) mỗi session. REFERENCE phục vụ **NGƯỜI** tra cứu (mở trên màn hình thứ 2 / web), KHÔNG cho Claude đọc.
+[REFERENCE.md](docs/REFERENCE.md) = ~2050 dòng, ~159k chars → ~55k tokens (Vietnamese prose ~2.3 chars/token, code blocks/tables ~3-4 chars/token, mix ~2.9). Auto-load = ~28% context Sonnet 200k (hoặc ~5.5% Opus 1M) mỗi session. REFERENCE phục vụ **NGƯỜI** tra cứu (mở trên màn hình thứ 2 / web), KHÔNG cho Claude đọc.
 
 ### 9.3 Tại sao bỏ `/init-context`?
 
