@@ -11,30 +11,9 @@
 >
 > ⚠️ **Một số nội dung có thể outdated** khi Anthropic ship version mới hoặc deprecate model. Phát hiện sai sót → submit issue/PR tại [github.com/MinhThang1009/dotclaude/issues](https://github.com/MinhThang1009/dotclaude/issues). Xem [CONTRIBUTING.md](.github/CONTRIBUTING.md) cho quy trình. Lịch sử thay đổi: [CHANGELOG.md](CHANGELOG.md).
 
-## 1. Cấu trúc
+## 1. Cấu trúc `~/.claude/` sau khi cài
 
-### 1.1 Repo source (browse trên GitHub)
-
-```text
-dotclaude/
-├── CLAUDE.md                       # Anthropic spec — copy vào ~/.claude/
-├── settings.json                   # Anthropic spec — copy vào ~/.claude/
-├── README.md / LICENSE / CHANGELOG.md   # Repo metadata, KHÔNG copy
-├── agents/ hooks/ skills/ rules/   # Anthropic spec dirs — copy
-├── references/ output-styles/ templates/   # Anthropic spec dirs — copy
-├── docs/                           # GitHub browsing only, KHÔNG copy
-│   ├── INTRODUCTION.md
-│   └── REFERENCE.md
-├── .github/                        # GitHub Community Standards, KHÔNG copy
-│   ├── CONTRIBUTING.md / CODE_OF_CONDUCT.md / SECURITY.md
-│   ├── ISSUE_TEMPLATE/
-│   ├── pull_request_template.md
-│   ├── dependabot.yml
-│   └── workflows/ci.yml
-└── scripts/ .gitignore .pre-commit-config.yaml ...   # Repo tooling, KHÔNG copy
-```
-
-### 1.2 `~/.claude/` sau khi cài (chỉ files thực sự Claude Code đọc)
+> Repo source có thêm `docs/`, `.github/`, `scripts/`, `LICENSE`, `CHANGELOG.md` cho GitHub browsing + CI — **KHÔNG copy** vào `~/.claude/` (xem [Bước 3](#bước-3--sao-chép-vào-claude)).
 
 ```text
 ~/.claude/
