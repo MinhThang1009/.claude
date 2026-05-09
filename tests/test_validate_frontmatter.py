@@ -178,3 +178,69 @@ class TestValidate:
         )
         errors = validate(f, "agent")
         assert any("unknown field 'foobar'" in e for e in errors)
+
+    def test_validate_propagates_parse_error(self, tmp_path):
+        # validate() khi parse_frontmatter return error → wrap với rel path
+        f = tmp_path / "broken.md"
+        f.write_text("no frontmatter at all", encoding="utf-8")
+        errors = validate(f, "skill")
+        assert len(errors) == 1
+        assert "broken.md" in errors[0]
+        assert "missing opening" in errors[0]
+
+
+# ── main() integration ─────────────────────────────────────────────
+
+
+class TestMain:
+    @pytest.fixture(autouse=True)
+    def _patch_root(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(_mod, "ROOT", tmp_path)
+
+    def _run(self):
+        try:
+            _mod.main()
+        except SystemExit as e:
+            return e.code
+        return None
+
+    def test_no_directories(self, capsys):
+        # Không có skills/, agents/, output-styles/ → 0 file, exit 0
+        code = self._run()
+        out = capsys.readouterr().out
+        assert "All 0 frontmatter file valid" in out
+        assert code == 0
+
+    def test_valid_skill(self, tmp_path, capsys):
+        sk = tmp_path / "skills" / "demo"
+        sk.mkdir(parents=True)
+        (sk / "SKILL.md").write_text("---\ndescription: ok\n---\n", encoding="utf-8")
+        code = self._run()
+        assert code == 0
+        assert "All 1 frontmatter file valid" in capsys.readouterr().out
+
+    def test_valid_agent_and_style(self, tmp_path, capsys):
+        ag = tmp_path / "agents"
+        ag.mkdir()
+        (ag / "a.md").write_text(
+            "---\nname: a\ndescription: d\n---\n", encoding="utf-8"
+        )
+        st = tmp_path / "output-styles"
+        st.mkdir()
+        (st / "s.md").write_text(
+            "---\nname: s\ndescription: d\n---\n", encoding="utf-8"
+        )
+        code = self._run()
+        assert code == 0
+        assert "All 2 frontmatter file valid" in capsys.readouterr().out
+
+    def test_invalid_file_exits_1(self, tmp_path, capsys):
+        ag = tmp_path / "agents"
+        ag.mkdir()
+        # Missing required 'description'
+        (ag / "bad.md").write_text("---\nname: t\n---\n", encoding="utf-8")
+        code = self._run()
+        captured = capsys.readouterr()
+        assert code == 1
+        assert "missing required field 'description'" in captured.err
+        assert "1 error(s) trong 1 file" in captured.err

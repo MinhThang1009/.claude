@@ -113,3 +113,119 @@ class TestFindJsonFiles:
         (sub / "deep.json").write_text("{}", encoding="utf-8")
         files = find_json_files(tmp_path)
         assert len(files) == 1
+
+
+class TestFetchSchema:
+    def test_cache_hit_skips_network(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(_mod, "SCHEMA_CACHE_DIR", tmp_path)
+        url = "https://example.test/schema.json"
+        cache_key = url.replace("/", "_").replace(":", "_")
+        (tmp_path / cache_key).write_text(
+            '{"type": "object", "cached": true}', encoding="utf-8"
+        )
+
+        # urlopen sẽ raise nếu được gọi → cache hit thì không touch network
+        def raise_if_called(*a, **kw):
+            raise AssertionError("urlopen should not be called on cache hit")
+
+        monkeypatch.setattr(_mod.urllib.request, "urlopen", raise_if_called)
+        schema = _mod.fetch_schema(url)
+        assert schema == {"type": "object", "cached": True}
+
+    def test_cache_miss_fetches_and_writes(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(_mod, "SCHEMA_CACHE_DIR", tmp_path)
+
+        class FakeResp:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *a):
+                return False
+
+            def read(self):
+                return b'{"type": "object", "fetched": true}'
+
+        monkeypatch.setattr(
+            _mod.urllib.request, "urlopen", lambda url, timeout: FakeResp()
+        )
+        url = "https://example.test/fresh.json"
+        schema = _mod.fetch_schema(url)
+        assert schema == {"type": "object", "fetched": True}
+        # Cache file đã được ghi
+        cache_key = url.replace("/", "_").replace(":", "_")
+        assert (tmp_path / cache_key).exists()
+
+
+class TestValidateFileSchemaPath:
+    def test_validates_against_schema_pass(self, tmp_path, monkeypatch):
+        f = tmp_path / "ok.json"
+        f.write_text(
+            '{"$schema": "https://x.test/s.json", "name": "ok"}', encoding="utf-8"
+        )
+        monkeypatch.setattr(
+            _mod,
+            "fetch_schema",
+            lambda u: {"type": "object", "required": ["name"]},
+        )
+        ok, msg = validate_file(f)
+        assert ok is True
+        assert "valid against" in msg
+
+    def test_validates_against_schema_fail(self, tmp_path, monkeypatch):
+        f = tmp_path / "bad.json"
+        f.write_text('{"$schema": "https://x.test/s.json"}', encoding="utf-8")
+        monkeypatch.setattr(
+            _mod,
+            "fetch_schema",
+            lambda u: {"type": "object", "required": ["name"]},
+        )
+        ok, msg = validate_file(f)
+        assert ok is False
+        assert "schema validation fail" in msg
+
+
+class TestMain:
+    def test_no_files(self, tmp_path, monkeypatch, capsys):
+        monkeypatch.setenv("GITHUB_WORKSPACE", str(tmp_path))
+        code = _mod.main()
+        out = capsys.readouterr().out
+        assert "No JSON files" in out
+        assert code == 0
+
+    def test_only_skipped_files(self, tmp_path, monkeypatch, capsys):
+        # File không có $schema → skip, checked = 0
+        (tmp_path / "x.json").write_text('{"key": "val"}', encoding="utf-8")
+        monkeypatch.setenv("GITHUB_WORKSPACE", str(tmp_path))
+        code = _mod.main()
+        out = capsys.readouterr().out
+        assert "No JSON files" in out
+        assert code == 0
+
+    def test_validates_ok_files(self, tmp_path, monkeypatch, capsys):
+        (tmp_path / "x.json").write_text(
+            '{"$schema": "https://x.test/s.json", "name": "ok"}',
+            encoding="utf-8",
+        )
+        monkeypatch.setenv("GITHUB_WORKSPACE", str(tmp_path))
+        monkeypatch.setattr(_mod, "fetch_schema", lambda u: {"type": "object"})
+        code = _mod.main()
+        out = capsys.readouterr().out
+        assert "OK" in out
+        assert "Validated 1 files, 0 failures" in out
+        assert code == 0
+
+    def test_reports_failures(self, tmp_path, monkeypatch, capsys):
+        (tmp_path / "x.json").write_text(
+            '{"$schema": "https://x.test/s.json"}', encoding="utf-8"
+        )
+        monkeypatch.setenv("GITHUB_WORKSPACE", str(tmp_path))
+        monkeypatch.setattr(
+            _mod,
+            "fetch_schema",
+            lambda u: {"type": "object", "required": ["name"]},
+        )
+        code = _mod.main()
+        captured = capsys.readouterr()
+        assert "FAIL" in captured.err
+        assert "1 failures" in captured.out
+        assert code == 1

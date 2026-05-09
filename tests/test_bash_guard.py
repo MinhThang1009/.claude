@@ -36,6 +36,11 @@ class TestSensitivePathAccess:
     def test_allow_stat_credentials(self, bash_guard):
         assert bash_guard.is_sensitive_path_access("stat credentials.json") is False
 
+    def test_skip_empty_segment(self, bash_guard):
+        # Edge: separator liên tiếp tạo empty segment sau split — phải skip
+        # qua continue, không crash. Vd ';;ls' split → ['', '', 'ls'].
+        assert bash_guard.is_sensitive_path_access(";; cat README.md") is False
+
 
 # ---------- is_raw_network_tool ----------
 
