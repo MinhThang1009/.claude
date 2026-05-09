@@ -1,6 +1,6 @@
 # REFERENCE — Cheatsheet Claude Code
 
-> ⚠️ **CẢNH BÁO TOKEN**: File này dài **~2050 dòng / ~159KB / ~55k tokens** (Vietnamese mix ~2.9 chars/token). KHÔNG `@-import` vào CLAUDE.md, KHÔNG paste full vào prompt — sẽ ăn ~28% context Sonnet 200k hoặc ~5.5% context Opus 1M ngay session start. Cách dùng đúng: mở trên trình duyệt / màn hình thứ 2 / editor để **NGƯỜI** tra cứu khi cần. Nếu cần Claude tham khảo 1 phần, copy đoạn cụ thể vào prompt thay vì import cả file.
+> ⚠️ **CẢNH BÁO TOKEN**: File này dài **~2084 dòng / ~164KB / ~57k tokens** (Vietnamese mix ~2.9 chars/token). KHÔNG `@-import` vào CLAUDE.md, KHÔNG paste full vào prompt — sẽ ăn ~28% context Sonnet 200k hoặc ~5.5% context Opus 1M ngay session start. Cách dùng đúng: mở trên trình duyệt / màn hình thứ 2 / editor để **NGƯỜI** tra cứu khi cần. Nếu cần Claude tham khảo 1 phần, copy đoạn cụ thể vào prompt thay vì import cả file.
 >
 > Tổng hợp từ docs chính thức [code.claude.com/docs](https://code.claude.com/docs) (2026), blog [claude.com](https://www.claude.com/blog), [MindStudio](https://www.mindstudio.ai/blog), [ClaudeFast](https://claudefa.st/blog), GitHub [anthropics/claude-code](https://github.com/anthropics/claude-code). Cập nhật cho Claude Code v2.1.x trở lên.
 >
@@ -236,7 +236,7 @@
 | Model      | Alias    | Model ID            | Context | Max output | Effort levels          | Pricing (in/out per MTok) |
 | ---------- | -------- | ------------------- | ------- | ---------- | ---------------------- | ------------------------- |
 | Opus 4.7   | `opus`   | `claude-opus-4-7`   | 1M      | 128k       | low/med/high/xhigh/max | $5 / $25                  |
-| Sonnet 4.6 | `sonnet` | `claude-sonnet-4-6` | 1M      | 64k        | low/med/high/max       | $3 / $15                  |
+| Sonnet 4.6 | `sonnet` | `claude-sonnet-4-6` | 1M      | 64k        | low/med/high/(xhigh→high)/max | $3 / $15                  |
 | Haiku 4.5  | `haiku`  | `claude-haiku-4-5`  | 200k    | 64k        | —                      | $1 / $5                   |
 
 **Legacy (vẫn hỗ trợ, nên migrate)**:
@@ -1150,7 +1150,7 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `BASH_DEFAULT_TIMEOUT_MS`                  | Bash timeout (default 120000 = 2 phút)                                                                                                         |
 | `BASH_MAX_TIMEOUT_MS`                      | Bash max timeout (default 600000)                                                                                                              |
 | `CLAUDE_CODE_AUTO_COMPACT_WINDOW`          | Context window cho auto-compaction                                                                                                             |
-| `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`          | Override % trigger auto-compact (Boris confirm default ~77.5% — 155k/200k tokens, [tweet](https://x.com/bcherny/status/1977163445205450783))   |
+| `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`          | Override % trigger auto-compact (Boris confirm default ~77.5% — 155k tokens trên window 200k, [tweet](https://x.com/bcherny/status/1977163445205450783))   |
 | `CLAUDE_CODE_MAX_CONTEXT_TOKENS`           | Override context window size — CHỈ effect khi `DISABLE_COMPACT=1` (constraint cứng từ docs)                                                    |
 | `CLAUDE_CODE_SUBAGENT_MODEL`               | Model cho subagent                                                                                                                             |
 | `CLAUDECODE`                               | Set trong spawned shells (dùng để detect Claude env)                                                                                           |

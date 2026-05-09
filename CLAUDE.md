@@ -63,7 +63,7 @@
 
 ## Quản lý context window
 
-- Theo dõi `/context` thường xuyên. **<30% aggressive (experienced)**, **30-40% sweet spot (newcomer target)**, **40-60% "dumb zone" — degrade bắt đầu**, **60% wrap up → `/compact` hoặc `/handoff`**, **~77% (155k/200k tokens) auto-compact firing**. Source: Dex Horthy (`<30/<40/60%` + "dumb zone"), Thariq Shihipar (`300-400k` 1M model), Boris Cherny (155k auto-compact). Trích dẫn đầy đủ tại [docs/REFERENCE.md §16](docs/REFERENCE.md#16-quản-lý-context-window--chi-tiết).
+- Theo dõi `/context` thường xuyên. **<30% aggressive (experienced)**, **30-40% sweet spot (newcomer target)**, **40-60% "dumb zone" — degrade bắt đầu**, **60% wrap up → `/compact` hoặc `/handoff`**, **~77% (155k tokens trên window 200k) auto-compact firing**. Source: Dex Horthy (`<30/<40/60%` + "dumb zone"), Thariq Shihipar (`300-400k` 1M model), Boris Cherny (155k auto-compact). Trích dẫn đầy đủ tại [docs/REFERENCE.md §16](docs/REFERENCE.md#16-quản-lý-context-window--chi-tiết).
 - Hoàn thành 1 phase (auth xong, refactor xong) → đề xuất `/compact` ngay, đừng đợi auto-compact ở ~77%.
 - Trước khi compact/clear → tôi sẽ yêu cầu bạn viết handoff brief; bạn dùng skill [`/handoff`](skills/handoff/SKILL.md).
 - Câu hỏi nhanh không cần lưu history → tôi dùng `/btw`.

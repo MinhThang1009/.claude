@@ -127,7 +127,7 @@ git commit -m "<subject>"
 **Cho message multiline hoặc có Unicode (tiếng Việt, emoji)**, dùng `-F` file để tránh lỗi encoding (đặc biệt trên Windows + PowerShell):
 ```bash
 git add <files cụ thể>
-# Tạo file message tạm
+# Tạo file message tạm — Linux/macOS/Git Bash dùng /tmp/, Windows PowerShell dùng $env:TEMP\
 cat > /tmp/commit-msg.txt <<'EOF'
 <subject>
 
@@ -139,7 +139,10 @@ git commit -F /tmp/commit-msg.txt
 rm /tmp/commit-msg.txt
 ```
 
-> **Lưu ý**: `git commit -m "subj" -m "body"` qua PowerShell here-string có thể garbled Unicode. Dùng `-F` an toàn cross-platform.
+> **Lưu ý OS**:
+> - Trên Git Bash (Windows) `/tmp/` map tới `C:\tmp\` — tạo dir trước nếu chưa có (`mkdir -p /tmp`).
+> - Trên PowerShell native (không có Git Bash) dùng `$env:TEMP\commit-msg.txt` thay `/tmp/...`.
+> - `git commit -m "subj" -m "body"` qua PowerShell here-string có thể garbled Unicode. Dùng `-F` an toàn cross-platform.
 
 ## Quy tắc bắt buộc
 

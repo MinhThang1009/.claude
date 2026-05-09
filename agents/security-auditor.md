@@ -26,7 +26,7 @@ Hỏi user phạm vi nếu không rõ.
 
 ### Hardcoded credentials
 Pattern Grep cần check:
-```regex
+```text
 (api[_-]?key|secret|token|password|passwd|pwd)\s*[:=]\s*["'][^"']+["']
 sk_live_, pk_live_, AKIA[0-9A-Z]{16}, ya29\.[0-9A-Za-z\-_]+
 -----BEGIN (RSA |OPENSSH )?PRIVATE KEY-----
