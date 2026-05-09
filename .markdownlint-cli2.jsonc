@@ -1,0 +1,20 @@
+// markdownlint-cli2 config — relax rules cho repo Vietnamese-prose
+// Docs: https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+{
+  "config": {
+    // MD013: line length — Vietnamese prose tự nhiên dài, disable
+    "MD013": false,
+    // MD024: duplicate headings — common section names như "Why" / "How" lặp lại OK
+    "MD024": false,
+    // MD033: inline HTML — đôi khi dùng <kbd>, <details> trong README
+    "MD033": false,
+    // MD036: emphasis used instead of heading — content style choice
+    "MD036": false,
+    // MD041: first line not h1 — REFERENCE.md có warning blockquote trước h1
+    "MD041": false
+  },
+  "ignores": [
+    "node_modules/",
+    ".git/"
+  ]
+}

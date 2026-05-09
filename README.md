@@ -1,5 +1,8 @@
 # Bộ cấu hình Global cho Claude Code (`~/.claude/`)
 
+[![CI](https://github.com/MinhThang1009/dotclaude/actions/workflows/ci.yml/badge.svg)](https://github.com/MinhThang1009/dotclaude/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 > Tổng hợp từ tài liệu chính thức Anthropic ([code.claude.com](https://code.claude.com/docs), [platform.claude.com](https://platform.claude.com/docs)), [Engineering Blog](https://www.anthropic.com/engineering), [blog claude.com](https://www.claude.com/blog), [MindStudio](https://www.mindstudio.ai/blog), [ClaudeFast](https://claudefa.st/blog), và best practices cộng đồng GitHub. Áp dụng MỌI project. Tối ưu cho **dev người Việt** — tiếng Việt cho comment/log/commit, tiếng Anh chuẩn convention cho identifier.
 
 > 👉 Lần đầu xem repo? Đọc [**INTRODUCTION.md**](INTRODUCTION.md) cho overview ngắn 1 phút.

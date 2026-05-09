@@ -50,11 +50,20 @@ Tham khảo workflow fact-check trong commit history (search `docs: fix .* fact-
 ### Quy trình
 
 1. Fork repo → tạo branch `fix/...` hoặc `feat/...`.
-2. Sửa, **verify**:
-   - Markdown: render preview check link không broken.
-   - Hooks: chạy `bash hooks/test-bash-guard.sh` (97 test case).
-   - settings.json: validate JSON syntax (`python -c "import json; json.load(open('settings.json'))"` hoặc `jq . settings.json`).
-3. Commit từng change nhỏ (revert được độc lập).
+2. Sửa, **verify** local trước khi push:
+   - Markdown: render preview check link không broken (`markdownlint-cli2 "**/*.md"` nếu cài).
+   - Hooks: chạy `bash hooks/test-bash-guard.sh` (119 test case, must 119/119 PASS).
+   - JSON: validate syntax (`python -m json.tool settings.json` hoặc `jq . settings.json`).
+   - Shell: `shellcheck hooks/*.sh` (nếu cài).
+   - Python: `ruff check hooks/` (nếu cài).
+3. CI trên GitHub Actions chạy 6 jobs tự động khi push/PR — phải pass hết trước khi merge:
+   - Hook regression tests (119 cases)
+   - JSON syntax validate
+   - Markdown link check (lychee)
+   - shellcheck cho `hooks/*.sh`
+   - ruff cho `hooks/*.py`
+   - markdownlint cho `**/*.md`
+4. Commit từng change nhỏ (revert được độc lập).
 4. Push fork → mở PR vào `main` với:
    - Title: Conventional Commit style.
    - Body: WHY change, link issue (`Closes #N`).

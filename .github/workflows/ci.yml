@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Đảm bảo workflow run cũ bị cancel khi push commit mới vào cùng PR/branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  hook-tests:
+    name: Hook regression tests (119 cases)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup ~/.claude/hooks
+        run: |
+          mkdir -p "$HOME/.claude/hooks"
+          cp hooks/*.py hooks/*.sh "$HOME/.claude/hooks/"
+          chmod +x "$HOME/.claude/hooks"/*.sh
+      - name: Run test-bash-guard.sh
+        run: bash hooks/test-bash-guard.sh
+
+  json-validate:
+    name: JSON syntax validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate all .json files
+        run: |
+          set -e
+          fail=0
+          while IFS= read -r f; do
+            if ! python3 -m json.tool "$f" >/dev/null 2>&1; then
+              echo "::error file=$f::Invalid JSON syntax"
+              fail=1
+            else
+              echo "OK $f"
+            fi
+          done < <(find . -type f -name '*.json' -not -path './.git/*' -not -path './node_modules/*')
+          exit $fail
+
+  markdown-links:
+    name: Markdown link check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # --no-progress: cleaner log; --exclude-mail: skip mailto:; --max-retries cho flaky external URL;
+          # --timeout 20s; '--accept' allow một số HTTP codes external có thể trả về (rate-limit, etc.)
+          args: >-
+            --no-progress
+            --exclude-mail
+            --max-retries 2
+            --timeout 20
+            --accept 200,203,206,429
+            './**/*.md'
+          fail: true
+
+  shellcheck:
+    name: Shell script lint (shellcheck)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run shellcheck
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq shellcheck
+          shellcheck hooks/*.sh
+
+  python-lint:
+    name: Python lint (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install ruff
+        run: pip install --quiet ruff
+      - name: Lint hooks/
+        run: ruff check hooks/
+
+  markdown-lint:
+    name: Markdown style lint (markdownlint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run markdownlint-cli2
+        uses: DavidAnson/markdownlint-cli2-action@v17
+        with:
+          globs: '**/*.md'
