@@ -1,6 +1,6 @@
 # Contributing — dotclaude
 
-> Repo này là user-config cá nhân cho Claude Code, share để cộng đồng dev người Việt tiết kiệm 1-2 ngày setup. Mọi đóng góp chất lượng đều được hoan nghênh.
+> Repo cung cấp bộ user-config cho Claude Code dành cho cộng đồng dev người Việt — tiết kiệm 1-2 ngày setup. Mọi đóng góp chất lượng đều được hoan nghênh.
 
 ## Báo lỗi
 
