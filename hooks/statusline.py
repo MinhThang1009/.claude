@@ -92,8 +92,7 @@ def main() -> None:
     # Bar min 1 cell khi pct>0 để không trống hoàn toàn ở zone <10%
     filled = max(1, pct // 10) if pct > 0 else 0
     bar = "▰" * filled + "▱" * (10 - filled)
-    # Bỏ space sau icon vì emoji wide character đã chiếm 2 cell
-    line2 = [f"{icon}{bar_color}{bar}{RESET} {pct}%"]
+    line2 = [f"{icon} {bar_color}{bar}{RESET} {pct}%"]
     if total_input:
         line2.append(f"{DIM}{total_input // 1000}k tokens{RESET}")
     if cost_usd > 0:
