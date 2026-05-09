@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-marketplace.json",
+  "name": "dotclaude-marketplace",
+  "owner": { "name": "MinhThang1009" },
+  "description": "Marketplace cho dotclaude plugin — Claude Code config tiếng Việt (EXPERIMENTAL — xem SECURITY.md)",
+  "plugins": [
+    {
+      "name": "dotclaude",
+      "source": "./plugins/dotclaude",
+      "description": "Dev workflow skills + security hooks + agents (tiếng Việt). EXPERIMENTAL: yêu cầu migration thủ công các file ngoài plugin (CLAUDE.md, rules, references, settings.json permissions).",
+      "version": "0.1.0-experimental",
+      "author": { "name": "MinhThang1009" },
+      "homepage": "https://github.com/MinhThang1009/dotclaude",
+      "repository": "https://github.com/MinhThang1009/dotclaude",
+      "license": "MIT",
+      "keywords": ["vietnamese", "dev-workflow", "security", "hooks", "experimental"]
+    }
+  ]
+}

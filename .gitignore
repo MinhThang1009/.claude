@@ -17,7 +17,9 @@ backups/
 shell-snapshots/
 downloads/
 plans/
-plugins/
+plugins/*
+!plugins/dotclaude/
+!plugins/dotclaude/**
 ide/
 .vscode/
 .last-cleanup
