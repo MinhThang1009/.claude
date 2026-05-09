@@ -178,8 +178,8 @@
   "autoMemoryEnabled": true,
   "statusLine": {
     "type": "command",
-    "command": "bash $HOME/.claude/hooks/statusline.sh",
-    "//": "Statusline custom: hiển thị icon ngưỡng + model + context % + cwd. Script tại hooks/statusline.{py,sh}. Ngưỡng theo Dex Horthy/Boris Cherny — xem docs/REFERENCE.md §16.2."
+    "command": "$HOME/.claude/hooks/statusline.sh",
+    "//": "Statusline custom: hiển thị icon ngưỡng + model + context % + cwd. Script tại hooks/statusline.{py,sh}. Ngưỡng theo Dex Horthy/Boris Cherny — xem docs/REFERENCE.md §16.2. Shebang trong .sh tự handle bash."
   },
   "claudeMdExcludes": [
     "**/node_modules/**/CLAUDE.md",
