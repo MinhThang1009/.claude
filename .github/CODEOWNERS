@@ -1,0 +1,13 @@
+# CODEOWNERS — https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# Auto-assign reviewer khi PR sửa file matching pattern.
+# Format: <pattern> <owner1> <owner2>...
+
+# Default owner cho tất cả file
+* @MinhThang1009
+
+# Critical security paths — yêu cầu review nghiêm ngặt
+hooks/ @MinhThang1009
+.github/workflows/ @MinhThang1009
+.gitignore @MinhThang1009
+settings.json @MinhThang1009
+.pre-commit-config.yaml @MinhThang1009
