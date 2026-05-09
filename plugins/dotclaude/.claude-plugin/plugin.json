@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "dotclaude",
-  "description": "Bộ Claude Code config tiếng Việt — 7 skills (commit/code-review/debug/refactor/explain/handoff/context-check), 4 agents (architect/code-reviewer/security-auditor/test-writer), security hooks chặn 19 attack vectors. CRITICAL: yêu cầu migration ~/.claude/CLAUDE.md, rules/, references/, settings.json — XEM SECURITY.md + README.",
+  "description": "Bộ Claude Code config tiếng Việt — 7 skills (commit/code-review/debug/refactor/explain/handoff/context-check), 4 agents (architect/code-reviewer/security-auditor/test-writer), security hooks chặn 8 attack vectors (xem SECURITY.md). CRITICAL: yêu cầu migration ~/.claude/CLAUDE.md, rules/, references/, settings.json — XEM SECURITY.md + README.",
   "version": "0.1.0-experimental",
   "author": { "name": "MinhThang1009" },
   "homepage": "https://github.com/MinhThang1009/dotclaude",
