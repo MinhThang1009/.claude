@@ -26,7 +26,7 @@ Cấu hình global ready-to-use cho Claude Code. Tiếng Việt cho comment/comm
 
 ## ✅ Có hữu ích không?
 
-- 🟢 **Phù hợp**: dev VN dùng Claude Code v2.1.111+, ưu tiên Max/Team plan (Opus 4.7 + 1M context)
+- 🟢 **Phù hợp**: dev VN dùng Claude Code v2.1.111+, ưu tiên Max/Team/Enterprise plan (Opus 4.7 + 1M context included); Pro/API cũng dùng được qua extra usage
 - 🔴 **Không phù hợp**: dev English-only, user muốn tự config từ đầu
 - 🛡️ **Quality**: schema chuẩn Anthropic, MIT License, bảng fallback cho Pro/Bedrock/Vertex
 

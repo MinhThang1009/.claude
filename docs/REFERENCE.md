@@ -201,7 +201,7 @@
 | Flag                       | Mục đích                                                                                                             |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | `--model <alias\|id>`      | `opus`, `sonnet`, `haiku`, `best`, `opusplan`, `opus[1m]`, `sonnet[1m]`, hoặc full ID (`claude-opus-4-7`) |
-| `--effort <level>`         | `low`, `medium`, `high`, `xhigh`, `max` (Opus 4.7); Opus 4.6/Sonnet 4.6 không có `xhigh`. Xem §6.2.                  |
+| `--effort <level>`         | `low`, `medium`, `high`, `xhigh`, `max` (Opus 4.7); Opus 4.6/Sonnet 4.6: `xhigh` fallback về `high`. Xem §6.2.                  |
 | `--fallback-model <alias>` | Fallback khi default overload (chỉ print mode)                                                                       |
 | `--betas <header>`         | Beta header cho API (chỉ API key user)                                                                               |
 
@@ -258,6 +258,8 @@
   - Opus 4.7: chỉ adaptive (không extended thinking)
   - Sonnet 4.6: có cả adaptive + extended
   - Haiku 4.5: chỉ extended (không adaptive)
+  - Opus 4.6: adaptive mặc định + extended thinking (set `CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1` để revert về fixed)
+  - Sonnet 4.5, Opus 4.5: chỉ extended thinking (không adaptive)
 - Effort levels chỉ hỗ trợ Opus 4.7, Opus 4.6, Sonnet 4.6. Model khác bỏ qua flag `--effort`.
 - 1M context: chỉ Opus 4.7/4.6, Sonnet 4.6. Append `[1m]` khi muốn dùng (vd `claude-opus-4-7[1m]`).
 - Trên Bedrock/Vertex/Foundry: alias `opus` → Opus 4.6, `sonnet` → Sonnet 4.5 (không phải latest). Pin bằng `ANTHROPIC_DEFAULT_OPUS_MODEL`/`_SONNET_MODEL` để control version.
@@ -301,7 +303,7 @@
 | `--debug-file <path>`                     | Ghi debug log vào file                           |
 | `--mcp-debug`                             | Debug MCP riêng                                  |
 
-> **Stream-json events** (cần `--verbose --include-partial-messages`): `system/init` (session metadata, tools, plugins, plugin_errors), `system/api_retry` (attempt/max_retries/retry_delay_ms/error_status/error category), `system/plugin_install` (chỉ khi `CLAUDE_CODE_SYNC_PLUGIN_INSTALL=1` — status: `started`/`installed`/`failed`/`completed`). Stdin pipe cap **10MB** (v2.1.128+) — vượt → exit non-zero.
+> **Stream-json events** (cần `--verbose --include-partial-messages`): `system/init` (session metadata, tools, plugins, plugin_errors), `system/api_retry` (attempt/max_retries/retry_delay_ms/error_status/error category), `system/plugin_install` (status: `started`/`installed`/`failed`/`completed`). Stdin pipe cap **10MB** (v2.1.128+) — vượt → exit non-zero.
 
 ### 2.7 IDE & integration
 | Flag          | Mục đích                           |
@@ -398,7 +400,7 @@
 | `/theme`                  | Đổi color theme                                                                                       |
 | `/color [name\|default]`  | Set màu prompt bar — 8 màu: `red`/`blue`/`green`/`yellow`/`purple`/`orange`/`pink`/`cyan`. Không arg = random |
 | `/statusline`             | Cấu hình status line                                                                                  |
-| `/fast [on\|off]`         | Toggle fast mode (chỉ Opus 4.6, tốc độ 2.5× nhanh hơn, giá $30/$150 per MTok ≈ 6× standard)           |
+| `/fast [on\|off]`         | Toggle fast mode (chỉ Opus 4.6, [docs](https://code.claude.com/docs/en/fast-mode): tốc độ 2.5×, giá $30/$150 per MTok)           |
 | `/voice [hold\|tap\|off]` | Toggle voice dictation, hoặc enable theo mode. Requires Claude.ai account                             |
 | `/privacy-settings`       | View/update privacy (Pro/Max)                                                                         |
 
@@ -588,7 +590,7 @@ MCP server có thể expose prompt thành command: `/mcp__<server>__<prompt>`.
 
 ### 6.1 Magic words trong prompt
 
-Chỉ **`ultrathink`** được nhận diện là keyword — Claude Code thêm in-context instruction request deeper reasoning **cho turn đó**, KHÔNG đổi effort level gửi lên API. Các cụm `think`, `think hard`, `megathink`… là **plain text**, không trigger gì đặc biệt — dùng `/effort` thay.
+Chỉ **`ultrathink`** được nhận diện là keyword — Claude Code thêm in-context instruction request deeper reasoning **cho turn đó**, KHÔNG đổi effort level gửi lên API. Các cụm `think`, `think hard`, `think more`… là **plain text**, không trigger gì đặc biệt — dùng `/effort` thay.
 
 ### 6.2 `/effort` levels (chính thức 2026)
 
@@ -614,7 +616,7 @@ Chỉ **`ultrathink`** được nhận diện là keyword — Claude Code thêm 
 
 **Override**: `CLAUDE_CODE_EFFORT_LEVEL` env var ưu tiên cao nhất
 
-Opus 4.7 dùng **adaptive reasoning** (thinking tùy bước, không cố định budget). Opus 4.6/Sonnet 4.6 dùng fixed budget. Tắt adaptive: `CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1`.
+Opus 4.7 **luôn** dùng adaptive reasoning (KHÔNG thể disable, `CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING` không apply). Opus 4.6/Sonnet 4.6 cũng dùng adaptive mặc định; set `CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1` để revert về fixed thinking budget.
 
 ---
 
@@ -844,7 +846,7 @@ CLI override 1 session: `claude --teammate-mode in-process`.
 > Source chính thức: [code.claude.com/docs/en/output-styles](https://code.claude.com/docs/en/output-styles)
 
 
-3 style mặc định (set qua `/output-style <name>` hoặc `outputStyle` trong settings):
+3 style mặc định (set qua `/config` → Output style hoặc `outputStyle` trong settings):
 
 | Style         | Mô tả                                                                 | Token cost |
 | ------------- | --------------------------------------------------------------------- | ---------- |
@@ -932,7 +934,7 @@ force-for-plugin: false               # Plugin only: true → auto-apply khi plu
     "<server-name>": { "alwaysLoad": true }    // (v2.1.121+) Skip tool-search deferral — full schema vào context start
   },
 
-  // Sandbox (macOS Seatbelt / Linux+WSL2 bubblewrap+socat)
+  // Sandbox (macOS Seatbelt / Linux bubblewrap / Windows qua WSL2 bubblewrap+socat)
   "sandbox": {
     "enabled": false,                          // true = bật sandbox cho Bash tool
     "failIfUnavailable": false,                // true = exit nếu sandbox không khả dụng (managed deployment)
@@ -1563,7 +1565,7 @@ Default: **single-agent**. Multi-agent (subagent / `/batch`) tốn **3-10× toke
 > |------|-------------|------|
 > | `<30/<40/60%` + thuật ngữ "dumb zone" | **Dex Horthy** (HumanLayer, MLOps Community presentation, 2026-03-24) | [youtu.be/YwZR6tc7qYg?t=1541](https://youtu.be/YwZR6tc7qYg?t=1541) |
 > | `300-400k tokens` context rot zone (1M model) | **Thariq Shihipar** (Anthropic Claude Code team, 2026-04-16) | curated tại [howborisusesclaudecode.com](https://howborisusesclaudecode.com/) |
-> | `155k tokens` auto-compact (200k window) | **Boris Cherny** (Anthropic Claude Code lead) | [X tweet 2025-10](https://x.com/bcherny/status/1977163445205450783) |
+> | `155k tokens` auto-compact (200k window) | **Boris Cherny** (Anthropic, creator of Claude Code) | [X tweet 2025-10](https://x.com/bcherny/status/1977163445205450783) |
 > | Compact threshold theo task complexity (50% complex / 70% simple) | **claude-codex.fr** | [claude-codex.fr/en/prompting/context-rot](https://claude-codex.fr/en/prompting/context-rot/) |
 > | Reaffirm 40% rule độc lập | **Justin Smith** (LinkedIn article, 2026-03-05) | [linkedin.com/pulse/40-rule-...](https://www.linkedin.com/pulse/40-rule-beating-claudes-dumb-zone-large-codebases-justin-smith-jlffc) |
 > | Aggregator | **Boris + Anthropic Claude Code team** | [howborisusesclaudecode.com](https://howborisusesclaudecode.com/) |
@@ -2061,7 +2063,7 @@ Cách xử lý:
 - [ ] Verify mọi output (test, lint, screenshot)
 - [ ] Subagent cho investigation
 - [ ] Commit thường xuyên (checkpoint để revert)
-- [ ] Theo dõi `/context` — 30-40% sweet spot, 40-60% "dumb zone", >60% nên action (theo Boris Cherny)
+- [ ] Theo dõi `/context` — 30-40% sweet spot, 40-60% "dumb zone", >60% nên action (theo Dex Horthy, MLOps Community)
 - [ ] Sửa 2 lần vẫn sai → `/clear` + reprompt, đừng spam correction
 - [ ] `/effort high` hoặc `ultrathink` cho task khó (architecture, debug heisenbug, refactor lớn)
 

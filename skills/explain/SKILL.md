@@ -1,7 +1,7 @@
 ---
 name: explain
 description: Giải thích code, thuật toán, hoặc kiến trúc cho người chưa biết. Đi từ tổng quan xuống chi tiết, có ví dụ cụ thể. Dùng khi user nói "giải thích", "đoạn này làm gì", "tại sao thế này lại work", hoặc gọi /explain.
-allowed-tools: Read Grep Glob Bash(git log:*) Bash(git blame:*) WebFetch
+allowed-tools: Read Grep Glob Bash(git log:*) Bash(git blame:*) WebFetch WebSearch
 argument-hint: "[đường dẫn file, tên hàm/class, hoặc câu hỏi]"
 ---
 
@@ -105,6 +105,6 @@ Output: ...
 (Ví dụ: "giải thích Bloom filter", "giải thích React reconciliation")
 
 - Trả lời từ kiến thức sẵn có.
-- Nếu liên quan đến framework/library mới (< 1 năm) → web_search để confirm version-specific behavior.
+- Nếu liên quan đến framework/library mới (< 1 năm) → WebSearch để confirm version-specific behavior.
 - Đưa ví dụ minh họa bằng pseudo-code hoặc code ngắn.
 - Trỏ tới nguồn chính thức (docs, paper) nếu user muốn đào sâu.

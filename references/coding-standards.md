@@ -8,7 +8,7 @@
 - **Convention codebase trước, "best practice" sau**. Snake_case nếu codebase snake_case. Tab nếu codebase tab.
 - **Đúng > đẹp > nhanh**. Code chạy đúng quan trọng hơn pattern fancy.
 - **Không over-engineer**. YAGNI. Generic abstraction sinh trong nhu cầu thật, không "phòng xa".
-- **Function < 50 dòng** lý tưởng. >100 dòng → có thể tách. Nesting >3 level → có thể flatten.
+- **Function < 50 dòng** lý tưởng. >100 dòng → xem xét tách (trừ khi logic có kết dính trên toàn bộ). Nesting >3 level → có thể flatten.
 - **Đặt tên rõ ràng**. `getUserById` thay `getUser`. `isEmailVerified` thay `verified`. Tránh `data`, `info`, `obj` trừ khi context rõ.
 
 ## Comment
@@ -49,7 +49,7 @@ limiter = RateLimiter(...)
 ## Performance
 
 - **Đo trước khi optimize**. Profile (`cProfile`, `py-spy`, Chrome DevTools, `perf`) — không đoán.
-- **Big-O quan trọng > vi-optimize**. O(n²) trên 10k item > 100ms; vi-optimize không cứu được.
+- **Big-O quan trọng > vi-optimize**. O(n²) trên 10k item = 100 triệu phép tính — rất chậm; vi-optimize không cứu được.
 - DB: index theo column hay query, không index loạn. N+1 query → batch hoặc join.
 - Network: batch request, cache hợp lý, set timeout.
 

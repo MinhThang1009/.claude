@@ -54,7 +54,7 @@ Ví dụ: `feat/google-oauth`, `fix/218-avatar-fallback`, `refactor/auth-middlew
 
 ## PR title & description
 
-- **PR title**: tiếng Anh, format giống commit message. Tool như Linear/Jira parse được.
+- **PR title**: tiếng Anh, theo Conventional Commits format (khác commit message ở chỗ subject tiếng Anh). Tool như Linear/Jira parse được.
 - **PR description**: tiếng Việt OK (review trong team Việt). Bao gồm: mục đích (1-2 câu), thay đổi chính (bullet), cách test, screenshot/video nếu UI, breaking change nếu có.
 
 ## Workflow
@@ -84,7 +84,7 @@ Ví dụ: `feat/google-oauth`, `fix/218-avatar-fallback`, `refactor/auth-middlew
 
 ## Attribution
 
-- KHÔNG thêm `Co-Authored-By: Claude <noreply@anthropic.com>` vào commit (đã tắt qua `attribution.commit: ""` trong `~/.claude/settings.json`).
+- KHÔNG thêm `Co-Authored-By: Claude` vào commit (đã tắt qua `attribution.commit: ""` trong `~/.claude/settings.json`) (xem [settings docs](https://code.claude.com/docs/en/settings)).
 - KHÔNG thêm tagline `🤖 Generated with [Claude Code]` vào commit/PR description.
 - Nếu vẫn xuất hiện → bug, báo người dùng để check setting.
 

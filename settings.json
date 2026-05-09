@@ -169,7 +169,6 @@
     "additionalDirectories": [],
     "defaultMode": "acceptEdits"
   },
-  "model": "opus[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -207,6 +206,7 @@
       }
     ]
   },
+  "model": "opus[1m]",
   "effortLevel": "xhigh",
   "autoUpdatesChannel": "latest",
   "autoMemoryEnabled": true,

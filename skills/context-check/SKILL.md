@@ -13,7 +13,7 @@ Mục đích: chủ động đánh giá context và đề xuất hành động �
 
 ### Bước 1 — Đọc trạng thái
 
-Claude **không thể tự chạy `/context`** vì đó là slash command của user. Đề nghị user:
+Claude **không thể tự chạy `/context`** vì đó là [slash command chỉ user invoke](https://code.claude.com/docs/en/skills). Đề nghị user:
 
 > Cần chạy `/context` ở terminal và gửi lại output (% và breakdown).
 
@@ -30,7 +30,7 @@ Sau khi user gửi output `/context`, phân tích theo các bước dưới.
 | % context | Trạng thái                          | Hành động đề xuất                                                        |
 | --------- | ----------------------------------- | ------------------------------------------------------------------------ |
 | `<30%`    | 🟢 Aggressive zone                  | Mục tiêu experienced users                                                |
-| `30-40%`  | 🟢 Sweet spot                       | Newcomer target — "shoot to keep it under 40%" (Boris)                   |
+| `30-40%`  | 🟢 Sweet spot                       | Newcomer target — "shoot to keep it under 40%" (Dex)                   |
 | `40-60%`  | 🟡 "Dumb zone" bắt đầu              | Performance degrade — plan wrap-up phase hiện tại                        |
 | `60-77%`  | 🟠 Wrap up actively                 | `/compact` HOẶC `/handoff` → `/clear` + brief mới                        |
 | `~77%`    | 🔴 Auto-compact firing (155k tokens)| Đã muộn — ưu tiên `/handoff --save` trước khi mất chi tiết               |

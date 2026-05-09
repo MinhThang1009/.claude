@@ -354,7 +354,7 @@ Default repo set `model: "opus[1m]"` + `effortLevel: "xhigh"` — phù hợp Max
 | **Pro / Team Standard**        | `"sonnet"` (Opus rate-limit nhanh hơn)       | `"high"` hoặc `"xhigh"`      |
 | **Free / không Opus 1M**       | `"opus"` (bỏ `[1m]`) hoặc `"sonnet"`         | `"high"`                     |
 | **Bedrock / Vertex / Foundry** | Pin full ID per provider — Bedrock: `"anthropic.claude-opus-4-7"`, Vertex: `"claude-opus-4-7"` (Foundry: check provider docs) | `"high"` (xhigh chỉ Opus 4.7) |
-| **Account giới hạn ngân sách** | `"haiku"`                                    | `"medium"` (haiku không support effort) |
+| **Account giới hạn ngân sách** | `"haiku"`                                    | bỏ hoặc để trống (haiku không support effort — setting bị ignore) |
 
 Sau sửa, restart Claude Code (`exit` rồi `claude`) để apply. Verify bằng `/model` và `/effort`.
 
@@ -453,7 +453,7 @@ Câu hỏi thường gặp:
 
 ### 9.1 Tại sao chỉ import 2 rules thay vì 4?
 
-Baseline context tính tiền theo mỗi message. 4 rules = thêm ~6000 tokens × mỗi turn × cả phiên = lãng phí. Chỉ import 2 rule áp dụng MỌI turn (`communication`, `security`); 2 rule còn lại để Claude đọc khi cần (qua REFERENCE hoặc user `@`-reference).
+Baseline context tính tiền theo mỗi message. 4 rules = thêm ~7000 tokens × mỗi turn × cả phiên = lãng phí. Chỉ import 2 rule áp dụng MỌI turn (`communication`, `security`); 2 rule còn lại để Claude đọc khi cần (qua REFERENCE hoặc user `@`-reference).
 
 ### 9.2 Tại sao [REFERENCE.md](docs/REFERENCE.md) không auto-load vào [CLAUDE.md](CLAUDE.md)?
 

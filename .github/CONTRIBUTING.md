@@ -56,7 +56,7 @@ Tham khảo workflow fact-check trong commit history (search `docs: fix .* fact-
    - JSON: validate syntax (`python -m json.tool settings.json` hoặc `jq . settings.json`).
    - Shell: `shellcheck hooks/*.sh` (nếu cài).
    - Python: `ruff check hooks/` (nếu cài).
-3. CI trên GitHub Actions chạy 9 jobs tự động khi push/PR — phải pass hết trước khi merge:
+3. CI trên GitHub Actions chạy **7 workflows** tự động khi push/PR — phải pass hết trước khi merge. Workflow chính (`ci.yml`, 11 jobs):
    - Hook regression tests (119 cases) — Ubuntu + macOS + Windows matrix (3 jobs)
    - JSON syntax validate
    - Markdown link check (lychee, offline mode)
@@ -66,6 +66,7 @@ Tham khảo workflow fact-check trong commit history (search `docs: fix .* fact-
    - pytest cho `tests/`
    - actionlint cho `.github/workflows/*.yml`
    - Frontmatter schema validate cho skills/agents/output-styles
+   - Ngoài ra: `codeql.yml`, `commitlint.yml`, `dependency-review.yml`, `link-check-external.yml`, `secret-scan.yml`, `spell.yml`
 4. Commit từng change nhỏ (revert được độc lập).
 5. Push fork → mở PR vào `main` với:
    - Title: Conventional Commit style.

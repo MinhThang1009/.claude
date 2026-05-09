@@ -17,15 +17,12 @@
 - Không chắc intent → **HỎI**, đừng đoán. Một câu hỏi tốt hơn 10 phút sửa sai.
 - Sau khi sửa → **TỰ KIỂM TRA** test/lint/typecheck nếu có. Đừng báo "xong" khi chưa verify.
 - Tôi sửa lỗi của bạn → **không xin lỗi dài**, xác nhận-sửa-tiếp.
-- Tôi nói "ultrathink" → keyword chính thức, Claude Code thêm in-context instruction request deeper reasoning cho turn đó (effort level KHÔNG đổi). Các cụm "megathink"/"think harder" KHÔNG phải keyword — đối xử như plain text.
+- Tôi nói "ultrathink" → keyword chính thức, Claude Code thêm in-context instruction request deeper reasoning cho turn đó (effort level KHÔNG đổi). Các cụm "think"/"think hard"/"think more" KHÔNG phải keyword — đối xử như plain text.
 - Subagent results, git state, external deps → xem chi tiết [`verification.md`](rules/verification.md).
 
 ## Phong cách trả lời
 
-- **Ngắn gọn**. Diff/code TRƯỚC, giải thích SAU. Không lặp lại câu hỏi của tôi. Không "Tuyệt vời!", "Chắc chắn rồi!".
-- Không emoji trừ khi tôi dùng trước.
-- Không heading lớn cho câu trả lời ngắn — dùng prose hoặc bullet.
-- Liệt kê thay đổi: ghi rõ *file nào, dòng nào, làm gì*. Không "ở một số chỗ".
+- **Ngắn gọn**. Diff/code TRƯỚC, giải thích SAU. Không emoji trừ khi tôi dùng trước. Chi tiết tại [`communication.md`](rules/communication.md).
 
 ## Code
 
@@ -44,14 +41,11 @@
 
 ## Bảo mật
 
-- KHÔNG in/log/commit secret, token, API key. Phát hiện hardcoded secret → cảnh báo ngay.
-- KHÔNG commit `.env`, `*.key`, `*.pem`. Check `.gitignore` trước khi commit.
-- KHÔNG `curl | bash`, KHÔNG `eval` chuỗi không kiểm soát.
-- Mask giá trị giống secret (chuỗi 32+ ký tự hex, JWT) khi hiển thị log.
+- Chi tiết tại [`security.md`](rules/security.md). Tóm tắt: KHÔNG in/log/commit secret. KHÔNG `curl | bash`, `eval`. Phát hiện hardcoded secret → cảnh báo ngay.
 
 ## Workflow ưu tiên
 
-- Khi cần plan (theo rule "Phong cách làm việc" ở trên) → ưu tiên đề xuất Plan Mode (`Shift+Tab×2`) hoặc skill `/plan` thay vì viết plan inline trong response.
+- Khi cần plan (theo rule "Phong cách làm việc" ở trên) → ưu tiên đề xuất Plan Mode (`Shift+Tab×2 từ default mode`) hoặc skill `/plan` thay vì viết plan inline trong response.
 - Investigate codebase rộng → đề xuất subagent ("use a subagent to investigate ...") để giữ context chính sạch. Nếu không dùng subagent → scope narrow (chỉ đọc file/dir cần thiết, không explore toàn bộ).
 - Refactor lớn → tách commit nhỏ revert được độc lập.
 - Bug khó → reproduce trước, viết failing test, mới fix.
@@ -65,7 +59,7 @@
 ## Quản lý context window
 
 - Theo dõi `/context` thường xuyên. **<40% sweet spot**, **40-60% dumb zone bắt đầu**, **60-77% wrap up actively**, **>77% sau auto-compact PHẢI act**. Ngưỡng community-curated, chi tiết + source tại [`docs/REFERENCE.md` §16.2](docs/REFERENCE.md).
-- Hoàn thành 1 phase (auth xong, refactor xong) → đề xuất `/compact` ngay, đừng đợi auto-compact firing (~77% của 200k window = ~155k tokens, theo Boris Cherny — Anthropic Claude Code lead).
+- Hoàn thành 1 phase (auth xong, refactor xong) → đề xuất `/compact` ngay, đừng đợi auto-compact firing (~77% của 200k window = ~155k tokens, theo [Boris Cherny — Anthropic, creator of Claude Code](https://x.com/bcherny/status/1977163445205450783)).
 - Trước khi compact/clear → tôi sẽ yêu cầu bạn viết handoff brief; bạn dùng skill [`/handoff`](skills/handoff/SKILL.md).
 - Câu hỏi nhanh không cần lưu history → tôi dùng `/btw`.
 

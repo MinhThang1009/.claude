@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Tạo handoff brief để compact session hiện tại HOẶC chuyển sang session mới. Gọi khi user nói "handoff", "chuyển session", "compact với note", "ghi lại trước khi clear", hoặc context >70%.
+description: Tạo handoff brief để compact session hiện tại HOẶC chuyển sang session mới. Gọi khi user nói "handoff", "chuyển session", "compact với note", "ghi lại trước khi clear", hoặc khi session có dấu hiệu context cao (nhiều tool output, nhiều file đã đọc, session dài).
 allowed-tools: Read Write Bash(git status:*) Bash(git log:*) Bash(git diff:*)
 argument-hint: "[--save | --inject]"
 model: inherit
@@ -8,7 +8,7 @@ model: inherit
 
 # Skill: Handoff giữa các session
 
-Theo nghiên cứu của Anthropic ([Using Claude Code session management and 1M context](https://claude.com/blog/using-claude-code-session-management-and-1m-context)) và kinh nghiệm cộng đồng: **resume một session dài thường tệ hơn brief-injection vào session mới** — vì resume kéo theo stale environment data (tool output cũ, file content cũ) còn brief chỉ mang quyết định và trạng thái hiện tại.
+Theo hướng dẫn từ Anthropic ([Using Claude Code session management and 1M context](https://claude.com/blog/using-claude-code-session-management-and-1m-context)) và kinh nghiệm cộng đồng: **resume một session dài thường tệ hơn brief-injection vào session mới** — vì resume kéo theo stale environment data (tool output cũ, file content cũ) còn brief chỉ mang quyết định và trạng thái hiện tại.
 
 ## Tình huống áp dụng
 
@@ -32,7 +32,7 @@ Theo nghiên cứu của Anthropic ([Using Claude Code session management and 1M
 
 ### Bước 2 — Soạn handoff brief
 
-Tôi viết brief **NGẮN** (5-10 dòng, ≤300 từ) theo format dưới đây. Brief phải tự đọc được mà không cần history.
+Tôi viết brief **NGẮN** (≤300 từ nội dung, không tính headings) theo format dưới đây. Bỏ section nào không áp dụng. Brief phải tự đọc được mà không cần history.
 
 ```markdown
 # Handoff — <task name> — <YYYY-MM-DD HH:MM>

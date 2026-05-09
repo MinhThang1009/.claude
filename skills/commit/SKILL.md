@@ -140,7 +140,7 @@ rm /tmp/commit-msg.txt
 ```
 
 > **Lưu ý OS**:
-> - Trên Git Bash (Windows) `/tmp/` map tới `C:\tmp\` — tạo dir trước nếu chưa có (`mkdir -p /tmp`).
+> - Trên Git Bash (Windows) `/tmp/` map tới `%TEMP%` (thường là `C:\Users\<user>\AppData\Local\Temp\`) — thư mục này đã tồn tại sẵn, không cần tạo.
 > - Trên PowerShell native (không có Git Bash) dùng `$env:TEMP\commit-msg.txt` thay `/tmp/...`.
 > - `git commit -m "subj" -m "body"` qua PowerShell here-string có thể garbled Unicode. Dùng `-F` an toàn cross-platform.
 

@@ -46,7 +46,7 @@ Tạo danh sách trước khi viết code. Phân loại:
 - Duplicate, ordered/unordered
 - Concurrency / async race (nếu áp dụng)
 
-### Error path (3-5 test)
+### Error path (tùy phức tạp: 1-2 đơn giản, 3-5 phức tạp)
 - Input invalid → throw đúng error
 - Dependency fail → handle thế nào
 - Permission deny / network error / timeout
@@ -90,7 +90,7 @@ Quy tắc:
 - **Một assert mỗi test** trừ khi assert là cùng một sự thật ở nhiều mặt (ví dụ check object có nhiều field cùng lúc).
 - **Test data**: dùng tên có ý nghĩa, không `foo/bar`. `validEmail`, `expiredToken`, `userWith3Items`.
 - **Mock**: chỉ mock external boundary (HTTP, DB, filesystem, time, random). KHÔNG mock thứ đang test, KHÔNG mock thứ đơn giản (math, string).
-- **No flaky**: test phải pass 100 lần liên tiếp. Nếu phụ thuộc thời gian → freeze time. Phụ thuộc network → mock. Phụ thuộc thứ tự → sort.
+- **No flaky**: test phải deterministic — pass mọi lần chạy. Nếu phụ thuộc thời gian → freeze time. Phụ thuộc network → mock. Phụ thuộc thứ tự → sort.
 
 ## Bước 5: Chạy test
 
