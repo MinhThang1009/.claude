@@ -57,7 +57,7 @@
     - [11.1 Permission rule syntax](#111-permission-rule-syntax)
     - [11.2 Built-in tools — tên dùng trong permission rules / hook matchers](#112-built-in-tools--tên-dùng-trong-permission-rules--hook-matchers)
 12. [Environment variables](#12-environment-variables)
-13. [Hook events — đầy đủ 29 event](#13-hook-events--đầy-đủ-29-event)
+13. [Hook events — đầy đủ 30 event](#13-hook-events--đầy-đủ-30-event)
     - [13.1 Per-session](#131-per-session)
     - [13.2 Per-turn](#132-per-turn)
     - [13.3 Per-tool-call (agentic loop)](#133-per-tool-call-agentic-loop)
@@ -1257,7 +1257,7 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 
 ---
 
-## 13. Hook events — đầy đủ 29 event
+## 13. Hook events — đầy đủ 30 event
 
 > Source chính thức: [code.claude.com/docs/en/hooks](https://code.claude.com/docs/en/hooks)
 
@@ -1551,7 +1551,7 @@ Default: **single-agent**. Multi-agent (subagent / `/batch`) tốn **3-10× toke
 
 ### 16.1 Tầm quan trọng
 
-Mọi best practice xoay quanh 1 ràng buộc: **context window đầy nhanh, performance giảm khi đầy**. Mỗi message re-read toàn bộ history → cost grow exponential trong agentic session. Ở 80%+ context, Claude bắt đầu "quên" instruction sớm, lặp sai lầm cũ. Boris Cherny (tech lead Claude Code) giữ CLAUDE.md ~2,500 tokens.
+Mọi best practice xoay quanh 1 ràng buộc: **context window đầy nhanh, performance giảm khi đầy**. Mỗi message re-read toàn bộ history → cost grow exponential trong agentic session. Ở 80%+ context, Claude bắt đầu "quên" instruction sớm, lặp sai lầm cũ. Boris Cherny (Head of Claude Code) giữ CLAUDE.md ~2,500 tokens.
 
 ### 16.2 Ngưỡng hành động
 

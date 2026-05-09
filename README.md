@@ -333,7 +333,7 @@ Default repo set `model: "opus[1m]"` + `effortLevel: "xhigh"` — phù hợp Max
 | ------------------------------ | -------------------------------------------- | ---------------------------- |
 | **Pro / Team Standard**        | `"sonnet"` (Opus rate-limit nhanh hơn)       | `"high"` hoặc `"xhigh"`      |
 | **Free / không Opus 1M**       | `"opus"` (bỏ `[1m]`) hoặc `"sonnet"`         | `"high"`                     |
-| **Bedrock / Vertex / Foundry** | Pin full ID: `"claude-sonnet-4-6"` hoặc `"claude-opus-4-6"` (Opus 4.7 chưa có) | `"high"` (xhigh chỉ Opus 4.7) |
+| **Bedrock / Vertex / Foundry** | Pin full ID per provider — Bedrock: `"anthropic.claude-opus-4-7"`, Vertex: `"claude-opus-4-7"` (Foundry: check provider docs) | `"high"` (xhigh chỉ Opus 4.7) |
 | **Account giới hạn ngân sách** | `"haiku"`                                    | `"medium"` (haiku không support effort) |
 
 Sau sửa, restart Claude Code (`exit` rồi `claude`) để apply. Verify bằng `/model` và `/effort`.
