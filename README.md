@@ -319,11 +319,11 @@ claude update
 ```
 
 Cụ thể các tính năng cần:
-- ✅ v2.1.0+: skills system
-- ✅ v2.1.59+: auto memory, plan mode v2
-- ✅ v2.1.101+: skills+commands merge, output styles built-in
+- ✅ v2.0.20+: skills system (v2.1.0 thêm hot-reload + fork sub-agent + `agent` field)
+- ✅ v2.1.59+: auto memory (`/memory`)
+- ✅ v1.0.81+: output styles built-in (Explanatory, Learning)
 - ✅ v2.1.111+: Opus 4.7, `effortLevel: xhigh` (Opus 4.7 exclusive)
-- ✅ v2.1.117+: `/model` selection persist vào `settings.local.json` khi project override
+- ✅ v2.1.117+: `/model` selection persist across restart kể cả khi project pin model khác
 
 ### 7.1 Nếu plan/account không hỗ trợ Opus 4.7 + 1M context
 
