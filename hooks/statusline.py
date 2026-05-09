@@ -71,7 +71,7 @@ def main() -> None:
         window_part = " 1M"
     else:
         window_part = ""
-    effort_label = f" ☆{effort}" if effort else ""
+    effort_label = f" ⚡{effort}" if effort else ""
     cwd_short = os.path.basename(cwd) if cwd else ""
 
     # Line 1: model + cwd + git
@@ -91,7 +91,7 @@ def main() -> None:
     # Line 2: progress bar + ctx + cost + duration + rate limits
     # Bar min 1 cell khi pct>0 để không trống hoàn toàn ở zone <10%
     filled = max(1, pct // 10) if pct > 0 else 0
-    bar = "█" * filled + "░" * (10 - filled)
+    bar = "▰" * filled + "▱" * (10 - filled)
     # Bỏ space sau icon vì emoji wide character đã chiếm 2 cell
     line2 = [f"{icon}{bar_color}{bar}{RESET} {pct}%"]
     if total_input:
