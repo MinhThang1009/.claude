@@ -37,12 +37,13 @@
 │   ├── bash-guard.sh               # Wrapper minimal gọi python
 │   ├── format-on-edit.sh           # PostToolUse: prettier/ruff/gofmt/rustfmt (skip nếu file ngoài project)
 │   └── test-bash-guard.sh          # Regression test 97 case (dev-only, có thể xóa)
-└── templates/                      # Template COPY vào TỪNG project mới
+└── templates/                      # Template COPY vào TỪNG project / skill mới
     ├── project-CLAUDE.md           # → <project>/CLAUDE.md
     ├── project-CLAUDE.local.md     # → <project>/CLAUDE.local.md
     ├── project-settings.json       # → <project>/.claude/settings.json
     ├── project-mcp.json            # → <project>/.mcp.json
-    └── HANDOFF.md                  # → <project>/.claude/HANDOFF.md (gitignored)
+    ├── HANDOFF.md                  # → <project>/.claude/HANDOFF.md (gitignored)
+    └── skill-evals.json            # → <skill>/evals/evals.json (eval-driven optimize)
 ```
 
 **Baseline tokens** — đo thực tế bằng `/context` (Opus 4.7 1M context, snapshot session start):
@@ -392,6 +393,28 @@ Verify hook coverage tại máy bạn:
 ```bash
 bash ~/.claude/hooks/test-bash-guard.sh    # Expect: Total 97, PASS 97, FAIL 0
 ```
+
+### 7.4 Eval-driven skill optimization (optional)
+
+Sau khi dùng skills 1 thời gian, có thể measure xem description trigger có chính xác / output có quality không. Theo [agentskills.io/skill-creation/evaluating-skills](https://agentskills.io/skill-creation/evaluating-skills):
+
+**Workflow 5 bước:**
+1. **Tạo test cases** — `<skill>/evals/evals.json` với prompt + expected_output + assertions. Template sẵn ở `templates/skill-evals.json`.
+2. **Run dual** — mỗi prompt chạy 2 lần: với skill và baseline (no skill / version cũ). Subagent isolation để clean context.
+3. **Grade** — assertion check qua LLM hoặc script. Output `grading.json` với pass/fail + evidence.
+4. **Aggregate** — `benchmark.json` summary tokens/duration/pass rate. Compute delta with-vs-without skill.
+5. **Iterate** — feed eval signals + current SKILL.md vào LLM, ask propose changes. Rerun.
+
+**Khi nào nên eval:**
+- Skill **không trigger** đúng prompt user kỳ vọng (vd: nói "review code" mà `/code-review` không invoke)
+- Output **inconsistent** giữa các run (cùng prompt, kết quả khác nhau)
+- Muốn so sánh skill mới vs version cũ trước khi merge
+
+**Tools:**
+- `skill-creator` skill từ [anthropics/skills](https://github.com/anthropics/skills/tree/main/skills/skill-creator) — automate eval loop end-to-end (split train/validation, parallel runs, propose improvements).
+- Manual: copy `templates/skill-evals.json` → `<skill>/evals/evals.json`, customize, run thủ công.
+
+**Lưu ý**: eval chi tiết cần Claude Code session thực với log + multiple runs (model nondeterministic). Đây là tooling NÂNG CAO — không bắt buộc cho usage cơ bản.
 
 ## 8. Tài liệu tham khảo
 

@@ -1,0 +1,43 @@
+{
+  "_comment": "Template eval cho skill — copy vào <skill-name>/evals/evals.json khi cần measure trigger rate / output quality. Spec: https://agentskills.io/skill-creation/evaluating-skills",
+  "skill_name": "your-skill-name",
+  "evals": [
+    {
+      "id": "trigger-explicit",
+      "_note": "Should-trigger: prompt nói rõ tên domain skill (vd: 'review code')",
+      "prompt": "Review code thay đổi trong PR này",
+      "expected_output": "Phân tích 6 góc nhìn (correctness/security/performance/...) với file:line cụ thể",
+      "files": [],
+      "assertions": [
+        "Output liệt kê ít nhất 3 góc nhìn",
+        "Mỗi finding có file path + line number",
+        "Có suggestion fix cụ thể, không chỉ chê"
+      ],
+      "should_trigger": true
+    },
+    {
+      "id": "trigger-implicit",
+      "_note": "Should-trigger: prompt không nói tên skill nhưng intent rõ",
+      "prompt": "Có gì sai sót trong commit gần nhất không?",
+      "expected_output": "Tương tự — review changes",
+      "files": [],
+      "assertions": [
+        "Skill /code-review được invoke",
+        "Output có cấu trúc review chuẩn"
+      ],
+      "should_trigger": true
+    },
+    {
+      "id": "should-not-trigger",
+      "_note": "Near-miss: keyword trùng nhưng task khác (vd: nói 'review' nhưng để hỏi về document)",
+      "prompt": "Review giúp tôi tài liệu README này có gì sai không",
+      "expected_output": "Đọc README, không invoke /code-review (vì là docs, không phải code)",
+      "files": [],
+      "assertions": [
+        "Skill /code-review KHÔNG được invoke",
+        "Claude trả lời như task đọc tài liệu thông thường"
+      ],
+      "should_trigger": false
+    }
+  ]
+}
