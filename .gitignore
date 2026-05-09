@@ -2,6 +2,28 @@
 .credentials.json
 mcp-needs-auth-cache.json
 
+# Secrets — defense-in-depth (pre-commit detect-private-key + permissions deny là các layer khác)
+.env
+.env.*
+!.env.example
+*.env
+*.key
+*.pem
+*.p12
+*.jks
+*.pfx
+id_rsa*
+id_ed25519*
+id_ecdsa*
+credentials.json
+service-account*.json
+serviceAccount*.json
+firebase-adminsdk*.json
+gcp-key*.json
+.aws/
+.netrc
+.npmrc
+
 # Session & history data
 history.jsonl
 projects/
