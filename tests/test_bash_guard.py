@@ -199,3 +199,69 @@ class TestCheckCommand:
         # .env trong SENSITIVE_PATH_PATTERNS — block via sensitive_path check
         blocked, reason = bash_guard.check_command("cat .env")
         assert blocked is True
+
+
+# ---------- main() JSON parsing ----------
+
+
+class TestMain:
+    def _run_main(self, bash_guard, stdin_data: str):
+        import io
+
+        captured_exit = None
+        captured_stderr = io.StringIO()
+
+        def fake_exit(code):
+            nonlocal captured_exit
+            captured_exit = code
+            raise SystemExit(code)
+
+        import unittest.mock as mock
+
+        with (
+            mock.patch("sys.stdin", io.StringIO(stdin_data)),
+            mock.patch("sys.stderr", captured_stderr),
+            mock.patch("sys.exit", fake_exit),
+        ):
+            try:
+                bash_guard.main()
+            except SystemExit:
+                pass
+        return captured_exit, captured_stderr.getvalue()
+
+    def test_empty_stdin(self, bash_guard):
+        code, _ = self._run_main(bash_guard, "")
+        assert code == 0
+
+    def test_malformed_json(self, bash_guard):
+        code, _ = self._run_main(bash_guard, "{not valid json")
+        assert code == 0
+
+    def test_missing_tool_input(self, bash_guard):
+        code, _ = self._run_main(bash_guard, '{"other": "field"}')
+        assert code == 0
+
+    def test_empty_command(self, bash_guard):
+        code, _ = self._run_main(bash_guard, '{"tool_input": {"command": ""}}')
+        assert code == 0
+
+    def test_safe_command_passes(self, bash_guard):
+        code, _ = self._run_main(
+            bash_guard, '{"tool_input": {"command": "git status"}}'
+        )
+        assert code == 0
+
+    def test_dangerous_command_blocked(self, bash_guard):
+        code, stderr = self._run_main(
+            bash_guard, '{"tool_input": {"command": "rm -rf /"}}'
+        )
+        assert code == 2
+        assert "BLOCKED" in stderr
+
+    def test_whitespace_only_stdin(self, bash_guard):
+        code, _ = self._run_main(bash_guard, "   \n\t  ")
+        assert code == 0
+
+    def test_nested_json_no_command(self, bash_guard):
+        code, _ = self._run_main(bash_guard, '{"tool_input": {"file_path": "/tmp/x"}}')
+        assert code == 0
