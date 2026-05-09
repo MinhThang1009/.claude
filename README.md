@@ -315,7 +315,7 @@ Cao → thấp khi xung đột:
 
 ### Cấp 3 — Compact thông minh
 
-- Theo dõi `/context` — sweet spot 30-40%, "dumb zone" 40-60%, action ở 60% (theo Boris Cherny, Claude Code lead).
+- Theo dõi `/context` — sweet spot 30-40%, "dumb zone" 40-60%, action ở 60%. Source: [Dex Horthy — MLOps Community](https://youtu.be/YwZR6tc7qYg?t=1541) (thresholds + "dumb zone"), [Thariq via howborisusesclaudecode.com](https://howborisusesclaudecode.com/) (1M model), [Boris Cherny X tweet](https://x.com/bcherny/status/1977163445205450783) (155k auto-compact). Trích dẫn đầy đủ tại [docs/REFERENCE.md §16](docs/REFERENCE.md#16-quản-lý-context-window--chi-tiết).
 - Kết thúc 1 phase công việc → `/compact` ngay (đừng đợi auto-compact ~77% / 155k tokens).
 - `/compact <chỉ thị>` để hướng (vd: `giữ phần API, drop test debug`).
 - "Compact Instructions" trong CLAUDE.md để hướng auto-compact (đã có sẵn trong template).

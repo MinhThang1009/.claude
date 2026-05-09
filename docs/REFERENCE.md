@@ -84,14 +84,16 @@
     - [15.10 Quyết định multi-agent vs single-agent](#1510-quyết-định-multi-agent-vs-single-agent)
 16. [Quản lý context window — chi tiết](#16-quản-lý-context-window--chi-tiết)
     - [16.1 Tầm quan trọng](#161-tầm-quan-trọng)
-    - [16.2 Ngưỡng hành động](#162-ngưỡng-hành-động)
-    - [16.3 `/compact` vs `/clear`](#163-compact-vs-clear)
-    - [16.4 Customize compaction](#164-customize-compaction)
-    - [16.5 Giảm baseline (token cố định mỗi session)](#165-giảm-baseline-token-cố-định-mỗi-session)
-    - [16.6 Giảm runtime (token tích lũy trong session)](#166-giảm-runtime-token-tích-lũy-trong-session)
-    - [16.7 Phân tích token usage](#167-phân-tích-token-usage)
-    - [16.8 Prompt caching (auto trong Claude Code)](#168-prompt-caching-auto-trong-claude-code)
-    - [16.9 Quy tắc survive sau `/compact`](#169-quy-tắc-survive-sau-compact)
+    - [16.2 Ngưỡng hành động (200k window)](#162-ngưỡng-hành-động-200k-window)
+    - [16.3 Compact threshold theo task complexity](#163-compact-threshold-theo-task-complexity)
+    - [16.4 Ngưỡng cho 1M context window (Opus 4.6+ với 1M mode)](#164-ngưỡng-cho-1m-context-window-opus-46-với-1m-mode)
+    - [16.5 `/compact` vs `/clear`](#165-compact-vs-clear)
+    - [16.6 Customize compaction](#166-customize-compaction)
+    - [16.7 Giảm baseline (token cố định mỗi session)](#167-giảm-baseline-token-cố-định-mỗi-session)
+    - [16.8 Giảm runtime (token tích lũy trong session)](#168-giảm-runtime-token-tích-lũy-trong-session)
+    - [16.9 Phân tích token usage](#169-phân-tích-token-usage)
+    - [16.10 Prompt caching (auto trong Claude Code)](#1610-prompt-caching-auto-trong-claude-code)
+    - [16.11 Quy tắc survive sau `/compact`](#1611-quy-tắc-survive-sau-compact)
 17. [Session management & handoff](#17-session-management--handoff)
     - [17.1 Lựa chọn `/compact` vs `/clear` vs `/handoff`](#171-lựa-chọn-compact-vs-clear-vs-handoff)
     - [17.2 Anti-pattern resume long session](#172-anti-pattern-resume-long-session)
@@ -1547,29 +1549,55 @@ Default: **single-agent**. Multi-agent (subagent / `/batch`) tốn **3-10× toke
 
 ## 16. Quản lý context window — chi tiết
 
-> Source: [code.claude.com/docs/en/memory](https://code.claude.com/docs/en/memory) + [platform.claude.com/docs/en/build-with-claude/prompt-caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching) (qualitative). Ngưỡng % cụ thể từ [Boris Cherny — Anthropic Claude Code lead](https://howborisusesclaudecode.com/) + [tweet xác nhận auto-compact 155k tokens](https://x.com/bcherny/status/1977163445205450783).
+> **Source chính thức (Anthropic, qualitative)**: [code.claude.com/docs/en/memory](https://code.claude.com/docs/en/memory) + [platform.claude.com/docs/en/build-with-claude/prompt-caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching). Anthropic KHÔNG publish % cụ thể; chỉ describe behavior ("approach context limits").
+>
+> **Ngưỡng % cụ thể (community-curated, multi-author — verified 2026-05-09)**:
+>
+> | Item | Source thực | Link |
+> |------|-------------|------|
+> | `<30/<40/60%` + thuật ngữ "dumb zone" | **Dex Horthy** (HumanLayer, MLOps Community presentation, 2026-03-24) | [youtu.be/YwZR6tc7qYg?t=1541](https://youtu.be/YwZR6tc7qYg?t=1541) |
+> | `300-400k tokens` context rot zone (1M model) | **Thariq Shihipar** (Anthropic Claude Code team, 2026-04-16) | curated tại [howborisusesclaudecode.com](https://howborisusesclaudecode.com/) |
+> | `155k tokens` auto-compact (200k window) | **Boris Cherny** (Anthropic Claude Code lead) | [X tweet 2025-10](https://x.com/bcherny/status/1977163445205450783) |
+> | Compact threshold theo task complexity (50% complex / 70% simple) | **claude-codex.fr** | [claude-codex.fr/en/prompting/context-rot](https://claude-codex.fr/en/prompting/context-rot/) |
+> | Reaffirm 40% rule độc lập | **Justin Smith** (LinkedIn article, 2026-03-05) | [linkedin.com/pulse/40-rule-...](https://www.linkedin.com/pulse/40-rule-beating-claudes-dumb-zone-large-codebases-justin-smith-jlffc) |
+> | Aggregator | **Boris + Anthropic Claude Code team** | [howborisusesclaudecode.com](https://howborisusesclaudecode.com/) |
 
 
 ### 16.1 Tầm quan trọng
 
-Mọi best practice xoay quanh 1 ràng buộc: **context window đầy nhanh, performance giảm khi đầy**. Mỗi message re-read toàn bộ history → cost grow exponential trong agentic session. Boris Cherny (Anthropic Claude Code lead) gọi vùng `>40%` là **"dumb zone"** — performance bắt đầu degrade rõ rệt. Boris cũng giữ CLAUDE.md ~2,500 tokens.
+Mọi best practice xoay quanh 1 ràng buộc: **context window đầy nhanh, performance giảm trước khi đầy**. Mỗi message re-read toàn bộ history → cost grow exponential trong agentic session. Dex Horthy ([MLOps Community video](https://youtu.be/YwZR6tc7qYg?t=1541)) gọi vùng `>40%` là **"dumb zone"** — performance degrade dù chưa đụng hard limit. Boris Cherny giữ `~/.claude/CLAUDE.md` ~76 tokens và project `CLAUDE.md` ~4k tokens (theo [howborisusesclaudecode.com](https://howborisusesclaudecode.com/)).
 
-### 16.2 Ngưỡng hành động
+### 16.2 Ngưỡng hành động (200k window)
 
-> Ngưỡng % dưới đây là khuyến nghị từ [Boris Cherny](https://howborisusesclaudecode.com/) — creator của Claude Code. Anthropic không publish % chính thức trong docs, chỉ describe behavior qualitatively ("approach context limits"). Auto-compact 155k tokens (~77.5% của 200k window) được Boris xác nhận trên [X](https://x.com/bcherny/status/1977163445205450783).
+> Ngưỡng dưới đây là **community best-practice từ multi-author** (Dex Horthy, Thariq Shihipar, Boris Cherny). Xem table source ở §16 đầu mục.
 
-| % context (200k window)     | Trạng thái                          | Hành động                                                              |
-| --------------------------- | ----------------------------------- | ---------------------------------------------------------------------- |
-| `<30%`                      | 🟢 Aggressive zone                  | Mục tiêu cho experienced users — push lên 60% chỉ với task đơn giản    |
-| `30-40%`                    | 🟢 Sweet spot                       | Mục tiêu cho newcomer — Boris recommend "shoot to keep it under 40%"   |
-| `40-60%`                    | 🟡 "Dumb zone" bắt đầu              | Performance degrade rõ rệt — plan wrap-up, finalize phase hiện tại     |
-| `60-77%`                    | 🟠 Wrap up actively                 | "If you get up to 60%, think about wrapping it up" → `/compact` hoặc `/handoff + /clear` |
-| `~77%` (155k tokens)        | 🔴 Auto-compact firing              | Claude Code tự động compact để giữ buffer — chất lượng đã giảm rồi      |
-| `>90%`                      | ⛔ Hard limit                        | Có thể stop processing, phải `/clear` thủ công                          |
+| % context (200k window)     | Trạng thái                          | Hành động                                                                              | Source |
+| --------------------------- | ----------------------------------- | -------------------------------------------------------------------------------------- | ------ |
+| `<30%`                      | 🟢 Aggressive zone                  | Mục tiêu cho experienced users — "aggressively keep it below 30%, push 60% chỉ task đơn giản" | Dex   |
+| `30-40%`                    | 🟢 Sweet spot                       | Mục tiêu cho newcomer — "shoot to keep it under 40%"                                   | Dex   |
+| `40-60%`                    | 🟡 "Dumb zone" bắt đầu              | Performance degrade rõ rệt — plan wrap-up, finalize phase hiện tại                     | Dex   |
+| `60-77%`                    | 🟠 Wrap up actively                 | "If you get up to 60%, think about wrapping it up" → `/compact` hoặc `/handoff + /clear` | Dex   |
+| `~77%` (155k tokens)        | 🔴 Auto-compact firing              | Claude Code tự động compact để giữ buffer — chất lượng đã giảm rồi                     | Boris X |
+| `>90%`                      | ⛔ Hard limit                        | Có thể stop processing, phải `/clear` thủ công                                          | qualitative |
 
-**Ghi chú cho 1M context window** (Opus 4.6+ với 1M mode): Boris recommend `CLAUDE_CODE_AUTO_COMPACT_WINDOW=400000` — vùng "context rot" ~300-400k tokens (30-40% của 1M). Tỷ lệ % không đổi nhiều giữa 200k và 1M model — vẫn nên target <40%.
+### 16.3 Compact threshold theo task complexity
 
-### 16.3 `/compact` vs `/clear`
+> Source: [claude-codex.fr/en/prompting/context-rot](https://claude-codex.fr/en/prompting/context-rot/) — nuance bổ sung cho table §16.2 ở trên (split theo task complexity, không chỉ user level).
+
+| Task type                      | Proactive compact tại |
+| ------------------------------ | --------------------- |
+| Complex task (multi-file refactor, debug nhiều file) | **50% fill** — compact sớm để giữ chi tiết |
+| Simple task (single-file edit, tweak nhỏ)            | **70% fill** — có thể đẩy lâu hơn         |
+
+### 16.4 Ngưỡng cho 1M context window (Opus 4.6+ với 1M mode)
+
+> Source: [Thariq via howborisusesclaudecode.com](https://howborisusesclaudecode.com/) — "context rot kicks in around ~300-400k tokens on the 1M context model".
+
+- **Vùng "context rot"**: 300-400k tokens (30-40% của 1M) — đừng để session drift quá ngưỡng này cho intelligence-sensitive work.
+- **Recommended override**: `CLAUDE_CODE_AUTO_COMPACT_WINDOW=400000` (Thariq's compromise, reshare bởi Boris).
+- **Tỷ lệ % không đổi**: vẫn target <40% kể cả với 1M model. Window lớn không nghĩa quality scale linearly — xem [Justin Smith on LinkedIn](https://www.linkedin.com/pulse/40-rule-beating-claudes-dumb-zone-large-codebases-justin-smith-jlffc) reaffirm độc lập.
+
+### 16.5 `/compact` vs `/clear`
 
 | `/compact`                           | `/clear`                          |
 | ------------------------------------ | --------------------------------- |
@@ -1578,7 +1606,7 @@ Mọi best practice xoay quanh 1 ràng buộc: **context window đầy nhanh, pe
 | Lossy nhưng có thread                | Sạch hoàn toàn                    |
 | Có thể `/compact <chỉ thị>` để hướng | Không nén, viết lại brief         |
 
-### 16.4 Customize compaction
+### 16.6 Customize compaction
 
 Thêm vào `CLAUDE.md`:
 ```markdown
@@ -1593,7 +1621,7 @@ Bỏ: tool output dài, dead-end debugging.
 
 Hoặc gọi runtime: `/compact tập trung phần auth, drop test debugging`.
 
-### 16.5 Giảm baseline (token cố định mỗi session)
+### 16.7 Giảm baseline (token cố định mỗi session)
 
 | Nhóm                                       | Giảm bằng cách                                                                               |
 | ------------------------------------------ | -------------------------------------------------------------------------------------------- |
@@ -1606,7 +1634,7 @@ Hoặc gọi runtime: `/compact tập trung phần auth, drop test debugging`.
 | `--bare` flag                              | Skip auto-discovery cho script (hooks, skills, plugins, MCP, CLAUDE.md)                      |
 | `--exclude-dynamic-system-prompt-sections` | Move per-machine sections → cải thiện prompt-cache                                           |
 
-### 16.6 Giảm runtime (token tích lũy trong session)
+### 16.8 Giảm runtime (token tích lũy trong session)
 
 - **`/clear` aggressive** giữa task không liên quan.
 - **Subagent** cho investigation rộng (`use a subagent to ...`) — context riêng, return summary.
@@ -1620,7 +1648,7 @@ Hoặc gọi runtime: `/compact tập trung phần auth, drop test debugging`.
   npm test > /tmp/test.log 2>&1; tail -50 /tmp/test.log
   ```
 
-### 16.7 Phân tích token usage
+### 16.9 Phân tích token usage
 
 ```text
 /context
@@ -1634,7 +1662,7 @@ Output breakdown:
 
 Mỗi nhóm chiếm % rõ ràng — fix nhóm > 15% trước.
 
-### 16.8 Prompt caching (auto trong Claude Code)
+### 16.10 Prompt caching (auto trong Claude Code)
 
 Claude Code dùng prompt caching tự động để giảm cost cho conversation dài. Cache prefix giống nhau giữa các turn → read **0.1× giá input** thay vì full price. Cache TTL mặc định 5 phút (sliding window — refresh mỗi lần dùng).
 
@@ -1663,7 +1691,7 @@ Claude Code dùng prompt caching tự động để giảm cost cho conversation
 - Reorder hoặc inject content vào giữa system prompt.
 - Compact xong → cache phải build lại từ đầu.
 
-### 16.9 Quy tắc survive sau `/compact`
+### 16.11 Quy tắc survive sau `/compact`
 
 - **Survive**: project-root CLAUDE.md (re-read từ disk), auto memory (re-injected từ disk; MEMORY.md cap 200 dòng/25KB lúc load)
 - **Survive (capped)**: skills đã invoke — re-attach sau summary, mỗi skill giữ **5,000 token đầu**, tổng **25,000 token** (oldest dropped first)

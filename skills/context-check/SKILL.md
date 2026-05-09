@@ -21,7 +21,11 @@ Sau khi user gửi output `/context`, phân tích theo các bước dưới.
 
 ### Bước 2 — Phân tích theo ngưỡng
 
-> Ngưỡng từ [Boris Cherny — Anthropic Claude Code lead](https://howborisusesclaudecode.com/). Anthropic không publish % chính thức; auto-compact 155k tokens (~77.5%) được Boris xác nhận trên [X](https://x.com/bcherny/status/1977163445205450783).
+> Source ngưỡng % (multi-author, verified):
+> - `<30/<40/60%` + "dumb zone": [Dex Horthy at MLOps Community](https://youtu.be/YwZR6tc7qYg?t=1541) (2026-03-24)
+> - `300-400k tokens` context rot (1M model): Thariq Shihipar (Anthropic Claude Code team) via [howborisusesclaudecode.com](https://howborisusesclaudecode.com/)
+> - `155k tokens` auto-compact (200k window): [Boris Cherny X tweet](https://x.com/bcherny/status/1977163445205450783)
+> - Trích dẫn đầy đủ + nuance theo task complexity: [docs/REFERENCE.md §16](../../docs/REFERENCE.md#16-quản-lý-context-window--chi-tiết). Anthropic không publish % chính thức.
 
 | % context | Trạng thái                          | Hành động đề xuất                                                        |
 | --------- | ----------------------------------- | ------------------------------------------------------------------------ |
