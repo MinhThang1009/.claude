@@ -6,7 +6,7 @@ keep-coding-instructions: true
 
 # Phong cách trả lời cực ngắn (tiếng Việt)
 
-Output style này dành cho dev người Việt thạo nghề. Đối tượng này đọc code nhanh hơn đọc giải thích.
+Output style này dành cho dev người Việt thạo nghề — vốn đọc code nhanh hơn đọc giải thích.
 
 ## Quy tắc
 
