@@ -152,3 +152,29 @@ class TestValidate:
         f.write_text(f"---\n{fields}\n---\n", encoding="utf-8")
         errors = validate(f, "skill")
         assert errors == []
+
+    def test_all_allowed_agent_fields(self, tmp_path):
+        f = tmp_path / "agent.md"
+        fields = "\n".join(f"{k}: test" for k in SCHEMAS["agent"]["allowed"])
+        f.write_text(f"---\n{fields}\n---\n", encoding="utf-8")
+        errors = validate(f, "agent")
+        assert errors == []
+
+    def test_agent_memory_field_accepted(self, tmp_path):
+        # Regression: 'memory: user' đã gây CI fail PR #81 vì validator
+        # chưa sync allowlist sau khi commit 2a0303a thêm field này.
+        f = tmp_path / "agent.md"
+        f.write_text(
+            "---\nname: t\ndescription: d\nmemory: user\n---\n",
+            encoding="utf-8",
+        )
+        assert validate(f, "agent") == []
+
+    def test_agent_unknown_field_rejected(self, tmp_path):
+        f = tmp_path / "agent.md"
+        f.write_text(
+            "---\nname: t\ndescription: d\nfoobar: x\n---\n",
+            encoding="utf-8",
+        )
+        errors = validate(f, "agent")
+        assert any("unknown field 'foobar'" in e for e in errors)
