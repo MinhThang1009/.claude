@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Câu hỏi sử dụng / thảo luận
-    url: https://github.com/MinhThang1009/dotclaude/discussions
-    about: Hỏi về cách dùng, share workflow, thảo luận tính năng → mở Discussion thay vì Issue
+  - name: Báo lỗi dotclaude config
+    url: https://github.com/MinhThang1009/dotclaude/issues/new/choose
+    about: Bug trong config, hooks, skills, docs → mở Issue với template phù hợp
   - name: Báo cáo lỗ hổng bảo mật nghiêm trọng
     url: https://github.com/MinhThang1009/dotclaude/security/advisories/new
     about: RCE, command injection bypass, secret exfiltration → Private Vulnerability Reporting (KHÔNG public issue)

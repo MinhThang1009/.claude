@@ -129,10 +129,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run actionlint
-        run: |
-          bash <(curl -sSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
-          ./actionlint -color
+      - uses: rhysd/actionlint@v1
+        with:
+          color: true
 
   frontmatter-validate:
     name: Frontmatter schema (skills/agents/output-styles)

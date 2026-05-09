@@ -32,6 +32,26 @@ CI/automation gaps fix theo Phase 5 audit (sync với main commit `dd2015b`):
 - `.markdownlint-cli2.jsonc` — markdownlint config (disable cosmetic rules cho Vietnamese-prose).
 - `scripts/validate-frontmatter.py` — schema validate cho `plugins/dotclaude/{skills,agents,output-styles}` (path đã adapt).
 
+### Added (post-audit sync — 2026-05-10)
+
+- `recommended-settings.json`: bổ sung 22 fields theo Anthropic docs official, thêm `$schema`, xóa comment keys (100% conform).
+- `.github/workflows/ci.yml`: thêm `windows-latest` vào hook-tests matrix (3 OS), external link checker scheduled, JSON schema validation job.
+- `tests/`: thêm pytest suite cho hooks + EditorConfig + CODEOWNERS + dependency-review. `conftest.py` auto-detect hooks path cho branch portability.
+- `.github/workflows/ci.yml` (actionlint): chuyển từ `curl | bash` sang `rhysd/actionlint@v1` GitHub Action.
+
+### Fixed (post-audit sync — 2026-05-10)
+
+- `plugins/dotclaude/hooks/hooks.json`: "19 attack vectors" → "8" (sync với plugin.json fix).
+- `plugins/dotclaude/hooks/bash-guard.py`: thêm `sys.stderr.reconfigure(encoding="utf-8")` cho Windows cp1252.
+- `docs/REFERENCE.md:225`: "Max / Team Premium" → "Max / Team plan".
+- `docs/REFERENCE.md:1955`: `docs.anthropic.com/llms.txt` → `platform.claude.com/docs/llms.txt`.
+- `docs/INTRODUCTION.md:14`: "~2050 dòng" → "~2052 dòng".
+- `.github/CONTRIBUTING.md:60`: "2 jobs" → "3 jobs" (Windows matrix).
+- `.github/ISSUE_TEMPLATE/config.yml`: xóa Discussions link 404, thay bằng Issues link.
+- 8 code blocks thiếu language tag → thêm `text` (README, SECURITY, AUDIT).
+- `tests/test_statusline.py:13`: xóa unused `import sys`.
+- `plugins/dotclaude/hooks/test-bash-guard.sh:15`: `[ $code -eq 2 ]` → `[[ $code -eq 2 ]]`.
+
 ### Changed
 
 Đồng bộ với main branch round 7:

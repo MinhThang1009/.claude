@@ -11,7 +11,7 @@ Cấu hình global ready-to-use cho Claude Code. Tiếng Việt cho comment/comm
 - **3 hook deterministic**: chặn `rm -rf` / fork bomb / `dd`, auto-format đa ngôn ngữ, hiển thị git status đầu session
 - **Permission rules** deny secrets (`.env`, `*.key`, `*.pem`) và lệnh nguy hiểm
 - **6 template** project sẵn dùng ([`CLAUDE.md`](../templates/project-CLAUDE.md), [`settings.json`](../templates/project-settings.json), [`.mcp.json`](../templates/project-mcp.json), [`HANDOFF.md`](../templates/HANDOFF.md), [`CLAUDE.local.md`](../templates/project-CLAUDE.local.md), [`skill-evals.json`](../templates/skill-evals.json))
-- [**REFERENCE.md**](REFERENCE.md) cheatsheet ~2050 dòng tổng hợp slash command, hook, env var
+- [**REFERENCE.md**](REFERENCE.md) cheatsheet ~2052 dòng tổng hợp slash command, hook, env var
 
 ## 🛠️ Cài đặt (3 bước)
 

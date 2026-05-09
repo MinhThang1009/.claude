@@ -1,5 +1,5 @@
 {
-  "description": "Security hooks: PreToolUse Bash guard (chặn 19 attack vectors), PostToolUse format-on-edit (prettier/ruff/gofmt/rustfmt với security hardening), SessionStart git status (sandboxed against repo poisoning).",
+  "description": "Security hooks: PreToolUse Bash guard (chặn 8 attack vectors), PostToolUse format-on-edit (prettier/ruff/gofmt/rustfmt với security hardening), SessionStart git status (sandboxed against repo poisoning).",
   "hooks": {
     "PreToolUse": [
       {

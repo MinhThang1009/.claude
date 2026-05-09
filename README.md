@@ -30,7 +30,7 @@ Muscle memory **sẽ break**. Cân nhắc trước khi switch.
 
 Lấy commit SHA mới nhất từ [GitHub branch](https://github.com/MinhThang1009/dotclaude/tree/plugin-experiment/v1):
 
-```
+```text
 /plugin marketplace add https://github.com/MinhThang1009/dotclaude.git#<COMMIT_SHA>
 /plugin install dotclaude@dotclaude-marketplace
 /reload-plugins
@@ -38,7 +38,7 @@ Lấy commit SHA mới nhất từ [GitHub branch](https://github.com/MinhThang1
 
 ### Quick (less secure, dev/test only)
 
-```
+```text
 /plugin marketplace add MinhThang1009/dotclaude
 /plugin install dotclaude@dotclaude-marketplace
 /reload-plugins
@@ -136,17 +136,17 @@ python -c "import json; json.load(open('$HOME/.claude/settings.json', encoding='
 ```
 
 Trong session Claude Code:
-```
+```text
 /permissions
 ```
 → Verify deny rules có `.env`, `*.pem`, `~/.aws/credentials`, `Bash(rm -rf /*)`, `Bash(nc:*)`, etc.
 
-```
+```text
 /skills
 ```
 → List skills `dotclaude:*`
 
-```
+```text
 /agents
 ```
 → List 4 agents `dotclaude:*`
@@ -185,20 +185,27 @@ plugins/dotclaude/
 
 ## Uninstall
 
-```
+```text
 /plugin uninstall dotclaude@dotclaude-marketplace
 /plugin marketplace remove dotclaude-marketplace
 ```
 
 ⚠️ **Manual cleanup required** — uninstall plugin **KHÔNG** clean migration files đã copy:
 
+**macOS / Linux (bash):**
+
 ```bash
-# Xóa migration files (giữ phần custom nếu có)
 rm ~/.claude/CLAUDE.md
 rm -rf ~/.claude/rules ~/.claude/references
-
-# Restore backup nếu cần
 mv ~/.claude.backup-<DATE> ~/.claude
+```
+
+**Windows (PowerShell):**
+
+```powershell
+Remove-Item "$env:USERPROFILE\.claude\CLAUDE.md"
+Remove-Item -Recurse "$env:USERPROFILE\.claude\rules", "$env:USERPROFILE\.claude\references"
+Move-Item "$env:USERPROFILE\.claude.backup-<DATE>" "$env:USERPROFILE\.claude"
 ```
 
 ## Verify hook coverage tại máy local (post-install)
@@ -216,6 +223,14 @@ bash ~/.claude/plugins/cache/<hash>/plugins/dotclaude/hooks/test-bash-guard.sh
 - [MIGRATION-RULES/](./MIGRATION-RULES/) — auto-import rules
 - [MIGRATION-REFERENCES/](./MIGRATION-REFERENCES/) — @-reference docs
 - Branch `main` — user-config repo gốc (full security, no migration needed)
+
+## Đóng góp
+
+Xem [CONTRIBUTING.md](./.github/CONTRIBUTING.md) để biết quy trình PR, coding style, và cách chạy CI local.
+
+## License
+
+[MIT](./LICENSE) — Copyright 2026 MinhThang1009.
 
 ## Tài liệu Anthropic tham khảo
 

@@ -36,7 +36,7 @@ Risks:
 **MITIGATION**:
 
 Recommended install bằng commit SHA pinned:
-```
+```text
 /plugin marketplace add https://github.com/MinhThang1009/dotclaude.git#<COMMIT_SHA>
 ```
 
