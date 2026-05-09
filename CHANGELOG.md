@@ -34,7 +34,7 @@ Format theo [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/), tuâ
 - `templates/project-mcp.json` — xóa broken `$schema` URL (json.schemastore.org/mcp.json 404).
 - `README.md` + `REFERENCE.md` — thêm verify date `2026-05-09` + disclaimer.
 - `REFERENCE.md` — fix version-gating list (5 fix sau cross-check raw CHANGELOG anthropics/claude-code), bỏ mention `coding-standards.md`/`git-workflow.md` plain-text → markdown links.
-- `INTRODUCTION.md` — thêm markdown links cho 5 template + 7 skill + 4 agent.
+- `INTRODUCTION.md` — thêm markdown links cho 6 template + 7 skill + 4 agent.
 
 ### Fixed
 
@@ -46,6 +46,11 @@ Format theo [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/), tuâ
 - 4 version-gating sai sau verify CHANGELOG: skills system v2.1.0 → v2.0.20, output styles v2.1.101 → v1.0.81, etc.
 - Soften env vars unverified specific values (`CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` 95% → "~95%, verify với env docs").
 - 3 broken external URL fix: `keepachangelog.com/vi/1.1.0/` → `/en/1.1.0/`; remove `$schema: json.schemastore.org/claude-code-settings.json` (404, similar to mcp.json earlier).
+- Stale numbers / counts trong docs:
+  - `README.md`: CLAUDE.md "~88 dòng" → "~90 dòng" (actual); test-bash-guard "97 case" → "119 case" (3 chỗ); REFERENCE byte size "~158k chars" → "~159k chars".
+  - `INTRODUCTION.md`: "5 template" → "6 template" (thêm `skill-evals.json` vào list).
+  - `CONTRIBUTING.md`: CI "6 jobs" → "9 jobs" (matrix Ubuntu+macOS + actionlint + frontmatter validate); fix duplicate `4.` numbering.
+  - `REFERENCE.md`: byte size "158KB" → "~159KB"; auto-compact env var "default 95%" → "~95%, verify với env docs".
 
 ### Security
 
