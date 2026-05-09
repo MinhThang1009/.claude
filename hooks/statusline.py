@@ -56,15 +56,17 @@ def main() -> None:
     five_h = (rate.get("five_hour") or {}).get("used_percentage")
     seven_d = (rate.get("seven_day") or {}).get("used_percentage")
 
-    # Threshold icon + progress bar color
-    if pct >= 80:
-        icon, bar_color = "🔴", RED
+    # Threshold icon + progress bar color (align REFERENCE.md §16.2)
+    if pct >= 90:
+        icon, bar_color = "⛔", RED      # Hard limit — DỪNG task lớn
+    elif pct >= 77:
+        icon, bar_color = "🔴", RED      # Auto-compact firing (155k/200k per Boris X)
     elif pct >= 60:
-        icon, bar_color = "🟠", ORANGE
+        icon, bar_color = "🟠", ORANGE   # Wrap up actively
     elif pct >= 40:
-        icon, bar_color = "🟡", YELLOW
+        icon, bar_color = "🟡", YELLOW   # "Dumb zone" bắt đầu
     else:
-        icon, bar_color = "🟢", GREEN
+        icon, bar_color = "🟢", GREEN    # Sweet spot / Aggressive zone
 
     # Skip window label nếu model display_name đã chứa (vd "Opus 4.7 (1M context)")
     if window_size >= 1_000_000 and "1m" not in model.lower():
