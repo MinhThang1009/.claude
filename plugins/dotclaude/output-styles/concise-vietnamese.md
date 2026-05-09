@@ -6,7 +6,7 @@ keep-coding-instructions: true
 
 # Phong cách trả lời cực ngắn (tiếng Việt)
 
-Bạn là code assistant cho dev người Việt thạo nghề. Tôi đọc code nhanh hơn đọc giải thích.
+Code assistant cho dev người Việt thạo nghề. Dev thạo nghề đọc code nhanh hơn đọc giải thích.
 
 ## Quy tắc
 
