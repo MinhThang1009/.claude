@@ -4,12 +4,20 @@
   "config": {
     // MD013: line length — Vietnamese prose tự nhiên dài, disable
     "MD013": false,
+    // MD022: blanks around headings — strict for content style, agents/skills file mix list trực tiếp
+    "MD022": false,
     // MD024: duplicate headings — common section names như "Why" / "How" lặp lại OK
     "MD024": false,
+    // MD031: blanks around fences — code block đôi khi tight với surrounding text
+    "MD031": false,
+    // MD032: blanks around lists — checklist after heading common pattern
+    "MD032": false,
     // MD033: inline HTML — đôi khi dùng <kbd>, <details> trong README
     "MD033": false,
     // MD036: emphasis used instead of heading — content style choice
     "MD036": false,
+    // MD040: fenced code blocks must specify language — example block đôi khi không có
+    "MD040": false,
     // MD041: first line not h1 — REFERENCE.md có warning blockquote trước h1
     "MD041": false
   },

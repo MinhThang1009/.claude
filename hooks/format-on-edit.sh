@@ -36,7 +36,7 @@ case "$FILE" in
       # Skip prettier nếu có executable config HOẶC plugin reference trong package.json
       # (RCE risk qua require() khi prettier khởi động).
       # Override: set CLAUDE_FORMAT_TRUST_PRETTIER_CONFIG=1 nếu trust config (vd: monorepo nội bộ)
-      cd "$PROJECT_DIR" 2>/dev/null
+      cd "$PROJECT_DIR" 2>/dev/null || exit 0
       HAS_RISKY_CONFIG=0
       if [ -f .prettierrc.js ] || [ -f .prettierrc.cjs ] || [ -f .prettierrc.mjs ] || \
          [ -f prettier.config.js ] || [ -f prettier.config.cjs ] || [ -f prettier.config.mjs ]; then
