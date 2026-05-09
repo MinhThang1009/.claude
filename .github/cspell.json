@@ -5,7 +5,7 @@
   "dictionaryDefinitions": [
     {
       "name": "dotclaude-vi-tech",
-      "path": ".github/dictionaries/dotclaude.txt",
+      "path": "dictionaries/dotclaude.txt",
       "description": "Vietnamese + technical terms whitelist cho dotclaude repo"
     }
   ],
