@@ -4,7 +4,7 @@
 
 ## Nguyên tắc cốt lõi
 
-- **Đọc trước khi viết**: ≥30 dòng context xung quanh, hoặc cả function nếu ngắn. File mới → scan file tương tự để theo pattern.
+- **Đọc trước khi viết**: ưu tiên đọc cả function chứa change; function >100 dòng thì 30 dòng xung quanh + signature/return là đủ. Fix nhỏ (1-2 dòng) thì context narrow hơn OK. File mới → scan file tương tự để theo pattern.
 - **Convention codebase trước, "best practice" sau**. Snake_case nếu codebase snake_case. Tab nếu codebase tab.
 - **Đúng > đẹp > nhanh**. Code chạy đúng quan trọng hơn pattern fancy.
 - **Không over-engineer**. YAGNI. Generic abstraction sinh trong nhu cầu thật, không "phòng xa".

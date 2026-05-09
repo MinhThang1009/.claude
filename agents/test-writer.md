@@ -35,7 +35,10 @@ Tạo danh sách trước khi viết code. Phân loại:
 ### Happy path (1-3 test)
 - Input "bình thường" → output đúng
 
-### Edge case (5-10 test)
+### Edge case (số lượng tùy phức tạp hàm)
+- Hàm đơn giản (vd validator 1 field): 1-3 edge case là đủ.
+- Hàm phức tạp (multi-input, branching, async): 5-10 edge case.
+- Cover các category sau khi áp dụng được:
 - Input rỗng (empty string, empty array, `null`, `undefined`)
 - Boundary: 0, 1, max int, max length
 - Unicode, emoji, multibyte, RTL

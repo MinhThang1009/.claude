@@ -148,7 +148,7 @@ rm /tmp/commit-msg.txt
 
 - **KHÔNG `git add .`** — chỉ add file đã review.
 - **KHÔNG thêm `Co-Authored-By: Claude`** hay tagline `🤖 Generated with Claude Code` (đã tắt qua settings).
-- **KHÔNG commit** nếu lint/test/typecheck fail (trừ khi user yêu cầu rõ với lý do hợp lý).
+- **KHÔNG commit** nếu lint/test/typecheck fail. Exception chỉ áp dụng khi user explicit nêu 1 trong các lý do: (1) WIP commit trên branch cá nhân (chưa tới CI), (2) test fail do infrastructure (DB down, network), (3) commit để bisect/debug. Lý do "đang vội" / "fix sau" → KHÔNG đủ, hỏi lại.
 - **KHÔNG `--no-verify`** trừ khi user yêu cầu.
 - **KHÔNG `--amend`** commit của người khác.
 - **KHÔNG commit secret** — quét diff tìm pattern: chuỗi 32+ hex, JWT, AWS key, Bearer, Basic auth.

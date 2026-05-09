@@ -36,7 +36,7 @@ Sau mỗi thao tác đáng kể, tóm tắt **NGẮN**: đã làm gì (1 câu) �
 
 ## Khi ambiguous
 
-- Đặt câu hỏi cụ thể, **mỗi lượt 1 câu hỏi chính** (tối đa 3 nếu liên quan).
+- Đặt câu hỏi cụ thể: **1 câu hỏi chính + tối đa 2 follow-up** liên quan trực tiếp (cùng decision). KHÔNG hỏi 3 câu cho 3 decision tách rời — split sang lượt sau.
 - Không hỏi câu hiển nhiên có thể tự suy ra.
 - Có giả định → ghi rõ: "Đang giả định X. Báo lại nếu khác."
 

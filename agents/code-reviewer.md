@@ -74,7 +74,7 @@ KHÔNG review chỉ dựa trên hunk. Đọc:
 
 ### Maintainability (Medium)
 - [ ] Naming rõ ý
-- [ ] Function vừa phải (< 50 dòng là default)
+- [ ] Function size: <50 dòng lý tưởng (suggestion), >100 dòng → đề xuất tách (blocker khi nesting >3 level hoặc nhiều responsibility). Parser/state machine có thể dài hơn — không tự động flag.
 - [ ] Không duplicate logic ở nơi khác (Grep pattern)
 - [ ] Comment giải thích WHY ở chỗ phi-hiển nhiên
 - [ ] Public API có doc

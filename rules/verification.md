@@ -4,8 +4,8 @@
 
 ## Subagent
 
-- Kết quả từ subagent → **verify bằng tool trực tiếp** (grep, đọc file, WebFetch) trước khi báo user. Subagent không thấy parent context (WebFetch results, file reads trước đó) → dễ báo sai.
-- Nếu delegate cross-check → **paste data cần thiết** vào prompt subagent, không assume agent tự tìm.
+- Kết quả từ subagent có **impact** (security finding, action user sẽ thực thi, claim về số liệu/version) → **verify bằng tool trực tiếp** (grep, đọc file, WebFetch) trước khi báo user. Subagent không thấy parent context → dễ báo sai. Summary trivial (vd "đã đọc 5 file, không tìm thấy X") thì có thể skip verify.
+- Data trong parent context (WebFetch, tool output trước, conversation) → **paste subset relevant** vào prompt subagent. Data trên disk + subagent có `Read`/`Grep` → để subagent tự tìm.
 - Không báo findings cho user mà chưa tự confirm ít nhất 1 lần.
 
 ## Git state
@@ -16,4 +16,4 @@
 ## External dependencies
 
 - Dùng GitHub Action / package bên ngoài → **verify tồn tại** (WebFetch check repo/tag) trước khi commit. Không bịa tag version.
-- Sửa file bằng Python script `open(file, 'w')` → **dùng Edit tool** thay vì viết script — tránh vô tình xóa/truncate file.
+- Sửa **1 file** bằng Python script `open(file, 'w')` → **dùng Edit tool** thay vì viết script (tránh vô tình truncate). Batch op (rename N file, mass refactor) → script OK nhưng PHẢI: (1) preview list file affected, (2) backup hoặc git stash trước, (3) chạy với dry-run flag nếu có.

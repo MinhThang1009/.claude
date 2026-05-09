@@ -77,7 +77,7 @@
 | Free space                    | 937,200    | 93.7%     |
 
 **Ghi chú**:
-- Vietnamese tokenize ~2.3 chars/token cho prose (kém hiệu quả hơn English ~4 chars/token); baseline ~29.8k cao hơn config English (~10-15k) là expected.
+- Vietnamese tokenize ~2.3 chars/token cho prose (ước lượng empirical, đo bằng `/context` trên tokenizer Claude — Anthropic không publish ratio chính thức cho từng ngôn ngữ); kém hiệu quả hơn English ~4 chars/token; baseline ~29.8k cao hơn config English (~10-15k) là expected.
 - `rules/verification.md` (491 tokens) auto-load mọi session từ snapshot 2026-05-10 — bổ sung verify cho subagent results, git state, external deps.
 - 2 references còn lại ([`coding-standards.md`](references/coding-standards.md), [`git-workflow.md`](references/git-workflow.md)) chỉ load khi `@`-reference → KHÔNG ăn baseline.
 - Autocompact buffer 33k reserved (không tính vào used) — Claude Code dành chỗ cho compact summary khi context đầy.

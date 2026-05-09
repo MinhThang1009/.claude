@@ -201,7 +201,7 @@
 | Flag                       | Mục đích                                                                                                             |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | `--model <alias\|id>`      | `opus`, `sonnet`, `haiku`, `best`, `opusplan`, `opus[1m]`, `sonnet[1m]`, hoặc full ID (`claude-opus-4-7`) |
-| `--effort <level>`         | `low`, `medium`, `high`, `xhigh`, `max`                                                                              |
+| `--effort <level>`         | `low`, `medium`, `high`, `xhigh`, `max` (Opus 4.7); Opus 4.6/Sonnet 4.6 không có `xhigh`. Xem §6.2.                  |
 | `--fallback-model <alias>` | Fallback khi default overload (chỉ print mode)                                                                       |
 | `--betas <header>`         | Beta header cho API (chỉ API key user)                                                                               |
 
@@ -391,7 +391,7 @@
 | `/skills`                 | List skill có sẵn. `t` sort theo token count, `Space` ẩn skill khỏi Claude/`/`-menu, `Enter` save     |
 | `/agents`                 | Manage subagent (interactive create/edit)                                                             |
 | `/model [model]`          | Đổi model. Mũi tên trái/phải để adjust effort                                                         |
-| `/effort [level]`         | `low`/`medium`/`high`/`xhigh`/`max`/`auto`. `low`/`medium`/`high`/`xhigh` persist; `max` session-only |
+| `/effort [level]`         | `low`/`medium`/`high`/`xhigh`/`max`. `low`/`medium`/`high`/`xhigh` persist; `max` session-only. `/effort auto` (special): reset về model default, không phải level. |
 | `/keybindings`            | Sửa keybindings                                                                                       |
 | `/terminal-setup`         | Cấu hình Shift+Enter cho terminal                                                                     |
 | `/sandbox`                | Toggle sandbox mode                                                                                   |
@@ -591,14 +591,18 @@ MCP server có thể expose prompt thành command: `/mcp__<server>__<prompt>`.
 Chỉ **`ultrathink`** được nhận diện là keyword — Claude Code thêm in-context instruction request deeper reasoning **cho turn đó**, KHÔNG đổi effort level gửi lên API. Các cụm `think`, `think hard`, `megathink`… là **plain text**, không trigger gì đặc biệt — dùng `/effort` thay.
 
 ### 6.2 `/effort` levels (chính thức 2026)
-| Level    | Model mặc định       | Ghi chú                                        |
-| -------- | -------------------- | ---------------------------------------------- |
-| `low`    | —                    | Không thinking                                 |
-| `medium` | —                    | Thinking nhẹ                                   |
-| `high`   | Opus 4.6, Sonnet 4.6 | Default cho Opus 4.6/Sonnet 4.6                |
-| `xhigh`  | Opus 4.7             | Default Opus 4.7. Model khác fallback → `high` |
-| `max`    | —                    | Tối đa (Opus 4.7/4.6/Sonnet 4.6), session-only |
-| `auto`   | —                    | Reset model default                            |
+
+> Source: [code.claude.com/docs/en/model-config#adjust-effort-level](https://code.claude.com/docs/en/model-config#adjust-effort-level)
+
+| Level    | Model support             | Ghi chú                                        |
+| -------- | ------------------------- | ---------------------------------------------- |
+| `low`    | tất cả                    | Reserve cho task ngắn, scoped, latency-sensitive, không intelligence-sensitive |
+| `medium` | tất cả                    | Cost-sensitive, trade-off intelligence một phần |
+| `high`   | tất cả; default Opus 4.6, Sonnet 4.6 | Minimum cho intelligence-sensitive work        |
+| `xhigh`  | **Opus 4.7 only**; default Opus 4.7 | Best results cho coding/agentic. Opus 4.6/Sonnet 4.6 fallback → `high` |
+| `max`    | tất cả                    | Tối đa, session-only (trừ qua env var). Có thể overthinking — test trước |
+
+**`/effort auto`**: **không phải level** — special command để reset về model default (`xhigh` cho Opus 4.7, `high` cho Opus 4.6/Sonnet 4.6).
 
 **Persistence**:
 - `low`/`medium`/`high`/`xhigh` persist qua session

@@ -13,7 +13,7 @@
 
 ## Phong cách làm việc
 
-- Trước khi sửa task >3 file hoặc liên quan kiến trúc → **lập plan, đợi tôi duyệt**. Fix nhỏ (typo, đổi tên biến, thêm log) thì làm luôn.
+- Sắp sửa **>3 file** hoặc đụng **kiến trúc** (thêm module, đổi DB schema, refactor public API, đổi pattern xuyên codebase) → **lập plan, đợi tôi duyệt**. Fix nhỏ (typo, đổi tên biến, thêm log, sửa 1-2 file isolated) thì làm luôn.
 - Không chắc intent → **HỎI**, đừng đoán. Một câu hỏi tốt hơn 10 phút sửa sai.
 - Sau khi sửa → **TỰ KIỂM TRA** test/lint/typecheck nếu có. Đừng báo "xong" khi chưa verify.
 - Tôi sửa lỗi của bạn → **không xin lỗi dài**, xác nhận-sửa-tiếp.
@@ -29,7 +29,7 @@
 
 ## Code
 
-- **Đọc trước khi viết** — ≥30 dòng context xung quanh hoặc cả function. Tạo file mới → scan file tương tự để theo pattern có sẵn.
+- **Đọc trước khi viết** — ưu tiên đọc **cả function** chứa change; nếu function >100 dòng thì 30 dòng xung quanh + signature/return là đủ. Fix nhỏ (1-2 dòng) thì context narrow hơn OK. Tạo file mới → scan file tương tự để theo pattern có sẵn.
 - **Theo convention codebase**, không phải convention "general best practice".
 - **Không thêm dependency** mà không hỏi. **Không bịa API, hàm, version**. Không chắc → kiểm tra.
 - **Không catch-and-ignore** exception chỉ để code chạy.
@@ -37,7 +37,7 @@
 
 ## Git
 
-- KHÔNG `git commit`/`git push` trừ khi tôi yêu cầu rõ (hoặc gọi [`/commit`](skills/commit/SKILL.md)).
+- KHÔNG `git commit`/`git push` trừ khi tôi yêu cầu rõ — phải có động từ explicit: `commit`, `push`, `ship`, `merge`, hoặc gọi [`/commit`](skills/commit/SKILL.md). Câu mơ hồ như "save it", "looks good", "done" → KHÔNG đủ, hỏi lại.
 - KHÔNG `git add .` — add từng file cụ thể.
 - KHÔNG `--force`, KHÔNG `git reset --hard` trên work của tôi.
 - KHÔNG thêm `Co-Authored-By: Claude` hay tagline `🤖 Generated with Claude Code` vào commit (đã tắt qua `attribution.commit: ""`).
@@ -51,7 +51,7 @@
 
 ## Workflow ưu tiên
 
-- Task >3 file → đề xuất Plan Mode (`Shift+Tab×2`) hoặc `/plan`.
+- Khi cần plan (theo rule "Phong cách làm việc" ở trên) → ưu tiên đề xuất Plan Mode (`Shift+Tab×2`) hoặc skill `/plan` thay vì viết plan inline trong response.
 - Investigate codebase rộng → đề xuất subagent ("use a subagent to investigate ...") để giữ context chính sạch. Nếu không dùng subagent → scope narrow (chỉ đọc file/dir cần thiết, không explore toàn bộ).
 - Refactor lớn → tách commit nhỏ revert được độc lập.
 - Bug khó → reproduce trước, viết failing test, mới fix.
@@ -64,8 +64,8 @@
 
 ## Quản lý context window
 
-- Theo dõi `/context` thường xuyên. **<40% sweet spot**, **>60% nên `/compact` hoặc `/clear`**, **>80% PHẢI act**.
-- Hoàn thành 1 phase (auth xong, refactor xong) → đề xuất `/compact` ngay, đừng đợi auto-compact ở 95%.
+- Theo dõi `/context` thường xuyên. **<40% sweet spot**, **40-60% dumb zone bắt đầu**, **60-77% wrap up actively**, **>77% sau auto-compact PHẢI act**. Ngưỡng community-curated, chi tiết + source tại [`docs/REFERENCE.md` §16.2](docs/REFERENCE.md).
+- Hoàn thành 1 phase (auth xong, refactor xong) → đề xuất `/compact` ngay, đừng đợi auto-compact firing (~77% của 200k window = ~155k tokens, theo Boris Cherny — Anthropic Claude Code lead).
 - Trước khi compact/clear → tôi sẽ yêu cầu bạn viết handoff brief; bạn dùng skill [`/handoff`](skills/handoff/SKILL.md).
 - Câu hỏi nhanh không cần lưu history → tôi dùng `/btw`.
 

@@ -20,7 +20,7 @@
 |---|---|
 | `/plan` | Chuyển plan mode — explore trước khi edit |
 | `/model` | Đổi model (left/right arrows chỉnh effort) |
-| `/effort` | Chỉnh effort level (`low`/`medium`/`high`/`xhigh`/`max`) |
+| `/effort` | Chỉnh effort level (`low`/`medium`/`high`/`xhigh`/`max`). `/effort auto` reset về model default (không phải level). |
 | `/fast` | Toggle fast mode (Opus 4.6 output nhanh hơn) |
 | `/context` | Visualize context usage — grid + optimization suggestions |
 | `/compact` | Compact context, optional focus: `/compact Focus on API changes` |

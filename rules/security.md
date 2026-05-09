@@ -7,7 +7,7 @@
 - **KHÔNG** in/log secret, token, API key, password, private key. Phát hiện hardcoded secret → cảnh báo NGAY (không chờ user xác nhận).
 - **KHÔNG** commit `.env`, `.env.*` (trừ `.env.example` đã sanitize), `*.key`, `*.pem`, `*.p12`, `*.jks`, `id_rsa*`, `credentials.json`.
 - Trước khi commit → kiểm tra `.gitignore`. File chưa có → thêm trước.
-- Mask khi hiển thị log/output: chuỗi 32+ hex, JWT (3 phần `.`-separated), AWS key (`AKIA...`), Bearer token, `Basic <base64>`.
+- Mask khi hiển thị log/output các pattern giống secret: JWT (3 phần `.`-separated), AWS key (`AKIA...`/`ASIA...`), Bearer token, `Basic <base64>`, GitHub PAT (`ghp_`/`gho_`/`ghu_`/`ghs_`/`ghr_`), Slack token (`xox[abprs]-`), Stripe key (`sk_live_`/`pk_live_`), private key blocks (`-----BEGIN`). KHÔNG mask hash công khai (MD5/SHA file integrity, commit SHA, UUID v4) — không phải secret.
 - Phát hiện secret rò rỉ trong git history → khuyến cáo dùng `git-filter-repo` + **rotate secret ngay**, KHÔNG chỉ sửa file mới nhất.
 
 ## Validate input
@@ -31,7 +31,7 @@
 ## Crypto
 
 - KHÔNG bịa thuật toán. Dùng thư viện chuẩn (`crypto`, `cryptography`, `bcrypt`, `argon2`, `libsodium`).
-- Hash password: `argon2id` (ưu tiên) hoặc `bcrypt` cost ≥12. KHÔNG MD5/SHA1/SHA256 trần.
+- Hash password: `argon2id` (ưu tiên) hoặc `bcrypt` cost ≥10 (OWASP 2024 baseline) — ≥12 cho high-value workload (financial, healthcare, admin). KHÔNG MD5/SHA1/SHA256 trần. Source: [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html).
 - Đối xứng: AES-GCM hoặc ChaCha20-Poly1305 với random nonce. KHÔNG ECB.
 - Random: `secrets` (Python), `crypto.randomBytes` (Node), `/dev/urandom`. KHÔNG `Math.random()` cho security.
 - TLS: tối thiểu 1.2, ưu tiên 1.3. Cert pinning chỉ khi cần thiết (không phải mặc định).
@@ -62,7 +62,7 @@
 - `chmod -R 777`, `chown -R` ngoài project.
 - `curl ... | bash`, `wget ... | sh` từ URL không phải vendor chính thức.
 - `dd if=... of=/dev/sd*` (overwrite disk).
-- `git push --force` lên branch chia sẻ (`main`, `master`, `develop`, `release/*`).
+- `git push --force` lên branch chia sẻ (`main`, `master`, `develop`, `release/*`). Khi cần rewrite history trên branch cá nhân → dùng `--force-with-lease` (an toàn hơn, abort nếu remote đã có commit mới); KHÔNG dùng `--force` trần.
 - `DROP DATABASE`, `TRUNCATE` trên DB production.
 
 ## Khi audit
