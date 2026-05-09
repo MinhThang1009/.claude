@@ -39,7 +39,7 @@ Closes #
 - [ ] Commit message tuân Conventional Commits, subject tiếng Việt
 - [ ] Không log / commit secret, token, API key, credential
 - [ ] Theo style của file đang sửa (terse, formal, impersonal Vietnamese)
-- [ ] Update [REFERENCE.md](../REFERENCE.md) / [CLAUDE.md](../CLAUDE.md) nếu thêm slash command / env var / hook event mới
+- [ ] Update [REFERENCE.md](../REFERENCE.md) / [CLAUDE.md](../MIGRATION-CLAUDE.md) nếu thêm slash command / env var / hook event mới
 - [ ] Nếu fact-check fix: kèm source URL chính thức trong commit message
 
 ## Test plan

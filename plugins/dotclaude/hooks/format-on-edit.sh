@@ -1,35 +1,19 @@
 #!/usr/bin/env bash
 # Format file sau khi Edit/Write/MultiEdit.
 # - Skip nếu file ngoài $CLAUDE_PROJECT_DIR (tránh ghi vào file system khác).
-# - Skip prettier nếu có executable config .js/.cjs/.mjs (RCE risk: require() execute code).
-# - prettier dùng --no-plugin-search để chống malicious package.json plugins (Sec H-4).
+# - Skip prettier nếu có config .js/.cjs/.mjs (RCE risk: require() execute code).
 # - Silent skip nếu formatter chưa cài.
 
 set -u
 
-# Security hardening (Sec H-1): sanitize PATH, unset PYTHON env vars
-export PATH=$(echo "$PATH" | tr ':' '\n' | grep -v '^$\|^\.$\|^\./' | tr '\n' ':' | sed 's/:$//')
-unset PYTHONPATH PYTHONHOME PYTHONSTARTUP
-
-# Find python interpreter (Win H3 fix: fallback python → python3 cho cross-platform)
-PY=""
-for p in python python3; do
-  if command -v "$p" >/dev/null 2>&1 && "$p" -c '' >/dev/null 2>&1; then
-    PY="$p"
-    break
-  fi
-done
-
-[ -z "$PY" ] && exit 0   # No python → silent skip
-
 INPUT=$(cat)
-FILE=$(echo "$INPUT" | "$PY" -c "import sys, json; print(json.loads(sys.stdin.read() or '{}').get('tool_input', {}).get('file_path', ''))" 2>/dev/null)
+FILE=$(echo "$INPUT" | python -c "import sys, json; print(json.loads(sys.stdin.read() or '{}').get('tool_input', {}).get('file_path', ''))" 2>/dev/null)
 
 [ -z "$FILE" ] && exit 0
 
 # Resolve absolute paths để compare. Dùng python (cross-platform, không cần realpath).
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$PWD}"
-RESOLVED=$("$PY" -c "
+RESOLVED=$(python -c "
 import os, sys
 try:
     proj = os.path.realpath(sys.argv[1])
@@ -49,19 +33,25 @@ except Exception:
 case "$FILE" in
   *.ts|*.tsx|*.js|*.jsx|*.json|*.md|*.yml|*.yaml|*.css|*.scss|*.html)
     if command -v prettier >/dev/null 2>&1; then
-      # Skip prettier nếu có executable config (RCE risk qua require())
+      # Skip prettier nếu có executable config HOẶC plugin reference trong package.json
+      # (RCE risk qua require() khi prettier khởi động).
       # Override: set CLAUDE_FORMAT_TRUST_PRETTIER_CONFIG=1 nếu trust config (vd: monorepo nội bộ)
-      cd "$PROJECT_DIR" 2>/dev/null
-      HAS_JS_CONFIG=0
+      cd "$PROJECT_DIR" 2>/dev/null || exit 0
+      HAS_RISKY_CONFIG=0
       if [ -f .prettierrc.js ] || [ -f .prettierrc.cjs ] || [ -f .prettierrc.mjs ] || \
          [ -f prettier.config.js ] || [ -f prettier.config.cjs ] || [ -f prettier.config.mjs ]; then
-        HAS_JS_CONFIG=1
+        HAS_RISKY_CONFIG=1
       fi
-      if [ "$HAS_JS_CONFIG" = "1" ] && [ "${CLAUDE_FORMAT_TRUST_PRETTIER_CONFIG:-}" != "1" ]; then
-        echo "WARN: skipping prettier — executable config (.prettierrc.js/.cjs/.mjs) is RCE risk. Set CLAUDE_FORMAT_TRUST_PRETTIER_CONFIG=1 to override." >&2
+      # Check package.json: prettier plugins load qua require() khi format chạy
+      if [ "$HAS_RISKY_CONFIG" != "1" ] && [ -f package.json ]; then
+        if grep -qE '(@prettier/plugin-|prettier-plugin-|"plugins"[[:space:]]*:[[:space:]]*\[)' package.json 2>/dev/null; then
+          HAS_RISKY_CONFIG=1
+        fi
+      fi
+      if [ "$HAS_RISKY_CONFIG" = "1" ] && [ "${CLAUDE_FORMAT_TRUST_PRETTIER_CONFIG:-}" != "1" ]; then
+        echo "WARN: skipping prettier — executable config hoặc plugin reference (package.json) is RCE risk via require(). Set CLAUDE_FORMAT_TRUST_PRETTIER_CONFIG=1 to override." >&2
       else
-        # --no-plugin-search: chặn auto-load plugins từ package.json (Sec H-4)
-        prettier --no-plugin-search --write "$FILE" >/dev/null 2>&1
+        prettier --write "$FILE" >/dev/null 2>&1
       fi
     fi
     ;;

@@ -1,6 +1,6 @@
 # Quy tắc Giao tiếp
 
-> Bổ sung "Phong cách trả lời" trong [`CLAUDE.md`](../CLAUDE.md).
+> Bổ sung "Phong cách trả lời" trong [`CLAUDE.md`](../MIGRATION-CLAUDE.md).
 
 ## Trả lời câu hỏi
 
