@@ -9,7 +9,7 @@
 
 > 📅 **Đã verify**: 2026-05-09 vs Claude Code v2.1.138 + Opus 4.7. Model ID, version-gating, env var, slash command, hook event đã cross-check với [docs Anthropic](https://code.claude.com/docs) + [raw CHANGELOG](https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md).
 >
-> ⚠️ **Một số nội dung có thể outdated** khi Anthropic ship version mới hoặc deprecate model. Phát hiện sai sót → submit issue/PR tại [github.com/MinhThang1009/dotclaude/issues](https://github.com/MinhThang1009/dotclaude/issues). Xem [CONTRIBUTING.md](CONTRIBUTING.md) cho quy trình.
+> ⚠️ **Một số nội dung có thể outdated** khi Anthropic ship version mới hoặc deprecate model. Phát hiện sai sót → submit issue/PR tại [github.com/MinhThang1009/dotclaude/issues](https://github.com/MinhThang1009/dotclaude/issues). Xem [CONTRIBUTING.md](CONTRIBUTING.md) cho quy trình. Lịch sử thay đổi: [CHANGELOG.md](CHANGELOG.md).
 
 ## 1. Cấu trúc thư mục sau khi cài
 

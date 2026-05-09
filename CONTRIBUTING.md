@@ -96,6 +96,19 @@ Tham khảo workflow fact-check trong commit history (search `docs: fix .* fact-
 - ❌ Tự promote tool/blog/MCP server cá nhân
 - ❌ Đổi license
 
+### Cập nhật CHANGELOG.md
+
+PR có user-visible change (feature, fix, breaking) cần thêm entry vào section `## [Unreleased]` của [CHANGELOG.md](CHANGELOG.md), theo format [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/):
+
+- **Added**: tính năng mới
+- **Changed**: thay đổi behavior tính năng có sẵn
+- **Deprecated**: tính năng sắp removed
+- **Removed**: tính năng đã removed
+- **Fixed**: bug fix
+- **Security**: vá lỗ hổng
+
+Bỏ qua nếu PR chỉ là internal refactor / typo / test-only.
+
 ## Setup dev
 
 ```bash
