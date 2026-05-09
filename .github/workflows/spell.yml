@@ -21,4 +21,4 @@ jobs:
         run: npm install -g cspell@8
 
       - name: Run cspell
-        run: cspell "**/*.md" --no-progress --no-summary --show-suggestions || echo "::warning::Spell check found issues — review and add to .github/dictionaries/dotclaude.txt if false positives"
+        run: cspell --config .github/cspell.json "**/*.md" --no-progress --no-summary --show-suggestions || echo "::warning::Spell check found issues — review and add to .github/dictionaries/dotclaude.txt if false positives"
