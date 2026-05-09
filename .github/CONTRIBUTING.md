@@ -57,12 +57,13 @@ Tham khảo workflow fact-check trong commit history (search `docs: fix .* fact-
    - Shell: `shellcheck hooks/*.sh` (nếu cài).
    - Python: `ruff check hooks/` (nếu cài).
 3. CI trên GitHub Actions chạy 9 jobs tự động khi push/PR — phải pass hết trước khi merge:
-   - Hook regression tests (119 cases) — Ubuntu + macOS matrix (2 jobs)
+   - Hook regression tests (119 cases) — Ubuntu + macOS + Windows matrix (3 jobs)
    - JSON syntax validate
    - Markdown link check (lychee, offline mode)
    - markdownlint cho `**/*.md`
    - shellcheck cho `hooks/*.sh`
    - ruff cho `hooks/*.py`
+   - pytest cho `tests/`
    - actionlint cho `.github/workflows/*.yml`
    - Frontmatter schema validate cho skills/agents/output-styles
 4. Commit từng change nhỏ (revert được độc lập).

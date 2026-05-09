@@ -110,7 +110,7 @@ jobs:
         with:
           python-version: '3.x'
       - name: Install pytest + dependencies
-        run: pip install --quiet pytest
+        run: pip install --quiet pytest pyyaml jsonschema
       - name: Run pytest
         run: python -m pytest tests/ -v
 
@@ -129,10 +129,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run actionlint
-        run: |
-          bash <(curl -sSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
-          ./actionlint -color
+      - uses: raven-actions/actionlint@v2
 
   frontmatter-validate:
     name: Frontmatter schema (skills/agents/output-styles)

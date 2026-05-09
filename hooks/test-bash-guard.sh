@@ -12,7 +12,7 @@ run() {
   json="{\"tool_input\":{\"command\":$(printf '%s' "$cmd" | python -c 'import sys,json; print(json.dumps(sys.stdin.read()))')}}"
   out=$(echo "$json" | bash "$HOOK" 2>&1)
   code=$?
-  local actual="PASS"; [ $code -eq 2 ] && actual="BLOCK"
+  local actual="PASS"; [[ $code -eq 2 ]] && actual="BLOCK"
   if [ "$actual" = "$expect" ]; then
     PASS=$((PASS+1))
     printf "  OK   [%-5s] %s\n" "$actual" "$label"

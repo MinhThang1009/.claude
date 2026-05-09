@@ -224,7 +224,7 @@
 > Pin version: `ANTHROPIC_DEFAULT_OPUS_MODEL` / `ANTHROPIC_DEFAULT_SONNET_MODEL`.
 
 **Default model theo plan**:
-- **Max / Team Premium** → Opus 4.7
+- **Max / Team plan** → Opus 4.7
 - **Pro / Team Standard / Enterprise / Anthropic API** → Sonnet 4.6
 - **Bedrock / Vertex / Foundry** → Sonnet 4.5
 
@@ -1984,7 +1984,7 @@ Cách xử lý:
 - What's new: <https://code.claude.com/docs/en/whats-new/index>
 - Glossary: <https://code.claude.com/docs/en/glossary>
 - LLM-friendly index (Claude Code): <https://code.claude.com/docs/llms.txt>
-- LLM-friendly index (platform): <https://docs.anthropic.com/llms.txt>
+- LLM-friendly index (platform): <https://platform.claude.com/docs/llms.txt>
 
 ### 20.19 Blogs & engineering writing
 - Engineering blog: <https://www.anthropic.com/engineering>
