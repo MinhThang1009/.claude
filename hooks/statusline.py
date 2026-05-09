@@ -66,13 +66,17 @@ def main() -> None:
     else:
         icon, bar_color = "🟢", GREEN
 
-    window_label = "1M" if window_size >= 1_000_000 else "200k"
+    # Skip window label nếu model display_name đã chứa (vd "Opus 4.7 (1M context)")
+    if window_size >= 1_000_000 and "1m" not in model.lower():
+        window_part = " 1M"
+    else:
+        window_part = ""
     effort_label = f" ☆{effort}" if effort else ""
     cwd_short = os.path.basename(cwd) if cwd else ""
 
     # Line 1: model + cwd + git
     branch, staged, modified = _git_info_cached(session_id, cwd)
-    line1 = [f"{CYAN}[{model} {window_label}{effort_label}]{RESET}"]
+    line1 = [f"{CYAN}[{model}{window_part}{effort_label}]{RESET}"]
     if cwd_short:
         line1.append(f"📁 {cwd_short}")
     if branch:
@@ -93,9 +97,13 @@ def main() -> None:
     if cost_usd > 0:
         line2.append(f"💰 ${cost_usd:.2f}")
     if duration_ms > 0:
-        mins = duration_ms // 60000
-        secs = (duration_ms % 60000) // 1000
-        line2.append(f"⏱️ {mins}m{secs:02d}s")
+        total_secs = duration_ms // 1000
+        if total_secs >= 3600:
+            line2.append(f"⏱️ {total_secs // 3600}h{(total_secs % 3600) // 60}m")
+        elif total_secs >= 60:
+            line2.append(f"⏱️ {total_secs // 60}m {total_secs % 60}s")
+        else:
+            line2.append(f"⏱️ {total_secs}s")
     if five_h is not None:
         line2.append(f"5h:{five_h:.0f}%")
     if seven_d is not None:
