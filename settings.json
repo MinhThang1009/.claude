@@ -1,6 +1,6 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "env": {
-    "//": "Tăng MAX_MCP_OUTPUT_TOKENS để MCP server (như filesystem, GitHub) không bị truncate khi trả về dữ liệu hữu ích. Mặc định 25k (docs MCP), warning threshold 10k.",
     "MAX_MCP_OUTPUT_TOKENS": "50000",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "0"
   },
@@ -9,7 +9,6 @@
     "pr": ""
   },
   "permissions": {
-    "//comment-allow": "Read/Glob/Grep + git read-only forms (status/diff/log/show/blame/branch/rev-parse/ls-files/grep) là Anthropic built-in auto-approved — KHÔNG cần khai báo (xem code.claude.com/docs/en/permissions §Read-only commands). Allow chỉ liệt kê: (1) commands không phải built-in read-only, (2) git write commands thường dùng để skip prompt, (3) dev tooling.",
     "allow": [
       "Bash(echo:*)",
       "Bash(printf:*)",
@@ -84,7 +83,6 @@
       "WebFetch(domain:www.anthropic.com)",
       "WebFetch(domain:anthropic.com)"
     ],
-    "//comment-deny": "Deny áp dụng MỌI mode kể cả bypass (per doc 'Removals targeting filesystem root or home directory still prompt as circuit breaker'). Hook bash-guard.sh là defense-in-depth.",
     "deny": [
       "Bash(rm -rf /*)",
       "Bash(rm -rf ~)",
@@ -127,7 +125,6 @@
       "Read(~/.docker/config.json)",
       "Read(~/.kube/config)"
     ],
-    "//comment-ask": "Ask cho commands network-affecting (push, install) — user muốn confirm. Bypass mode skip ASK theo doc.",
     "ask": [
       "Bash(git push:*)",
       "Bash(npm install:*)",
@@ -145,8 +142,7 @@
       "Bash(go install:*)",
       "Bash(brew install:*)"
     ],
-    "defaultMode": "acceptEdits",
-    "//comment-mode": "acceptEdits = file edits (Edit/Write) tự apply không cần Apply diff card. Bash/WebFetch theo allow/ask/deny rule. Precedence: deny > ask > allow > mode. Per Anthropic doc: 'bypassPermissions skips all permission prompts. Root and home directory removals still prompt as circuit breaker.' — Bypass mode (Shift+Tab) override defaultMode cho session."
+    "defaultMode": "acceptEdits"
   },
   "model": "opus[1m]",
   "hooks": {
@@ -191,8 +187,7 @@
   "autoMemoryEnabled": true,
   "statusLine": {
     "type": "command",
-    "command": "$HOME/.claude/hooks/statusline.sh",
-    "//": "Statusline custom: hiển thị icon ngưỡng + model + context % + cwd. Script tại hooks/statusline.{py,sh}. Ngưỡng theo Dex Horthy/Boris Cherny — xem docs/REFERENCE.md §16.2. Shebang trong .sh tự handle bash."
+    "command": "$HOME/.claude/hooks/statusline.sh"
   },
   "claudeMdExcludes": [
     "**/node_modules/**/CLAUDE.md",
@@ -200,6 +195,5 @@
     "**/dist/**/CLAUDE.md",
     "**/build/**/CLAUDE.md",
     "**/.venv/**/CLAUDE.md"
-  ],
-  "//": "Settings global cho ~/.claude/settings.json. Override bằng settings.json của project khi cần. effortLevel=xhigh persist được; nếu muốn 'max' thì set CLAUDE_CODE_EFFORT_LEVEL=max ở env shell. theme chỉnh qua /config interactive (lưu vào ~/.claude.json), không phải settings.json."
+  ]
 }
