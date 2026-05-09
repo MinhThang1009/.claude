@@ -1061,7 +1061,9 @@ force-for-plugin: false               # Plugin only: true → auto-apply khi plu
 - `WebFetch(domain:*.example.com)` — bất kỳ subdomain
 - `Agent(Explore)` — subagent type cụ thể
 - `Agent(my-custom-agent)` — custom subagent
-- `MCP(github)` — MCP server theo tên
+- `mcp__github` — MCP server theo tên (all tools)
+- `mcp__github__*` — wildcard all tools từ server
+- `mcp__github__search_repos` — tool cụ thể
 
 **Wildcard** (semantics khác nhau theo tool):
 - `Read()`/`Edit()` (gitignore-style): `*` = single segment (không cross `/`), `**` = recursive
