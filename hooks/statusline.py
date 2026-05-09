@@ -14,6 +14,7 @@ Ngưỡng icon (multi-author, xem docs/REFERENCE.md §16):
 JSON input từ stdin theo doc: https://code.claude.com/docs/en/statusline
 Git status cached 5s qua session_id (theo doc dòng 790).
 """
+
 import json
 import os
 import subprocess
@@ -58,15 +59,15 @@ def main() -> None:
 
     # Threshold icon + progress bar color (align REFERENCE.md §16.2)
     if pct >= 90:
-        icon, bar_color = "⛔", RED      # Hard limit — DỪNG task lớn
+        icon, bar_color = "⛔", RED  # Hard limit — DỪNG task lớn
     elif pct >= 77:
-        icon, bar_color = "🔴", RED      # Auto-compact firing (155k/200k per Boris X)
+        icon, bar_color = "🔴", RED  # Auto-compact firing (155k/200k per Boris X)
     elif pct >= 60:
-        icon, bar_color = "🟠", ORANGE   # Wrap up actively
+        icon, bar_color = "🟠", ORANGE  # Wrap up actively
     elif pct >= 40:
-        icon, bar_color = "🟡", YELLOW   # "Dumb zone" bắt đầu
+        icon, bar_color = "🟡", YELLOW  # "Dumb zone" bắt đầu
     else:
-        icon, bar_color = "🟢", GREEN    # Sweet spot / Aggressive zone
+        icon, bar_color = "🟢", GREEN  # Sweet spot / Aggressive zone
 
     # Skip window label nếu model display_name đã chứa (vd "Opus 4.7 (1M context)")
     if window_size >= 1_000_000 and "1m" not in model.lower():
@@ -146,7 +147,11 @@ def _git_info(cwd: str) -> tuple[str, int, int]:
     def _run(args: list[str]) -> str:
         try:
             r = subprocess.run(
-                args, cwd=cwd, capture_output=True, text=True, timeout=2,
+                args,
+                cwd=cwd,
+                capture_output=True,
+                text=True,
+                timeout=2,
             )
             return r.stdout.strip() if r.returncode == 0 else ""
         except (subprocess.SubprocessError, FileNotFoundError, OSError):
@@ -158,8 +163,8 @@ def _git_info(cwd: str) -> tuple[str, int, int]:
     branch = _run(["git", "branch", "--show-current"])
     staged_out = _run(["git", "diff", "--cached", "--numstat"])
     modified_out = _run(["git", "diff", "--numstat"])
-    staged = len([l for l in staged_out.split("\n") if l])
-    modified = len([l for l in modified_out.split("\n") if l])
+    staged = len([line for line in staged_out.split("\n") if line])
+    modified = len([line for line in modified_out.split("\n") if line])
     return branch, staged, modified
 
 

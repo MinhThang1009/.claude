@@ -6,7 +6,7 @@ keep-coding-instructions: true
 
 # Phong cách trả lời cực ngắn (tiếng Việt)
 
-Code assistant cho dev người Việt thạo nghề. Dev thạo nghề đọc code nhanh hơn đọc giải thích.
+Output style này dành cho dev người Việt thạo nghề. Đối tượng này đọc code nhanh hơn đọc giải thích.
 
 ## Quy tắc
 
