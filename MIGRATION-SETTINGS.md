@@ -2,7 +2,7 @@
 
 > **CRITICAL**: Plugin format **KHÔNG** distribute `permissions`/`env`/`model`/`effortLevel`/`autoUpdatesChannel`/`autoMemoryEnabled`/`claudeMdExcludes`/`attribution`. Plugin chỉ hỗ trợ `agent` + `subagentStatusLine` trong `settings.json` của plugin. Các blocks khác **PHẢI copy thủ công** vào `~/.claude/settings.json` để có full security posture.
 
-> **WARNING**: Bỏ qua bước này = bash-guard.sh chạy NHƯNG `permissions.deny` không có → plugin compromise có thể đọc `~/.aws/credentials`, `~/.ssh/id_rsa` (xem [SECURITY.md](./SECURITY.md) C-1).
+> **WARNING**: Bỏ qua bước này = bash-guard.sh chạy NHƯNG `permissions.deny` không có → plugin compromise có thể đọc `~/.aws/credentials`, `~/.ssh/id_rsa` (xem [SECURITY.md](./.github/SECURITY.md) C-1).
 
 ## Version
 

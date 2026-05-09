@@ -17,7 +17,7 @@ Plugin format **không** distribute permissions/env/model defaults. Thiếu migr
 User dễ skip migration vì plugin "đã work" (skills/agents trigger fine).
 
 **MITIGATION**:
-1. Đọc [MIGRATION-SETTINGS.md](./MIGRATION-SETTINGS.md) NGAY sau install
+1. Đọc [MIGRATION-SETTINGS.md](../MIGRATION-SETTINGS.md) NGAY sau install
 2. Copy `recommended-settings.json` → `~/.claude/settings.json` (hoặc merge thủ công)
 3. Verify trong session Claude Code: `/permissions` show deny rules
 
@@ -110,6 +110,6 @@ Nếu phát hiện vulnerability trong dotclaude plugin:
 
 ## See also
 
-- [README.md](./README.md) — install + migration guide
-- [MIGRATION-SETTINGS.md](./MIGRATION-SETTINGS.md) — copy permissions/env/model thủ công
+- [README.md](../README.md) — install + migration guide
+- [MIGRATION-SETTINGS.md](../MIGRATION-SETTINGS.md) — copy permissions/env/model thủ công
 - Branch `main` = user-config repo gốc (commit `70a925a`) — full security posture, recommended cho production use

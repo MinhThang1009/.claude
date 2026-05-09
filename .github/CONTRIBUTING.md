@@ -43,7 +43,7 @@ Tham khảo workflow fact-check trong commit history (search `docs: fix .* fact-
 
 ### Style guidelines
 
-- **Commit message**: [Conventional Commits](https://www.conventionalcommits.org/), subject **tiếng Việt**, type tiếng Anh (`feat`, `fix`, `docs`, `refactor`, `style`, `test`, `chore`...). Tham khảo [skills/commit/SKILL.md](plugins/dotclaude/skills/commit/SKILL.md).
+- **Commit message**: [Conventional Commits](https://www.conventionalcommits.org/), subject **tiếng Việt**, type tiếng Anh (`feat`, `fix`, `docs`, `refactor`, `style`, `test`, `chore`...). Tham khảo [plugins/dotclaude/skills/commit/SKILL.md](../plugins/dotclaude/skills/commit/SKILL.md).
 - **Markdown**: Theo style file đang sửa (terse, bullet-heavy, tiếng Việt cho prose, tiếng Anh cho identifier/code).
 - **Không thêm dependency** vào hooks/* mà không thảo luận trước (issue).
 
@@ -100,7 +100,7 @@ Tham khảo workflow fact-check trong commit history (search `docs: fix .* fact-
 
 ### Cập nhật CHANGELOG.md
 
-PR có user-visible change (feature, fix, breaking) cần thêm entry vào section `## [Unreleased]` của [CHANGELOG.md](CHANGELOG.md), theo format [Keep a Changelog](https://keepachangelog.com/en/1.1.0/):
+PR có user-visible change (feature, fix, breaking) cần thêm entry vào section `## [Unreleased]` của [CHANGELOG.md](../CHANGELOG.md), theo format [Keep a Changelog](https://keepachangelog.com/en/1.1.0/):
 
 - **Added**: tính năng mới
 - **Changed**: thay đổi behavior tính năng có sẵn
@@ -147,7 +147,7 @@ Manual run tất cả: `pre-commit run --all-files`. Skip 1 lần (chỉ khi c�
 
 ## License
 
-Đóng góp qua PR mặc nhiên áp dụng [MIT License](LICENSE) — cùng license với repo.
+Đóng góp qua PR mặc nhiên áp dụng [MIT License](../LICENSE) — cùng license với repo.
 
 ## Liên hệ
 

@@ -4,7 +4,7 @@
 >
 > Tổng hợp từ docs chính thức [code.claude.com/docs](https://code.claude.com/docs) (2026), blog [claude.com](https://www.claude.com/blog), [MindStudio](https://www.mindstudio.ai/blog), [ClaudeFast](https://claudefa.st/blog), GitHub [anthropics/claude-code](https://github.com/anthropics/claude-code). Cập nhật cho Claude Code v2.1.x trở lên.
 >
-> 📅 **Đã verify**: 2026-05-09 vs Claude Code v2.1.138 + Opus 4.7. Phát hiện sai sót → [CONTRIBUTING.md](CONTRIBUTING.md).
+> 📅 **Đã verify**: 2026-05-09 vs Claude Code v2.1.138 + Opus 4.7. Phát hiện sai sót → [CONTRIBUTING.md](../.github/CONTRIBUTING.md).
 
 ## Mục lục
 
@@ -173,7 +173,7 @@
 | `claude setup-token`                         | Tạo long-lived OAuth token cho CI                                                              |
 | `claude ultrareview [target]`                | Non-interactive ultrareview. Flags: `--json`, `--timeout <minutes>`                            |
 
-> **Brief-injection > resume**: với session dài, mở session mới và paste handoff brief thường tốt hơn `--resume` vì resume kéo theo stale tool output, file content cũ. Tham khảo skill [`/handoff`](plugins/dotclaude/skills/handoff/SKILL.md).
+> **Brief-injection > resume**: với session dài, mở session mới và paste handoff brief thường tốt hơn `--resume` vì resume kéo theo stale tool output, file content cũ. Tham khảo skill [`/handoff`](../plugins/dotclaude/skills/handoff/SKILL.md).
 
 ---
 
@@ -1708,7 +1708,7 @@ Context phiên này:
 
 ### 17.3 Workflow handoff khuyến nghị
 
-1. Khi `/context` >65%, hoặc kết thúc 1 phase công việc → gọi skill [`/handoff`](plugins/dotclaude/skills/handoff/SKILL.md) hoặc nói "viết handoff brief".
+1. Khi `/context` >65%, hoặc kết thúc 1 phase công việc → gọi skill [`/handoff`](../plugins/dotclaude/skills/handoff/SKILL.md) hoặc nói "viết handoff brief".
 2. Save về `.claude/HANDOFF.md` (cần thêm vào `.gitignore` — xem Section 22 checklist).
 3. `/compact giữ brief, drop debugging history` HOẶC `/clear` rồi prompt mới: `Đọc .claude/HANDOFF.md và tiếp tục từ "Bước tiếp"`.
 4. Cuối ngày / cuối session → update HANDOFF.md → `git status` → commit work.

@@ -1,6 +1,6 @@
 # dotclaude — Claude Code plugin (EXPERIMENTAL)
 
-> ⚠️ **EXPERIMENTAL branch `plugin-experiment/v1`** — Plugin format thay vì user-config repo. Yêu cầu **migration thủ công** sau install. **ĐỌC [SECURITY.md](./SECURITY.md) trước.**
+> ⚠️ **EXPERIMENTAL branch `plugin-experiment/v1`** — Plugin format thay vì user-config repo. Yêu cầu **migration thủ công** sau install. **ĐỌC [SECURITY.md](./.github/SECURITY.md) trước.**
 
 > Branch `main` (commit `70a925a`) = user-config repo gốc với full security posture, **recommended cho production use**. Plugin branch chỉ test concept.
 
@@ -126,7 +126,7 @@ xcopy /Y MIGRATION-REFERENCES\*.* "%USERPROFILE%\.claude\references\"
 
 - **Manual merge** (đã custom settings.json): xem [MIGRATION-SETTINGS.md §Manual merge](./MIGRATION-SETTINGS.md#manual-merge-recommended-cho-user-đã-custom-settingsjson)
 
-⚠️ **CRITICAL**: Nếu skip bước này, plugin sẽ thiếu `permissions.deny` rules — bash-guard.sh chạy nhưng Read tool không filter sensitive files. Xem [SECURITY.md C-1](./SECURITY.md).
+⚠️ **CRITICAL**: Nếu skip bước này, plugin sẽ thiếu `permissions.deny` rules — bash-guard.sh chạy nhưng Read tool không filter sensitive files. Xem [SECURITY.md C-1](./.github/SECURITY.md).
 
 ### Bước 5 — Verify migration
 
@@ -210,7 +210,7 @@ bash ~/.claude/plugins/cache/<hash>/plugins/dotclaude/hooks/test-bash-guard.sh
 
 ## See also
 
-- [SECURITY.md](./SECURITY.md) — security considerations + threat model
+- [SECURITY.md](./.github/SECURITY.md) — security considerations + threat model
 - [MIGRATION-SETTINGS.md](./MIGRATION-SETTINGS.md) — settings.json merge guide
 - [MIGRATION-CLAUDE.md](./MIGRATION-CLAUDE.md) — CLAUDE.md gốc
 - [MIGRATION-RULES/](./MIGRATION-RULES/) — auto-import rules
