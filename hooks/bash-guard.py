@@ -9,7 +9,9 @@ import json
 import re
 
 # Force UTF-8 stderr cho Windows cp1252 (BLOCKED message chứa tiếng Việt).
-if hasattr(sys.stderr, "reconfigure"):
+if hasattr(sys.stderr, "reconfigure"):  # pragma: no cover
+    # Module-level — chạy 1 lần lúc import; nhánh False (stream không có
+    # reconfigure) không reachable trong test environment.
     sys.stderr.reconfigure(encoding="utf-8")
 
 # ===== Sensitive path patterns =====

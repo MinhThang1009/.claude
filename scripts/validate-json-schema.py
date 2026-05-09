@@ -16,9 +16,10 @@ import urllib.request
 from pathlib import Path
 
 # Force UTF-8 stdout/stderr cho Windows cp1252.
-if hasattr(sys.stdout, "reconfigure"):
+# Module-level — chạy 1 lần lúc import; nhánh False không reachable trong test.
+if hasattr(sys.stdout, "reconfigure"):  # pragma: no cover
     sys.stdout.reconfigure(encoding="utf-8")
-if hasattr(sys.stderr, "reconfigure"):
+if hasattr(sys.stderr, "reconfigure"):  # pragma: no cover
     sys.stderr.reconfigure(encoding="utf-8")
 
 try:

@@ -111,8 +111,8 @@ jobs:
           python-version: '3.x'
       - name: Install pytest + coverage + dependencies
         run: pip install --quiet pytest coverage pyyaml jsonschema
-      - name: Run pytest under coverage
-        run: python -m coverage run --source=scripts,hooks -m pytest tests/ -v
+      - name: Run pytest under coverage (line + branch)
+        run: python -m coverage run --branch --source=scripts,hooks -m pytest tests/ -v
       - name: Enforce 100% coverage
         run: python -m coverage report -m --fail-under=100
 
