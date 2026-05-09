@@ -1,0 +1,34 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "dictionaries": ["dotclaude-vi-tech"],
+  "dictionaryDefinitions": [
+    {
+      "name": "dotclaude-vi-tech",
+      "path": ".github/dictionaries/dotclaude.txt",
+      "description": "Vietnamese + technical terms whitelist cho dotclaude repo"
+    }
+  ],
+  "ignorePaths": [
+    ".git",
+    "node_modules",
+    "**/__pycache__/**",
+    "**/*.lock",
+    "CHANGELOG.md",
+    "**/dist/**",
+    "**/build/**"
+  ],
+  "ignoreRegExpList": [
+    "https?://[^\\s]+",
+    "`[^`]+`",
+    "\\$\\{[^}]+\\}",
+    "[0-9a-f]{7,40}"
+  ],
+  "allowCompoundWords": true,
+  "overrides": [
+    {
+      "filename": "**/*.py",
+      "ignoreRegExpList": ["#.*"]
+    }
+  ]
+}

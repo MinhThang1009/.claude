@@ -1,0 +1,24 @@
+name: Spell Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  cspell:
+    name: cspell (English + Vietnamese custom)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install cspell
+        run: npm install -g cspell@8
+
+      - name: Run cspell
+        run: cspell "**/*.md" --no-progress --no-summary --show-suggestions || echo "::warning::Spell check found issues — review and add to .github/dictionaries/dotclaude.txt if false positives"
