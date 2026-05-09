@@ -101,7 +101,7 @@ jobs:
         run: ruff check hooks/
 
   python-tests:
-    name: Python tests (pytest)
+    name: Python tests (pytest + coverage 100% gate)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -109,10 +109,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      - name: Install pytest + dependencies
-        run: pip install --quiet pytest pyyaml jsonschema
-      - name: Run pytest
-        run: python -m pytest tests/ -v
+      - name: Install pytest + coverage + dependencies
+        run: pip install --quiet pytest coverage pyyaml jsonschema
+      - name: Run pytest under coverage
+        run: python -m coverage run --source=scripts,hooks -m pytest tests/ -v
+      - name: Enforce 100% coverage
+        run: python -m coverage report -m --fail-under=100
 
   markdown-lint:
     name: Markdown style lint (markdownlint)
