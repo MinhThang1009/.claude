@@ -34,7 +34,9 @@ RESET = "\033[0m"
 
 
 def main() -> None:
-    if hasattr(sys.stdout, "reconfigure"):
+    if hasattr(sys.stdout, "reconfigure"):  # pragma: no cover
+        # Windows cp1252 fix: TextIOWrapper.reconfigure chỉ tồn tại trên
+        # real stdout. Test mock sys.stdout với StringIO → branch False.
         sys.stdout.reconfigure(encoding="utf-8")
 
     try:
@@ -168,5 +170,5 @@ def _git_info(cwd: str) -> tuple[str, int, int]:
     return branch, staged, modified
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()

@@ -23,7 +23,7 @@ if hasattr(sys.stderr, "reconfigure"):
 
 try:
     import jsonschema
-except ImportError:
+except ImportError:  # pragma: no cover
     print(
         "ERROR: jsonschema not installed. Run: pip install jsonschema", file=sys.stderr
     )
@@ -106,5 +106,5 @@ def main() -> int:
     return 1 if fails else 0
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     sys.exit(main())

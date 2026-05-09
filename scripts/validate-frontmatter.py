@@ -16,7 +16,7 @@ from pathlib import Path
 
 try:
     import yaml
-except ImportError:
+except ImportError:  # pragma: no cover
     print("ERROR: PyYAML required. Install: pip install pyyaml", file=sys.stderr)
     sys.exit(2)
 
@@ -85,7 +85,10 @@ def parse_frontmatter(path: Path):
 
     # Find closing ---
     lines = text.splitlines()
-    if not lines or lines[0] != "---":
+    if not lines or lines[0] != "---":  # pragma: no cover
+        # Defensive: opening check ở trên đã đảm bảo lines[0] == "---" qua mọi
+        # đường vào hợp lệ. Branch này chỉ trigger với input bất thường (vd
+        # null bytes làm splitlines drop dòng đầu) — giữ lại để không crash.
         return None, "first line must be exactly '---'"
 
     end = -1
@@ -169,5 +172,5 @@ def main():
     sys.exit(0)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()
