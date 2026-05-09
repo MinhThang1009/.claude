@@ -73,7 +73,7 @@ def main() -> None:
         window_part = " 1M"
     else:
         window_part = ""
-    effort_label = f" ⚡{effort}" if effort else ""
+    effort_label = f" ⚡ {effort}" if effort else ""
     cwd_short = os.path.basename(cwd) if cwd else ""
 
     # Line 1: model + cwd + git
