@@ -1,0 +1,53 @@
+name: External Link Check
+
+on:
+  schedule:
+    # Thứ Hai 05:00 UTC — sau CodeQL/secret-scan, weekly cadence.
+    - cron: '0 5 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  link-check:
+    name: Lychee external links (online)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run lychee (online mode)
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # Check tất cả .md, online mode (không có --offline)
+          # Skip private/local URLs để tránh false positive
+          args: >-
+            --verbose
+            --no-progress
+            --max-retries 2
+            --retry-wait-time 5
+            --timeout 20
+            --exclude-mail
+            --exclude-loopback
+            --exclude-private
+            "**/*.md"
+          fail: false
+          output: ./lychee-report.md
+
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lychee-external-link-report
+          path: lychee-report.md
+          retention-days: 14
+
+      - name: Open issue nếu phát hiện broken link
+        if: steps.lychee.outputs.exit_code != 0
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: "External link check: phát hiện URL hỏng (${{ github.run_id }})"
+          content-filepath: ./lychee-report.md
+          labels: documentation, link-check, automated
