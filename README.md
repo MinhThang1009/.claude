@@ -36,7 +36,7 @@
 │   ├── bash-guard.py               # Engine pattern matching (Python) — defense layer chính
 │   ├── bash-guard.sh               # Wrapper minimal gọi python
 │   ├── format-on-edit.sh           # PostToolUse: prettier/ruff/gofmt/rustfmt (skip nếu file ngoài project)
-│   └── test-bash-guard.sh          # Regression test 90 case (dev-only, có thể xóa)
+│   └── test-bash-guard.sh          # Regression test 97 case (dev-only, có thể xóa)
 └── templates/                      # Template COPY vào TỪNG project mới
     ├── project-CLAUDE.md           # → <project>/CLAUDE.md
     ├── project-CLAUDE.local.md     # → <project>/CLAUDE.local.md
@@ -363,7 +363,7 @@ where.exe bash python git    # Windows
 
 ### 7.3 Defense layers — coverage hook bash-guard
 
-Hook `bash-guard.py` chặn các pattern nguy hiểm sau (verified bằng 90 test case):
+Hook `bash-guard.py` chặn các pattern nguy hiểm sau (verified bằng 97 test case):
 
 | Threat | Coverage | Vector ví dụ |
 |---|---|---|
@@ -390,7 +390,7 @@ Hook `bash-guard.py` chặn các pattern nguy hiểm sau (verified bằng 90 tes
 
 Verify hook coverage tại máy bạn:
 ```bash
-bash ~/.claude/hooks/test-bash-guard.sh    # Expect: Total 90, PASS 90, FAIL 0
+bash ~/.claude/hooks/test-bash-guard.sh    # Expect: Total 97, PASS 97, FAIL 0
 ```
 
 ## 8. Tài liệu tham khảo

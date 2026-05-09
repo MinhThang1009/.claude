@@ -1708,7 +1708,7 @@ Context phiên này:
 ### 17.3 Workflow handoff khuyến nghị
 
 1. Khi `/context` >65%, hoặc kết thúc 1 phase công việc → gọi skill [`/handoff`](skills/handoff/SKILL.md) hoặc nói "viết handoff brief".
-2. Save về `.claude/HANDOFF.md` (cần thêm vào `.gitignore` — xem Section 21 checklist).
+2. Save về `.claude/HANDOFF.md` (cần thêm vào `.gitignore` — xem Section 22 checklist).
 3. `/compact giữ brief, drop debugging history` HOẶC `/clear` rồi prompt mới: `Đọc .claude/HANDOFF.md và tiếp tục từ "Bước tiếp"`.
 4. Cuối ngày / cuối session → update HANDOFF.md → `git status` → commit work.
 
