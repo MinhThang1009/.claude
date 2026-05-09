@@ -2,7 +2,7 @@
 
 Toàn bộ thay đổi đáng chú ý của repo `dotclaude` được ghi nhận trong file này.
 
-Format theo [Keep a Changelog 1.1.0](https://keepachangelog.com/vi/1.1.0/), tuân thủ [Semantic Versioning](https://semver.org/lang/vi/).
+Format theo [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/), tuân thủ [Semantic Versioning](https://semver.org/lang/vi/).
 
 ## [Unreleased]
 
@@ -38,12 +38,14 @@ Format theo [Keep a Changelog 1.1.0](https://keepachangelog.com/vi/1.1.0/), tuâ
 
 ### Fixed
 
-- 3 WRONG factual claim phát hiện qua fact-check round 1 vs Anthropic docs:
-  - REFERENCE.md: "29 events" → "30 events" hooks.
-  - REFERENCE.md: Boris Cherny "tech lead" → "Head of Claude Code".
+- WRONG factual claim phát hiện qua fact-check vs Anthropic docs:
+  - REFERENCE.md: Boris Cherny title soften → "Anthropic Claude Code lead" (exact title không verifiable public).
   - README.md: Opus 4.7 đã có trên Bedrock + Vertex (cập nhật bảng fallback).
+  - REFERENCE.md: hook events count giữ 29 (docs canonical confirm). Lưu ý: round 1 fact-check tạm đổi 29 → 30 nhưng round 5 verify lại docs/en/hooks confirm 29 — đã revert.
 - 6 fact-check issue Tier B+C: bỏ `default` model alias, soften `/schedule` quotas, remove `CLAUDE_CODE_SYNC_PLUGIN_INSTALL` env (unverified), Code Review cost caveat, etc.
 - 4 version-gating sai sau verify CHANGELOG: skills system v2.1.0 → v2.0.20, output styles v2.1.101 → v1.0.81, etc.
+- Soften env vars unverified specific values (`CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` 95% → "~95%, verify với env docs").
+- 3 broken external URL fix: `keepachangelog.com/vi/1.1.0/` → `/en/1.1.0/`; remove `$schema: json.schemastore.org/claude-code-settings.json` (404, similar to mcp.json earlier).
 
 ### Security
 

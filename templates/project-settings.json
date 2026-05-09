@@ -1,6 +1,5 @@
 {
-  "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "_comment": "Settings cho project — commit vào git. Override cá nhân để vào .claude/settings.local.json (đã gitignore tự động).",
+  "_comment": "Settings cho project — commit vào git. Override cá nhân để vào .claude/settings.local.json (đã gitignore tự động). $schema URL cũ json.schemastore.org/claude-code-settings.json đã 404 (2026-05); Anthropic chưa publish public JSON schema cho Claude Code settings.",
 
   "attribution": {
     "_comment": "Tắt 'Co-Authored-By: Claude' và '🤖 Generated with Claude Code' trong commit/PR",

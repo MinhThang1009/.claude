@@ -98,7 +98,7 @@ Tham khảo workflow fact-check trong commit history (search `docs: fix .* fact-
 
 ### Cập nhật CHANGELOG.md
 
-PR có user-visible change (feature, fix, breaking) cần thêm entry vào section `## [Unreleased]` của [CHANGELOG.md](CHANGELOG.md), theo format [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/):
+PR có user-visible change (feature, fix, breaking) cần thêm entry vào section `## [Unreleased]` của [CHANGELOG.md](CHANGELOG.md), theo format [Keep a Changelog](https://keepachangelog.com/en/1.1.0/):
 
 - **Added**: tính năng mới
 - **Changed**: thay đổi behavior tính năng có sẵn

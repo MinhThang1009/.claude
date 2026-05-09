@@ -59,7 +59,7 @@
     - [11.1 Permission rule syntax](#111-permission-rule-syntax)
     - [11.2 Built-in tools — tên dùng trong permission rules / hook matchers](#112-built-in-tools--tên-dùng-trong-permission-rules--hook-matchers)
 12. [Environment variables](#12-environment-variables)
-13. [Hook events — đầy đủ 30 event](#13-hook-events--đầy-đủ-30-event)
+13. [Hook events — đầy đủ 29 event](#13-hook-events--đầy-đủ-29-event)
     - [13.1 Per-session](#131-per-session)
     - [13.2 Per-turn](#132-per-turn)
     - [13.3 Per-tool-call (agentic loop)](#133-per-tool-call-agentic-loop)
@@ -871,7 +871,6 @@ force-for-plugin: false               # Plugin only: true → auto-apply khi plu
 
 ```jsonc
 {
-  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "model": "claude-opus-4-7",
   "outputStyle": "Default",            // values: "Default" | "Explanatory" | "Learning" | custom name (default: none)
   "language": "vietnamese",            // Claude's preferred response language (vd "japanese", "spanish") — KHÔNG phải voice dictation
@@ -1149,7 +1148,7 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `BASH_DEFAULT_TIMEOUT_MS`                  | Bash timeout (default 120000 = 2 phút)                                                                                                         |
 | `BASH_MAX_TIMEOUT_MS`                      | Bash max timeout (default 600000)                                                                                                              |
 | `CLAUDE_CODE_AUTO_COMPACT_WINDOW`          | Context window cho auto-compaction                                                                                                             |
-| `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`          | Trigger auto-compact (default 95%)                                                                                                             |
+| `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`          | Trigger auto-compact (default ~95%, verify với env-vars docs)                                                                                  |
 | `CLAUDE_CODE_MAX_CONTEXT_TOKENS`           | Override context window size — CHỈ effect khi `DISABLE_COMPACT=1` (constraint cứng từ docs)                                                    |
 | `CLAUDE_CODE_SUBAGENT_MODEL`               | Model cho subagent                                                                                                                             |
 | `CLAUDECODE`                               | Set trong spawned shells (dùng để detect Claude env)                                                                                           |
@@ -1259,7 +1258,7 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 
 ---
 
-## 13. Hook events — đầy đủ 30 event
+## 13. Hook events — đầy đủ 29 event
 
 > Source chính thức: [code.claude.com/docs/en/hooks](https://code.claude.com/docs/en/hooks)
 
@@ -1553,7 +1552,7 @@ Default: **single-agent**. Multi-agent (subagent / `/batch`) tốn **3-10× toke
 
 ### 16.1 Tầm quan trọng
 
-Mọi best practice xoay quanh 1 ràng buộc: **context window đầy nhanh, performance giảm khi đầy**. Mỗi message re-read toàn bộ history → cost grow exponential trong agentic session. Ở 80%+ context, Claude bắt đầu "quên" instruction sớm, lặp sai lầm cũ. Boris Cherny (Head of Claude Code) giữ CLAUDE.md ~2,500 tokens.
+Mọi best practice xoay quanh 1 ràng buộc: **context window đầy nhanh, performance giảm khi đầy**. Mỗi message re-read toàn bộ history → cost grow exponential trong agentic session. Ở 80%+ context, Claude bắt đầu "quên" instruction sớm, lặp sai lầm cũ. Boris Cherny (Anthropic Claude Code lead) giữ CLAUDE.md ~2,500 tokens.
 
 ### 16.2 Ngưỡng hành động
 

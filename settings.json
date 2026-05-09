@@ -1,5 +1,4 @@
 {
-  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "env": {
     "//": "Tăng MAX_MCP_OUTPUT_TOKENS để MCP server (như filesystem, GitHub) không bị truncate khi trả về dữ liệu hữu ích. Mặc định 25k (docs MCP), warning threshold 10k.",
     "MAX_MCP_OUTPUT_TOKENS": "50000",
