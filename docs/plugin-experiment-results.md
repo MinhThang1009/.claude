@@ -11,8 +11,8 @@ Convert `dotclaude` user-config repo sang Claude Code plugin format **technicall
 | Branch | Commit | Status | Purpose |
 |---|---|---|---|
 | `main` | `70a925a` | ✅ Canonical | User-config repo gốc với full security posture |
-| `plugin-experiment/poc-v0.1` | `e0f87de` | ✅ Reference | PoC test 1 skill — validated plugin format work |
 | `plugin-experiment/v1` | `14fe966` | ✅ Reference | Full migration với 4 commits split + security hardening |
+| ~~`plugin-experiment/poc-v0.1`~~ | ~~`e0f87de`~~ | 🗑️ Deleted | PoC test 1 skill — validated plugin format work, branch deleted sau khi xác nhận concept |
 
 Tag: `dotclaude-v0.1.0-experimental` pinned ở `14fe966` (commit-SHA reference cho secure install).
 
@@ -104,7 +104,8 @@ Total findings: 91 (5 BLOCKER + 14 HIGH + 15 MEDIUM + 11 LOW + 46 confirmations)
 ## Reference
 
 - Plan file: `~/.claude/plans/l-n-k-ho-ch-y-happy-hickey.md`
-- Branches: [poc-v0.1](https://github.com/MinhThang1009/dotclaude/tree/plugin-experiment/poc-v0.1), [v1](https://github.com/MinhThang1009/dotclaude/tree/plugin-experiment/v1)
+- Branch: [plugin-experiment/v1](https://github.com/MinhThang1009/dotclaude/tree/plugin-experiment/v1)
 - Tag: [`dotclaude-v0.1.0-experimental`](https://github.com/MinhThang1009/dotclaude/releases/tag/dotclaude-v0.1.0-experimental)
+- Note: branch `plugin-experiment/poc-v0.1` (PoC) đã deleted sau khi confirm concept work — chỉ giữ v1 cho full migration reference
 - Audit findings: 91 total (chi tiết trong plan file)
 - Docs verified: 18+ Anthropic pages
