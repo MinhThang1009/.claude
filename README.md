@@ -33,9 +33,10 @@
 ├── output-styles/
 │   └── concise-vietnamese.md       # Style tiếng Việt ngắn gọn
 ├── hooks/                          # Hook scripts (gọi từ settings.json)
-│   ├── bash-guard.sh               # PreToolUse: chặn rm -rf root/home, curl|bash, đọc .env qua Bash
-│   ├── format-on-edit.sh           # PostToolUse: prettier/ruff/gofmt/rustfmt sau Edit/Write
-│   └── test-bash-guard.sh          # Regression test 39 case (dev-only, có thể xóa)
+│   ├── bash-guard.py               # Engine pattern matching (Python) — defense layer chính
+│   ├── bash-guard.sh               # Wrapper minimal gọi python
+│   ├── format-on-edit.sh           # PostToolUse: prettier/ruff/gofmt/rustfmt (skip nếu file ngoài project)
+│   └── test-bash-guard.sh          # Regression test 90 case (dev-only, có thể xóa)
 └── templates/                      # Template COPY vào TỪNG project mới
     ├── project-CLAUDE.md           # → <project>/CLAUDE.md
     ├── project-CLAUDE.local.md     # → <project>/CLAUDE.local.md
@@ -358,6 +359,38 @@ Hook **silent skip** (không error) nếu tool optional thiếu — đã handle 
 ```bash
 which bash python git    # macOS/Linux
 where.exe bash python git    # Windows
+```
+
+### 7.3 Defense layers — coverage hook bash-guard
+
+Hook `bash-guard.py` chặn các pattern nguy hiểm sau (verified bằng 90 test case):
+
+| Threat | Coverage | Vector ví dụ |
+|---|---|---|
+| Đọc file nhạy cảm qua Bash | ✅ | `cat .env`, `python -c "open('.env')"`, `cp .env /tmp`, `< .env` redirect |
+| Network exfiltration | ✅ | `curl --data @.env`, `nc < .env`, `socat`, `telnet` |
+| Pipe download → execute | ✅ | `curl \| bash`, `eval $(curl)`, `source <(curl)`, 2-step `curl -o /tmp/x && bash /tmp/x` |
+| Force push branch | ✅ | `git push --force/-f/--force-with-lease/--force-if-includes`, `git push origin +main`, `git -c push.default=current push` |
+| Recursive delete root/home | ✅ | `rm -rf /`, `rm --recursive --force ~`, `find / -delete`, `find ~ -exec rm` |
+| Disk wipe | ✅ | `dd of=/dev/sda` (block device write) |
+| Fork bomb | ✅ | `:(){:\|:&};:` |
+
+**Sensitive paths được protect** (Read deny + Bash hook):
+`.env*`, `*.env`, `.envrc`, `*.pem`, `*.key`, `*.p12`, `*.jks`, `id_rsa*`, `id_ed25519*`, `~/.aws/credentials`, `~/.aws/config`, `~/.netrc`, `~/.npmrc`, `~/.pypirc`, `~/.docker/config.json`, `~/.kube/config`, `**/credentials.json`, `**/serviceAccount*.json`, `**/firebase-adminsdk*.json`.
+
+**Safe metadata commands** (PASS với sensitive path): `ls`, `stat`, `file`, `wc -l`, `find -name/-type`, `realpath`, `dirname`, `basename`, `which`, `type`, `echo`, `printf`. (List metadata, không reveal content.)
+
+**Format hook hardening**: skip nếu file ngoài `$CLAUDE_PROJECT_DIR`. Skip prettier nếu có config `.prettierrc.js/.cjs/.mjs` (RCE risk: `require()` execute code).
+
+**Limits cần biết**:
+- Hook là **defense-in-depth deterministic**, không thay thế user judgment với permission `ask`.
+- Variable-resolved path không được bắt: `FILE=.env cat $FILE` (cần dynamic shell parsing).
+- Quoted path: `cat "/path with space/.env"` — quote có thể phá pattern. Hiếm gặp.
+- Hook chỉ chạy với Bash tool. Nếu Claude dùng Read/Edit/Write tool, áp dụng permission rules thay.
+
+Verify hook coverage tại máy bạn:
+```bash
+bash ~/.claude/hooks/test-bash-guard.sh    # Expect: Total 90, PASS 90, FAIL 0
 ```
 
 ## 8. Tài liệu tham khảo
