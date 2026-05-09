@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "_comment": "Recommended settings cho user dotclaude plugin. Copy hoặc merge vào ~/.claude/settings.json. Plugin format KHÔNG distribute permissions/env/model — phải copy thủ công. Xem MIGRATION-SETTINGS.md cho hướng dẫn merge.",
   "env": {
-    "//": "Tăng MAX_MCP_OUTPUT_TOKENS để MCP server (như filesystem, GitHub) không bị truncate khi trả về dữ liệu hữu ích. Mặc định 25k (docs MCP), warning threshold 10k.",
     "MAX_MCP_OUTPUT_TOKENS": "50000",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "0"
   },
@@ -132,48 +132,9 @@
       "Bash(cargo add:*)",
       "Bash(go get:*)"
     ],
-    "defaultMode": "acceptEdits",
-    "//": "Mặc định cho global. Project có thể override hoặc thêm allow/deny.",
-    "//defaultMode": "acceptEdits = file edits (Edit/Write) tự apply không cần Apply diff card. Bash/WebFetch nguy hiểm vẫn theo allow/ask/deny rule. Precedence: deny > ask > allow > mode (mode chỉ kick in khi không rule nào match)."
+    "defaultMode": "acceptEdits"
   },
   "model": "opus[1m]",
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$HOME/.claude/hooks/bash-guard.sh\"",
-            "shell": "bash"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$HOME/.claude/hooks/format-on-edit.sh\"",
-            "shell": "bash"
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash -c 'cd \"${CLAUDE_PROJECT_DIR:-.}\" 2>/dev/null; git rev-parse --git-dir >/dev/null 2>&1 && { echo \"=== Git status ===\"; git status -s; echo \"=== Branch ===\"; git rev-parse --abbrev-ref HEAD; }; exit 0'",
-            "shell": "bash"
-          }
-        ]
-      }
-    ]
-  },
   "effortLevel": "xhigh",
   "autoUpdatesChannel": "latest",
   "autoMemoryEnabled": true,
@@ -183,6 +144,5 @@
     "**/dist/**/CLAUDE.md",
     "**/build/**/CLAUDE.md",
     "**/.venv/**/CLAUDE.md"
-  ],
-  "//": "Settings global cho ~/.claude/settings.json. Override bằng settings.json của project khi cần. effortLevel=xhigh persist được; nếu muốn 'max' thì set CLAUDE_CODE_EFFORT_LEVEL=max ở env shell. theme chỉnh qua /config interactive (lưu vào ~/.claude.json), không phải settings.json."
+  ]
 }
