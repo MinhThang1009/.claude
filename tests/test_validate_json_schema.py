@@ -10,6 +10,8 @@ from unittest.mock import patch
 
 import pytest
 
+pytest.importorskip("jsonschema", reason="jsonschema required for JSON schema tests")
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 _spec = importlib.util.spec_from_file_location(

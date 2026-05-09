@@ -8,6 +8,8 @@ from pathlib import Path
 
 import pytest
 
+yaml = pytest.importorskip("yaml", reason="PyYAML required for frontmatter tests")
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # Load module trực tiếp (tên file có hyphen).

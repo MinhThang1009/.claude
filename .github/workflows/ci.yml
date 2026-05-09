@@ -110,7 +110,7 @@ jobs:
         with:
           python-version: '3.x'
       - name: Install pytest + dependencies
-        run: pip install --quiet pytest
+        run: pip install --quiet pytest pyyaml jsonschema
       - name: Run pytest
         run: python -m pytest tests/ -v
 
