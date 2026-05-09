@@ -85,4 +85,4 @@ Khi `/compact` chạy (manual hoặc auto), summary PHẢI giữ lại:
 
 @~/.claude/rules/security.md
 
-> 2 rule còn lại (`coding-standards.md`, `git-workflow.md`) KHÔNG auto-import để tiết kiệm context. Tôi sẽ `@~/.claude/references/...` khi cần, hoặc bạn tự đọc khi gặp task tương ứng.
+> 2 rule còn lại ([`coding-standards.md`](references/coding-standards.md), [`git-workflow.md`](references/git-workflow.md)) KHÔNG auto-import để tiết kiệm context. Tôi sẽ `@~/.claude/references/...` khi cần, hoặc bạn tự đọc khi gặp task tương ứng.

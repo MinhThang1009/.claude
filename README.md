@@ -69,7 +69,7 @@
 
 **Ghi chú**:
 - Vietnamese tokenize ~2.3 chars/token cho prose (kém hiệu quả hơn English ~4 chars/token); baseline 28.3k cao hơn config English (~10-15k) là expected.
-- 2 references còn lại (`coding-standards.md`, `git-workflow.md`) chỉ load khi `@`-reference → KHÔNG ăn baseline.
+- 2 references còn lại ([`coding-standards.md`](references/coding-standards.md), [`git-workflow.md`](references/git-workflow.md)) chỉ load khi `@`-reference → KHÔNG ăn baseline.
 - Autocompact buffer 33k reserved (không tính vào used) — Claude Code dành chỗ cho compact summary khi context đầy.
 
 ## 2. Cài đặt
@@ -431,9 +431,9 @@ Câu hỏi thường gặp:
 
 Baseline context tính tiền theo mỗi message. 4 rules = thêm ~6000 tokens × mỗi turn × cả phiên = lãng phí. Chỉ import 2 rule áp dụng MỌI turn (`communication`, `security`); 2 rule còn lại để Claude đọc khi cần (qua REFERENCE hoặc user `@`-reference).
 
-### 9.2 Tại sao REFERENCE.md không auto-load vào CLAUDE.md?
+### 9.2 Tại sao [REFERENCE.md](REFERENCE.md) không auto-load vào [CLAUDE.md](CLAUDE.md)?
 
-REFERENCE.md = ~2050 dòng, ~158k chars → ~55k tokens (Vietnamese prose ~2.3 chars/token, code blocks/tables ~3-4 chars/token, mix ~2.9). Auto-load = ~28% context Sonnet 200k (hoặc ~5.5% Opus 1M) mỗi session. REFERENCE phục vụ **NGƯỜI** tra cứu (mở trên màn hình thứ 2 / web), KHÔNG cho Claude đọc.
+[REFERENCE.md](REFERENCE.md) = ~2050 dòng, ~158k chars → ~55k tokens (Vietnamese prose ~2.3 chars/token, code blocks/tables ~3-4 chars/token, mix ~2.9). Auto-load = ~28% context Sonnet 200k (hoặc ~5.5% Opus 1M) mỗi session. REFERENCE phục vụ **NGƯỜI** tra cứu (mở trên màn hình thứ 2 / web), KHÔNG cho Claude đọc.
 
 ### 9.3 Tại sao bỏ `/init-context`?
 
