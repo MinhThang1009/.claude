@@ -1148,7 +1148,7 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `BASH_DEFAULT_TIMEOUT_MS`                  | Bash timeout (default 120000 = 2 phút)                                                                                                         |
 | `BASH_MAX_TIMEOUT_MS`                      | Bash max timeout (default 600000)                                                                                                              |
 | `CLAUDE_CODE_AUTO_COMPACT_WINDOW`          | Context window cho auto-compaction                                                                                                             |
-| `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`          | Trigger auto-compact (default ~95%, verify với env-vars docs)                                                                                  |
+| `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`          | Override % trigger auto-compact (Boris confirm default ~77.5% — 155k/200k tokens, [tweet](https://x.com/bcherny/status/1977163445205450783))   |
 | `CLAUDE_CODE_MAX_CONTEXT_TOKENS`           | Override context window size — CHỈ effect khi `DISABLE_COMPACT=1` (constraint cứng từ docs)                                                    |
 | `CLAUDE_CODE_SUBAGENT_MODEL`               | Model cho subagent                                                                                                                             |
 | `CLAUDECODE`                               | Set trong spawned shells (dùng để detect Claude env)                                                                                           |
@@ -1547,23 +1547,27 @@ Default: **single-agent**. Multi-agent (subagent / `/batch`) tốn **3-10× toke
 
 ## 16. Quản lý context window — chi tiết
 
-> Source chính thức: [code.claude.com/docs/en/memory](https://code.claude.com/docs/en/memory) + [platform.claude.com/docs/en/build-with-claude/prompt-caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)
+> Source: [code.claude.com/docs/en/memory](https://code.claude.com/docs/en/memory) + [platform.claude.com/docs/en/build-with-claude/prompt-caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching) (qualitative). Ngưỡng % cụ thể từ [Boris Cherny — Anthropic Claude Code lead](https://howborisusesclaudecode.com/) + [tweet xác nhận auto-compact 155k tokens](https://x.com/bcherny/status/1977163445205450783).
 
 
 ### 16.1 Tầm quan trọng
 
-Mọi best practice xoay quanh 1 ràng buộc: **context window đầy nhanh, performance giảm khi đầy**. Mỗi message re-read toàn bộ history → cost grow exponential trong agentic session. Ở 80%+ context, Claude bắt đầu "quên" instruction sớm, lặp sai lầm cũ. Boris Cherny (Anthropic Claude Code lead) giữ CLAUDE.md ~2,500 tokens.
+Mọi best practice xoay quanh 1 ràng buộc: **context window đầy nhanh, performance giảm khi đầy**. Mỗi message re-read toàn bộ history → cost grow exponential trong agentic session. Boris Cherny (Anthropic Claude Code lead) gọi vùng `>40%` là **"dumb zone"** — performance bắt đầu degrade rõ rệt. Boris cũng giữ CLAUDE.md ~2,500 tokens.
 
 ### 16.2 Ngưỡng hành động
 
-| % context | Hành động                                    |
-| --------- | -------------------------------------------- |
-| <40%      | 🟢 Sweet spot, làm việc bình thường          |
-| 40-60%    | 🟢 OK, để ý task lớn sắp tới                 |
-| 60-70%    | 🟡 Sau khi xong phase tiếp theo → `/compact` |
-| 70-80%    | 🟠 `/compact` HOẶC `/handoff + /clear` ngay  |
-| 80-95%    | 🔴 DỪNG. Brief-injection sang session mới    |
-| 95%+      | Auto-compact firing — chất lượng đã giảm rồi |
+> Ngưỡng % dưới đây là khuyến nghị từ [Boris Cherny](https://howborisusesclaudecode.com/) — creator của Claude Code. Anthropic không publish % chính thức trong docs, chỉ describe behavior qualitatively ("approach context limits"). Auto-compact 155k tokens (~77.5% của 200k window) được Boris xác nhận trên [X](https://x.com/bcherny/status/1977163445205450783).
+
+| % context (200k window)     | Trạng thái                          | Hành động                                                              |
+| --------------------------- | ----------------------------------- | ---------------------------------------------------------------------- |
+| `<30%`                      | 🟢 Aggressive zone                  | Mục tiêu cho experienced users — push lên 60% chỉ với task đơn giản    |
+| `30-40%`                    | 🟢 Sweet spot                       | Mục tiêu cho newcomer — Boris recommend "shoot to keep it under 40%"   |
+| `40-60%`                    | 🟡 "Dumb zone" bắt đầu              | Performance degrade rõ rệt — plan wrap-up, finalize phase hiện tại     |
+| `60-77%`                    | 🟠 Wrap up actively                 | "If you get up to 60%, think about wrapping it up" → `/compact` hoặc `/handoff + /clear` |
+| `~77%` (155k tokens)        | 🔴 Auto-compact firing              | Claude Code tự động compact để giữ buffer — chất lượng đã giảm rồi      |
+| `>90%`                      | ⛔ Hard limit                        | Có thể stop processing, phải `/clear` thủ công                          |
+
+**Ghi chú cho 1M context window** (Opus 4.6+ với 1M mode): Boris recommend `CLAUDE_CODE_AUTO_COMPACT_WINDOW=400000` — vùng "context rot" ~300-400k tokens (30-40% của 1M). Tỷ lệ % không đổi nhiều giữa 200k và 1M model — vẫn nên target <40%.
 
 ### 16.3 `/compact` vs `/clear`
 
@@ -2023,7 +2027,7 @@ Cách xử lý:
 - [ ] Verify mọi output (test, lint, screenshot)
 - [ ] Subagent cho investigation
 - [ ] Commit thường xuyên (checkpoint để revert)
-- [ ] Theo dõi `/context` — <40% sweet spot, >60% nên action
+- [ ] Theo dõi `/context` — 30-40% sweet spot, 40-60% "dumb zone", >60% nên action (theo Boris Cherny)
 - [ ] Sửa 2 lần vẫn sai → `/clear` + reprompt, đừng spam correction
 - [ ] `/effort high` hoặc `ultrathink` cho task khó (architecture, debug heisenbug, refactor lớn)
 
@@ -2047,6 +2051,6 @@ Cách xử lý:
 5. **Subagent cho investigation** — giữ context chính sạch.
 6. **Commit thường xuyên** — checkpoint để revert nếu Claude đi sai hướng.
 7. **Brief-injection > resume** cho session dài.
-8. **`/compact` proactive** sau mỗi phase, đừng đợi auto-compact 95%.
+8. **`/compact` proactive** sau mỗi phase, đừng đợi auto-compact ~77% (155k tokens).
 9. **`/effort high`** hoặc `ultrathink` cho task khó.
 10. **CLAUDE.md riêng project + global** — global = preference cá nhân, project = context project.

@@ -21,13 +21,16 @@ Sau khi user gửi output `/context`, phân tích theo các bước dưới.
 
 ### Bước 2 — Phân tích theo ngưỡng
 
-| % context | Trạng thái        | Hành động đề xuất                                                        |
-| --------- | ----------------- | ------------------------------------------------------------------------ |
-| <30%      | 🟢 Sạch           | Tiếp tục bình thường                                                     |
-| 30-50%    | 🟢 Tốt            | Tiếp tục, để ý task lớn sắp tới                                          |
-| 50-70%    | 🟡 Cần để ý       | Nếu sắp xong 1 phase → `/compact` luôn. Nếu task mới → cân nhắc `/clear` |
-| 70-85%    | 🟠 Hành động ngay | `/handoff` → `/compact <brief>` HOẶC `/clear` + brief mới                |
-| >85%      | 🔴 Nguy hiểm      | DỪNG mọi task lớn. Brief + new session ngay                              |
+> Ngưỡng từ [Boris Cherny — Anthropic Claude Code lead](https://howborisusesclaudecode.com/). Anthropic không publish % chính thức; auto-compact 155k tokens (~77.5%) được Boris xác nhận trên [X](https://x.com/bcherny/status/1977163445205450783).
+
+| % context | Trạng thái                          | Hành động đề xuất                                                        |
+| --------- | ----------------------------------- | ------------------------------------------------------------------------ |
+| `<30%`    | 🟢 Aggressive zone                  | Mục tiêu experienced users                                                |
+| `30-40%`  | 🟢 Sweet spot                       | Newcomer target — "shoot to keep it under 40%" (Boris)                   |
+| `40-60%`  | 🟡 "Dumb zone" bắt đầu              | Performance degrade — plan wrap-up phase hiện tại                        |
+| `60-77%`  | 🟠 Wrap up actively                 | `/compact` HOẶC `/handoff` → `/clear` + brief mới                        |
+| `~77%`    | 🔴 Auto-compact firing (155k tokens)| Đã muộn — ưu tiên `/handoff --save` trước khi mất chi tiết               |
+| `>90%`    | ⛔ Hard limit                        | DỪNG task lớn ngay, brief + new session                                   |
 
 ### Bước 3 — Phân tích từng nhóm
 
@@ -54,7 +57,7 @@ Ví dụ output:
 | ---------------------------------------------- | --------------------------------------- |
 | Đang giữa 1 task, cần giữ thread               | Hoàn thành 1 task, chuyển task khác hẳn |
 | Quyết định và file path quan trọng cần survive | Không cần lịch sử                       |
-| Context 50-80%                                 | Context >85% hoặc đã rối                |
+| Context 40-60% ("dumb zone")                   | Context >77% (auto-compact zone) hoặc đã rối |
 | Nhiều dead-end debugging cần dọn               | Đã commit xong, sang feature mới        |
 
 **Nguyên tắc vàng**: `/compact` = nén, `/clear` = xóa hẳn. Nhầm `/clear` với `/compact` = mất context phải re-explain. Nhầm `/compact` với `/clear` = giữ rác cho task mới.

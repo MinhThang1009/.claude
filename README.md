@@ -315,8 +315,8 @@ Cao → thấp khi xung đột:
 
 ### Cấp 3 — Compact thông minh
 
-- Theo dõi `/context` — sweet spot <40%, action ở >60%.
-- Kết thúc 1 phase công việc → `/compact ngay` (đừng đợi auto ở 95%).
+- Theo dõi `/context` — sweet spot 30-40%, "dumb zone" 40-60%, action ở 60% (theo Boris Cherny, Claude Code lead).
+- Kết thúc 1 phase công việc → `/compact` ngay (đừng đợi auto-compact ~77% / 155k tokens).
 - `/compact <chỉ thị>` để hướng (vd: `giữ phần API, drop test debug`).
 - "Compact Instructions" trong CLAUDE.md để hướng auto-compact (đã có sẵn trong template).
 
