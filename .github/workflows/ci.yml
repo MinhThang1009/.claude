@@ -129,9 +129,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: rhysd/actionlint@v1
-        with:
-          color: true
+      - uses: raven-actions/actionlint@v2
 
   frontmatter-validate:
     name: Frontmatter schema (skills/agents/output-styles)
