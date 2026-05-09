@@ -1,6 +1,5 @@
 {
-  "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "_comment": "Recommended settings cho user dotclaude plugin. Copy hoặc merge vào ~/.claude/settings.json. Plugin format KHÔNG distribute permissions/env/model — phải copy thủ công. Xem MIGRATION-SETTINGS.md cho hướng dẫn merge.",
+  "_comment": "Recommended settings cho user dotclaude plugin. Copy hoặc merge vào ~/.claude/settings.json. Plugin format KHÔNG distribute permissions/env/model — phải copy thủ công. Xem MIGRATION-SETTINGS.md cho hướng dẫn merge. Note: $schema removed vì schema schemastore quá strict cho permission patterns Grep(**)/Read(**) hợp lệ trong Anthropic spec.",
   "env": {
     "MAX_MCP_OUTPUT_TOKENS": "50000",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "0"

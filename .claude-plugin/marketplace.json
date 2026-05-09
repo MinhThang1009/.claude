@@ -1,5 +1,4 @@
 {
-  "$schema": "https://json.schemastore.org/claude-code-plugin-marketplace.json",
   "name": "dotclaude-marketplace",
   "owner": { "name": "MinhThang1009" },
   "description": "Marketplace cho dotclaude plugin — Claude Code config tiếng Việt (EXPERIMENTAL — xem SECURITY.md)",

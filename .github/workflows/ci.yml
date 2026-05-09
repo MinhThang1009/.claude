@@ -32,11 +32,14 @@ jobs:
         run: bash plugins/dotclaude/hooks/test-bash-guard.sh
 
   json-validate:
-    name: JSON syntax validate
+    name: JSON syntax + schema validate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate all .json files
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Validate JSON syntax
         run: |
           set -e
           fail=0
@@ -49,6 +52,10 @@ jobs:
             fi
           done < <(find . -type f -name '*.json' -not -path './.git/*' -not -path './node_modules/*')
           exit $fail
+      - name: Install jsonschema
+        run: pip install --quiet jsonschema
+      - name: Validate JSON schemas (file có $schema field)
+        run: python scripts/validate-json-schema.py
 
   markdown-links:
     name: Markdown link check
