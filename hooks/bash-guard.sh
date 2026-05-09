@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 # Wrapper minimal cho bash-guard.py.
-# Toàn bộ logic pattern matching nằm trong file .py (Python regex flexible hơn
-# bash glob/grep ERE, dễ test, không cần jq).
-exec python "$HOME/.claude/hooks/bash-guard.py"
+# Toàn bộ logic pattern matching nằm trong file .py.
+# Try python rồi python3 (Windows ưu tiên python.exe; Linux/macOS modern thường có python3).
+# Test bằng `<cmd> -c ''` để bỏ qua Windows Store stub fail.
+for PY in python python3; do
+  if command -v "$PY" >/dev/null 2>&1 && "$PY" -c '' >/dev/null 2>&1; then
+    exec "$PY" "$HOME/.claude/hooks/bash-guard.py"
+  fi
+done
+# Không có python → skip silent (không block bừa)
+exit 0

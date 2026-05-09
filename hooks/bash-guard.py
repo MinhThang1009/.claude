@@ -85,11 +85,22 @@ def is_raw_network_tool(cmd: str) -> bool:
 
 
 def is_curl_wget_exfil(cmd: str) -> bool:
-    """curl/wget với flag upload data → khả năng exfil secret."""
+    """curl/wget upload nội dung từ file → khả năng exfil secret.
+
+    Chỉ block khi data source là FILE (`@<path>`, --upload-file, --post-file, -T).
+    Không block `-d hello` (literal string) hay `-d '{"a":1}'` (inline JSON) —
+    đây là API call thông thường.
+    """
     return bool(re.search(
         r'(?:^|[\s;|&])(?:curl|wget)\b[^|;&]*?'
-        r'(?:--data(?:-binary|-raw|-urlencode)?|--upload-file|--post-file|'
-        r'\s-T\b|\s-F\b|\s-d\b)',
+        r'(?:'
+        r'--upload-file\b|'                         # luôn upload file
+        r'--post-file\b|'                            # wget post file
+        r'\s-T\s+\S+|'                               # -T file → upload
+        r'--data(?:-binary|-raw|-urlencode)?\s+@|'   # --data @file
+        r'\s-d\s+@|'                                 # -d @file
+        r'\s-F\s+[\w.-]+=@'                          # -F name=@file
+        r')',
         cmd
     ))
 
@@ -111,8 +122,9 @@ def is_pipe_to_shell(cmd: str) -> bool:
         r'(?:bash|sh|zsh|ksh)\s+-c\s+[\'"]?\$\([^)]*(?:curl|wget)\b',
         # 2-step: curl ... -o /tmp/x && (bash|sh) /tmp/x
         # Match "curl/wget ... -o <path>" sau đó "(bash|sh|source) <path>"
+        # \1 phải kết thúc bằng word boundary để không match prefix khác
         r'(?:curl|wget)[^|;&]*-[oO]\s+(\S+)[^|;&]*'
-        r'(?:&&|;|\|\|)\s*(?:bash|sh|zsh|source|\.)\s+\1',
+        r'(?:&&|;|\|\|)\s*(?:bash|sh|zsh|source|\.)\s+\1(?=\s|$|[;|&])',
     ]
     return any(re.search(p, cmd) for p in patterns)
 
