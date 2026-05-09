@@ -1,0 +1,70 @@
+name: Feature Request
+description: Đề xuất tính năng / cải tiến cho dotclaude
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Cảm ơn đề xuất. Vui lòng mô tả rõ vấn đề và phương án.
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Phạm vi đề xuất
+      options:
+        - Skill mới
+        - Agent mới
+        - Hook mới / cải tiến defense
+        - Permission rule
+        - Output style
+        - Documentation
+        - CI / automation
+        - Template
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Vấn đề cần giải quyết
+      description: Mô tả pain point hiện tại — workflow nào đang bất tiện, tính năng nào đang thiếu
+      placeholder: |
+        Ví dụ: "Khi review PR lớn, hiện không có cách quick filter file đã thay đổi theo loại"
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Phương án đề xuất
+      description: Mô tả tính năng / hành vi mong đợi
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Phương án thay thế đã cân nhắc
+      description: Liệt kê tool / approach khác đã thử (nếu có)
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Complexity ước tính
+      options:
+        - Đơn giản (config / docs change)
+        - Trung bình (skill / agent mới)
+        - Phức tạp (hook logic / breaking change)
+        - Không chắc
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Kiểm tra trước khi submit
+      options:
+        - label: Đã search issue cũ và không trùng
+          required: true
+        - label: Đã đọc CONTRIBUTING.md, biết loại PR welcome / không nhận
+          required: true

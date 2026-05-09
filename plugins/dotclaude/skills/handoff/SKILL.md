@@ -92,9 +92,9 @@ Tiếp tục từ handoff: [brief inline 5-7 dòng]. File chính: <list>. Bướ
 
 ## Tích hợp với `/compact`
 
-Sau khi tôi soạn brief, người dùng có thể chạy:
+Sau khi soạn brief xong, user có thể chạy:
 ```text
-/compact Giữ lại brief tôi vừa cho, drop debugging history và tool output cũ.
+/compact Giữ lại brief vừa soạn, drop debugging history và tool output cũ.
 ```
 Câu chỉ dẫn này giúp Claude compact có hướng, brief survives cao hơn auto-summary.
 

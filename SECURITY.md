@@ -80,7 +80,7 @@ cat plugins/dotclaude/hooks/hooks.json
 
 # 4. Verify regression tests pass
 bash plugins/dotclaude/hooks/test-bash-guard.sh
-# Expected: Total 97, PASS 97, FAIL 0
+# Expected: Total 119, PASS 119, FAIL 0
 
 # 5. Local test
 claude --plugin-dir ./plugins/dotclaude

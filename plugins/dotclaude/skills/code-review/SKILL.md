@@ -88,12 +88,12 @@ Format chuẩn:
 Quy tắc:
 - Mỗi finding phải có **vị trí cụ thể** (file:line) và **gợi ý fix**.
 - KHÔNG nitpick style nếu có formatter — formatter chạy tự động xử lý.
-- KHÔNG đề xuất rewrite kiểu "tôi sẽ làm khác" nếu chỉ là preference.
+- KHÔNG đề xuất rewrite kiểu "làm khác đi" nếu chỉ là preference.
 - Nếu mọi thứ ổn → nói rõ "Không có vấn đề blocking, có thể merge". Đừng bịa lỗi.
 
 ## Bước 5: Hỏi tiếp
 
-Sau khi đưa kết quả, hỏi: "Muốn tôi đề xuất diff cụ thể cho các issue 🔴 không, hay chỉ dừng ở mức liệt kê?"
+Sau khi đưa kết quả, hỏi: "Có cần diff cụ thể cho các issue 🔴 không, hay dừng ở mức liệt kê?"
 
 Skill này read-only (frontmatter `allowed-tools` không có Edit/Write). Output diff là **text suggestion** trong chat — user tự copy/apply. Nếu muốn auto-apply, dùng skill `/refactor` hoặc subagent có Edit/Write.
 

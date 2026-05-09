@@ -59,7 +59,7 @@ Với MỖI bước:
 4. **Báo cáo ngắn**: "Bước N xong, test pass" hoặc "Bước N fail vì X, đã revert".
 5. Đề xuất commit checkpoint: `refactor: tách hàm validateEmail`.
 
-KHÔNG combine nhiều bước thành một edit lớn. Cảm giác "tôi sẽ làm hết một thể" là cám dỗ — nhưng sai một chỗ trong batch lớn thì khó tìm. Bước nhỏ + commit nhỏ = revert dễ.
+KHÔNG combine nhiều bước thành một edit lớn. Cảm giác muốn làm hết một thể là cám dỗ — nhưng sai một chỗ trong batch lớn thì khó tìm. Bước nhỏ + commit nhỏ = revert dễ.
 
 ## Bước 4: Verify cuối
 

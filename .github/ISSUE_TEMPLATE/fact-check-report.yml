@@ -1,0 +1,77 @@
+name: Fact-check Report
+description: Báo cáo claim sai factual trong docs (model ID, version-gating, env var, slash command, hook event)
+title: "[Fact-check]: "
+labels: ["fact-check", "documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Repo này tổng hợp từ docs Anthropic. Nội dung có thể outdated khi Anthropic ship version mới hoặc deprecate API.
+
+        Vui lòng cung cấp source chính thức để verify. Nếu chưa rõ source, mở Discussion thay vì Issue.
+
+  - type: input
+    id: file-line
+    attributes:
+      label: Vị trí claim sai
+      description: File và line number (vd `REFERENCE.md:1234`)
+      placeholder: "REFERENCE.md:1234"
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-claim
+    attributes:
+      label: Claim hiện tại
+      description: Quote nguyên văn dòng / paragraph có vấn đề
+      render: markdown
+    validations:
+      required: true
+
+  - type: textarea
+    id: correct-fact
+    attributes:
+      label: Fact đúng
+      description: Mô tả thông tin đúng (env var name, version, behavior...)
+    validations:
+      required: true
+
+  - type: input
+    id: source-url
+    attributes:
+      label: Source URL chính thức
+      description: Link tới docs Anthropic / CHANGELOG / blog post bác bỏ claim hiện tại
+      placeholder: "https://docs.claude.com/en/docs/..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: source-quote
+    attributes:
+      label: Quote source verbatim
+      description: Paste đoạn text từ source xác nhận fact đúng
+      render: markdown
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Mức độ ảnh hưởng
+      options:
+        - "WRONG — claim sai, có thể gây hiểu nhầm setup"
+        - "OUTDATED — đúng cũ, giờ deprecated/renamed"
+        - "INCOMPLETE — đúng nhưng thiếu nuance quan trọng"
+        - "TYPO — sai chính tả nhỏ"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Kiểm tra trước khi submit
+      options:
+        - label: Source URL đã verify còn live
+          required: true
+        - label: Đã check version Claude Code (claim có thể đúng cho version cũ)
+          required: true

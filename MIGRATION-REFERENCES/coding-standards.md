@@ -67,11 +67,11 @@ limiter = RateLimiter(...)
 
 ## Cờ đỏ DỪNG-HỎI
 
-Tôi muốn được hỏi trước khi bạn:
+Cần hỏi xác nhận trước khi thực hiện:
 - Thêm dependency mới (kể cả "phổ biến").
 - Đổi schema DB / migration.
 - Thay đổi config production / deployment.
 - Sửa file shared (>3 module dùng) làm thay đổi behavior.
 - Refactor cross-cutting (>5 file).
 - Đổi public API signature.
-- Xóa file/code mà bạn không chắc 100% là dead.
+- Xóa file/code không chắc 100% là dead.

@@ -1,0 +1,96 @@
+name: Bug Report
+description: Báo cáo lỗi reproduce được trong cấu hình dotclaude
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Cảm ơn việc báo cáo lỗi. Vui lòng điền đầy đủ thông tin để giúp việc reproduce và sửa lỗi.
+
+  - type: input
+    id: claude-code-version
+    attributes:
+      label: Claude Code version
+      description: Output của `claude --version`
+      placeholder: "v2.1.138"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Hệ điều hành
+      options:
+        - macOS
+        - Linux (Ubuntu)
+        - Linux (other)
+        - Windows (Git Bash)
+        - Windows (WSL)
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: plan
+    attributes:
+      label: Anthropic plan
+      options:
+        - Pro
+        - Max
+        - Team
+        - Enterprise
+        - API key
+        - Bedrock
+        - Vertex AI
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Các bước reproduce
+      description: Liệt kê các bước cụ thể để reproduce lỗi
+      placeholder: |
+        1. Clone repo và copy `~/.claude/`
+        2. Chạy `claude` trong thư mục project
+        3. Gõ `/skill-name`
+        4. Quan sát hành vi
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Hành vi mong đợi
+      description: Mô tả những gì lẽ ra phải xảy ra
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Hành vi thực tế
+      description: Mô tả những gì thực sự xảy ra (kèm error message nếu có)
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log / Screenshot
+      description: Paste log output hoặc đính kèm screenshot. Nhớ mask secret/token nếu có.
+      render: shell
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Kiểm tra trước khi submit
+      options:
+        - label: Đã search issue cũ và không trùng
+          required: true
+        - label: Đã verify lỗi nằm ở dotclaude config (không phải Claude Code core)
+          required: true
+        - label: Log không chứa secret / API key / personal info
+          required: true

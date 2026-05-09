@@ -180,7 +180,7 @@ plugins/dotclaude/
     ├── bash-guard.py             # Engine
     ├── bash-guard.sh             # Wrapper (sanitize PATH, unset PYTHON env)
     ├── format-on-edit.sh         # Formatter (--no-plugin-search, python fallback)
-    └── test-bash-guard.sh        # Regression 97 case
+    └── test-bash-guard.sh        # Regression 119 case
 ```
 
 ## Uninstall
@@ -193,7 +193,7 @@ plugins/dotclaude/
 ⚠️ **Manual cleanup required** — uninstall plugin **KHÔNG** clean migration files đã copy:
 
 ```bash
-# Xóa migration files (giữ phần custom của bạn nếu có)
+# Xóa migration files (giữ phần custom nếu có)
 rm ~/.claude/CLAUDE.md
 rm -rf ~/.claude/rules ~/.claude/references
 
@@ -201,11 +201,11 @@ rm -rf ~/.claude/rules ~/.claude/references
 mv ~/.claude.backup-<DATE> ~/.claude
 ```
 
-## Verify hook coverage tại máy bạn (post-install)
+## Verify hook coverage tại máy local (post-install)
 
 ```bash
 bash ~/.claude/plugins/cache/<hash>/plugins/dotclaude/hooks/test-bash-guard.sh
-# Expected: Total 97, PASS 97, FAIL 0
+# Expected: Total 119, PASS 119, FAIL 0
 ```
 
 ## See also

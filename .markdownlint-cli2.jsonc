@@ -1,0 +1,38 @@
+// markdownlint-cli2 config — relax rules cho repo Vietnamese-prose
+// Docs: https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+{
+  "config": {
+    // MD013: line length — Vietnamese prose tự nhiên dài, disable
+    "MD013": false,
+    // MD022: blanks around headings — strict for content style, agents/skills file mix list trực tiếp
+    "MD022": false,
+    // MD024: duplicate headings — common section names như "Why" / "How" lặp lại OK
+    "MD024": false,
+    // MD031: blanks around fences — code block đôi khi tight với surrounding text
+    "MD031": false,
+    // MD032: blanks around lists — checklist after heading common pattern
+    "MD032": false,
+    // MD033: inline HTML — đôi khi dùng <kbd>, <details> trong README
+    "MD033": false,
+    // MD036: emphasis used instead of heading — content style choice
+    "MD036": false,
+    // MD040: fenced code blocks must specify language — example block đôi khi không có
+    "MD040": false,
+    // MD041: first line not h1 — REFERENCE.md có warning blockquote trước h1
+    "MD041": false,
+    // MD012: multiple consecutive blank lines — REFERENCE.md có nhiều section break dùng 2 blank
+    "MD012": false,
+    // MD028: blank line trong blockquote — > tổng hợp\n>\n> verify pattern phổ biến
+    "MD028": false,
+    // MD029: ordered list prefix style — vài chỗ dùng 1./1./1. mixed
+    "MD029": false,
+    // MD058: blanks around tables — table sau heading không cần extra blank
+    "MD058": false,
+    // MD060: table column alignment — markdown table không cần visual pipe align
+    "MD060": false
+  },
+  "ignores": [
+    "node_modules/",
+    ".git/"
+  ]
+}

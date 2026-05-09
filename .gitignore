@@ -27,3 +27,7 @@ ide/
 # Transient session state (audit workflow)
 HANDOFF.md
 fetch-tasks.md
+
+# Python bytecode (from running plugin hooks scripts)
+__pycache__/
+*.pyc

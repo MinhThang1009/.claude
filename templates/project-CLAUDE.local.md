@@ -1,15 +1,17 @@
 # <TÊN PROJECT> — Note cá nhân
 
-> **GITIGNORE**. Note cá nhân của bạn về project, không chia sẻ trong team. Cộng dồn với `<project>/CLAUDE.md` (team) và `~/.claude/CLAUDE.md` (global).
+> **GITIGNORE**. Note cá nhân về project (per-user), không chia sẻ trong team. Cộng dồn với `<project>/CLAUDE.md` (team) và `~/.claude/CLAUDE.md` (global).
+>
+> 📝 **Quy ước first-person**: Đây là personal note template — đại từ "tôi" trong placeholder examples = USER (người sở hữu file). Khi copy template vào project, tự thay placeholder `<vd: ...>` bằng nội dung thực tế.
 
-## Môi trường local của bạn
+## Môi trường local
 
 - Node version đang dùng: <vd: 20.11>
 - Database local: <vd: PostgreSQL chạy trong Docker port 5433>
 - Branch đang làm: <vd: feat/google-oauth>
 - Issue tracker reference: <vd: tôi quản lý task qua linear @yourname>
 
-## Pattern bạn muốn Claude lưu ý cho RIÊNG bạn
+## Pattern Claude lưu ý cho user này
 
 - <vd: Tôi prefer dùng `vitest` thay `jest`. Nếu thấy file test cũ dùng jest → đề xuất migrate dần>
 - <vd: Khi sửa Tailwind, tôi muốn class theo thứ tự: layout → spacing → typography → color → state>

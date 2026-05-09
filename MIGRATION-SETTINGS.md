@@ -20,7 +20,7 @@ cp recommended-settings.json ~/.claude/settings.json
 
 ## Manual merge (recommended cho user ĐÃ custom settings.json)
 
-Mở `recommended-settings.json` (cùng folder), copy từng block vào `~/.claude/settings.json` của bạn:
+Mở `recommended-settings.json` (cùng folder), copy từng block vào `~/.claude/settings.json` đang dùng:
 
 ### 1. `permissions.allow` (40+ entries) — append, dedup
 

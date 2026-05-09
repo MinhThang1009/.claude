@@ -1,8 +1,10 @@
 # REFERENCE — Cheatsheet Claude Code
 
-> ⚠️ **CẢNH BÁO TOKEN**: File này dài **~2050 dòng / 158KB / ~55k tokens** (Vietnamese mix ~2.9 chars/token). KHÔNG `@-import` vào CLAUDE.md, KHÔNG paste full vào prompt — sẽ ăn 28% context Sonnet 200k hoặc 5.5% context Opus 1M ngay session start. Cách dùng đúng: mở trên trình duyệt / màn hình thứ 2 / editor để **NGƯỜI** tra cứu khi cần. Nếu cần Claude tham khảo 1 phần, copy đoạn cụ thể vào prompt thay vì import cả file.
+> ⚠️ **CẢNH BÁO TOKEN**: File này dài **~2050 dòng / ~159KB / ~55k tokens** (Vietnamese mix ~2.9 chars/token). KHÔNG `@-import` vào CLAUDE.md, KHÔNG paste full vào prompt — sẽ ăn ~28% context Sonnet 200k hoặc ~5.5% context Opus 1M ngay session start. Cách dùng đúng: mở trên trình duyệt / màn hình thứ 2 / editor để **NGƯỜI** tra cứu khi cần. Nếu cần Claude tham khảo 1 phần, copy đoạn cụ thể vào prompt thay vì import cả file.
 >
 > Tổng hợp từ docs chính thức [code.claude.com/docs](https://code.claude.com/docs) (2026), blog [claude.com](https://www.claude.com/blog), [MindStudio](https://www.mindstudio.ai/blog), [ClaudeFast](https://claudefa.st/blog), GitHub [anthropics/claude-code](https://github.com/anthropics/claude-code). Cập nhật cho Claude Code v2.1.x trở lên.
+>
+> 📅 **Đã verify**: 2026-05-09 vs Claude Code v2.1.138 + Opus 4.7. Phát hiện sai sót → [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Mục lục
 
@@ -164,7 +166,7 @@
 | `claude plugin list [--json]`                | List plugin đã cài. `--json` parse được programmatic                                           |
 | `claude plugin uninstall <name> [--prune]`   | Gỡ plugin. `--prune` xóa luôn orphaned auto-installed deps                                     |
 | `claude plugin marketplace add <repo>`       | Add marketplace mới                                                                            |
-| `claude plugin tag [--push] [--dry-run]`     | (Author) Tag release `{plugin}--v{version}` theo manifest. v2.1.110+                           |
+| `claude plugin tag [--push] [--dry-run]`     | (Author) Tag release `{plugin}--v{version}` theo manifest. v2.1.118+                           |
 | `claude plugin prune [--scope X] [--dry-run] [-y]` | Xóa orphaned auto-installed deps (sau khi uninstall plugin chính). v2.1.121+             |
 | `claude project purge [path]`                | Xóa local state của project (transcripts, debug log…). Flags: `--dry-run`, `-y`, `-i`, `--all` |
 | `claude remote-control`                      | Chạy server mode cho Remote Control từ claude.ai/app                                           |
@@ -196,7 +198,7 @@
 ### 2.2 Model & effort
 | Flag                       | Mục đích                                                                                                             |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `--model <alias\|id>`      | `opus`, `sonnet`, `haiku`, `best`, `default`, `opusplan`, `opus[1m]`, `sonnet[1m]`, hoặc full ID (`claude-opus-4-7`) |
+| `--model <alias\|id>`      | `opus`, `sonnet`, `haiku`, `best`, `opusplan`, `opus[1m]`, `sonnet[1m]`, hoặc full ID (`claude-opus-4-7`) |
 | `--effort <level>`         | `low`, `medium`, `high`, `xhigh`, `max`                                                                              |
 | `--fallback-model <alias>` | Fallback khi default overload (chỉ print mode)                                                                       |
 | `--betas <header>`         | Beta header cho API (chỉ API key user)                                                                               |
@@ -423,7 +425,7 @@
 | `/web-setup`              | Connect GitHub cho Claude Code on the web                |
 | `/autofix-pr [prompt]`    | Spawn web session auto-fix PR                            |
 | `/ultraplan <prompt>`     | Draft plan trong browser, execute remotely               |
-| `/schedule [description]` | Tạo/edit/list/run routine định kỳ. Alias `/routines`. Trigger: scheduled (hourly/nightly/weekly), API endpoint với auth token (POST → session URL), webhook GitHub events (PR filter). Limit: Pro 5/Max 15/T+E 25 routines/day |
+| `/schedule [description]` | Tạo/edit/list/run routine định kỳ. Alias `/routines`. Trigger: scheduled (hourly/nightly/weekly), API endpoint với auth token (POST → session URL), webhook GitHub events (PR filter). Limit: daily cap per-account, plan-dependent — xem `claude.ai/settings/usage` |
 | `/install-github-app`     | Cài Claude GitHub Actions                                |
 | `/install-slack-app`      | Cài Claude Slack                                         |
 | `/setup-bedrock`          | Cấu hình Amazon Bedrock                                  |
@@ -450,7 +452,7 @@
 | `/login`, `/logout`  | Auth                                                       |
 | `/upgrade`           | Upgrade plan                                               |
 | `/extra-usage`       | Cấu hình extra usage khi hit rate limit                    |
-| `/passes`            | Share free week với bạn                                    |
+| `/passes`            | Share free week (Claude subscription benefit)              |
 | `/feedback [report]` | Submit feedback. Alias `/bug`                              |
 | `/release-notes`     | Xem changelog                                              |
 | `/team-onboarding`   | Generate onboarding guide từ usage history                 |
@@ -468,14 +470,15 @@
 | `/fewer-permission-prompts`  | **[Skill]** Scan transcript → thêm allowlist vào `.claude/settings.json` |
 | `/focus`                     | Toggle focus view (chỉ hiện prompt cuối + response cuối)                 |
 | `/heapdump`                  | Ghi heap snapshot + memory breakdown (debug OOM)                         |
-| `/recap`                     | Tóm tắt 1 dòng session hiện tại (auto chạy sau 3+ phút idle)             |
+| `/radio`                     | Mở Claude FM lo-fi radio (background music)                              |
+| `/recap`                     | Tóm tắt 1 dòng session hiện tại (auto chạy khi quay lại sau idle)        |
 | `/review [PR]`               | Review PR locally (nhẹ hơn `/ultrareview`)                               |
 | `/tui [default\|fullscreen]` | Đổi UI renderer (`fullscreen` = flicker-free alt-screen)                 |
 | `/ultrareview [PR]`          | Multi-agent code review chạy trên cloud sandbox                          |
 
 ### 3.11 Đã loại bỏ / deprecated
 - `/vim` — Removed v2.1.92. Dùng `/config` → Editor mode
-- `/pr-comments` — Removed v2.1.91. Hỏi Claude trực tiếp xem PR comments
+- `/pr-comments` — Đã removed (không có trong CHANGELOG). Hỏi Claude trực tiếp xem PR comments
 - `/output-style`, `/output-style:new` — Đổi style nay qua `/config` → Output style. Tạo custom style: file markdown trong `~/.claude/output-styles/` (user) hoặc `.claude/output-styles/` (project). Hoặc set `outputStyle` trong settings.json
 
 ### 3.12 MCP prompts
@@ -626,7 +629,7 @@ CLAUDE.local.md                  # Note cá nhân, GITIGNORE
 ├── HANDOFF.md                   # (Optional) Brief chuyển session, GITIGNORE
 ├── rules/*.md                   # Topic rule, có thể path-gated
 ├── skills/<name>/SKILL.md       # Skill project
-├── commands/*.md                # (Legacy, merge với skills v2.1.101+)
+├── commands/*.md                # (Legacy, merge với skills v2.1.3+)
 ├── agents/*.md                  # Subagent project
 ├── output-styles/*.md           # Output style project
 ├── hooks/*.{sh,py,js}           # Hook scripts
@@ -868,7 +871,6 @@ force-for-plugin: false               # Plugin only: true → auto-apply khi plu
 
 ```jsonc
 {
-  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "model": "claude-opus-4-7",
   "outputStyle": "Default",            // values: "Default" | "Explanatory" | "Learning" | custom name (default: none)
   "language": "vietnamese",            // Claude's preferred response language (vd "japanese", "spanish") — KHÔNG phải voice dictation
@@ -1146,7 +1148,7 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `BASH_DEFAULT_TIMEOUT_MS`                  | Bash timeout (default 120000 = 2 phút)                                                                                                         |
 | `BASH_MAX_TIMEOUT_MS`                      | Bash max timeout (default 600000)                                                                                                              |
 | `CLAUDE_CODE_AUTO_COMPACT_WINDOW`          | Context window cho auto-compaction                                                                                                             |
-| `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`          | Trigger auto-compact (default 95%)                                                                                                             |
+| `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`          | Trigger auto-compact (default ~95%, verify với env-vars docs)                                                                                  |
 | `CLAUDE_CODE_MAX_CONTEXT_TOKENS`           | Override context window size — CHỈ effect khi `DISABLE_COMPACT=1` (constraint cứng từ docs)                                                    |
 | `CLAUDE_CODE_SUBAGENT_MODEL`               | Model cho subagent                                                                                                                             |
 | `CLAUDECODE`                               | Set trong spawned shells (dùng để detect Claude env)                                                                                           |
@@ -1244,7 +1246,6 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD` | `1` = load CLAUDE.md từ `--add-dir` directories (mặc định KHÔNG load để tránh inject từ shared dir)                                        |
 | `SLASH_COMMAND_TOOL_CHAR_BUDGET`           | Override budget chars cho skill descriptions trong `/` menu (default 1% context window, fallback 8000). Tăng nếu nhiều skill bị truncate         |
 | `FORCE_AUTOUPDATE_PLUGINS`                 | `1` = giữ plugin auto-update bật ngay cả khi `DISABLE_AUTOUPDATER=1` (manage Claude Code update tay nhưng plugin vẫn auto)                       |
-| `CLAUDE_CODE_SYNC_PLUGIN_INSTALL`          | `1` = block first turn cho tới khi marketplace plugins install xong (emit `system/plugin_install` events trong stream-json)                      |
 | `CLAUDE_CODE_OAUTH_TOKEN`                  | Long-lived OAuth token cho CI/headless (tạo bằng `claude setup-token`). Inference-only — KHÔNG support Remote Control                          |
 | `BROWSER`                                  | Path tới browser binary cho OAuth login (vd WSL2: `/mnt/c/Program Files/Google/Chrome/Application/chrome.exe`)                                  |
 | `CCR_FORCE_BUNDLE`                         | `1` = force bundle local repo (kể cả khi GitHub connected) — `claude --remote` dùng khi repo không trên GitHub                                  |
@@ -1551,7 +1552,7 @@ Default: **single-agent**. Multi-agent (subagent / `/batch`) tốn **3-10× toke
 
 ### 16.1 Tầm quan trọng
 
-Mọi best practice xoay quanh 1 ràng buộc: **context window đầy nhanh, performance giảm khi đầy**. Mỗi message re-read toàn bộ history → cost grow exponential trong agentic session. Ở 80%+ context, Claude bắt đầu "quên" instruction sớm, lặp sai lầm cũ. Boris Cherny (tech lead Claude Code) giữ CLAUDE.md ~2,500 tokens.
+Mọi best practice xoay quanh 1 ràng buộc: **context window đầy nhanh, performance giảm khi đầy**. Mỗi message re-read toàn bộ history → cost grow exponential trong agentic session. Ở 80%+ context, Claude bắt đầu "quên" instruction sớm, lặp sai lầm cũ. Boris Cherny (Anthropic Claude Code lead) giữ CLAUDE.md ~2,500 tokens.
 
 ### 16.2 Ngưỡng hành động
 
@@ -1778,11 +1779,11 @@ Cách xử lý:
 | Auto-fix PR khi CI fail         | `/autofix-pr`                                            |
 | Watch external event            | `/loop <interval> <prompt>`                              |
 | Audit security trên diff        | `/security-review`                                       |
-| Code review GitHub PR auto      | Code Review feature (Team/Enterprise): GitHub App + repo selection. Avg $15-25/PR, ~20 min. Settings: monthly org cap để giới hạn cost |
-| Mở Claude Code từ URL           | Deep link: `claude-cli://open?q=<prompt>&cwd=<path>&repo=<owner/name>` — `q` URL-encoded (max 5K char, `%0A` line break), `cwd` absolute path, `repo` resolve qua local clone đã thấy. v2.1.91+ |
+| Code review GitHub PR auto      | Code Review feature (Team/Enterprise): GitHub App + repo selection. Typical $15-25/PR, ~20 min (token-based estimate, varies theo PR size). Settings: monthly org cap để giới hạn cost |
+| Mở Claude Code từ URL           | Deep link: `claude-cli://open?q=<prompt>&cwd=<path>&repo=<owner/name>` — `q` URL-encoded (max 5K char từ v2.1.85+, multi-line via `%0A` từ v2.1.91+), `cwd` absolute path, `repo` resolve qua local clone đã thấy |
 | Mở deep link từ shell           | `open` (macOS) / `xdg-open` (Linux) / `Start-Process` (PS) / `start "" "..."` (cmd)  |
 | Tắt deep link handler           | `disableDeepLinkRegistration: "disable"` trong settings  |
-| Plugin dependency với version   | `dependencies` trong `.claude-plugin/plugin.json`: `[{ "name": "x", "version": "~2.1.0", "marketplace": "y" }]`. Cross-marketplace cần `allowCrossMarketplaceDependenciesOn` trong `marketplace.json`. v2.1.110+ |
+| Plugin dependency với version   | `dependencies` trong `.claude-plugin/plugin.json`: `[{ "name": "x", "version": "~2.1.0", "marketplace": "y" }]`. Cross-marketplace cần `allowCrossMarketplaceDependenciesOn` trong `marketplace.json` (key chưa thấy trong CHANGELOG public, verify với plugin docs trước khi rely on) |
 | Plugin executable trên Bash PATH | Đặt binary vào `bin/` ở plugin root → auto add vào PATH khi plugin enabled. Claude gọi binary như bare command từ Bash tool. v2.1.91+ |
 
 ---

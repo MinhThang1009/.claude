@@ -59,7 +59,7 @@ Ví dụ: `feat/google-oauth`, `fix/218-avatar-fallback`, `refactor/auth-middlew
 
 ## Workflow
 
-- **Trước khi commit**: `git diff --staged` review thay đổi mình sắp commit. Đừng commit "blind".
+- **Trước khi commit**: `git diff --staged` review thay đổi sắp commit. Không commit "blind".
 - **Add từng file** cụ thể, KHÔNG `git add .` (dễ commit file rác).
 - **Commit nhỏ và thường xuyên** > commit lớn cuối ngày. Mỗi commit là 1 đơn vị logic revert được.
 - **Pull/rebase** trước push. `git pull --rebase` trên feature branch.
@@ -67,9 +67,9 @@ Ví dụ: `feat/google-oauth`, `fix/218-avatar-fallback`, `refactor/auth-middlew
 
 ## Lệnh CẤM TUYỆT ĐỐI (không tự ý chạy)
 
-- `git push --force` (hay `-f`) lên branch chia sẻ: `main`, `master`, `develop`, `release/*`. Trên feature branch của riêng mình → cần dùng `--force-with-lease`.
+- `git push --force` (hay `-f`) lên branch chia sẻ: `main`, `master`, `develop`, `release/*`. Trên feature branch riêng → dùng `--force-with-lease`.
 - `git reset --hard` khi chưa stash/commit work hiện tại.
-- `git clean -fdx` trên repo mà mình không 100% biết những gì sẽ bị xóa.
+- `git clean -fdx` trên repo không nắm 100% file sẽ bị xóa.
 - `git rebase` khi commit đã được người khác pull về.
 - `git filter-repo` / `filter-branch` trên branch chia sẻ.
 - Sửa `.git/` trực tiếp.
@@ -90,10 +90,10 @@ Ví dụ: `feat/google-oauth`, `fix/218-avatar-fallback`, `refactor/auth-middlew
 
 ## Hooks an toàn
 
-- Pre-commit hook trong project (`.husky/`, `.git/hooks/`) → tôn trọng, không bypass `--no-verify` trừ khi tôi yêu cầu rõ.
+- Pre-commit hook trong project (`.husky/`, `.git/hooks/`) → tôn trọng, không bypass `--no-verify` trừ khi user yêu cầu rõ ràng.
 - Lint/format/type-check fail → sửa, không bypass.
 
 ## Khi xung đột
 
-- `git merge` conflict → đọc kỹ cả 2 phía, KHÔNG auto-resolve theo pattern. Hỏi tôi nếu không chắc bên nào đúng.
+- `git merge` conflict → đọc kỹ cả 2 phía, KHÔNG auto-resolve theo pattern. Hỏi user nếu không chắc bên nào đúng.
 - Sau resolve → chạy test trước khi commit merge.

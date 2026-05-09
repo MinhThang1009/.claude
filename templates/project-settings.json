@@ -1,6 +1,5 @@
 {
-  "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "_comment": "Settings cho project — commit vào git. Override cá nhân để vào .claude/settings.local.json (đã gitignore tự động).",
+  "_comment": "Settings cho project — commit vào git. Override cá nhân để vào .claude/settings.local.json (đã gitignore tự động). $schema URL cũ json.schemastore.org/claude-code-settings.json đã 404 (2026-05); Anthropic chưa publish public JSON schema cho Claude Code settings.",
 
   "attribution": {
     "_comment": "Tắt 'Co-Authored-By: Claude' và '🤖 Generated with Claude Code' trong commit/PR",
@@ -50,17 +49,12 @@
       "Bash(go get:*)"
     ],
 
-    "_comment_deny": "Lệnh CHẶN tuyệt đối — KHÔNG bao giờ chạy. Lưu ý: pattern phức tạp (fork bomb với ký tự đặc biệt {}();) phải chặn qua hook PreToolUse bên dưới — permission rule chỉ hỗ trợ glob đơn giản.",
+    "_comment_deny": "Lệnh CHẶN tuyệt đối — KHÔNG bao giờ chạy. Lưu ý: permission rule match TỪNG SUBCOMMAND riêng (per docs), KHÔNG match compound như 'curl | bash' — defense thật cho compound nằm ở hook PreToolUse bash-guard.py bên dưới (is_pipe_to_shell, is_dangerous_rm, is_dd_to_disk, is_fork_bomb).",
     "deny": [
       "Bash(rm -rf /*)",
       "Bash(rm -rf ~)",
       "Bash(rm -rf $*)",
       "Bash(chmod -R 777:*)",
-      "Bash(curl * | bash:*)",
-      "Bash(curl * | sh:*)",
-      "Bash(wget * | bash:*)",
-      "Bash(wget * | sh:*)",
-      "Bash(dd if=*:*)",
       "Bash(mkfs*:*)",
       "Bash(git push --force:*)",
       "Bash(git push -f:*)",
