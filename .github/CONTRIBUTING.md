@@ -152,4 +152,4 @@ Manual run tất cả: `pre-commit run --all-files`. Skip 1 lần (chỉ khi c�
 ## Liên hệ
 
 - Issue: [github.com/MinhThang1009/dotclaude/issues](https://github.com/MinhThang1009/dotclaude/issues)
-- Discussion: [github.com/MinhThang1009/dotclaude/discussions](https://github.com/MinhThang1009/dotclaude/discussions) (nếu enabled)
+- Discussions: hiện chưa enabled. Sẽ kích hoạt khi cộng đồng phát triển; trước đó dùng Issue cho mọi câu hỏi.
