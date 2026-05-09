@@ -49,24 +49,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run lychee
+      - name: Run lychee (offline mode — chỉ check relative links nội bộ)
         uses: lycheeverse/lychee-action@v2
         with:
-          # Liberal accept codes (some sites return 401/403/429 for unauthenticated bots),
-          # extended timeout, retry, exclude mail + private IP, skip Anthropic docs (cloudflare bot
-          # block thường trả 403 cho user-agent CI), giới hạn concurrent để không bị rate-limit.
+          # Offline mode: KHÔNG fetch external URL. Chỉ verify file local tồn tại.
+          # External URL checking fragile trong CI (rate-limit, redirect, auth, transient
+          # network) — không phản ánh repo health. Internal link mới là regression catch.
+          # External link recheck nên là separate scheduled job nếu cần.
           args: >-
             --no-progress
-            --exclude-mail
-            --exclude-loopback
-            --exclude-private
-            --exclude '^https?://(code|docs|platform|www)\.claude\.com'
-            --exclude '^https?://www\.anthropic\.com'
-            --max-retries 3
-            --retry-wait-time 5
-            --timeout 30
-            --max-concurrency 5
-            --accept '200,201,202,203,204,206,301,302,304,403,429'
+            --offline
             './**/*.md'
           fail: true
 
