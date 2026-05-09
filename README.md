@@ -11,7 +11,30 @@
 >
 > ⚠️ **Một số nội dung có thể outdated** khi Anthropic ship version mới hoặc deprecate model. Phát hiện sai sót → submit issue/PR tại [github.com/MinhThang1009/dotclaude/issues](https://github.com/MinhThang1009/dotclaude/issues). Xem [CONTRIBUTING.md](.github/CONTRIBUTING.md) cho quy trình. Lịch sử thay đổi: [CHANGELOG.md](CHANGELOG.md).
 
-## 1. Cấu trúc thư mục sau khi cài
+## 1. Cấu trúc
+
+### 1.1 Repo source (browse trên GitHub)
+
+```text
+dotclaude/
+├── CLAUDE.md                       # Anthropic spec — copy vào ~/.claude/
+├── settings.json                   # Anthropic spec — copy vào ~/.claude/
+├── README.md / LICENSE / CHANGELOG.md   # Repo metadata, KHÔNG copy
+├── agents/ hooks/ skills/ rules/   # Anthropic spec dirs — copy
+├── references/ output-styles/ templates/   # Anthropic spec dirs — copy
+├── docs/                           # GitHub browsing only, KHÔNG copy
+│   ├── INTRODUCTION.md
+│   └── REFERENCE.md
+├── .github/                        # GitHub Community Standards, KHÔNG copy
+│   ├── CONTRIBUTING.md / CODE_OF_CONDUCT.md / SECURITY.md
+│   ├── ISSUE_TEMPLATE/
+│   ├── pull_request_template.md
+│   ├── dependabot.yml
+│   └── workflows/ci.yml
+└── scripts/ .gitignore .pre-commit-config.yaml ...   # Repo tooling, KHÔNG copy
+```
+
+### 1.2 `~/.claude/` sau khi cài (chỉ files thực sự Claude Code đọc)
 
 ```text
 ~/.claude/
@@ -116,27 +139,37 @@ git clone https://github.com/MinhThang1009/dotclaude.git
 
 ### Bước 3 — Sao chép vào `~/.claude/`
 
+> Chỉ copy files Claude Code thực sự đọc. Repo metadata (`README.md`, `LICENSE`, `CHANGELOG.md`, `docs/`, `.github/`, `scripts/`, `.gitignore`...) KHÔNG copy.
+
 **macOS / Linux**
 
 ```bash
 mkdir -p ~/.claude
-cp -r dotclaude/. ~/.claude/
+for item in CLAUDE.md settings.json agents hooks output-styles references rules skills templates; do
+  cp -r "dotclaude/$item" ~/.claude/
+done
 ```
 
 **Windows (PowerShell)**
 
 ```powershell
 New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude" | Out-Null
-# -Force trên Get-ChildItem mới include được hidden file (.gitignore...)
-Get-ChildItem -Path dotclaude -Force | Copy-Item -Destination "$env:USERPROFILE\.claude\" -Recurse -Force
+$items = @('CLAUDE.md', 'settings.json', 'agents', 'hooks', 'output-styles', 'references', 'rules', 'skills', 'templates')
+foreach ($item in $items) {
+  Copy-Item -Recurse -Force "dotclaude\$item" "$env:USERPROFILE\.claude\"
+}
 ```
 
 **Windows (CMD)**
 
 ```cmd
 if not exist "%USERPROFILE%\.claude" mkdir "%USERPROFILE%\.claude"
-xcopy /E /I /Y /H dotclaude\* "%USERPROFILE%\.claude\"
+copy /Y "dotclaude\CLAUDE.md" "%USERPROFILE%\.claude\"
+copy /Y "dotclaude\settings.json" "%USERPROFILE%\.claude\"
+for %i in (agents hooks output-styles references rules skills templates) do xcopy /E /I /Y /H "dotclaude\%i" "%USERPROFILE%\.claude\%i\"
 ```
+
+> CMD `for` loop syntax là `%i` interactive, `%%i` trong batch file (`.bat`/`.cmd`).
 
 ### Bước 4 — Verify
 
