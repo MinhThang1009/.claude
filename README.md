@@ -440,6 +440,10 @@ Sau khi dùng skills 1 thời gian, có thể measure xem description trigger c�
 - Best practices: <https://code.claude.com/docs/en/best-practices>
 - Cheatsheet đầy đủ: xem [`REFERENCE.md`](docs/REFERENCE.md)
 - Session management: <https://claude.com/blog/using-claude-code-session-management-and-1m-context>
+- Troubleshooting (lỗi phổ biến + fix): xem [`REFERENCE.md` §18 "Common failures & fix"](docs/REFERENCE.md#18-common-failures--fix)
+- License: [MIT](LICENSE)
+- Đóng góp: [`CONTRIBUTING.md`](.github/CONTRIBUTING.md)
+- Lịch sử thay đổi: [`CHANGELOG.md`](CHANGELOG.md)
 
 ## 9. Cấu trúc nội bộ — lý do thiết kế
 

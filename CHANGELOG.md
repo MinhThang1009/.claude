@@ -6,6 +6,37 @@ Format theo [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/), tuâ
 
 ## [Unreleased]
 
+### Added
+
+- **Statusline custom** (`hooks/statusline.py` + `hooks/statusline.sh`) — hiển thị real-time ở status bar Claude Code:
+  - Line 1: `[model + window mode (1M/200k) + ⚡ effort]` + `📁 cwd basename` + `🌿 git branch` + `+staged ~modified`
+  - Line 2: threshold icon + progress bar `▰▱` + `ctx %` + `Nk tokens` + `💰 cost` + `⏱ duration` + `5h:N% 7d:N%` rate limits
+  - 5 threshold zones theo multi-author cite: 🟢 sweet spot (<40%) / 🟡 dumb zone (40-60%) / 🟠 wrap up (60-77%) / 🔴 auto-compact firing (77-90%) / ⛔ hard limit (≥90%)
+  - Git status cached 5s qua `session_id` để tránh lag repo lớn (theo Anthropic statusline doc dòng 790)
+  - Bash wrapper fallback `python3` → `python`, silent fail nếu Python missing (không break statusline)
+  - Force UTF-8 stdout cho Windows cp1252 encoding
+- `settings.json`: `statusLine` config wire vào `$HOME/.claude/hooks/statusline.sh`.
+
+### Changed (Phase 4 audit fixes — 2026-05-09)
+
+- **Thresholds context window** (REFERENCE.md §16, README, CLAUDE.md, skills/context-check/SKILL.md): unify multi-author cite — Dex Horthy (`<30/<40/60%` + "dumb zone", MLOps Community video), Thariq Shihipar (`300-400k` 1M model context rot, Anthropic Claude Code team), Boris Cherny (`155k` auto-compact 200k window, X tweet). Round 1 cite sai cho Boris toàn bộ ngưỡng % — round 2 đính chính multi-author đúng.
+- REFERENCE.md §16 mở rộng từ 7 → 11 subsection: thêm §16.3 "Compact threshold theo task complexity" (claude-codex.fr nuance) + §16.4 "Ngưỡng cho 1M context window" (Thariq compromise + Justin Smith LinkedIn reaffirm).
+- Audit cập nhật line counts: REFERENCE.md ~2050 → ~2084 dòng (actual 2084), byte size ~159KB → ~164KB (actual 163798).
+- Notation "155k/200k tokens" (ambiguous) → "155k tokens trên window 200k".
+- Sonnet 4.6 effort levels: `low/med/high/max` → `low/med/high/(xhigh→high)/max` (rõ fallback behavior).
+
+### Security (Phase 4 audit fixes — 2026-05-09)
+
+- `.gitignore`: mở rộng coverage cho secret file types (`.env*`, `*.key`, `*.pem`, `id_rsa*`, `credentials.json`, `service-account*.json`, etc.) — defense-in-depth bên cạnh pre-commit `detect-private-key` + `permissions.deny` của settings.json.
+
+### Fixed (Phase 4 audit fixes — 2026-05-09)
+
+- `agents/security-auditor.md` L29: ` ```regex ` không phải language tag chuẩn → đổi sang ` ```text `.
+- `skills/commit/SKILL.md` L131: bash code block `/tmp/commit-msg.txt` thiếu OS note → bổ sung note Git Bash Windows + PowerShell native.
+- `output-styles/concise-vietnamese.md` L9: depersonalize "Bạn là... Tôi đọc code..." → impersonal "Code assistant... Dev thạo nghề đọc code...".
+- `.github/CONTRIBUTING.md` L3: tone formal hơn cho public contributing guide.
+- `.github/CONTRIBUTING.md` L155: xóa link Discussions trỏ tới URL 404 (Discussions chưa enabled trên repo).
+
 ### Changed (file structure)
 
 - Clean root cho readability: move 5 file ra subdirectory chuẩn:
