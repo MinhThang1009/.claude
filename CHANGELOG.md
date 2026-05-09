@@ -8,9 +8,18 @@ Format theo [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/), tuâ
 
 ## [Unreleased]
 
-### Added
+### Added (Phase 4 audit — 2026-05-09)
 
-Đồng bộ các community standards file từ `main` (round 7 audit cho cả 2 branches):
+CI/automation gaps fix theo Phase 5 audit (sync với main commit `dd2015b`):
+
+- `.github/workflows/codeql.yml` — CodeQL Python security-extended scan, weekly + on-PR.
+- `.github/workflows/commitlint.yml` + `commitlint.config.js` — Conventional Commits enforcement on PR.
+- `.github/workflows/spell.yml` + `.cspell.json` + `.github/dictionaries/dotclaude.txt` — cspell English + Vietnamese custom dict (56 technical terms).
+- `.github/workflows/secret-scan.yml` — gitleaks defense-in-depth bên cạnh pre-commit detect-private-key.
+
+### Added (round 7 audit)
+
+Đồng bộ các community standards file từ `main`:
 
 - `CHANGELOG.md` — file ghi log thay đổi (file này).
 - `CODE_OF_CONDUCT.md` — Contributor Covenant 2.1.
@@ -33,7 +42,20 @@ Format theo [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/), tuâ
 - `templates/project-settings.json`: bỏ broken `$schema: json.schemastore.org/claude-code-settings.json` (404); xóa misleading deny rules (`Bash(curl * | bash:*)` no-op per docs).
 - `README.md` (plugin guide): test count "97 case" → "119 case" tại 2 chỗ; sync với main fix.
 
-### Fixed
+### Fixed (Phase 4 audit — 2026-05-09)
+
+- `plugins/dotclaude/.claude-plugin/plugin.json` L4: description claim "19 attack vectors" mâu thuẫn SECURITY.md ("8 vector"). Fix → "8 attack vectors (xem SECURITY.md)" — match thực tế codebase.
+- `docs/REFERENCE.md` L3: line count "~2050 dòng" → "~2052 dòng" (actual `wc -l` = 2052 trên plugin branch).
+- `plugins/dotclaude/agents/security-auditor.md` L29: ` ```regex ` không phải lang tag chuẩn → ` ```text `.
+- `plugins/dotclaude/skills/commit/SKILL.md` L131: bash code block `/tmp/` thiếu OS note → bổ sung Git Bash Windows + PowerShell native.
+- `plugins/dotclaude/output-styles/concise-vietnamese.md` L9: depersonalize "Bạn là... Tôi đọc code..." → impersonal.
+- `.github/CONTRIBUTING.md` L3 + L155: tone formal hơn + xóa link Discussions URL 404.
+
+### Security (Phase 4 audit — 2026-05-09)
+
+- `.gitignore`: mở rộng coverage cho secret file types (`.env*`, `*.key`, `*.pem`, `id_rsa*`, `credentials.json`, `service-account*.json`, etc.) — defense-in-depth bên cạnh pre-commit `detect-private-key` + `permissions.deny`.
+
+### Fixed (round 7)
 
 - Hook events count audit: số chính xác là **29** (per docs/en/hooks). Mọi mention `30 events` đã revert về 29.
 - Boris Cherny title soften: "Head of Claude Code" → "Anthropic Claude Code lead" (exact title không verifiable public).
