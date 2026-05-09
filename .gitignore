@@ -25,3 +25,7 @@ ide/
 # Transient session state (audit workflow)
 HANDOFF.md
 fetch-tasks.md
+
+# Python bytecode (hooks/bash-guard.py)
+__pycache__/
+*.pyc

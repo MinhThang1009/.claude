@@ -3,6 +3,8 @@
 > ⚠️ **CẢNH BÁO TOKEN**: File này dài **~2050 dòng / 158KB / ~55k tokens** (Vietnamese mix ~2.9 chars/token). KHÔNG `@-import` vào CLAUDE.md, KHÔNG paste full vào prompt — sẽ ăn 28% context Sonnet 200k hoặc 5.5% context Opus 1M ngay session start. Cách dùng đúng: mở trên trình duyệt / màn hình thứ 2 / editor để **NGƯỜI** tra cứu khi cần. Nếu cần Claude tham khảo 1 phần, copy đoạn cụ thể vào prompt thay vì import cả file.
 >
 > Tổng hợp từ docs chính thức [code.claude.com/docs](https://code.claude.com/docs) (2026), blog [claude.com](https://www.claude.com/blog), [MindStudio](https://www.mindstudio.ai/blog), [ClaudeFast](https://claudefa.st/blog), GitHub [anthropics/claude-code](https://github.com/anthropics/claude-code). Cập nhật cho Claude Code v2.1.x trở lên.
+>
+> 📅 **Đã verify**: 2026-05-09 vs Claude Code v2.1.138 + Opus 4.7. Phát hiện sai sót → [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Mục lục
 
@@ -164,7 +166,7 @@
 | `claude plugin list [--json]`                | List plugin đã cài. `--json` parse được programmatic                                           |
 | `claude plugin uninstall <name> [--prune]`   | Gỡ plugin. `--prune` xóa luôn orphaned auto-installed deps                                     |
 | `claude plugin marketplace add <repo>`       | Add marketplace mới                                                                            |
-| `claude plugin tag [--push] [--dry-run]`     | (Author) Tag release `{plugin}--v{version}` theo manifest. v2.1.110+                           |
+| `claude plugin tag [--push] [--dry-run]`     | (Author) Tag release `{plugin}--v{version}` theo manifest. v2.1.118+                           |
 | `claude plugin prune [--scope X] [--dry-run] [-y]` | Xóa orphaned auto-installed deps (sau khi uninstall plugin chính). v2.1.121+             |
 | `claude project purge [path]`                | Xóa local state của project (transcripts, debug log…). Flags: `--dry-run`, `-y`, `-i`, `--all` |
 | `claude remote-control`                      | Chạy server mode cho Remote Control từ claude.ai/app                                           |
@@ -476,7 +478,7 @@
 
 ### 3.11 Đã loại bỏ / deprecated
 - `/vim` — Removed v2.1.92. Dùng `/config` → Editor mode
-- `/pr-comments` — Removed v2.1.91. Hỏi Claude trực tiếp xem PR comments
+- `/pr-comments` — Đã removed (không có trong CHANGELOG). Hỏi Claude trực tiếp xem PR comments
 - `/output-style`, `/output-style:new` — Đổi style nay qua `/config` → Output style. Tạo custom style: file markdown trong `~/.claude/output-styles/` (user) hoặc `.claude/output-styles/` (project). Hoặc set `outputStyle` trong settings.json
 
 ### 3.12 MCP prompts
@@ -627,7 +629,7 @@ CLAUDE.local.md                  # Note cá nhân, GITIGNORE
 ├── HANDOFF.md                   # (Optional) Brief chuyển session, GITIGNORE
 ├── rules/*.md                   # Topic rule, có thể path-gated
 ├── skills/<name>/SKILL.md       # Skill project
-├── commands/*.md                # (Legacy, merge với skills v2.1.101+)
+├── commands/*.md                # (Legacy, merge với skills v2.1.3+)
 ├── agents/*.md                  # Subagent project
 ├── output-styles/*.md           # Output style project
 ├── hooks/*.{sh,py,js}           # Hook scripts
@@ -1779,10 +1781,10 @@ Cách xử lý:
 | Watch external event            | `/loop <interval> <prompt>`                              |
 | Audit security trên diff        | `/security-review`                                       |
 | Code review GitHub PR auto      | Code Review feature (Team/Enterprise): GitHub App + repo selection. Typical $15-25/PR, ~20 min (token-based estimate, varies theo PR size). Settings: monthly org cap để giới hạn cost |
-| Mở Claude Code từ URL           | Deep link: `claude-cli://open?q=<prompt>&cwd=<path>&repo=<owner/name>` — `q` URL-encoded (max 5K char, `%0A` line break), `cwd` absolute path, `repo` resolve qua local clone đã thấy. v2.1.91+ |
+| Mở Claude Code từ URL           | Deep link: `claude-cli://open?q=<prompt>&cwd=<path>&repo=<owner/name>` — `q` URL-encoded (max 5K char từ v2.1.85+, multi-line via `%0A` từ v2.1.91+), `cwd` absolute path, `repo` resolve qua local clone đã thấy |
 | Mở deep link từ shell           | `open` (macOS) / `xdg-open` (Linux) / `Start-Process` (PS) / `start "" "..."` (cmd)  |
 | Tắt deep link handler           | `disableDeepLinkRegistration: "disable"` trong settings  |
-| Plugin dependency với version   | `dependencies` trong `.claude-plugin/plugin.json`: `[{ "name": "x", "version": "~2.1.0", "marketplace": "y" }]`. Cross-marketplace cần `allowCrossMarketplaceDependenciesOn` trong `marketplace.json`. v2.1.110+ |
+| Plugin dependency với version   | `dependencies` trong `.claude-plugin/plugin.json`: `[{ "name": "x", "version": "~2.1.0", "marketplace": "y" }]`. Cross-marketplace cần `allowCrossMarketplaceDependenciesOn` trong `marketplace.json` (key chưa thấy trong CHANGELOG public, verify với plugin docs trước khi rely on) |
 | Plugin executable trên Bash PATH | Đặt binary vào `bin/` ở plugin root → auto add vào PATH khi plugin enabled. Claude gọi binary như bare command từ Bash tool. v2.1.91+ |
 
 ---

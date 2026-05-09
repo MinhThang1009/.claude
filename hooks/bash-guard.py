@@ -64,8 +64,10 @@ def is_sensitive_path_access(cmd: str) -> bool:
     Safe metadata commands (ls/stat/file/test/wc -l/...) chỉ list metadata,
     không reveal nội dung file → cho qua kể cả với sensitive path.
     """
-    # Split command into segments by separators (;, &, &&, ||, |)
-    segments = re.split(r';|&&|\|\||&|\|', cmd)
+    # Split command into segments by separators (;, &, &&, ||, |, > , >>, <, <<).
+    # Redirect operators (>, >>, <, <<) phải tách để 'echo $SECRET > .env' không
+    # đi qua check như 1 segment (echo prefix match SAFE_METADATA → bypass).
+    segments = re.split(r';|&&|\|\||&|\||>>|>|<<|<', cmd)
     for seg in segments:
         seg = seg.strip()
         if not seg:
@@ -133,20 +135,30 @@ def is_dangerous_rm(cmd: str) -> bool:
     """rm hoặc find xóa root/home/cwd/parent.
 
     Cover: short flag (-rf, -fr, -Rf, -r, -R), long flag (--recursive --force),
-    find với -delete hoặc -exec rm.
+    --no-preserve-root, target có/không trailing slash, find với -delete hoặc -exec rm.
     """
-    # Target patterns: root, home, cwd, parent
-    targets = r'(?:/|/\*|~|~/|~/\*|\$HOME|\$\{HOME\}|\.|\./|\./\*|\.\.)'
+    # Target patterns: root, home, cwd, parent (cover trailing / và /*)
+    targets = (
+        r'(?:'
+        r'/(?:\*)?|'                              # /, /*
+        r'~(?:/(?:\*)?)?|'                        # ~, ~/, ~/*
+        r'\$\{?HOME\}?(?:/(?:\*)?)?|'             # $HOME, ${HOME}, $HOME/, ${HOME}/, $HOME/*, ${HOME}/*
+        r'\.{1,2}(?:/(?:\*)?)?'                   # ., .., ./, ../, ./*, ../*
+        r')'
+    )
     target_boundary = rf'{targets}(?=[\s;|&]|$)'
 
+    # rm với recursive flag (-r/-R/--recursive/--no-preserve-root) ở bất kỳ vị trí
+    # nào trước target nguy hiểm. Match flag thông qua word boundary để cover
+    # `rm --no-preserve-root -rf /` (--no-preserve-root xen giữa rm và -rf).
+    rm_dangerous = (
+        rf'(?:^|[\s;|&])rm\b[^|;&]*?'
+        rf'(?:--recursive|--no-preserve-root|-[a-zA-Z]*[rR][a-zA-Z]*)\b'
+        rf'[^|;&]*?{target_boundary}'
+    )
+
     patterns = [
-        # rm với short flag chứa r/R
-        rf'(?:^|[\s;|&])rm\s+-[a-zA-Z]*[rR][a-zA-Z]*\s+{target_boundary}',
-        # rm với long flag --recursive (có thể có --force, --interactive=never xen)
-        rf'(?:^|[\s;|&])rm\s+(?:--(?:recursive|force|interactive=never|verbose|preserve-root=no)\s+)*'
-        rf'(?:--(?:recursive|force))\s+'
-        rf'(?:--(?:recursive|force|interactive=never|verbose|preserve-root=no)\s+)*'
-        rf'{target_boundary}',
+        rm_dangerous,
         # find <target> -delete
         rf'(?:^|[\s;|&])find\s+{targets}[^|;&]*-delete',
         # find <target> -exec rm
