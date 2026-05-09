@@ -1,0 +1,60 @@
+# Pre-commit hook config — chạy local trước khi commit để catch lỗi sớm.
+# Setup: `pip install pre-commit && pre-commit install`
+# Manual run all hooks: `pre-commit run --all-files`
+# Skip hooks 1 lần: `git commit --no-verify` (chỉ khi cần thiết)
+
+repos:
+  # Built-in hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: \.md$  # Markdown trailing space đôi khi intentional (line break)
+      - id: end-of-file-fixer
+      - id: check-yaml
+        exclude: ^\.markdownlint-cli2\.jsonc$  # JSONC, không phải YAML
+      - id: check-json
+        exclude: ^\.markdownlint-cli2\.jsonc$
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+      - id: detect-private-key
+
+  # Local hooks: tận dụng tool đã có trong repo
+  - repo: local
+    hooks:
+      - id: bash-guard-tests
+        name: Run bash-guard test suite (119 cases)
+        entry: bash hooks/test-bash-guard.sh
+        language: system
+        pass_filenames: false
+        files: ^hooks/
+        # Chỉ run khi có thay đổi trong hooks/
+
+      - id: frontmatter-validate
+        name: Validate skill/agent/output-style frontmatter
+        entry: python scripts/validate-frontmatter.py
+        language: system
+        pass_filenames: false
+        files: ^(skills/.*\.md|agents/.*\.md|output-styles/.*\.md|scripts/validate-frontmatter\.py)$
+
+  # Shellcheck (cần cài shellcheck binary local)
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
+        files: \.sh$
+
+  # Ruff Python lint
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.0
+    hooks:
+      - id: ruff
+        files: \.py$
+
+  # Markdownlint (cần Node.js)
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.22.1
+    hooks:
+      - id: markdownlint-cli2
+        files: \.md$

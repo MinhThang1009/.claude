@@ -13,16 +13,22 @@ concurrency:
 
 jobs:
   hook-tests:
-    name: Hook regression tests (119 cases)
-    runs-on: ubuntu-latest
+    name: Hook tests (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup ~/.claude/hooks
+        shell: bash
         run: |
           mkdir -p "$HOME/.claude/hooks"
           cp hooks/*.py hooks/*.sh "$HOME/.claude/hooks/"
           chmod +x "$HOME/.claude/hooks"/*.sh
       - name: Run test-bash-guard.sh
+        shell: bash
         run: bash hooks/test-bash-guard.sh
 
   json-validate:
@@ -96,3 +102,27 @@ jobs:
         uses: DavidAnson/markdownlint-cli2-action@v17
         with:
           globs: '**/*.md'
+
+  actionlint:
+    name: GitHub Actions YAML lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run actionlint
+        run: |
+          bash <(curl -sSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          ./actionlint -color
+
+  frontmatter-validate:
+    name: Frontmatter schema (skills/agents/output-styles)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install PyYAML
+        run: pip install --quiet pyyaml
+      - name: Validate frontmatter
+        run: python scripts/validate-frontmatter.py

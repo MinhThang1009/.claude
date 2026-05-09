@@ -101,11 +101,34 @@ Tham khảo workflow fact-check trong commit history (search `docs: fix .* fact-
 ```bash
 git clone https://github.com/<your-fork>/dotclaude.git
 cd dotclaude
-# Test hooks
+
+# Test hooks (119 case)
 bash hooks/test-bash-guard.sh
-# Lint markdown (optional)
+
+# Validate frontmatter (cần PyYAML)
+pip install pyyaml
+python scripts/validate-frontmatter.py
+
+# Lint markdown
 npx markdownlint-cli2 "**/*.md"
 ```
+
+### Pre-commit hooks (recommended)
+
+Setup pre-commit để catch lỗi tự động trước mỗi commit (tránh CI fail sau khi push):
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+Sau đó mỗi `git commit` sẽ chạy:
+- `bash-guard-tests` (nếu có thay đổi trong `hooks/`)
+- `frontmatter-validate` (nếu có thay đổi skill/agent/output-style)
+- `shellcheck`, `ruff`, `markdownlint-cli2` cho file tương ứng
+- Built-in: trailing whitespace, EOF newline, JSON/YAML syntax, merge conflict, private key detection
+
+Manual run tất cả: `pre-commit run --all-files`. Skip 1 lần (chỉ khi cần thiết, lý do rõ ràng): `git commit --no-verify`.
 
 ## License
 
