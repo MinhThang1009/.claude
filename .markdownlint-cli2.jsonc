@@ -19,7 +19,17 @@
     // MD040: fenced code blocks must specify language — example block đôi khi không có
     "MD040": false,
     // MD041: first line not h1 — REFERENCE.md có warning blockquote trước h1
-    "MD041": false
+    "MD041": false,
+    // MD012: multiple consecutive blank lines — REFERENCE.md có nhiều section break dùng 2 blank
+    "MD012": false,
+    // MD028: blank line trong blockquote — > tổng hợp\n>\n> verify pattern phổ biến
+    "MD028": false,
+    // MD029: ordered list prefix style — vài chỗ dùng 1./1./1. mixed
+    "MD029": false,
+    // MD058: blanks around tables — table sau heading không cần extra blank
+    "MD058": false,
+    // MD060: table column alignment — markdown table không cần visual pipe align
+    "MD060": false
   },
   "ignores": [
     "node_modules/",
