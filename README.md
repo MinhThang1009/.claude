@@ -322,12 +322,12 @@ Cụ thể các tính năng cần:
 - ✅ v2.1.0+: skills system
 - ✅ v2.1.59+: auto memory, plan mode v2
 - ✅ v2.1.101+: skills+commands merge, output styles built-in
-- ✅ v2.1.111+: Opus 4.7, `effortLevel: xhigh` (mặc định mới của Opus 4.7)
+- ✅ v2.1.111+: Opus 4.7, `effortLevel: xhigh` (Opus 4.7 exclusive)
 - ✅ v2.1.117+: `/model` selection persist vào `settings.local.json` khi project override
 
 ### 7.1 Nếu plan/account không hỗ trợ Opus 4.7 + 1M context
 
-Default repo set `model: "opus[1m]"` + `effortLevel: "xhigh"` — phù hợp Max/Team Premium plan trên Anthropic API. Account khác cần sửa `settings.json`:
+Default repo set `model: "opus[1m]"` + `effortLevel: "xhigh"` — phù hợp Max/Team plan trên Anthropic API. Account khác cần sửa `settings.json`:
 
 | Plan / Provider                | Sửa `model`                                  | Sửa `effortLevel`            |
 | ------------------------------ | -------------------------------------------- | ---------------------------- |

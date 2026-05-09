@@ -196,7 +196,7 @@
 ### 2.2 Model & effort
 | Flag                       | Mục đích                                                                                                             |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `--model <alias\|id>`      | `opus`, `sonnet`, `haiku`, `best`, `default`, `opusplan`, `opus[1m]`, `sonnet[1m]`, hoặc full ID (`claude-opus-4-7`) |
+| `--model <alias\|id>`      | `opus`, `sonnet`, `haiku`, `best`, `opusplan`, `opus[1m]`, `sonnet[1m]`, hoặc full ID (`claude-opus-4-7`) |
 | `--effort <level>`         | `low`, `medium`, `high`, `xhigh`, `max`                                                                              |
 | `--fallback-model <alias>` | Fallback khi default overload (chỉ print mode)                                                                       |
 | `--betas <header>`         | Beta header cho API (chỉ API key user)                                                                               |
@@ -423,7 +423,7 @@
 | `/web-setup`              | Connect GitHub cho Claude Code on the web                |
 | `/autofix-pr [prompt]`    | Spawn web session auto-fix PR                            |
 | `/ultraplan <prompt>`     | Draft plan trong browser, execute remotely               |
-| `/schedule [description]` | Tạo/edit/list/run routine định kỳ. Alias `/routines`. Trigger: scheduled (hourly/nightly/weekly), API endpoint với auth token (POST → session URL), webhook GitHub events (PR filter). Limit: Pro 5/Max 15/T+E 25 routines/day |
+| `/schedule [description]` | Tạo/edit/list/run routine định kỳ. Alias `/routines`. Trigger: scheduled (hourly/nightly/weekly), API endpoint với auth token (POST → session URL), webhook GitHub events (PR filter). Limit: daily cap per-account, plan-dependent — xem `claude.ai/settings/usage` |
 | `/install-github-app`     | Cài Claude GitHub Actions                                |
 | `/install-slack-app`      | Cài Claude Slack                                         |
 | `/setup-bedrock`          | Cấu hình Amazon Bedrock                                  |
@@ -468,7 +468,8 @@
 | `/fewer-permission-prompts`  | **[Skill]** Scan transcript → thêm allowlist vào `.claude/settings.json` |
 | `/focus`                     | Toggle focus view (chỉ hiện prompt cuối + response cuối)                 |
 | `/heapdump`                  | Ghi heap snapshot + memory breakdown (debug OOM)                         |
-| `/recap`                     | Tóm tắt 1 dòng session hiện tại (auto chạy sau 3+ phút idle)             |
+| `/radio`                     | Mở Claude FM lo-fi radio (background music)                              |
+| `/recap`                     | Tóm tắt 1 dòng session hiện tại (auto chạy khi quay lại sau idle)        |
 | `/review [PR]`               | Review PR locally (nhẹ hơn `/ultrareview`)                               |
 | `/tui [default\|fullscreen]` | Đổi UI renderer (`fullscreen` = flicker-free alt-screen)                 |
 | `/ultrareview [PR]`          | Multi-agent code review chạy trên cloud sandbox                          |
@@ -1244,7 +1245,6 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD` | `1` = load CLAUDE.md từ `--add-dir` directories (mặc định KHÔNG load để tránh inject từ shared dir)                                        |
 | `SLASH_COMMAND_TOOL_CHAR_BUDGET`           | Override budget chars cho skill descriptions trong `/` menu (default 1% context window, fallback 8000). Tăng nếu nhiều skill bị truncate         |
 | `FORCE_AUTOUPDATE_PLUGINS`                 | `1` = giữ plugin auto-update bật ngay cả khi `DISABLE_AUTOUPDATER=1` (manage Claude Code update tay nhưng plugin vẫn auto)                       |
-| `CLAUDE_CODE_SYNC_PLUGIN_INSTALL`          | `1` = block first turn cho tới khi marketplace plugins install xong (emit `system/plugin_install` events trong stream-json)                      |
 | `CLAUDE_CODE_OAUTH_TOKEN`                  | Long-lived OAuth token cho CI/headless (tạo bằng `claude setup-token`). Inference-only — KHÔNG support Remote Control                          |
 | `BROWSER`                                  | Path tới browser binary cho OAuth login (vd WSL2: `/mnt/c/Program Files/Google/Chrome/Application/chrome.exe`)                                  |
 | `CCR_FORCE_BUNDLE`                         | `1` = force bundle local repo (kể cả khi GitHub connected) — `claude --remote` dùng khi repo không trên GitHub                                  |
@@ -1778,7 +1778,7 @@ Cách xử lý:
 | Auto-fix PR khi CI fail         | `/autofix-pr`                                            |
 | Watch external event            | `/loop <interval> <prompt>`                              |
 | Audit security trên diff        | `/security-review`                                       |
-| Code review GitHub PR auto      | Code Review feature (Team/Enterprise): GitHub App + repo selection. Avg $15-25/PR, ~20 min. Settings: monthly org cap để giới hạn cost |
+| Code review GitHub PR auto      | Code Review feature (Team/Enterprise): GitHub App + repo selection. Typical $15-25/PR, ~20 min (token-based estimate, varies theo PR size). Settings: monthly org cap để giới hạn cost |
 | Mở Claude Code từ URL           | Deep link: `claude-cli://open?q=<prompt>&cwd=<path>&repo=<owner/name>` — `q` URL-encoded (max 5K char, `%0A` line break), `cwd` absolute path, `repo` resolve qua local clone đã thấy. v2.1.91+ |
 | Mở deep link từ shell           | `open` (macOS) / `xdg-open` (Linux) / `Start-Process` (PS) / `start "" "..."` (cmd)  |
 | Tắt deep link handler           | `disableDeepLinkRegistration: "disable"` trong settings  |
