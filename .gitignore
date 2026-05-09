@@ -20,6 +20,7 @@ plans/
 plugins/
 ide/
 .vscode/
+.last-cleanup
 
 # Transient session state (audit workflow)
 HANDOFF.md

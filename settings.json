@@ -14,25 +14,16 @@
       "Read(**)",
       "Glob(**)",
       "Grep(**)",
-      "Bash(ls:*)",
       "Bash(pwd)",
-      "Bash(cat:*)",
-      "Bash(head:*)",
-      "Bash(tail:*)",
-      "Bash(wc:*)",
       "Bash(echo:*)",
       "Bash(which:*)",
       "Bash(file:*)",
-      "Bash(find:*)",
       "Bash(tree:*)",
-      "Bash(git status)",
       "Bash(git status:*)",
-      "Bash(git diff)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
       "Bash(git show:*)",
       "Bash(git blame:*)",
-      "Bash(git branch)",
       "Bash(git branch:*)",
       "Bash(git remote -v)",
       "Bash(git stash list)",
@@ -77,7 +68,10 @@
       "Bash(gh repo view:*)",
       "WebFetch(domain:platform.claude.com)",
       "WebFetch(domain:code.claude.com)",
-      "WebFetch(domain:docs.claude.com)"
+      "WebFetch(domain:docs.claude.com)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:www.anthropic.com)",
+      "WebFetch(domain:anthropic.com)"
     ],
     "deny": [
       "Bash(rm -rf /*)",
@@ -86,18 +80,12 @@
       "Bash(sudo rm:*)",
       "Bash(chmod -R 777:*)",
       "Bash(chmod 777:*)",
-      "Bash(curl * | bash)",
-      "Bash(curl * | sh)",
-      "Bash(wget -O - * | bash)",
-      "Bash(wget -O - * | sh)",
-      "Bash(eval:*)",
       "Bash(git push --force:*)",
       "Bash(git push -f:*)",
       "Bash(git reset --hard:*)",
       "Bash(git clean -fdx:*)",
       "Read(.env)",
-      "Read(.env.local)",
-      "Read(.env.production)",
+      "Read(.env.*)",
       "Read(**/*.pem)",
       "Read(**/*.key)",
       "Read(**/id_rsa)",
@@ -119,14 +107,11 @@
       "Bash(yarn add:*)",
       "Bash(pip install:*)",
       "Bash(cargo add:*)",
-      "Bash(go get:*)",
-      "WebFetch(*)",
-      "Edit(**)",
-      "Write(**)"
+      "Bash(go get:*)"
     ],
     "defaultMode": "acceptEdits",
     "//": "Mặc định cho global. Project có thể override hoặc thêm allow/deny.",
-    "//defaultMode": "acceptEdits = file edits (Edit/Write) tự apply không cần Apply diff card trong IDE. Bash/MCP nguy hiểm vẫn theo allow/ask/deny rule. Edit(**) và Write(**) trong ask list dưới có thể override mode này — nếu vẫn bị hỏi, xem xét bỏ."
+    "//defaultMode": "acceptEdits = file edits (Edit/Write) tự apply không cần Apply diff card. Bash/WebFetch nguy hiểm vẫn theo allow/ask/deny rule. Precedence: deny > ask > allow > mode (mode chỉ kick in khi không rule nào match)."
   },
   "model": "opus[1m]",
   "hooks": {
@@ -136,7 +121,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'cmd=$(jq -r \".tool_input.command // empty\" 2>/dev/null); case \"$cmd\" in *\"rm -rf\"*\"/\"*|*\":(){\"*|*\"dd if=\"*) echo \"BLOCKED: dangerous command pattern\" >&2; exit 2;; esac; exit 0'",
+            "command": "bash \"$HOME/.claude/hooks/bash-guard.sh\"",
             "shell": "bash"
           }
         ]
@@ -148,7 +133,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'f=$(jq -r \".tool_input.file_path // empty\" 2>/dev/null); [ -z \"$f\" ] && exit 0; case \"$f\" in *.ts|*.tsx|*.js|*.jsx|*.json|*.md|*.yml|*.yaml) command -v prettier >/dev/null 2>&1 && prettier --write \"$f\" 2>/dev/null;; *.py) command -v ruff >/dev/null 2>&1 && ruff format \"$f\" 2>/dev/null;; *.go) command -v gofmt >/dev/null 2>&1 && gofmt -w \"$f\" 2>/dev/null;; *.rs) command -v rustfmt >/dev/null 2>&1 && rustfmt \"$f\" 2>/dev/null;; esac; exit 0'",
+            "command": "bash \"$HOME/.claude/hooks/format-on-edit.sh\"",
             "shell": "bash"
           }
         ]
