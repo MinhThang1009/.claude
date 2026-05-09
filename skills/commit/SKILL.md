@@ -117,10 +117,29 @@ OK chứ?
 ```
 
 Nếu OK → chạy (Claude tự generate command thực với value cụ thể):
+
+**Cho message ngắn, ASCII (1 dòng):**
 ```bash
 git add <files cụ thể>
-git commit -m "<subject>" -m "<body>" -m "<footer>"
+git commit -m "<subject>"
 ```
+
+**Cho message multiline hoặc có Unicode (tiếng Việt, emoji)**, dùng `-F` file để tránh lỗi encoding (đặc biệt trên Windows + PowerShell):
+```bash
+git add <files cụ thể>
+# Tạo file message tạm
+cat > /tmp/commit-msg.txt <<'EOF'
+<subject>
+
+<body>
+
+<footer>
+EOF
+git commit -F /tmp/commit-msg.txt
+rm /tmp/commit-msg.txt
+```
+
+> **Lưu ý**: `git commit -m "subj" -m "body"` qua PowerShell here-string có thể garbled Unicode. Dùng `-F` an toàn cross-platform.
 
 ## Quy tắc bắt buộc
 

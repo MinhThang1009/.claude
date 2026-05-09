@@ -74,6 +74,8 @@
       "Bash(cargo publish:*)",
       "Read(.env)",
       "Read(.env.*)",
+      "Read(*.env)",
+      "Read(.envrc)",
       "Read(**/credentials.json)",
       "Read(**/*.pem)",
       "Read(**/*.key)",
@@ -85,17 +87,17 @@
     ]
   },
 
-  "_comment_hooks": "Hook chạy DETERMINISTIC — KHÔNG phụ thuộc Claude nhớ rule. Bỏ comment cụ thể nếu cần.",
+  "_comment_hooks": "Hook chạy DETERMINISTIC — KHÔNG phụ thuộc Claude nhớ rule. Reference script global ở ~/.claude/hooks/bash-guard.sh (cài qua dotclaude). Script dùng python parse JSON (không cần jq).",
   "hooks": {
     "PreToolUse": [
       {
-        "_comment": "Chặn lệnh xóa toàn bộ trước khi tool chạy — phòng prompt injection",
+        "_comment": "Chặn lệnh nguy hiểm (rm -rf root/home, curl|bash, đọc .env qua Bash, dd disk, fork bomb)",
         "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
             "shell": "bash",
-            "command": "cmd=$(jq -r '.tool_input.command // empty' 2>/dev/null); if echo \"$cmd\" | grep -qE '(rm -rf /|rm -rf \\$|rm -rf ~|chmod -R 777|curl.*\\| *bash|curl.*\\| *sh|:\\(\\)\\s*\\{|dd if=)'; then echo 'BLOCKED: dangerous command detected' >&2; exit 2; fi; exit 0",
+            "command": "bash \"$HOME/.claude/hooks/bash-guard.sh\"",
             "timeout": 5
           }
         ]
