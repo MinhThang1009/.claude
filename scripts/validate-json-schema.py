@@ -47,7 +47,7 @@ def fetch_schema(url: str) -> dict:
 
 def find_json_files(root: Path) -> list[Path]:
     """Find all JSON files tracked by git (excluding cspell/markdownlint configs)."""
-    skip_files = {".cspell.json"}
+    skip_files = {"cspell.json", ".cspell.json"}
     skip_dirs = {".git", "node_modules", "__pycache__"}
     out: list[Path] = []
     for p in root.rglob("*.json"):
