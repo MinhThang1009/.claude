@@ -32,10 +32,15 @@
 │   └── architect.md                # Architecture decision (opus)
 ├── output-styles/
 │   └── concise-vietnamese.md       # Style tiếng Việt ngắn gọn
+├── hooks/                          # Hook scripts (gọi từ settings.json)
+│   ├── bash-guard.sh               # PreToolUse: chặn rm -rf root/home, curl|bash, đọc .env qua Bash
+│   ├── format-on-edit.sh           # PostToolUse: prettier/ruff/gofmt/rustfmt sau Edit/Write
+│   └── test-bash-guard.sh          # Regression test 39 case (dev-only, có thể xóa)
 └── templates/                      # Template COPY vào TỪNG project mới
     ├── project-CLAUDE.md           # → <project>/CLAUDE.md
     ├── project-CLAUDE.local.md     # → <project>/CLAUDE.local.md
     ├── project-settings.json       # → <project>/.claude/settings.json
+    ├── project-mcp.json            # → <project>/.mcp.json
     └── HANDOFF.md                  # → <project>/.claude/HANDOFF.md (gitignored)
 ```
 
@@ -155,6 +160,9 @@ mkdir -p .claude
 cp ~/.claude/templates/project-settings.json .claude/settings.json
 cp ~/.claude/templates/HANDOFF.md .claude/HANDOFF.md
 
+# MCP servers (optional — chỉ copy nếu project dùng MCP)
+cp ~/.claude/templates/project-mcp.json ./.mcp.json
+
 # .gitignore
 cat >> .gitignore <<'EOF'
 
@@ -181,6 +189,9 @@ New-Item -ItemType Directory -Force -Path ".claude" | Out-Null
 Copy-Item "$env:USERPROFILE\.claude\templates\project-settings.json" ".claude\settings.json"
 Copy-Item "$env:USERPROFILE\.claude\templates\HANDOFF.md" ".claude\HANDOFF.md"
 
+# MCP servers (optional — chỉ copy nếu project dùng MCP)
+Copy-Item "$env:USERPROFILE\.claude\templates\project-mcp.json" ".\.mcp.json"
+
 # .gitignore (append). -Encoding utf8 bắt buộc trên PS 5.1 (default UTF-16 LE BOM sẽ phá .gitignore).
 Add-Content -Path ".gitignore" -Encoding utf8 -Value @"
 
@@ -206,6 +217,9 @@ copy /Y "%USERPROFILE%\.claude\templates\project-CLAUDE.local.md" ".\CLAUDE.loca
 if not exist ".claude" mkdir ".claude"
 copy /Y "%USERPROFILE%\.claude\templates\project-settings.json" ".claude\settings.json"
 copy /Y "%USERPROFILE%\.claude\templates\HANDOFF.md" ".claude\HANDOFF.md"
+
+:: MCP servers (optional — chỉ copy nếu project dùng MCP)
+copy /Y "%USERPROFILE%\.claude\templates\project-mcp.json" ".\.mcp.json"
 
 :: .gitignore (append)
 (
@@ -329,18 +343,21 @@ Sau sửa, restart Claude Code (`exit` rồi `claude`) để apply. Verify bằn
 | Tool                             | Bắt buộc                              | macOS / Linux                           | Windows                                                        |
 | -------------------------------- | ------------------------------------- | --------------------------------------- | -------------------------------------------------------------- |
 | `bash`                           | ✅ Bắt buộc (mọi hook)                | Có sẵn                                  | Cần Git Bash (đi kèm Git for Windows) hoặc WSL                 |
-| `jq`                             | ✅ Bắt buộc (parse tool input JSON)   | `brew install jq` / `apt install jq`    | `winget install jqlang.jq` hoặc download [jqlang.org](https://jqlang.org) |
+| `python` (3.x)                   | ✅ Bắt buộc (hook parse JSON input)   | Có sẵn (macOS/Linux) hoặc `brew install python` | `winget install Python.Python.3.12` hoặc Microsoft Store |
 | `git`                            | ✅ Bắt buộc (SessionStart hook)       | Có sẵn                                  | Git for Windows                                                |
+| `jq`                             | ⏸️ Optional (chỉ cần nếu user viết hook custom dùng jq) | `brew install jq` / `apt install jq` | `winget install jqlang.jq` |
 | `prettier`                       | ⏸️ Optional (auto-format JS/TS/JSON/MD) | `npm i -g prettier`                     | `npm i -g prettier`                                            |
-| `ruff`                           | ⏸️ Optional (auto-format Python)       | `pip install ruff`                      | `pip install ruff`                                             |
+| `ruff`                           | ⏸️ Optional (auto-format Python code)  | `pip install ruff`                      | `pip install ruff`                                             |
 | `gofmt`                          | ⏸️ Optional (auto-format Go)           | Có sẵn khi cài Go                       | Có sẵn khi cài Go                                              |
 | `rustfmt`                        | ⏸️ Optional (auto-format Rust)         | `rustup component add rustfmt`          | `rustup component add rustfmt`                                 |
 
-Hook **silent skip** (không error) nếu tool optional thiếu — đã handle bằng `command -v`. Nhưng nếu thiếu `bash` hoặc `jq` thì hook fail và Claude Code sẽ log warning trong `/doctor`. Verify nhanh:
+> **Note**: Hook scripts dùng `python` thay `jq` để parse JSON input vì `jq` không có sẵn trên Windows git bash. Nếu bạn fork repo và viết hook custom theo style `jq`, thêm `jq` vào dependency.
+
+Hook **silent skip** (không error) nếu tool optional thiếu — đã handle bằng `command -v`. Nhưng nếu thiếu `bash`, `python`, hoặc `git` thì hook fail và Claude Code sẽ log warning trong `/doctor`. Verify nhanh:
 
 ```bash
-which bash jq git    # macOS/Linux
-where.exe bash jq git    # Windows
+which bash python git    # macOS/Linux
+where.exe bash python git    # Windows
 ```
 
 ## 8. Tài liệu tham khảo
