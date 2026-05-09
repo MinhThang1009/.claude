@@ -39,10 +39,7 @@ def main() -> None:
     else:
         icon = "🟢"
 
-    home = os.path.expanduser("~")
-    short_cwd = cwd
-    if cwd and cwd.startswith(home):
-        short_cwd = "~" + cwd[len(home):]
+    short_cwd = os.path.basename(cwd) if cwd else ""
 
     parts = [f"{icon} {model}", f"ctx:{pct}%"]
     if short_cwd:
