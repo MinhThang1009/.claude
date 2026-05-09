@@ -1,6 +1,5 @@
 {
-  "$schema": "https://json.schemastore.org/mcp.json",
-  "_comment": "MCP server team-share — copy thành <project>/.mcp.json (commit). Schema: https://code.claude.com/docs/en/mcp. KHÔNG để key bắt đầu bằng '_' trong 'mcpServers' vì Claude Code sẽ parse như server name hợp lệ. Examples ở phần dưới, paste vào 'mcpServers' khi cần.",
+  "_comment": "MCP server team-share — copy thành <project>/.mcp.json (commit). Format docs: https://code.claude.com/docs/en/mcp (chưa có public JSON schema cho .mcp.json Claude Code; schemastore.org/mcp.json 404 tính tới 2026-05). KHÔNG để key bắt đầu bằng '_' trong 'mcpServers' vì Claude Code sẽ parse như server name hợp lệ. Examples ở phần dưới, paste vào 'mcpServers' khi cần.",
 
   "_examples_stdio_filesystem": "{ \"filesystem\": { \"type\": \"stdio\", \"command\": \"npx\", \"args\": [\"-y\", \"@modelcontextprotocol/server-filesystem\", \"${CLAUDE_PROJECT_DIR}/src\"] } }",
 

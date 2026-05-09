@@ -33,16 +33,23 @@ except Exception:
 case "$FILE" in
   *.ts|*.tsx|*.js|*.jsx|*.json|*.md|*.yml|*.yaml|*.css|*.scss|*.html)
     if command -v prettier >/dev/null 2>&1; then
-      # Skip prettier nếu có executable config (RCE risk qua require())
+      # Skip prettier nếu có executable config HOẶC plugin reference trong package.json
+      # (RCE risk qua require() khi prettier khởi động).
       # Override: set CLAUDE_FORMAT_TRUST_PRETTIER_CONFIG=1 nếu trust config (vd: monorepo nội bộ)
       cd "$PROJECT_DIR" 2>/dev/null
-      HAS_JS_CONFIG=0
+      HAS_RISKY_CONFIG=0
       if [ -f .prettierrc.js ] || [ -f .prettierrc.cjs ] || [ -f .prettierrc.mjs ] || \
          [ -f prettier.config.js ] || [ -f prettier.config.cjs ] || [ -f prettier.config.mjs ]; then
-        HAS_JS_CONFIG=1
+        HAS_RISKY_CONFIG=1
       fi
-      if [ "$HAS_JS_CONFIG" = "1" ] && [ "${CLAUDE_FORMAT_TRUST_PRETTIER_CONFIG:-}" != "1" ]; then
-        echo "WARN: skipping prettier — executable config (.prettierrc.js/.cjs/.mjs) is RCE risk. Set CLAUDE_FORMAT_TRUST_PRETTIER_CONFIG=1 to override." >&2
+      # Check package.json: prettier plugins load qua require() khi format chạy
+      if [ "$HAS_RISKY_CONFIG" != "1" ] && [ -f package.json ]; then
+        if grep -qE '(@prettier/plugin-|prettier-plugin-|"plugins"[[:space:]]*:[[:space:]]*\[)' package.json 2>/dev/null; then
+          HAS_RISKY_CONFIG=1
+        fi
+      fi
+      if [ "$HAS_RISKY_CONFIG" = "1" ] && [ "${CLAUDE_FORMAT_TRUST_PRETTIER_CONFIG:-}" != "1" ]; then
+        echo "WARN: skipping prettier — executable config hoặc plugin reference (package.json) is RCE risk via require(). Set CLAUDE_FORMAT_TRUST_PRETTIER_CONFIG=1 to override." >&2
       else
         prettier --write "$FILE" >/dev/null 2>&1
       fi
