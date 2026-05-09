@@ -96,3 +96,10 @@ Quy tắc:
 Sau khi đưa kết quả, hỏi: "Muốn tôi đề xuất diff cụ thể cho các issue 🔴 không, hay chỉ dừng ở mức liệt kê?"
 
 Skill này read-only (frontmatter `allowed-tools` không có Edit/Write). Output diff là **text suggestion** trong chat — user tự copy/apply. Nếu muốn auto-apply, dùng skill `/refactor` hoặc subagent có Edit/Write.
+
+## Gotchas
+
+- **Race condition, off-by-one, memory leak**: không obvious từ diff. Đọc CONTEXT xung quanh, không chỉ dòng thay đổi.
+- **Security holes** (SQLi, XSS, IDOR, SSRF): check input validation + auth check, không tin diff "trông OK".
+- **Test coverage ≠ quality**: test có thể test sai thứ. Đọc test assertion, không chỉ count coverage %.
+- **Style nit priority THẤP NHẤT**: flag nhưng không block PR nếu logic OK. Ưu tiên fix bug + security trước.

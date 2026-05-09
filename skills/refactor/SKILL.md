@@ -107,3 +107,10 @@ Các bước đã thực hiện:
 [Nếu có] Note để follow-up:
 - Phát hiện bug ở foo.ts:42 trong lúc refactor — chưa fix, mở issue?
 ```
+
+## Gotchas
+
+- **Refactor = giữ behavior**. Test phải pass TRƯỚC và SAU. Nếu khác → feature/fix, không phải refactor.
+- **Không có test → viết characterization test trước**. Refactor blind rất nguy hiểm với code legacy.
+- **Đổi tên file/symbol** = đổi nhiều import. Dùng IDE refactor tool nếu có, không grep & replace blind (dễ miss case-sensitive, comment, string literal).
+- **Performance thay đổi = optimize, không phải refactor**. Tách 2 loại commit riêng để revert dễ.
