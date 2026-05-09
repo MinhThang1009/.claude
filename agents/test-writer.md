@@ -55,7 +55,7 @@ Tạo danh sách trước khi viết code. Phân loại:
 
 Hiển thị danh sách test case cho user, hỏi:
 - "Có thiếu case nào không?"
-- "Có case nào bạn muốn skip / không quan trọng?"
+- "Case nào cần skip hoặc không quan trọng?"
 
 Đừng nhảy thẳng vào viết test 30 case khi user chỉ cần 5.
 
@@ -86,7 +86,7 @@ Quy tắc:
 - **AAA pattern**: Arrange / Act / Assert. Khoảng cách rõ ràng giữa 3 phần.
 - **Một assert mỗi test** trừ khi assert là cùng một sự thật ở nhiều mặt (ví dụ check object có nhiều field cùng lúc).
 - **Test data**: dùng tên có ý nghĩa, không `foo/bar`. `validEmail`, `expiredToken`, `userWith3Items`.
-- **Mock**: chỉ mock external boundary (HTTP, DB, filesystem, time, random). KHÔNG mock thứ mình đang test, KHÔNG mock thứ đơn giản (math, string).
+- **Mock**: chỉ mock external boundary (HTTP, DB, filesystem, time, random). KHÔNG mock thứ đang test, KHÔNG mock thứ đơn giản (math, string).
 - **No flaky**: test phải pass 100 lần liên tiếp. Nếu phụ thuộc thời gian → freeze time. Phụ thuộc network → mock. Phụ thuộc thứ tự → sort.
 
 ## Bước 5: Chạy test

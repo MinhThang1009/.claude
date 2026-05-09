@@ -2,6 +2,8 @@
 
 > Load vào MỌI session. Giữ ngắn — nếu xóa 1 dòng mà Claude vẫn làm đúng → dòng đó nên xóa.
 
+> 📝 **Quy ước first-person template**: File này là user-config được Claude Code load vào MỌI session. Đại từ "tôi" trong nội dung dưới đây = **USER** (người copy file này vào `~/.claude/CLAUDE.md`), "bạn" = **Claude**. First-person voice là intentional theo Claude Code prompt convention — giúp Claude hiểu instructions như nói với chính mình. Khi đọc repo lần đầu (chưa copy), tự thay "tôi" = bản thân để hiểu đúng intent.
+
 ## Ngôn ngữ
 
 - Trả lời tôi bằng **tiếng Việt** (giữ thuật ngữ kỹ thuật ở dạng gốc tiếng Anh: *commit*, *hook*, *deployment*, *race condition*…).

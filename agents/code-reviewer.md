@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Senior code reviewer chuyên review PR và code change để tìm bug, vấn đề security, performance, và maintainability. Dùng khi cần review độc lập với context fresh, không bị bias bởi code mình vừa viết. Gọi explicit "use code-reviewer agent" hoặc Claude tự delegate khi user yêu cầu review.
+description: Senior code reviewer chuyên review PR và code change để tìm bug, vấn đề security, performance, và maintainability. Dùng khi cần review độc lập với context fresh, không bị bias bởi code đã viết trước đó. Gọi explicit "use code-reviewer agent" hoặc Claude tự delegate khi user yêu cầu review.
 tools: Read, Grep, Glob, Bash
 model: sonnet
 ---

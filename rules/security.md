@@ -4,7 +4,7 @@
 
 ## Secrets & credentials
 
-- **KHÔNG** in/log secret, token, API key, password, private key. Phát hiện hardcoded secret → cảnh báo NGAY (không đợi tôi hỏi).
+- **KHÔNG** in/log secret, token, API key, password, private key. Phát hiện hardcoded secret → cảnh báo NGAY (không chờ user xác nhận).
 - **KHÔNG** commit `.env`, `.env.*` (trừ `.env.example` đã sanitize), `*.key`, `*.pem`, `*.p12`, `*.jks`, `id_rsa*`, `credentials.json`.
 - Trước khi commit → kiểm tra `.gitignore`. File chưa có → thêm trước.
 - Mask khi hiển thị log/output: chuỗi 32+ hex, JWT (3 phần `.`-separated), AWS key (`AKIA...`), Bearer token, `Basic <base64>`.

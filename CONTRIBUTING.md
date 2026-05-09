@@ -1,6 +1,6 @@
 # Contributing — dotclaude
 
-> Cảm ơn bạn quan tâm đóng góp. Repo này là user-config cá nhân cho Claude Code, share để cộng đồng dev người Việt tiết kiệm 1-2 ngày setup. Mọi đóng góp chất lượng đều welcome.
+> Repo này là user-config cá nhân cho Claude Code, share để cộng đồng dev người Việt tiết kiệm 1-2 ngày setup. Mọi đóng góp chất lượng đều được hoan nghênh.
 
 ## Báo lỗi
 
@@ -29,7 +29,7 @@ Trước khi mở issue, kiểm tra:
 
 ## Báo nội dung sai (fact-check)
 
-Repo này tổng hợp từ docs Anthropic. Nội dung có thể outdated khi Anthropic update. Nếu bạn phát hiện claim sai (env var đã rename, slash command đã removed, model ID mới…):
+Repo này tổng hợp từ docs Anthropic. Nội dung có thể outdated khi Anthropic update. Khi phát hiện claim sai (env var đã rename, slash command đã removed, model ID mới…):
 
 1. Mở issue tag `fact-check` với:
    - File:line (vd `REFERENCE.md:1234`)
@@ -132,7 +132,7 @@ Manual run tất cả: `pre-commit run --all-files`. Skip 1 lần (chỉ khi c�
 
 ## License
 
-Bằng việc submit PR, bạn đồng ý đóng góp dưới [MIT License](LICENSE) — cùng license với repo.
+Đóng góp qua PR mặc nhiên áp dụng [MIT License](LICENSE) — cùng license với repo.
 
 ## Liên hệ
 

@@ -87,7 +87,7 @@ Output: ...
 ## Quy tắc
 
 - **Dùng ngôn ngữ phù hợp với user**. Nếu user là junior, tránh từ chuyên ngành chưa giải thích. Nếu user là senior, đi nhanh.
-- **Không tự bịa**. Nếu code có chỗ bạn không chắc → đọc thêm hoặc nói thẳng "phần này tôi cần verify". KHÔNG bịa ra "có lẽ nó làm X".
+- **Không tự bịa**. Nếu code có chỗ không chắc → đọc thêm hoặc nói thẳng "phần này cần verify". KHÔNG bịa ra "có lẽ nó làm X".
 - **Liên kết tới nguồn**: link tới file:line cụ thể, hoặc PR/commit nếu thông tin từ git history.
 - **So sánh với pattern quen thuộc**: "Đây là Observer pattern", "Cấu trúc giống Express middleware". Giúp user mapping từ kiến thức có sẵn.
 - **Không lecture**. Giải thích vừa đủ user hỏi, không kể lể history của ngôn ngữ.
@@ -104,7 +104,7 @@ Output: ...
 
 (Ví dụ: "giải thích Bloom filter", "giải thích React reconciliation")
 
-- Trả lời từ kiến thức của bạn.
+- Trả lời từ kiến thức sẵn có.
 - Nếu liên quan đến framework/library mới (< 1 năm) → web_search để confirm version-specific behavior.
 - Đưa ví dụ minh họa bằng pseudo-code hoặc code ngắn.
 - Trỏ tới nguồn chính thức (docs, paper) nếu user muốn đào sâu.

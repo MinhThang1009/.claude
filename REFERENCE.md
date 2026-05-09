@@ -452,7 +452,7 @@
 | `/login`, `/logout`  | Auth                                                       |
 | `/upgrade`           | Upgrade plan                                               |
 | `/extra-usage`       | Cấu hình extra usage khi hit rate limit                    |
-| `/passes`            | Share free week với bạn                                    |
+| `/passes`            | Share free week (Claude subscription benefit)              |
 | `/feedback [report]` | Submit feedback. Alias `/bug`                              |
 | `/release-notes`     | Xem changelog                                              |
 | `/team-onboarding`   | Generate onboarding guide từ usage history                 |

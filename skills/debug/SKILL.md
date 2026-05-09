@@ -23,7 +23,7 @@ Hỏi user (nếu chưa rõ):
 
 ## Bước 2: Reproduce
 
-Trước khi đoán nguyên nhân, **reproduce trong môi trường của bạn**:
+Trước khi đoán nguyên nhân, **reproduce trong môi trường local**:
 - Chạy lệnh user mô tả
 - Mở file, gọi hàm, gửi request — tái tạo điều kiện gây lỗi
 - Capture output đầy đủ
@@ -97,13 +97,13 @@ Nếu project không có test framework hoặc bug khó test (UI bug, race condi
 
 ## Khi bug không reproduce được
 
-Trường hợp khó (race condition, env khác, "trên máy tôi chạy được"):
-- KHÔNG đoán fix rồi báo "chắc xong rồi". Nói thẳng: "Tôi không reproduce được, nên fix sau đây là dựa trên giả thuyết X. Cần verify bằng [cách Y]."
+Trường hợp khó (race condition, env khác, "works-on-my-machine"):
+- KHÔNG đoán fix rồi báo "chắc xong rồi". Nói thẳng: "Không reproduce được, fix sau đây dựa trên giả thuyết X. Cần verify bằng [cách Y]."
 - Đề xuất thêm log/telemetry để bắt được lần xảy ra tiếp theo.
 
-## Khi tôi đã sửa 2 lần vẫn không đúng
+## Khi đã sửa 2 lần vẫn không đúng
 
-DỪNG. Đề xuất: "Tôi đã thử 2 cách không thành. Đề xuất `/clear` rồi mô tả lại bug với context tốt hơn — có thể tôi đang miss điểm gì đó."
+DỪNG. Đề xuất: "Đã thử 2 cách không thành. Đề xuất `/clear` rồi mô tả lại bug với context tốt hơn — có thể đang miss điểm gì đó."
 
 ## Gotchas
 

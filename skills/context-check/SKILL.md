@@ -13,11 +13,11 @@ Mục đích: chủ động đánh giá context và đề xuất hành động �
 
 ### Bước 1 — Đọc trạng thái
 
-Tôi (Claude) **không thể tự chạy `/context`** vì đó là slash command của user. Hãy đề nghị người dùng:
+Claude **không thể tự chạy `/context`** vì đó là slash command của user. Đề nghị user:
 
-> Bạn chạy `/context` giúp mình, gửi lại số % và breakdown nhé.
+> Cần chạy `/context` ở terminal và gửi lại output (% và breakdown).
 
-Sau khi user gửi output `/context`, tôi phân tích.
+Sau khi user gửi output `/context`, phân tích theo các bước dưới.
 
 ### Bước 2 — Phân tích theo ngưỡng
 
@@ -31,7 +31,7 @@ Sau khi user gửi output `/context`, tôi phân tích.
 
 ### Bước 3 — Phân tích từng nhóm
 
-`/context` chia output theo nhóm (system, memory/CLAUDE.md, skills, MCP tools, conversation, file content). Tôi tìm thủ phạm:
+`/context` chia output theo nhóm (system, memory/CLAUDE.md, skills, MCP tools, conversation, file content). Tìm nhóm tiêu thụ cao bất thường:
 
 | Nhóm tiêu thụ cao               | Nguyên nhân                         | Cách giảm                                                 |
 | ------------------------------- | ----------------------------------- | --------------------------------------------------------- |
@@ -45,8 +45,8 @@ Sau khi user gửi output `/context`, tôi phân tích.
 
 Đưa ra **1 đề xuất chính** kèm lý do, KHÔNG list 5 option để user chọn:
 
-Ví dụ output của tôi:
-> Context đang ở 73%. Conversation history chiếm 45% — chủ yếu do tool output dài từ phiên debug ban nãy. **Đề xuất**: chạy `/handoff` để mình tóm tắt 5 dòng key decision, rồi `/compact giữ lại brief, drop debug log`. Sau đó tiếp tục task hiện tại trong session này. Estimate context sau compact: ~25%.
+Ví dụ output:
+> Context đang ở 73%. Conversation history chiếm 45% — chủ yếu do tool output dài từ phiên debug trước. **Đề xuất**: chạy `/handoff` để tóm tắt 5 dòng key decision, rồi `/compact giữ lại brief, drop debug log`. Sau đó tiếp tục task hiện tại trong session này. Estimate context sau compact: ~25%.
 
 ## Lựa chọn `/compact` vs `/clear`
 

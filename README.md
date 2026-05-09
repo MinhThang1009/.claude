@@ -360,7 +360,7 @@ Sau sửa, restart Claude Code (`exit` rồi `claude`) để apply. Verify bằn
 | `gofmt`                          | ⏸️ Optional (auto-format Go)           | Có sẵn khi cài Go                       | Có sẵn khi cài Go                                              |
 | `rustfmt`                        | ⏸️ Optional (auto-format Rust)         | `rustup component add rustfmt`          | `rustup component add rustfmt`                                 |
 
-> **Note**: Hook scripts dùng `python` thay `jq` để parse JSON input vì `jq` không có sẵn trên Windows git bash. Nếu bạn fork repo và viết hook custom theo style `jq`, thêm `jq` vào dependency.
+> **Note**: Hook scripts dùng `python` thay `jq` để parse JSON input vì `jq` không có sẵn trên Windows git bash. Khi fork repo và viết hook custom theo style `jq`, thêm `jq` vào dependency.
 
 Hook **silent skip** (không error) nếu tool optional thiếu — đã handle bằng `command -v`. Nhưng nếu thiếu `bash`, `python`, hoặc `git` thì hook fail và Claude Code sẽ log warning trong `/doctor`. Verify nhanh:
 
@@ -396,7 +396,7 @@ Hook `bash-guard.py` chặn các pattern nguy hiểm sau (verified bằng 97 tes
 - Quoted path: `cat "/path with space/.env"` — quote có thể phá pattern. Hiếm gặp.
 - Hook chỉ chạy với Bash tool. Nếu Claude dùng Read/Edit/Write tool, áp dụng permission rules thay.
 
-Verify hook coverage tại máy bạn:
+Verify hook coverage tại máy local:
 ```bash
 bash ~/.claude/hooks/test-bash-guard.sh    # Expect: Total 97, PASS 97, FAIL 0
 ```
