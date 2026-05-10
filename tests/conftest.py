@@ -46,6 +46,7 @@ def _load_module(name: str, path: Path):
 
 _bash_guard = _load_module("bash_guard", HOOKS_DIR / "bash-guard.py")
 _statusline = _load_module("statusline", HOOKS_DIR / "statusline.py")
+_format_on_edit = _load_module("format_on_edit", HOOKS_DIR / "format-on-edit.py")
 
 
 @pytest.fixture
@@ -58,3 +59,10 @@ def statusline():
     if _statusline is None:
         pytest.skip("statusline.py không tồn tại trên branch này (chỉ có ở main)")
     return _statusline
+
+
+@pytest.fixture
+def format_on_edit():
+    if _format_on_edit is None:
+        pytest.skip("format-on-edit.py không tồn tại trên branch này")
+    return _format_on_edit
