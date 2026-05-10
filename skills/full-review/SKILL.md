@@ -24,18 +24,20 @@ Nếu Haiku agent trả về "skip" → **dừng ngay**, không dispatch Bước
 
 ### Bước 2 — Dispatch agents (adaptive scaling)
 
-**Scale số agents theo complexity** (theo Anthropic multi-agent research pattern):
+**Scale số agents theo complexity** (theo [Anthropic multi-agent research pattern](https://www.anthropic.com/engineering/multi-agent-research-system): "Simple fact-finding requires just 1 agent... complex research might use more than 10 subagents"):
 
-Khi scope = **diff** (unstaged, branch, PR):
-- **Small** (≤20 dòng, 1-2 files, không đụng auth/payment/crypto): **1 agent** (code-reviewer only).
-- **Medium** (21-200 dòng, 3-10 files): **2 agents** (code-reviewer + security-auditor).
-- **Large** (>200 dòng, >10 files, hoặc sensitive areas): **3 agents** (full).
+Haiku pre-check (Bước 1) đánh giá complexity dựa trên:
+- Số dòng thay đổi / kích thước codebase
+- Số files affected
+- Có đụng sensitive areas không (auth, payment, crypto, database schema)
+- Complexity logic (simple rename vs architectural change)
 
-Khi scope = **all** (toàn bộ codebase):
-- **Small codebase** (≤500 dòng, ≤10 files): **2 agents** (code-reviewer + security-auditor).
-- **Large codebase** (>500 dòng hoặc >10 files): **3 agents** (full).
+Rồi chọn scale:
+- **Simple** (thay đổi nhỏ, ít files, không sensitive): **1 agent** (code-reviewer only) — tiết kiệm tokens.
+- **Moderate** (nhiều files, logic phức tạp, hoặc có security concern): **2 agents** (code-reviewer + security-auditor).
+- **Complex** (thay đổi lớn, nhiều modules, sensitive areas, hoặc cần test coverage analysis): **3 agents** (full).
 
-KHÔNG override scaling vì user nói "all" — "all" chỉ define scope, KHÔNG define số agents.
+"all" scope chỉ define phạm vi review, KHÔNG override scaling — Haiku vẫn judge complexity dựa trên nội dung thực tế.
 
 Launch subagents theo scale đã chọn:
 
