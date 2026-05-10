@@ -1,6 +1,11 @@
 # Personal config (dùng settings.example.json làm template)
 settings.json
 
+# Audit specs + reports (internal tooling, không phải template)
+docs/AUDIT_INSTRUCTIONS.md
+docs/AUDIT_SPEC.md
+docs/AUDIT-*.md
+
 # Credentials & auth
 .credentials.json
 mcp-needs-auth-cache.json
