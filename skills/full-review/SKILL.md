@@ -17,16 +17,16 @@ Skill này dispatch 3 subagents song song, validate findings, rồi consolidate 
 1. Xác định scope từ `$ARGUMENTS` (PR, branch, files, hoặc all)
 2. Collect diff stats:
    - Scope diff: `git diff --stat` → đếm dòng thay đổi, số files
-   - Scope all: `find . -type f -not -path '*/.git/*' -not -path '*/node_modules/*' -not -path '*/dist/*' -not -path '*/__pycache__/*' | wc -l` (đếm files) + `wc -l` trên source files → đếm LOC codebase (không hardcode extensions — hoạt động với mọi ngôn ngữ)
+   - Scope all: `git ls-files | wc -l` (đếm tracked files, tự respect `.gitignore`) + `git ls-files | xargs wc -l` → đếm LOC codebase. Nếu không có git → `find . -type f | wc -l` (adjust exclude theo project)
    - Scope PR: `gh pr diff <N> --stat`
 3. Collect file list: `git diff --name-only` hoặc `find` → liệt kê file names
 4. Nếu clean (0 changes cho diff scope) → báo user, dừng
 5. Nếu scope mơ hồ → hỏi user, KHÔNG đoán
 
-**Dispatch Haiku agent** với data đã collect (inject diff stats + file list vào prompt):
-- Haiku nhận **số liệu thực** (không cần tự count) + file names (thấy sensitive areas)
-- Haiku check: PR closed/draft? Trivial change (≤5 dòng, chỉ format/typo)? → "skip"
-- Haiku **chọn scale tier** dựa trên data thực (xem Bước 2)
+**Dispatch lightweight agent** (Haiku nếu available, hoặc model nhẹ nhất) với data đã collect (inject diff stats + file list vào prompt):
+- Agent nhận **số liệu thực** (không cần tự count) + file names (thấy sensitive areas)
+- Check: PR closed/draft? Trivial change (≤5 dòng, chỉ format/typo)? → "skip"
+- **Chọn scale tier** dựa trên data thực (xem Bước 2)
 
 Nếu Haiku trả về "skip" → **dừng ngay**, không dispatch Bước 2.
 
@@ -48,17 +48,14 @@ Haiku dùng bảng trên làm **guideline**, có thể adjust nếu context cho 
 
 Launch subagents theo scale đã chọn:
 
-**Agent 1: code-reviewer** (Sonnet)
+**Agent 1: code-reviewer** (model + tools theo agent definition)
 - Prompt: "Review code changes trong [scope]. Tìm bugs, logic errors, performance, maintainability. Rate mỗi issue confidence 0-100. Chỉ report confidence ≥ 80."
-- Tools: Read, Grep, Glob, Bash
 
-**Agent 2: security-auditor** (Opus)
+**Agent 2: security-auditor** (model + tools theo agent definition)
 - Prompt: "Security audit code changes trong [scope]. Tìm injection, auth flaws, secrets, insecure crypto, SSRF, XSS. Report theo CVSS severity."
-- Tools: Read, Grep, Glob, Bash, WebFetch
 
-**Agent 3: test-analyzer** (Sonnet)
+**Agent 3: test-analyzer** (model + tools theo agent definition)
 - Prompt: "Phân tích test coverage cho code changes trong [scope]. Kiểm tra: có test cho logic mới không? Edge cases đã cover? Có test bị break không? Chạy test suite nếu có."
-- Tools: Read, Grep, Glob, Bash
 
 ### Bước 3 — Consolidate (adaptive theo số agents)
 

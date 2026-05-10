@@ -87,7 +87,7 @@ Hiển thị danh sách test case cho user, hỏi:
 
 ## Bước 4: Viết test
 
-Format chuẩn (test description **tiếng Việt**, identifier hàm/biến **tiếng Anh**):
+Format chuẩn (test description **tiếng Việt**, identifier hàm/biến **tiếng Anh**). Adapt syntax theo test framework của project — ví dụ TS/Jest:
 
 ```typescript
 describe('functionName', () => {
@@ -95,16 +95,16 @@ describe('functionName', () => {
     it('phải [hành vi]', () => {
       // arrange — chuẩn bị dữ liệu test
       const input = ...
-
       // act — gọi hàm cần test
       const result = functionName(input)
-
       // assert — kiểm tra kết quả
       expect(result).toBe(...)
     })
   })
 })
 ```
+
+Tương đương Python/pytest: `def test_function_name_khi_dieu_kien():`, Go: `func TestFunctionName_KhiDieuKien(t *testing.T)`, v.v. — follow convention framework, giữ test description tiếng Việt.
 
 Quy tắc:
 - **Naming**: `phải <hành động> <đối tượng> khi <điều kiện>` — đọc lên giống spec, dev VN đọc nhanh.
@@ -153,7 +153,7 @@ Báo cáo cuối:
 - ✓ error: throw khi ...
 - ...
 
-**Đã chạy**: `pnpm test <module>` → 12 passed, 0 failed
+**Đã chạy**: `<project test command>` → N passed, 0 failed
 
 **Cần follow-up** (nếu có):
 - Chưa cover case [X] vì cần refactor để test được — note vào TODO

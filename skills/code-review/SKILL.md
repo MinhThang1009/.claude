@@ -24,7 +24,7 @@ Tùy theo `$ARGUMENTS`:
 - **Không có argument**: review diff đã inject ở trên (unstaged + staged changes)
 - **Số (123)**: review PR #123 (`gh pr diff 123` — chạy thêm nếu cần)
 - **Đường dẫn (`src/foo.ts`)**: review nội dung file đó
-- **`branch <name>`**: review tất cả thay đổi của branch so với `main` (`git diff main...<name>`)
+- **`branch <name>`**: review thay đổi của branch so với default branch (auto-detect: `git symbolic-ref refs/remotes/origin/HEAD` → fallback `main` → `master`)
 
 Hiển thị scope đã chọn cho user trước khi tiếp tục.
 
