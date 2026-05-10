@@ -23,7 +23,7 @@
 
 ## 1. Cấu trúc `~/.claude/` sau khi cài
 
-> Repo source có thêm `docs/`, `.github/`, `scripts/`, `LICENSE`, `CHANGELOG.md` cho GitHub browsing + CI — **KHÔNG copy** vào `~/.claude/` (xem [Bước 3](#bước-3--sao-chép-vào-claude)).
+> Repo source có thêm `docs/`, `.github/`, `scripts/`, `tests/`, `requirements-test.txt`, `.gitattributes`, `LICENSE`, `CHANGELOG.md` cho GitHub browsing + CI — **KHÔNG copy** vào `~/.claude/` (xem [Bước 3](#bước-3--sao-chép-vào-claude)).
 
 ```text
 ~/.claude/
@@ -67,7 +67,8 @@
 ├── hooks/                          # Hook scripts (gọi từ settings.json)
 │   ├── bash-guard.py               # Engine pattern matching (Python) — defense layer chính
 │   ├── bash-guard.sh               # Wrapper minimal gọi python
-│   ├── format-on-edit.sh           # PostToolUse: prettier/ruff/gofmt/rustfmt (skip nếu file ngoài project)
+│   ├── format-on-edit.py           # Engine: prettier/ruff/gofmt/rustfmt + RCE detection
+│   ├── format-on-edit.sh           # Wrapper minimal gọi python
 │   ├── statusline.py               # StatusLine update script
 │   ├── statusline.sh               # Wrapper cho statusline
 │   └── test-bash-guard.sh          # Regression test 119 case (dev-only, có thể xóa)
