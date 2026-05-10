@@ -26,7 +26,7 @@ Nếu Haiku agent trả về "skip" → **dừng ngay**, không dispatch Bước
 
 **Scale số agents theo complexity** (theo [Anthropic multi-agent research pattern](https://www.anthropic.com/engineering/multi-agent-research-system): "Simple fact-finding requires just 1 agent... complex research might use more than 10 subagents"):
 
-Haiku pre-check (Bước 1) đánh giá complexity dựa trên:
+Haiku pre-check (Bước 1) đánh giá complexity dựa trên (criteria tự thiết kế cho code review, không phải từ Anthropic article):
 - Số dòng thay đổi / kích thước codebase
 - Số files affected
 - Có đụng sensitive areas không (auth, payment, crypto, database schema)
