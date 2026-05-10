@@ -6,7 +6,26 @@ Format theo [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/), tuâ
 
 ## [Unreleased]
 
-### Added
+### Added (2026-05-10 — agent expansion + content updates)
+
+- **5 agents mới** mở rộng coverage cho fullstack JS web/app workflow:
+  - `agents/debugger.md` — Root cause analysis + fix + verify (5-step process). Dựa trên docs example chính thức Anthropic.
+  - `agents/documentation-engineer.md` — Viết/maintain README, API docs, CHANGELOG, architecture guides. Zero-hallucination extraction từ code.
+  - `agents/dependency-manager.md` — Audit deps (CVE, unused, outdated, license), bundle size optimization (moment→dayjs, lodash→lodash-es).
+  - `agents/performance-engineer.md` — Profiling (DB N+1, memory leak, connection pool), caching strategy, before/after benchmarks.
+  - `agents/nextjs-developer.md` — Next.js 14+ App Router specialist: Server Components, Server Actions, rendering strategies (SSG/SSR/ISR/PPR), SEO.
+- **10 agents hiện có được cập nhật**:
+  - Tất cả 10 agents: thêm `TodoWrite` (consistency với pattern Anthropic feature-dev plugin).
+  - 5 agents (reviewer, explorer, architect, security-auditor, type-design-analyzer): thêm `LSP` cho code intelligence.
+  - 3 agents (reviewer, explorer, architect): thêm `WebFetch` + `WebSearch` cho external research.
+  - `code-reviewer`: thêm Accessibility checklist (semantic HTML, ARIA, color contrast, keyboard nav, form labels).
+  - `code-architect`: thêm API Design section (REST/GraphQL, pagination, versioning, auth patterns, webhooks).
+  - `code-simplifier`: thêm Code smell detection (long method, feature envy, data clumps...) + Advanced refactoring patterns (Replace Conditional with Polymorphism...) + Safety guidelines.
+  - `documentation-engineer`: thêm Zero-hallucination extraction techniques + SECURITY.md trong docs scope.
+- **Memory configuration** cho agents áp dụng cross-session learning: `code-reviewer` (user), `code-architect`/`code-explorer`/`security-auditor`/`code-simplifier`/`test-writer`/`test-analyzer` (project). Theo docs example Anthropic.
+- **README.md + INTRODUCTION.md** cập nhật: 4→15 agents, 7→9 skills, 4→6 hooks, token table từ `/context` thực tế (29.8k→46.2k baseline).
+
+### Added (Statusline)
 
 - **Statusline custom** (`hooks/statusline.py` + `hooks/statusline.sh`) — hiển thị real-time ở status bar Claude Code:
   - Line 1: `[model + window mode (1M/200k) + ⚡ effort]` + `📁 cwd basename` + `🌿 git branch` + `+staged ~modified`
