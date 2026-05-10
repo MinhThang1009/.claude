@@ -451,9 +451,9 @@ Sau khi dùng skills 1 thời gian, có thể measure xem description trigger c�
 
 Câu hỏi thường gặp:
 
-### 9.1 Tại sao chỉ import 2 rules thay vì 4?
+### 9.1 Tại sao tách rules và references?
 
-Baseline context tính tiền theo mỗi message. 4 rules = thêm ~7000 tokens × mỗi turn × cả phiên = lãng phí. Chỉ import 2 rule áp dụng MỌI turn (`communication`, `security`); 2 rule còn lại để Claude đọc khi cần (qua REFERENCE hoặc user `@`-reference).
+3 rules (`communication`, `security`, `verification`) auto-load mọi session (~4,400 tokens). 2 references (`coding-standards`, `git-workflow`) KHÔNG auto-load để tiết kiệm context — Claude tự đọc khi gặp task liên quan, hoặc user `@`-reference khi cần.
 
 ### 9.2 Tại sao [REFERENCE.md](docs/REFERENCE.md) không auto-load vào [CLAUDE.md](CLAUDE.md)?
 

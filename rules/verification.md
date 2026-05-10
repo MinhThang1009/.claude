@@ -7,12 +7,17 @@
 - Kết quả từ subagent có **impact** (security finding, action user sẽ thực thi, claim về số liệu/version) → **verify bằng tool trực tiếp** (Grep, Read, WebFetch) trước khi báo user. Subagent không thấy parent context ([docs](https://code.claude.com/docs/en/sub-agents)) → dễ báo sai. Summary trivial (vd "đã đọc 5 file, không tìm thấy X") thì có thể skip verify.
 - Data trong parent context (WebFetch, tool output trước, conversation) → **paste subset relevant** vào prompt subagent. Data trên disk + subagent có `Read`/`Grep` → để subagent tự tìm.
 - Không báo findings cho user mà chưa tự confirm ít nhất 1 lần.
-- Regular subagent **KHÔNG load** CLAUDE.md, rules/*.md, hay instruction nào của parent ([docs](https://code.claude.com/docs/en/sub-agents)). Nếu cần tuân thủ convention → inject vào prompt hoặc dùng `skills` field trong frontmatter. **Ngoại trừ**: forked subagent (`context: fork` hoặc `CLAUDE_CODE_FORK_SUBAGENT=1`) kế thừa toàn bộ context + CLAUDE.md của parent.
+- Subagent KHÔNG nhận full Claude Code system prompt — chỉ nhận system prompt riêng (markdown body của agent definition). **CLAUDE.md vẫn load** qua message flow bình thường ([docs](https://code.claude.com/docs/en/sub-agents)). rules/*.md KHÔNG load. Nếu cần convention cụ thể → inject vào prompt hoặc dùng `skills` field. Forked subagent (`CLAUDE_CODE_FORK_SUBAGENT=1` hoặc `context: fork` trong **skill** frontmatter) kế thừa toàn bộ conversation history.
 - **Background** subagent auto-deny permissions chưa pre-approve. Kết quả bất thường (ít findings, empty output) → có thể do bị deny silently. Retry bằng foreground nếu nghi ngờ.
-- Consolidate output từ nhiều subagent → **đếm findings mỗi subagent** trước, ghi tổng expected. Nếu consolidated report ít hơn → liệt kê rõ finding nào bị drop + lý do. KHÔNG drop ngầm.
+- Consolidate output từ nhiều subagent → **đếm findings mỗi subagent** trước (tự đếm, không tin self-count), ghi tổng expected. Nếu consolidated report ít hơn → liệt kê rõ finding nào bị drop + lý do. KHÔNG drop ngầm. Hai subagent report cùng finding nhưng severity khác → lấy severity **cao hơn**. Finding partially valid → giữ phần đúng, ghi rõ phần sai.
 - Audit/review spec thay đổi giữa chừng → **re-dispatch** subagent với spec mới. KHÔNG re-evaluate findings cũ từ memory — findings cũ chạy theo spec cũ, không đại diện cho spec mới.
-- Dispatch subagent audit file đã **edit trong session** → grep/diff verify file trên disk khớp expected trước khi dispatch. Subagent có thể miss content khi file dài — không tin coverage rating tuyệt đối.
-- Subagent báo "not covered" cho content mình vừa thêm → **grep verify trước khi chấp nhận**. Session cache (system-reminder loaded đầu session) ≠ disk state hiện tại — subagent có thể confuse bởi stale cache.
+- Subagent có thể **miss content** khi file dài hoặc task quá nhiều (fetch URLs + đọc files + evaluate + report cùng lúc). Không tin coverage rating tuyệt đối — subagent báo "not covered" → **grep verify trước khi chấp nhận**. Giới hạn scope: mỗi subagent ≤10 files hoặc ≤3 complex tasks đồng thời.
+- **Session cache** (system-reminder loaded đầu session) ≠ disk state hiện tại. Ảnh hưởng **cả subagent lẫn lead agent**: content đã thêm/sửa/xóa trong session không reflect trong system-reminder. Khi consolidate findings hoặc so sánh file → luôn dùng Read/Grep từ disk, KHÔNG dựa vào nội dung đã load trong context.
+
+## Self-review bias
+
+- Sau batch fixes (>5 edits) → dispatch **fresh subagent** review changes thay vì tự verify. Tự fix → tự review = bias (session này đã chứng minh: tự verify bằng grep miss 5 regressions, fresh subagent bắt được).
+- Fresh subagent KHÔNG nhận context về intent sửa — chỉ nhận file paths + instruction "review for correctness". Đây là feature, không phải bug: independent review cần independent context.
 
 ## Batch edits
 

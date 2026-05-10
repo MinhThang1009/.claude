@@ -1813,7 +1813,7 @@ Cách xử lý:
 | Sandbox an toàn                 | `/sandbox` hoặc `sandbox: true`                          |
 | Cộng tác nhiều agent            | Subagents + agent teams                                  |
 | Run khi máy tắt                 | `/schedule` (cloud routine)                              |
-| Style trả lời khác              | `/output-style` (built-in: Default/Explanatory/Learning) |
+| Style trả lời khác              | `/config` → Output style (built-in: Default/Explanatory/Learning; custom: `.claude/output-styles/`) |
 | Loại file Claude khỏi đọc       | `permissions.deny` trong `settings.json` (vd `Read(**/dist/**)`) |
 | Bulk migration parallel         | `/batch <instruction>`                                   |
 | Auto-fix PR khi CI fail         | `/autofix-pr`                                            |
