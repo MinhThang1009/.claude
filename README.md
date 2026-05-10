@@ -61,7 +61,7 @@
 │   ├── documentation-engineer.md   # Viết/maintain docs (sonnet)
 │   ├── performance-engineer.md     # Profiling + optimization (sonnet)
 │   ├── dependency-manager.md       # Audit deps + bundle size (sonnet)
-│   └── nextjs-developer.md        # Next.js App Router specialist (sonnet)
+│   └── nextjs-developer.md         # Next.js App Router specialist (sonnet)
 ├── output-styles/
 │   └── concise-vietnamese.md       # Style tiếng Việt ngắn gọn
 ├── hooks/                          # Hook scripts (gọi từ settings.json)
