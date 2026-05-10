@@ -23,8 +23,8 @@ Skill này dispatch 3 subagents song song, validate findings, rồi consolidate 
 4. Nếu clean (0 changes cho diff scope) → báo user, dừng
 5. Nếu scope mơ hồ → hỏi user, KHÔNG đoán
 
-**Dispatch lightweight agent** (Haiku nếu available, hoặc model nhẹ nhất) với data đã collect (inject diff stats + file list vào prompt):
-- Agent nhận **số liệu thực** (không cần tự count) + file names (thấy sensitive areas)
+**Dispatch pre-check subagent** (`model: haiku` trong Agent tool call) với data đã collect (inject diff stats + file list vào prompt):
+- Subagent nhận **số liệu thực** (không cần tự count) + file names (thấy sensitive areas)
 - Check: PR closed/draft? Trivial change (≤5 dòng, chỉ format/typo)? → "skip"
 - **Chọn scale tier** dựa trên data thực (xem Bước 2)
 
