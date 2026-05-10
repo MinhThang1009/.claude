@@ -1,0 +1,14 @@
+# Force LF cho shell + Python scripts (chạy được trên Git Bash/WSL/macOS/Linux)
+*.sh    text eol=lf
+*.py    text eol=lf
+
+# Auto-detect cho text khác (markdown, json, yaml...)
+*       text=auto
+
+# Binary — không bao giờ convert
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.pdf   binary
