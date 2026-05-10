@@ -23,6 +23,7 @@ description: >
   assistant: "Tôi sẽ dùng code-reviewer agent để review changes."
   </example>
 tools: Read, Grep, Glob, Bash
+disallowedTools: Edit, Write, NotebookEdit
 model: sonnet
 memory: user
 color: blue

@@ -23,6 +23,7 @@ description: >
   assistant: "Tôi sẽ dùng type-design-analyzer agent để phân tích types trong PR."
   </example>
 tools: Read, Grep, Glob, Bash
+disallowedTools: Edit, Write, NotebookEdit
 model: sonnet
 color: pink
 ---

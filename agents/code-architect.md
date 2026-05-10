@@ -33,6 +33,7 @@ description: >
   assistant: "Tôi sẽ dùng architect agent để thiết kế plan cho feature này."
   </example>
 tools: Read, Grep, Glob, Bash, WebFetch, WebSearch
+disallowedTools: Edit, Write, NotebookEdit
 model: opus
 memory: project
 effort: high

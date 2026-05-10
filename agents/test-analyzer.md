@@ -23,6 +23,7 @@ description: >
   assistant: "Tôi sẽ dùng test-analyzer agent để kiểm tra test coverage cho validation."
   </example>
 tools: Read, Grep, Glob, Bash
+disallowedTools: Edit, Write, NotebookEdit
 model: sonnet
 memory: project
 color: cyan

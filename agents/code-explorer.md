@@ -23,6 +23,7 @@ description: >
   assistant: "Tôi sẽ dùng code-explorer agent để map architecture và dependencies."
   </example>
 tools: Read, Grep, Glob, Bash, WebFetch
+disallowedTools: Edit, Write, NotebookEdit
 model: sonnet
 memory: project
 color: yellow

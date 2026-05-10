@@ -23,6 +23,7 @@ description: >
   assistant: "Tôi sẽ dùng security-auditor agent để audit auth flow."
   </example>
 tools: Read, Grep, Glob, Bash, WebFetch
+disallowedTools: Edit, Write, NotebookEdit
 model: opus
 memory: user
 effort: high
