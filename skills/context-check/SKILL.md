@@ -33,7 +33,7 @@ Sau khi user gửi output `/context`, phân tích theo các bước dưới.
 | `30-40%`  | 🟢 Sweet spot                       | Newcomer target — "shoot to keep it under 40%" (Dex)                   |
 | `40-60%`  | 🟡 "Dumb zone" bắt đầu              | Performance degrade — plan wrap-up phase hiện tại                        |
 | `60-77%`  | 🟠 Wrap up actively                 | `/compact` HOẶC `/handoff` → `/clear` + brief mới                        |
-| `~77%`    | 🔴 Auto-compact firing (155k tokens)| Đã muộn — ưu tiên `/handoff --save` trước khi mất chi tiết               |
+| `~77%`    | 🔴 Critical zone (Boris claim 155k) | Compact proactively — auto-compact default ~95% theo docs mới, nhưng quality đã giảm ở đây |
 | `>90%`    | ⛔ Hard limit                        | DỪNG task lớn ngay, brief + new session                                   |
 
 ### Bước 3 — Phân tích từng nhóm
