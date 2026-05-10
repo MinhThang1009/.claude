@@ -26,9 +26,16 @@ Nếu Haiku agent trả về "skip" → **dừng ngay**, không dispatch Bước
 
 **Scale số agents theo complexity** (theo Anthropic multi-agent research pattern):
 
-- **Small diff** (≤20 dòng, 1-2 files, không đụng auth/payment/crypto): dispatch **1 agent** (code-reviewer only) — tiết kiệm tokens, đủ cho simple changes.
-- **Medium diff** (21-200 dòng, 3-10 files): dispatch **2 agents** (code-reviewer + security-auditor) — skip test-analyzer nếu không có test changes.
-- **Large diff** (>200 dòng, >10 files, hoặc đụng sensitive areas): dispatch **3 agents** đồng thời (full).
+Khi scope = **diff** (unstaged, branch, PR):
+- **Small** (≤20 dòng, 1-2 files, không đụng auth/payment/crypto): **1 agent** (code-reviewer only).
+- **Medium** (21-200 dòng, 3-10 files): **2 agents** (code-reviewer + security-auditor).
+- **Large** (>200 dòng, >10 files, hoặc sensitive areas): **3 agents** (full).
+
+Khi scope = **all** (toàn bộ codebase):
+- **Small codebase** (≤500 dòng, ≤10 files): **2 agents** (code-reviewer + security-auditor).
+- **Large codebase** (>500 dòng hoặc >10 files): **3 agents** (full).
+
+KHÔNG override scaling vì user nói "all" — "all" chỉ define scope, KHÔNG define số agents.
 
 Launch subagents theo scale đã chọn:
 
