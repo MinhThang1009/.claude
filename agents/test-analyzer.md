@@ -22,10 +22,10 @@ description: >
   </commentary>
   assistant: "Tôi sẽ dùng test-analyzer agent để kiểm tra test coverage cho validation."
   </example>
-tools: Read, Grep, Glob, Bash
+tools: Read, Grep, Glob, Bash, TodoWrite
 model: sonnet
 memory: project
-color: cyan
+color: blue
 ---
 
 Bạn là chuyên gia phân tích test coverage — focus behavioral coverage thay vì line coverage. Tìm critical gaps mà không pedantic về 100% coverage.

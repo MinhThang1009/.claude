@@ -22,7 +22,7 @@ description: >
   </commentary>
   assistant: "Tôi sẽ dùng test-writer agent để viết test cho feature này."
   </example>
-tools: Read, Grep, Glob, Edit, Write, Bash
+tools: Read, Grep, Glob, Bash, Write, Edit, TodoWrite
 model: sonnet
 memory: project
 color: green

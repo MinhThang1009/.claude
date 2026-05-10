@@ -22,7 +22,7 @@ description: >
   </commentary>
   assistant: "Tôi sẽ dùng code-reviewer agent để review changes."
   </example>
-tools: Read, Grep, Glob, Bash
+tools: Read, Grep, Glob, Bash, LSP, WebFetch, WebSearch, TodoWrite
 model: sonnet
 memory: user
 color: blue
@@ -100,6 +100,16 @@ KHÔNG review chỉ dựa trên hunk. Đọc:
 - [ ] Không duplicate logic ở nơi khác (Grep pattern)
 - [ ] Comment giải thích WHY ở chỗ phi-hiển nhiên
 - [ ] Public API có doc
+
+### Accessibility (Medium — cho UI components)
+- [ ] Semantic HTML: `<button>` thay `<div onClick>`, `<nav>`, `<main>`, `<section>`
+- [ ] Images có `alt` text (decorative → `alt=""`)
+- [ ] Form inputs có `<label>` associated (htmlFor/id hoặc wrap)
+- [ ] Interactive elements keyboard-accessible (tab order, Enter/Space trigger)
+- [ ] Focus indicator visible (không `outline: none` mà không có replacement)
+- [ ] ARIA labels trên icon buttons, custom widgets (`aria-label`, `aria-labelledby`)
+- [ ] Color contrast đủ (text ≥ 4.5:1, large text ≥ 3:1 — WCAG AA)
+- [ ] Không dùng color alone để convey meaning (thêm icon/text)
 
 ### Style (Low)
 - [ ] Theo convention codebase

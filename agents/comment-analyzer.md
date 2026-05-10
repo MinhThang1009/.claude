@@ -22,7 +22,7 @@ description: >
   </commentary>
   assistant: "Tôi sẽ dùng comment-analyzer agent để verify comments trong PR."
   </example>
-tools: Read, Grep, Glob, Bash
+tools: Read, Grep, Glob, Bash, TodoWrite
 model: sonnet
 color: cyan
 ---

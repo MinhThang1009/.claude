@@ -22,7 +22,7 @@ description: >
   </commentary>
   assistant: "Tôi sẽ dùng security-auditor agent để audit auth flow."
   </example>
-tools: Read, Grep, Glob, Bash, WebFetch
+tools: Read, Grep, Glob, Bash, LSP, WebFetch, TodoWrite
 model: opus
 memory: user
 effort: high

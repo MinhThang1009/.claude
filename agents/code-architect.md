@@ -32,7 +32,7 @@ description: >
   </commentary>
   assistant: "Tôi sẽ dùng architect agent để thiết kế plan cho feature này."
   </example>
-tools: Read, Grep, Glob, Bash, WebFetch, WebSearch
+tools: Read, Grep, Glob, Bash, LSP, WebFetch, WebSearch, TodoWrite
 model: opus
 memory: project
 effort: high
@@ -188,6 +188,41 @@ Khi đối diện trade-off, dùng các trục:
 | Generality  | Generic/configurable | Specific/hardcoded |
 
 Xác định vị trí team trên từng trục và lý do chọn vị trí đó.
+
+# API Design (khi thiết kế API)
+
+Khi user cần thiết kế REST/GraphQL API:
+
+## Resource design
+- Resource-oriented URL (`/users/{id}/orders`, không phải `/getUserOrders`)
+- HTTP methods đúng semantic (GET=read, POST=create, PUT=replace, PATCH=partial, DELETE=remove)
+- Status codes chính xác (201 Created, 204 No Content, 409 Conflict...)
+
+## Pagination
+- Cursor-based (recommended cho dataset lớn, real-time)
+- Offset/limit (đơn giản, phù hợp dataset nhỏ/tĩnh)
+- Trả `next_cursor` / `has_more` trong response
+
+## Versioning
+- URI prefix `/v1/` (đơn giản, explicit — recommended)
+- Header `Accept: application/vnd.api+json;version=2` (flexible nhưng phức tạp)
+- Tránh break backward compatibility — additive changes preferred
+
+## Error format
+- Consistent structure: `{ "error": { "code": "...", "message": "...", "details": [...] } }`
+- Error codes meaningful, documented
+- HTTP status + application error code riêng
+
+## Auth patterns
+- JWT stateless (scale tốt, revocation khó)
+- Session-based (revocation dễ, cần session store)
+- API key (machine-to-machine, simple)
+- OAuth 2.0 (third-party access, complex)
+
+## Webhook design
+- Retry with exponential backoff
+- Signature verification (HMAC)
+- Idempotency key để handle duplicate delivery
 
 # KHÔNG làm
 
