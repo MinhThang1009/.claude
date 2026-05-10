@@ -86,7 +86,7 @@
     - [16.1 Tầm quan trọng](#161-tầm-quan-trọng)
     - [16.2 Ngưỡng hành động (200k window)](#162-ngưỡng-hành-động-200k-window)
     - [16.3 Compact threshold theo task complexity](#163-compact-threshold-theo-task-complexity)
-    - [16.4 Ngưỡng cho 1M context window (Opus 4.6+ với 1M mode)](#164-ngưỡng-cho-1m-context-window-opus-46-với-1m-mode)
+    - [16.4 Ngưỡng cho 1M context window (Opus 4.7/4.6, Sonnet 4.6 với 1M mode)](#164-ngưỡng-cho-1m-context-window-opus-4746-sonnet-46-với-1m-mode)
     - [16.5 `/compact` vs `/clear`](#165-compact-vs-clear)
     - [16.6 Customize compaction](#166-customize-compaction)
     - [16.7 Giảm baseline (token cố định mỗi session)](#167-giảm-baseline-token-cố-định-mỗi-session)
@@ -1565,7 +1565,7 @@ Default: **single-agent**. Multi-agent (subagent / `/batch`) tốn **3-10× toke
 > |------|-------------|------|
 > | `<30/<40/60%` + thuật ngữ "dumb zone" | **Dex Horthy** (HumanLayer, MLOps Community presentation, 2026-03-24) | [youtu.be/YwZR6tc7qYg?t=1541](https://youtu.be/YwZR6tc7qYg?t=1541) |
 > | `300-400k tokens` context rot zone (1M model) | **Thariq Shihipar** (Anthropic Claude Code team, 2026-04-16) | curated tại [howborisusesclaudecode.com](https://howborisusesclaudecode.com/) |
-> | `155k tokens` auto-compact (200k window) | **Boris Cherny** (Anthropic, creator of Claude Code) | [X tweet 2025-10](https://x.com/bcherny/status/1977163445205450783) |
+> | `155k tokens` auto-compact (200k window) | **Boris Cherny** (Anthropic, Claude Code lead) | [X tweet 2025-10](https://x.com/bcherny/status/1977163445205450783) |
 > | Compact threshold theo task complexity (50% complex / 70% simple) | **claude-codex.fr** | [claude-codex.fr/en/prompting/context-rot](https://claude-codex.fr/en/prompting/context-rot/) |
 > | Reaffirm 40% rule độc lập | **Justin Smith** (LinkedIn article, 2026-03-05) | [linkedin.com/pulse/40-rule-...](https://www.linkedin.com/pulse/40-rule-beating-claudes-dumb-zone-large-codebases-justin-smith-jlffc) |
 > | Aggregator | **Boris + Anthropic Claude Code team** | [howborisusesclaudecode.com](https://howborisusesclaudecode.com/) |
@@ -1597,7 +1597,7 @@ Mọi best practice xoay quanh 1 ràng buộc: **context window đầy nhanh, pe
 | Complex task (multi-file refactor, debug nhiều file) | **50% fill** — compact sớm để giữ chi tiết |
 | Simple task (single-file edit, tweak nhỏ)            | **70% fill** — có thể đẩy lâu hơn         |
 
-### 16.4 Ngưỡng cho 1M context window (Opus 4.6+ với 1M mode)
+### 16.4 Ngưỡng cho 1M context window (Opus 4.7/4.6, Sonnet 4.6 với 1M mode)
 
 > Source: [Thariq via howborisusesclaudecode.com](https://howborisusesclaudecode.com/) — "context rot kicks in around ~300-400k tokens on the 1M context model".
 

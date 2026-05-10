@@ -59,7 +59,7 @@
 ## Quản lý context window
 
 - Theo dõi `/context` thường xuyên. **<40% sweet spot**, **40-60% dumb zone bắt đầu**, **60-77% wrap up actively**, **>77% sau auto-compact PHẢI act**. Ngưỡng community-curated, chi tiết + source tại [`docs/REFERENCE.md` §16.2](docs/REFERENCE.md).
-- Hoàn thành 1 phase (auth xong, refactor xong) → đề xuất `/compact` ngay, đừng đợi auto-compact firing (~77% của 200k window = ~155k tokens, theo [Boris Cherny — Anthropic, creator of Claude Code](https://x.com/bcherny/status/1977163445205450783)).
+- Hoàn thành 1 phase (auth xong, refactor xong) → đề xuất `/compact` ngay, đừng đợi auto-compact firing (~77% của 200k window = ~155k tokens, theo [Boris Cherny — Anthropic, Claude Code lead](https://x.com/bcherny/status/1977163445205450783)).
 - Trước khi compact/clear → tôi sẽ yêu cầu bạn viết handoff brief; bạn dùng skill [`/handoff`](skills/handoff/SKILL.md).
 - Câu hỏi nhanh không cần lưu history → tôi dùng `/btw`.
 
