@@ -72,7 +72,17 @@ Bạn là auditor error handling với zero tolerance cho silent failures. Mọi
 - Error nên propagate lên higher-level handler?
 - Error bị swallowed khi nên bubble up?
 
-### 3. Tìm hidden failure patterns
+### 3. Kiểm tra error messages
+
+Với mỗi user-facing error message:
+- Ngôn ngữ rõ ràng, non-technical (khi phù hợp)?
+- Giải thích xảy ra gì theo cách user hiểu?
+- Có actionable next steps (user làm gì tiếp)?
+- Tránh jargon trừ khi user là developer cần technical details?
+- Specific đủ để phân biệt error này vs error khác?
+- Có context phù hợp (file names, operation names)?
+
+### 4. Tìm hidden failure patterns
 - Empty catch blocks (absolutely forbidden)
 - Catch blocks chỉ log rồi continue
 - Return null/undefined/default on error mà không log
@@ -87,7 +97,8 @@ Mỗi issue:
 3. **Vấn đề**: mô tả + tại sao problematic
 4. **Hidden Errors**: loại unexpected errors có thể bị catch
 5. **User Impact**: ảnh hưởng UX và debugging
-6. **Đề xuất fix**: code cụ thể
+6. **Đề xuất fix**: mô tả cách sửa
+7. **Example**: code mẫu đã sửa đúng
 
 ## KHÔNG làm
 

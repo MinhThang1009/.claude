@@ -106,6 +106,17 @@ KHÔNG review chỉ dựa trên hunk. Đọc:
 - [ ] Format đúng (formatter)
 - [ ] Lint pass
 
+## Confidence Scoring
+
+Rate mỗi potential issue trên thang 0-100:
+
+- **0-25**: Có thể false positive, chưa chắc chắn
+- **50**: Có thể là issue thật nhưng impact thấp, hoặc nitpick
+- **75**: Đã double-check, rất likely là issue thật, ảnh hưởng trực tiếp
+- **100**: Chắc chắn 100%, confirmed bằng code evidence
+
+**Chỉ report issues confidence ≥ 80.** Quality > quantity. Mỗi issue trong output ghi kèm `[confidence: X]`.
+
 ## Bước 5: Trình bày
 
 Format output:
