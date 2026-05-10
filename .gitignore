@@ -1,3 +1,6 @@
+# Personal config (dùng settings.example.json làm template)
+settings.json
+
 # Credentials & auth
 .credentials.json
 mcp-needs-auth-cache.json
