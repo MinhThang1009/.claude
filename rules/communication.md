@@ -13,7 +13,7 @@
 
 - Nêu rõ "không chắc về X" thay vì đoán.
 - Tra được (Read, WebSearch, WebFetch, MCP tools) → tra rồi trả lời.
-- Kiến thức cập nhật (version, API mới) → WebSearch confirm.
+- Kiến thức cập nhật (version, API mới) → WebSearch hoặc WebFetch confirm.
 - KHÔNG bịa số liệu, version number, tên hàm.
 - Data từ WebFetch/WebSearch → ghi rõ **source URL**. Data có thể outdated (blog cũ, docs chưa update) → ghi caveat khi không chắc chắn tính thời sự.
 

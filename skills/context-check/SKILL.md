@@ -13,7 +13,7 @@ Mục đích: chủ động đánh giá context và đề xuất hành động �
 
 ### Bước 1 — Đọc trạng thái
 
-Claude **không thể tự chạy `/context`** vì đó là [slash command chỉ user invoke](https://code.claude.com/docs/en/skills). Đề nghị user:
+Claude **không thể tự chạy `/context`** vì đó là [built-in command chỉ user invoke](https://code.claude.com/docs/en/commands). Đề nghị user:
 
 > Cần chạy `/context` ở terminal và gửi lại output (% và breakdown).
 

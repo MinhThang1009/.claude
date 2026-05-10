@@ -1564,8 +1564,8 @@ Default: **single-agent**. Multi-agent (subagent / `/batch`) tốn **3-10× toke
 > | Item | Source thực | Link |
 > |------|-------------|------|
 > | `<30/<40/60%` + thuật ngữ "dumb zone" | **Dex Horthy** (HumanLayer, MLOps Community presentation, 2026-03-24) | [youtu.be/YwZR6tc7qYg?t=1541](https://youtu.be/YwZR6tc7qYg?t=1541) |
-> | `300-400k tokens` context rot zone (1M model) | **Thariq Shihipar** (Anthropic Claude Code team, 2026-04-16) | curated tại [howborisusesclaudecode.com](https://howborisusesclaudecode.com/) |
-> | `155k tokens` auto-compact (200k window) | **Boris Cherny** (Anthropic, Claude Code lead) | [X tweet 2025-10](https://x.com/bcherny/status/1977163445205450783) |
+> | `300-400k tokens` context rot zone (1M model) | **Thariq** (@trq212, via howborisusesclaudecode.com, 2026-04-16) | curated tại [howborisusesclaudecode.com](https://howborisusesclaudecode.com/) |
+> | `155k tokens` auto-compact (200k window) | **Boris Cherny** (Anthropic, Claude Code lead) | [X tweet](https://x.com/bcherny/status/1977163445205450783) |
 > | Compact threshold theo task complexity (50% complex / 70% simple) | **claude-codex.fr** | [claude-codex.fr/en/prompting/context-rot](https://claude-codex.fr/en/prompting/context-rot/) |
 > | Reaffirm 40% rule độc lập | **Justin Smith** (LinkedIn article, 2026-03-05) | [linkedin.com/pulse/40-rule-...](https://www.linkedin.com/pulse/40-rule-beating-claudes-dumb-zone-large-codebases-justin-smith-jlffc) |
 > | Aggregator | **Boris + Anthropic Claude Code team** | [howborisusesclaudecode.com](https://howborisusesclaudecode.com/) |
@@ -1573,7 +1573,7 @@ Default: **single-agent**. Multi-agent (subagent / `/batch`) tốn **3-10× toke
 
 ### 16.1 Tầm quan trọng
 
-Mọi best practice xoay quanh 1 ràng buộc: **context window đầy nhanh, performance giảm trước khi đầy**. Mỗi message re-read toàn bộ history → cost grow exponential trong agentic session. Dex Horthy ([MLOps Community video](https://youtu.be/YwZR6tc7qYg?t=1541)) gọi vùng `>40%` là **"dumb zone"** — performance degrade dù chưa đụng hard limit. Boris Cherny giữ `~/.claude/CLAUDE.md` ~76 tokens và project `CLAUDE.md` ~4k tokens (theo [howborisusesclaudecode.com](https://howborisusesclaudecode.com/)).
+Mọi best practice xoay quanh 1 ràng buộc: **context window đầy nhanh, performance giảm trước khi đầy**. Mỗi message re-read toàn bộ history → cost grow exponential trong agentic session. Dex Horthy ([MLOps Community video](https://youtu.be/YwZR6tc7qYg?t=1541)) gọi vùng `>40%` là **"dumb zone"** — performance degrade dù chưa đụng hard limit. Boris Cherny giữ CLAUDE.md gọn (theo [howborisusesclaudecode.com](https://howborisusesclaudecode.com/) — số token cụ thể có thể đã thay đổi).
 
 ### 16.2 Ngưỡng hành động (200k window)
 
