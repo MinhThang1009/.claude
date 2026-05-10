@@ -31,19 +31,34 @@
 │   ├── debug/SKILL.md              # Reproduce → root cause → failing test → fix
 │   ├── refactor/SKILL.md           # Pre-flight → step-by-step verify
 │   ├── explain/SKILL.md            # Kim tự tháp ngược, top-down
-│   ├── handoff/SKILL.md            # 🆕 Brief để chuyển session
-│   └── context-check/SKILL.md      # 🆕 Đánh giá context, đề xuất action
+│   ├── handoff/SKILL.md            # Brief để chuyển session
+│   ├── context-check/SKILL.md      # Đánh giá context, đề xuất action
+│   ├── feature-dev/SKILL.md        # Guided feature development
+│   └── full-review/SKILL.md        # Multi-agent review dispatch
 ├── agents/                         # Subagent chuyên biệt (context riêng)
-│   ├── code-reviewer.md            # Senior reviewer (sonnet)
-│   ├── security-auditor.md         # Security audit (opus)
-│   ├── test-writer.md              # AAA test (sonnet)
-│   └── code-architect.md            # Architecture decision (opus)
+│   ├── code-reviewer.md            # Senior reviewer + a11y checklist (sonnet)
+│   ├── code-explorer.md            # Trace execution paths (sonnet)
+│   ├── code-architect.md           # Architecture + API design (opus)
+│   ├── code-simplifier.md          # Simplify + refactoring patterns (sonnet)
+│   ├── security-auditor.md         # Security audit OWASP (opus)
+│   ├── test-writer.md              # Viết test happy/edge/error (sonnet)
+│   ├── test-analyzer.md            # Đánh giá test coverage (sonnet)
+│   ├── type-design-analyzer.md     # Phân tích type design (sonnet)
+│   ├── comment-analyzer.md         # Phân tích comment quality (sonnet)
+│   ├── silent-failure-hunter.md    # Tìm silent failures (sonnet)
+│   ├── debugger.md                 # Root cause analysis + fix (sonnet)
+│   ├── documentation-engineer.md   # Viết/maintain docs (sonnet)
+│   ├── performance-engineer.md     # Profiling + optimization (sonnet)
+│   ├── dependency-manager.md       # Audit deps + bundle size (sonnet)
+│   └── nextjs-developer.md        # Next.js App Router specialist (sonnet)
 ├── output-styles/
 │   └── concise-vietnamese.md       # Style tiếng Việt ngắn gọn
 ├── hooks/                          # Hook scripts (gọi từ settings.json)
 │   ├── bash-guard.py               # Engine pattern matching (Python) — defense layer chính
 │   ├── bash-guard.sh               # Wrapper minimal gọi python
 │   ├── format-on-edit.sh           # PostToolUse: prettier/ruff/gofmt/rustfmt (skip nếu file ngoài project)
+│   ├── statusline.py               # StatusLine update script
+│   ├── statusline.sh               # Wrapper cho statusline
 │   └── test-bash-guard.sh          # Regression test 119 case (dev-only, có thể xóa)
 └── templates/                      # Template COPY vào TỪNG project / skill mới
     ├── project-CLAUDE.md           # → <project>/CLAUDE.md
@@ -54,31 +69,27 @@
     └── skill-evals.json            # → <skill>/evals/evals.json (eval-driven optimize)
 ```
 
-**Baseline tokens** — đo thực tế bằng `/context` (Opus 4.7 1M context, snapshot session start, 2026-05-10):
+**Baseline tokens** — đo thực tế bằng `/context` (Opus 4.7 1M context, snapshot session start, 2026-05-10, 15 agents):
 
 | Category                      | Tokens     | % of 1M   |
 | ----------------------------- | ---------- | --------- |
 | System prompt                 | 9,500      | 0.9%      |
-| System tools                  | 11,700     | 1.2%      |
-| Memory files                  | 7,000      | 0.7%      |
-| ├── `CLAUDE.md`               | 2,700      | —         |
-| ├── `rules/security`          | 2,100      | —         |
-| ├── `rules/communication`     | 1,800      | —         |
-| └── `rules/verification`      | 491        | —         |
-| Skills                        | 939        | <0.1%     |
-| Custom agents                 | 591        | <0.1%     |
-| ├── `security-auditor`        | 177        | —         |
-| ├── `architect`               | 150        | —         |
-| ├── `code-reviewer`           | 136        | —         |
-| └── `test-writer`             | 128        | —         |
-| Messages (start)              | 13         | <0.1%     |
-| **Total used (start)**        | **29,800** | **~3.0%** |
+| System tools                  | 18,100     | 1.8%      |
+| Memory files                  | 10,900     | 1.1%      |
+| ├── `CLAUDE.md`               | 3,200      | —         |
+| ├── `rules/security`          | 3,100      | —         |
+| ├── `rules/verification`      | 2,700      | —         |
+| └── `rules/communication`     | 1,900      | —         |
+| Custom agents (15)            | 6,400      | 0.6%      |
+| Skills                        | 1,100      | 0.1%      |
+| Messages (start)              | 160        | <0.1%     |
+| **Total used (start)**        | **46,200** | **~5%**   |
 | Autocompact buffer (reserved) | 33,000     | 3.3%      |
-| Free space                    | 937,200    | 93.7%     |
+| Free space                    | 920,800    | 92.1%     |
 
 **Ghi chú**:
-- Vietnamese tokenize ~2.3 chars/token cho prose (ước lượng empirical, đo bằng `/context` trên tokenizer Claude — Anthropic không publish ratio chính thức cho từng ngôn ngữ); kém hiệu quả hơn English ~4 chars/token; baseline ~29.8k cao hơn config English (~10-15k) là expected.
-- `rules/verification.md` (491 tokens) auto-load mọi session từ snapshot 2026-05-10 — bổ sung verify cho subagent results, git state, external deps.
+- Vietnamese tokenize ~2.3 chars/token cho prose (ước lượng empirical, đo bằng `/context` trên tokenizer Claude — Anthropic không publish ratio chính thức cho từng ngôn ngữ); kém hiệu quả hơn English ~4 chars/token; baseline ~46.2k cao hơn config English (~10-15k) là expected.
+- 15 agents (6,400 tokens tổng descriptions) — chỉ load descriptions tại session start, body load khi spawn agent.
 - 2 references còn lại ([`coding-standards.md`](references/coding-standards.md), [`git-workflow.md`](references/git-workflow.md)) chỉ load khi `@`-reference → KHÔNG ăn baseline.
 - Autocompact buffer 33k reserved (không tính vào used) — Claude Code dành chỗ cho compact summary khi context đầy.
 
