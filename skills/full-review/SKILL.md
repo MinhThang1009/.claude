@@ -26,16 +26,15 @@ Nếu Haiku agent trả về "skip" → **dừng ngay**, không dispatch Bước
 
 **Scale số agents theo complexity** (theo [Anthropic multi-agent research pattern](https://www.anthropic.com/engineering/multi-agent-research-system): "Simple fact-finding requires just 1 agent... complex research might use more than 10 subagents"):
 
-Haiku pre-check (Bước 1) đánh giá complexity dựa trên (criteria tự thiết kế cho code review, không phải từ Anthropic article):
-- Số dòng thay đổi / kích thước codebase
-- Số files affected
-- Có đụng sensitive areas không (auth, payment, crypto, database schema)
-- Complexity logic (simple rename vs architectural change)
+Haiku pre-check (Bước 1) đánh giá complexity và chọn scale. Guidelines (qualitative labels + quantitative bounds, criteria tự thiết kế cho code review):
 
-Rồi chọn scale:
-- **Simple** (thay đổi nhỏ, ít files, không sensitive): **1 agent** (code-reviewer only) — tiết kiệm tokens.
-- **Moderate** (nhiều files, logic phức tạp, hoặc có security concern): **2 agents** (code-reviewer + security-auditor).
-- **Complex** (thay đổi lớn, nhiều modules, sensitive areas, hoặc cần test coverage analysis): **3 agents** (full).
+| Tier | Label | Bounds (guidelines, không hard cutoff) | Agents |
+|------|-------|---------------------------------------|--------|
+| 1 | **Simple** | ~1-20 dòng, 1-2 files, không đụng auth/payment/crypto | **1** (code-reviewer only) |
+| 2 | **Moderate** | ~20-200 dòng, 3-10 files, hoặc có security concern | **2** (code-reviewer + security-auditor) |
+| 3 | **Complex** | >200 dòng, >10 files, sensitive areas, hoặc architectural change | **3** (full) |
+
+Haiku dùng bảng trên làm **guideline**, có thể adjust nếu context cho thấy complexity khác bounds (vd: 15 dòng nhưng đụng auth → Moderate, không phải Simple).
 
 "all" scope chỉ define phạm vi review, KHÔNG override scaling — Haiku vẫn judge complexity dựa trên nội dung thực tế.
 
