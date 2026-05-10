@@ -18,7 +18,7 @@ Skill này dispatch 3 subagents song song, validate findings, rồi consolidate 
 2. Collect diff stats:
    - Scope diff: `git diff --stat` → đếm dòng thay đổi, số files
    - Scope all: `git ls-files | wc -l` (đếm tracked files, tự respect `.gitignore`) + `git ls-files | xargs wc -l` → đếm LOC codebase. Nếu không có git → `find . -type f | wc -l` (adjust exclude theo project)
-   - Scope PR: `gh pr diff <N> --stat`
+   - Scope PR: `gh pr diff <N> --stat` (GitHub). Nếu không có `gh` CLI hoặc dùng platform khác (GitLab, Bitbucket) → hỏi user cung cấp diff
 3. Collect file list: `git diff --name-only` hoặc `find` → liệt kê file names
 4. Nếu clean (0 changes cho diff scope) → báo user, dừng
 5. Nếu scope mơ hồ → hỏi user, KHÔNG đoán
@@ -61,7 +61,7 @@ Launch subagents theo scale đã chọn:
 
 **Nếu chỉ 1 agent** (Simple tier): skip dedup + validate — output trực tiếp findings của agent đó. Không cần consolidate 1 source.
 
-**Nếu 2+ agents**: 
+**Nếu 2+ agents**:
 1. **Đếm findings mỗi agent** (tự đếm, không tin self-count).
 2. **Deduplicate**: nếu 2+ agents báo cùng issue → giữ 1, lấy severity cao hơn, ghi "confirmed by N agents".
 3. **KHÔNG drop finding ngầm** — mọi finding phải xuất hiện trong report hoặc ghi rõ lý do drop.

@@ -22,7 +22,7 @@ git diff HEAD 2>/dev/null || echo "No git diff available"
 Tùy theo `$ARGUMENTS`:
 
 - **Không có argument**: review diff đã inject ở trên (unstaged + staged changes)
-- **Số (123)**: review PR #123 (`gh pr diff 123` — chạy thêm nếu cần)
+- **Số (123)**: review PR #123 (`gh pr diff 123` — yêu cầu GitHub CLI; nếu không có `gh` → hỏi user cung cấp diff)
 - **Đường dẫn (`src/foo.ts`)**: review nội dung file đó
 - **`branch <name>`**: review thay đổi của branch so với default branch (auto-detect: `git symbolic-ref refs/remotes/origin/HEAD` → fallback `main` → `master`)
 
