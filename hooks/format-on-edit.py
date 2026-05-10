@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import shutil
 import subprocess
 import sys
@@ -42,7 +41,7 @@ RISKY_PRETTIER_CONFIGS = (
     "prettier.config.mjs",
 )
 
-PLUGIN_PATTERN = re.compile(r'(@prettier/plugin-|prettier-plugin-|"plugins"\s*:\s*\[)')
+PLUGIN_NAME_PREFIXES = ("@prettier/plugin-", "prettier-plugin-")
 
 
 def parse_input(data: str) -> str | None:
@@ -77,7 +76,12 @@ def resolve_in_project(project_dir: str, file_path: str) -> str | None:
 
 
 def has_risky_prettier_config(project_dir: str) -> bool:
-    """Detect prettier config có RCE risk qua require() execution."""
+    """Detect prettier config có RCE risk qua require() execution.
+
+    Parse package.json đúng cấu trúc thay vì regex search raw text — tránh
+    false positive khi 'prettier-plugin-x' xuất hiện trong description/comment
+    mà KHÔNG được dùng thật.
+    """
     proj = Path(project_dir)
     for name in RISKY_PRETTIER_CONFIGS:
         if (proj / name).is_file():
@@ -87,9 +91,24 @@ def has_risky_prettier_config(project_dir: str) -> bool:
         return False
     try:
         content = pkg_json.read_text(encoding="utf-8")
-    except (OSError, UnicodeDecodeError):
+        data = json.loads(content)
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
         return False
-    return bool(PLUGIN_PATTERN.search(content))
+    if not isinstance(data, dict):
+        return False
+    # Plugin khai báo trong "prettier.plugins" array — execute lúc format chạy
+    prettier_cfg = data.get("prettier")
+    if isinstance(prettier_cfg, dict) and prettier_cfg.get("plugins"):
+        return True
+    # Plugin trong dependencies/devDependencies/peerDependencies — sẽ load qua require()
+    for dep_field in ("dependencies", "devDependencies", "peerDependencies"):
+        deps = data.get(dep_field)
+        if not isinstance(deps, dict):
+            continue
+        for pkg_name in deps:
+            if isinstance(pkg_name, str) and pkg_name.startswith(PLUGIN_NAME_PREFIXES):
+                return True
+    return False
 
 
 def run_formatter(cmd: list[str], cwd: str | None = None) -> None:
@@ -130,7 +149,9 @@ def main() -> int:
     resolved = resolve_in_project(project_dir, file_path)
     if resolved is None:
         return 0
-    format_file(file_path, project_dir)
+    # Dùng resolved (absolute path) — đảm bảo prettier chạy đúng file
+    # kể cả khi file_path gốc là relative.
+    format_file(resolved, project_dir)
     return 0
 
 

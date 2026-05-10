@@ -101,14 +101,19 @@ jobs:
         run: ruff check hooks/
 
   python-tests:
-    name: Python tests (pytest + coverage 100% gate)
-    runs-on: ubuntu-latest
+    name: Python tests (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
           python-version: '3.x'
+          cache: pip
       - name: Install pytest + coverage + dependencies
         run: pip install --quiet pytest coverage pyyaml jsonschema
       - name: Run pytest under coverage (line + branch)

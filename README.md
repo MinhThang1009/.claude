@@ -1,7 +1,17 @@
 # Bộ cấu hình Global cho Claude Code (`~/.claude/`)
 
+<div align="center">
+
 [![CI](https://github.com/MinhThang1009/dotclaude/actions/workflows/ci.yml/badge.svg)](https://github.com/MinhThang1009/dotclaude/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/MinhThang1009/dotclaude/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/python-3.6%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Bash](https://img.shields.io/badge/bash-4%2B-4EAA25?logo=gnubash&logoColor=white)](https://www.gnu.org/software/bash/)
+[![Markdown](https://img.shields.io/badge/markdown-CommonMark-000000?logo=markdown&logoColor=white)](https://commonmark.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/MinhThang1009/dotclaude?logo=git&logoColor=white)](https://github.com/MinhThang1009/dotclaude/commits/main)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-v2.1.111%2B-D97757?logo=anthropic&logoColor=white)](https://code.claude.com/docs)
+
+</div>
 
 > Tổng hợp từ tài liệu chính thức Anthropic ([code.claude.com](https://code.claude.com/docs), [platform.claude.com](https://platform.claude.com/docs)), [Engineering Blog](https://www.anthropic.com/engineering), [blog claude.com](https://www.claude.com/blog), [MindStudio](https://www.mindstudio.ai/blog), [ClaudeFast](https://claudefa.st/blog), và best practices cộng đồng GitHub. Áp dụng MỌI project. Tối ưu cho **dev người Việt** — tiếng Việt cho comment/log/commit, tiếng Anh chuẩn convention cho identifier.
 

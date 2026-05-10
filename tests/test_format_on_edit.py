@@ -143,6 +143,57 @@ class TestHasRiskyPrettierConfig:
         )
         assert format_on_edit.has_risky_prettier_config(str(tmp_path)) is False
 
+    def test_package_json_false_positive_in_description(self, format_on_edit, tmp_path):
+        # Plugin name xuất hiện trong description text, KHÔNG dùng thật → không trigger
+        (tmp_path / "package.json").write_text(
+            '{"description": "we do NOT use prettier-plugin-tailwindcss here", '
+            '"dependencies": {"react": "^18"}}'
+        )
+        assert format_on_edit.has_risky_prettier_config(str(tmp_path)) is False
+
+    def test_package_json_peer_dep_plugin(self, format_on_edit, tmp_path):
+        (tmp_path / "package.json").write_text(
+            '{"peerDependencies": {"@prettier/plugin-xml": "^3"}}'
+        )
+        assert format_on_edit.has_risky_prettier_config(str(tmp_path)) is True
+
+    def test_package_json_prettier_plugins_empty(self, format_on_edit, tmp_path):
+        # prettier.plugins = [] → falsy, không trigger
+        (tmp_path / "package.json").write_text(
+            '{"prettier": {"plugins": []}, "dependencies": {"react": "^18"}}'
+        )
+        assert format_on_edit.has_risky_prettier_config(str(tmp_path)) is False
+
+    def test_package_json_prettier_not_dict(self, format_on_edit, tmp_path):
+        # prettier có thể là string (path tới config) — không phải dict
+        (tmp_path / "package.json").write_text(
+            '{"prettier": "./prettier.json", "dependencies": {"react": "^18"}}'
+        )
+        assert format_on_edit.has_risky_prettier_config(str(tmp_path)) is False
+
+    def test_package_json_deps_not_dict(self, format_on_edit, tmp_path):
+        # dependencies là array (malformed nhưng valid JSON) — không crash
+        (tmp_path / "package.json").write_text(
+            '{"dependencies": ["react"], "devDependencies": null}'
+        )
+        assert format_on_edit.has_risky_prettier_config(str(tmp_path)) is False
+
+    def test_package_json_dep_key_not_string(self, format_on_edit, tmp_path):
+        # JSON key luôn là string sau parse, nhưng test defensive cho assert
+        (tmp_path / "package.json").write_text(
+            '{"dependencies": {"normal-pkg": "1.0", "@prettier/plugin-php": "1.0"}}'
+        )
+        assert format_on_edit.has_risky_prettier_config(str(tmp_path)) is True
+
+    def test_package_json_root_not_dict(self, format_on_edit, tmp_path):
+        # JSON valid nhưng root là array
+        (tmp_path / "package.json").write_text("[]")
+        assert format_on_edit.has_risky_prettier_config(str(tmp_path)) is False
+
+    def test_package_json_invalid_json(self, format_on_edit, tmp_path):
+        (tmp_path / "package.json").write_text("{not valid json")
+        assert format_on_edit.has_risky_prettier_config(str(tmp_path)) is False
+
     def test_package_json_unreadable(self, format_on_edit, tmp_path):
         (tmp_path / "package.json").write_text("{}")
         with patch("pathlib.Path.read_text", side_effect=OSError("permission")):
