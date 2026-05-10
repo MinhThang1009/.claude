@@ -11,12 +11,16 @@ Skill này dispatch 3 subagents song song, validate findings, rồi consolidate 
 
 ## Quy trình
 
-### Bước 1 — Pre-check (Haiku-level, nhanh)
+### Bước 1 — Pre-check (dispatch Haiku agent, tiết kiệm tokens)
 
-Trước khi dispatch agents, kiểm tra:
+Launch **1 Haiku agent** kiểm tra nhanh:
 - `git status` / `git diff --stat` → có changes không? Nếu clean → báo user, dừng.
 - Scope: `$ARGUMENTS` xác định review gì (PR, branch, files, hoặc all unstaged).
+- Nếu scope = PR: check PR closed? draft? Claude đã comment chưa? (`gh pr view <N> --json state,isDraft --comments`)
+- Diff quá nhỏ (≤5 dòng, chỉ format/typo) → báo user "trivial change, skip full review?" thay vì dispatch 3 agents.
 - Nếu scope mơ hồ → hỏi user, KHÔNG đoán.
+
+Nếu Haiku agent trả về "skip" → **dừng ngay**, không dispatch Bước 2.
 
 ### Bước 2 — Dispatch 3 agents song song
 

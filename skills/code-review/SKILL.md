@@ -3,6 +3,7 @@ name: code-review
 description: Review code thay đổi trong working tree, branch hiện tại, hoặc PR. Tìm bug, vấn đề security, performance, style, test coverage. Dùng khi user nói "review code", "review pr", "kiểm tra code", hoặc gọi /code-review.
 allowed-tools: Read Grep Glob Bash(git diff:*) Bash(git log:*) Bash(git status:*) Bash(gh pr view:*) Bash(gh pr diff:*)
 context: fork
+agent: code-reviewer
 argument-hint: "[tùy chọn — số PR hoặc đường dẫn cụ thể]"
 ---
 
@@ -10,12 +11,18 @@ argument-hint: "[tùy chọn — số PR hoặc đường dẫn cụ thể]"
 
 Bạn được gọi để review code một cách kỹ lưỡng nhưng có ưu tiên.
 
+## Context tự động inject
+
+```!
+git diff HEAD 2>/dev/null || echo "No git diff available"
+```
+
 ## Bước 1: Xác định scope
 
 Tùy theo `$ARGUMENTS`:
 
-- **Không có argument**: review thay đổi chưa commit (`git diff` + `git diff --staged`)
-- **Số (123)**: review PR #123 (`gh pr diff 123`)
+- **Không có argument**: review diff đã inject ở trên (unstaged + staged changes)
+- **Số (123)**: review PR #123 (`gh pr diff 123` — chạy thêm nếu cần)
 - **Đường dẫn (`src/foo.ts`)**: review nội dung file đó
 - **`branch <name>`**: review tất cả thay đổi của branch so với `main` (`git diff main...<name>`)
 
