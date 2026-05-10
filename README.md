@@ -81,7 +81,14 @@
 | ├── `rules/verification`      | 2,700      | —         |
 | └── `rules/communication`     | 1,900      | —         |
 | Custom agents (15)            | 6,400      | 0.6%      |
-| Skills                        | 1,100      | 0.1%      |
+| ├── `code-architect`          | 647        | —         |
+| ├── `documentation-engineer`  | 538        | —         |
+| ├── `security-auditor`        | 438        | —         |
+| ├── `test-analyzer`           | 430        | —         |
+| ├── `code-explorer`           | 422        | —         |
+| └── … (10 agents còn lại)     | 3,925      | —         |
+| Skills (9)                    | 1,100      | 0.1%      |
+| └── commit, code-review, full-review, feature-dev, debug, refactor, explain, handoff, context-check | — | — |
 | Messages (start)              | 160        | <0.1%     |
 | **Total used (start)**        | **46,200** | **~5%**   |
 | Autocompact buffer (reserved) | 33,000     | 3.3%      |
