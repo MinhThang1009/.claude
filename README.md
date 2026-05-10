@@ -89,13 +89,13 @@
 | └── … (10 agents còn lại)     | 3,925      | —         |
 | Skills (9)                    | 1,100      | 0.1%      |
 | └── commit, code-review, full-review, feature-dev, debug, refactor, explain, handoff, context-check | — | — |
-| Messages (start)              | 160        | <0.1%     |
-| **Total used (start)**        | **46,200** | **~5%**   |
+| Messages (start)              | 13         | <0.1%     |
+| **Total used (start)**        | **46,000** | **~5%**   |
 | Autocompact buffer (reserved) | 33,000     | 3.3%      |
-| Free space                    | 920,800    | 92.1%     |
+| Free space                    | 921,000    | 92.1%     |
 
 **Ghi chú**:
-- Vietnamese tokenize ~2.3 chars/token cho prose (ước lượng empirical, đo bằng `/context` trên tokenizer Claude — Anthropic không publish ratio chính thức cho từng ngôn ngữ); kém hiệu quả hơn English ~4 chars/token; baseline ~46.2k cao hơn config English (~10-15k) là expected.
+- Vietnamese tokenize ~2.3 chars/token cho prose (ước lượng empirical, đo bằng `/context` trên tokenizer Claude — Anthropic không publish ratio chính thức cho từng ngôn ngữ); kém hiệu quả hơn English ~4 chars/token; baseline ~46k cao hơn config English (~10-15k) là expected.
 - 15 agents (6,400 tokens tổng descriptions) — chỉ load descriptions tại session start, body load khi spawn agent.
 - 2 references còn lại ([`coding-standards.md`](references/coding-standards.md), [`git-workflow.md`](references/git-workflow.md)) chỉ load khi `@`-reference → KHÔNG ăn baseline.
 - Autocompact buffer 33k reserved (không tính vào used) — Claude Code dành chỗ cho compact summary khi context đầy.
