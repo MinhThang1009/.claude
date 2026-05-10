@@ -1,7 +1,7 @@
 ---
 name: full-review
-description: Multi-agent review dispatch 3 agents song song (code-review + security-audit + test-analysis), validate findings, consolidate report. Dùng khi cần review toàn diện trước deploy, merge PR lớn, hoặc audit codebase.
-allowed-tools: Read, Grep, Glob, Bash(git diff:*), Bash(git log:*), Bash(git status:*), WebFetch
+description: Multi-agent review dispatch 3 agents song song (code-review + security-audit + test-analyzer), validate findings, consolidate report. Dùng khi cần review toàn diện trước deploy, merge PR lớn, hoặc audit codebase.
+allowed-tools: Read Grep Glob Bash(git diff:*) Bash(git log:*) Bash(git status:*) WebFetch
 argument-hint: "[scope: PR #N | branch | files | all]"
 ---
 
@@ -34,7 +34,7 @@ Launch **3 subagents đồng thời**:
 - Prompt: "Security audit code changes trong [scope]. Tìm injection, auth flaws, secrets, insecure crypto, SSRF, XSS. Report theo CVSS severity."
 - Tools: Read, Grep, Glob, Bash, WebFetch
 
-**Agent 3: test-analysis** (Sonnet)
+**Agent 3: test-analyzer** (Sonnet)
 - Prompt: "Phân tích test coverage cho code changes trong [scope]. Kiểm tra: có test cho logic mới không? Edge cases đã cover? Có test bị break không? Chạy test suite nếu có."
 - Tools: Read, Grep, Glob, Bash
 
@@ -59,7 +59,7 @@ Với mỗi finding **Critical/High**:
 # Full Review Report
 
 **Scope**: [mô tả scope]
-**Agents**: code-reviewer (N findings) + security-auditor (N findings) + test-analysis (N findings)
+**Agents**: code-reviewer (N findings) + security-auditor (N findings) + test-analyzer (N findings)
 **Tổng raw**: X findings → Y sau dedup → Z validated
 
 ## 🔴 Critical / High (validated)
