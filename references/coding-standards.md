@@ -34,6 +34,8 @@ limiter = RateLimiter(...)
 
 - KHÔNG `catch` rỗng/swallow exception. Lỗi cần được handle có chủ đích.
 - KHÔNG `catch (Exception e)` blanket — bắt cụ thể loại lỗi mong đợi.
+- Ưu tiên **early return / guard clause / Result types** hơn try-catch khi có thể. Try-catch chỉ dùng khi thực sự cần catch exception (I/O, network, parsing).
+- Fallback behavior phải **explicit và justified** — không silently fallback mà user không biết. Optional chaining (`?.`) có thể hide errors — chỉ dùng khi `undefined` là kết quả hợp lệ.
 - Re-throw kèm context: `throw new ServiceError("Không lấy được user", { cause: e })`.
 - Error message hiển thị cho user: **tiếng Việt**, generic, không lộ stack/internal info.
 - Log internal: tiếng Việt OK, kèm context (user id, request id).

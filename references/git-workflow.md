@@ -85,8 +85,8 @@ Ví dụ: `feat/google-oauth`, `fix/218-avatar-fallback`, `refactor/auth-middlew
 ## Attribution
 
 - KHÔNG thêm `Co-Authored-By: Claude` vào commit (đã tắt qua `attribution.commit: ""` trong `~/.claude/settings.json`) (xem [settings docs](https://code.claude.com/docs/en/settings)).
-- KHÔNG thêm tagline `🤖 Generated with [Claude Code]` vào commit/PR description.
-- Nếu vẫn xuất hiện → bug, báo người dùng để check setting.
+- KHÔNG thêm tagline `🤖 Generated with [Claude Code]` vào commit/PR description. Lưu ý: `attribution.commit` chỉ control commit message — PR description attribution từ plugins (vd `/commit-push-pr`) cần set thêm `attribution.pr: ""`.
+- Nếu vẫn xuất hiện → bug, báo người dùng để check cả `attribution.commit` và `attribution.pr` trong settings.
 
 ## Hooks an toàn
 
