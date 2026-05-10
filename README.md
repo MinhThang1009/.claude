@@ -88,7 +88,15 @@
 | ├── `code-explorer`           | 422        | —         |
 | └── … (10 agents còn lại)     | 3,925      | —         |
 | Skills (9)                    | 1,100      | 0.1%      |
-| └── commit, code-review, full-review, feature-dev, debug, refactor, explain, handoff, context-check | — | — |
+| ├── `commit`                  | —          | —         |
+| ├── `code-review`             | —          | —         |
+| ├── `full-review`             | —          | —         |
+| ├── `feature-dev`             | —          | —         |
+| ├── `debug`                   | —          | —         |
+| ├── `refactor`                | —          | —         |
+| ├── `explain`                 | —          | —         |
+| ├── `handoff`                 | —          | —         |
+| └── `context-check`           | —          | —         |
 | Messages (start)              | 13         | <0.1%     |
 | **Total used (start)**        | **46,000** | **~5%**   |
 | Autocompact buffer (reserved) | 33,000     | 3.3%      |
