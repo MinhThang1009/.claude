@@ -25,6 +25,8 @@ Quy trình phát triển feature có hệ thống: hiểu → khảo sát → h�
 
 **Mục tiêu**: Hiểu code hiện tại liên quan đến feature.
 
+**Skip nếu**: user nói đã hiểu codebase ("tôi biết rồi", "skip explore") — chuyển thẳng Phase 3.
+
 Launch **2-3 code-explorer agents song song**, mỗi agent focus khác nhau:
 - Agent 1: "Tìm features tương tự [feature] và trace implementation"
 - Agent 2: "Map architecture và abstractions cho [khu vực liên quan]"
@@ -49,9 +51,10 @@ Nếu user nói "tùy bạn" → đưa recommendation cụ thể, xin explicit c
 
 ## Phase 4: Architecture Design
 
-**Mục tiêu**: Thiết kế 2-3 approaches với trade-offs khác nhau.
+**Mục tiêu**: Thiết kế approaches với trade-offs.
 
-Launch **2-3 code-architect agents song song** với focuses khác:
+**Feature nhỏ** (1-2 files, pattern rõ từ codebase): 1 approach đủ, không cần dispatch architect agents — lead tự propose.
+**Feature vừa/lớn**: Launch **2-3 code-architect agents song song** với focuses khác:
 - Agent 1: "Minimal changes — smallest diff, maximum reuse"
 - Agent 2: "Clean architecture — maintainability, elegant abstractions"
 - Agent 3: "Pragmatic balance — speed + quality"
@@ -76,7 +79,8 @@ Review tất cả approaches, form opinion. Trình bày user:
 
 **Mục tiêu**: Verify code quality trước khi báo xong.
 
-Launch **3 agents song song**:
+**Feature nhỏ** (≤3 files changed): 1 code-reviewer agent đủ.
+**Feature vừa/lớn**: Launch **2-3 agents song song**:
 - Agent 1 (code-reviewer): simplicity, DRY, readability
 - Agent 2 (code-reviewer): bugs, functional correctness
 - Agent 3 (code-reviewer): project conventions, abstractions

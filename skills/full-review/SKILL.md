@@ -60,28 +60,35 @@ Launch subagents theo scale đã chọn:
 - Prompt: "Phân tích test coverage cho code changes trong [scope]. Kiểm tra: có test cho logic mới không? Edge cases đã cover? Có test bị break không? Chạy test suite nếu có."
 - Tools: Read, Grep, Glob, Bash
 
-### Bước 3 — Consolidate (đếm trước, không drop ngầm)
+### Bước 3 — Consolidate (adaptive theo số agents)
 
-Sau khi 3 agents trả kết quả:
+**Nếu chỉ 1 agent** (Simple tier): skip dedup + validate — output trực tiếp findings của agent đó. Không cần consolidate 1 source.
 
+**Nếu 2+ agents**: 
 1. **Đếm findings mỗi agent** (tự đếm, không tin self-count).
 2. **Deduplicate**: nếu 2+ agents báo cùng issue → giữ 1, lấy severity cao hơn, ghi "confirmed by N agents".
 3. **KHÔNG drop finding ngầm** — mọi finding phải xuất hiện trong report hoặc ghi rõ lý do drop.
 
-### Bước 4 — Validate findings (2-pass review)
+### Bước 4 — Validate findings (adaptive)
 
-Với mỗi finding **Critical/High**:
-- Launch **1 fresh subagent** (không nhận context về intent) verify finding đó.
+**Nếu 0 findings Critical/High**: skip validation — không có gì cần validate.
+
+**Nếu có Critical/High**:
+- Launch **1 fresh subagent** (không nhận context về intent) verify mỗi finding.
 - Subagent chỉ nhận: file path + line number + issue description + instruction "verify xem issue này có thật không".
 - Finding không validate → đánh dấu "unverified", vẫn giữ trong report nhưng ghi rõ.
 
-### Bước 5 — Output
+### Bước 5 — Output (scale theo complexity)
+
+**Simple** (1 agent, ít findings): output ngắn gọn — list findings + 1-2 câu summary. Không cần headers phức tạp.
+
+**Moderate/Complex** (2-3 agents): output đầy đủ:
 
 ```markdown
 # Full Review Report
 
 **Scope**: [mô tả scope]
-**Agents**: code-reviewer (N findings) + security-auditor (N findings) + test-analyzer (N findings)
+**Agents**: [agents đã dispatch] (N findings mỗi agent)
 **Tổng raw**: X findings → Y sau dedup → Z validated
 
 ## 🔴 Critical / High (validated)
@@ -94,13 +101,13 @@ Với mỗi finding **Critical/High**:
 [findings]
 
 ## ⚠️ Unverified (cần user confirm)
-[findings chưa validate]
+[findings chưa validate — bỏ section nếu không có]
 
 ## ✅ Điểm tốt
 [những thứ làm đúng]
 
 ## Test Coverage
-[phân tích từ agent 3]
+[phân tích từ test-analyzer — bỏ section nếu không dispatch test-analyzer]
 ```
 
 ### Bước 6 — Hỏi user
