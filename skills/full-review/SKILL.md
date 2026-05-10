@@ -22,9 +22,15 @@ Launch **1 Haiku agent** kiểm tra nhanh:
 
 Nếu Haiku agent trả về "skip" → **dừng ngay**, không dispatch Bước 2.
 
-### Bước 2 — Dispatch 3 agents song song
+### Bước 2 — Dispatch agents (adaptive scaling)
 
-Launch **3 subagents đồng thời**:
+**Scale số agents theo complexity** (theo Anthropic multi-agent research pattern):
+
+- **Small diff** (≤20 dòng, 1-2 files, không đụng auth/payment/crypto): dispatch **1 agent** (code-reviewer only) — tiết kiệm tokens, đủ cho simple changes.
+- **Medium diff** (21-200 dòng, 3-10 files): dispatch **2 agents** (code-reviewer + security-auditor) — skip test-analyzer nếu không có test changes.
+- **Large diff** (>200 dòng, >10 files, hoặc đụng sensitive areas): dispatch **3 agents** đồng thời (full).
+
+Launch subagents theo scale đã chọn:
 
 **Agent 1: code-reviewer** (Sonnet)
 - Prompt: "Review code changes trong [scope]. Tìm bugs, logic errors, performance, maintainability. Rate mỗi issue confidence 0-100. Chỉ report confidence ≥ 80."
