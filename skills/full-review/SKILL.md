@@ -11,22 +11,30 @@ Skill này dispatch 3 subagents song song, validate findings, rồi consolidate 
 
 ## Quy trình
 
-### Bước 1 — Pre-check (dispatch Haiku agent, tiết kiệm tokens)
+### Bước 1 — Collect data + Pre-check (hybrid: lead collect → Haiku judge)
 
-Launch **1 Haiku agent** kiểm tra nhanh:
-- `git status` / `git diff --stat` → có changes không? Nếu clean → báo user, dừng.
-- Scope: `$ARGUMENTS` xác định review gì (PR, branch, files, hoặc all unstaged).
-- Nếu scope = PR: check PR closed? draft? Claude đã comment chưa? (`gh pr view <N> --json state,isDraft --comments`)
-- Diff quá nhỏ (≤5 dòng, chỉ format/typo) → báo user "trivial change, skip full review?" thay vì dispatch 3 agents.
-- Nếu scope mơ hồ → hỏi user, KHÔNG đoán.
+**Lead agent** chạy trước (deterministic, không cần subagent):
+1. Xác định scope từ `$ARGUMENTS` (PR, branch, files, hoặc all)
+2. Collect diff stats:
+   - Scope diff: `git diff --stat` → đếm dòng thay đổi, số files
+   - Scope all: `find . -name "*.py" -o -name "*.ts" ... | xargs wc -l` → đếm LOC codebase
+   - Scope PR: `gh pr diff <N> --stat`
+3. Collect file list: `git diff --name-only` hoặc `find` → liệt kê file names
+4. Nếu clean (0 changes cho diff scope) → báo user, dừng
+5. Nếu scope mơ hồ → hỏi user, KHÔNG đoán
 
-Nếu Haiku agent trả về "skip" → **dừng ngay**, không dispatch Bước 2.
+**Dispatch Haiku agent** với data đã collect (inject diff stats + file list vào prompt):
+- Haiku nhận **số liệu thực** (không cần tự count) + file names (thấy sensitive areas)
+- Haiku check: PR closed/draft? Trivial change (≤5 dòng, chỉ format/typo)? → "skip"
+- Haiku **chọn scale tier** dựa trên data thực (xem Bước 2)
+
+Nếu Haiku trả về "skip" → **dừng ngay**, không dispatch Bước 2.
 
 ### Bước 2 — Dispatch agents (adaptive scaling)
 
 **Scale số agents theo complexity** (theo [Anthropic multi-agent research pattern](https://www.anthropic.com/engineering/multi-agent-research-system): "Simple fact-finding requires just 1 agent... complex research might use more than 10 subagents"):
 
-Haiku pre-check (Bước 1) đánh giá complexity và chọn scale. Guidelines (qualitative labels + quantitative bounds, criteria tự thiết kế cho code review):
+Haiku chọn scale dựa trên **data thực đã inject** ở Bước 1. Guidelines (qualitative labels + quantitative bounds, criteria tự thiết kế cho code review):
 
 | Tier | Label | Bounds (guidelines, không hard cutoff) | Agents |
 |------|-------|---------------------------------------|--------|
@@ -36,7 +44,7 @@ Haiku pre-check (Bước 1) đánh giá complexity và chọn scale. Guidelines 
 
 Haiku dùng bảng trên làm **guideline**, có thể adjust nếu context cho thấy complexity khác bounds (vd: 15 dòng nhưng đụng auth → Moderate, không phải Simple).
 
-"all" scope chỉ define phạm vi review, KHÔNG override scaling — Haiku vẫn judge complexity dựa trên nội dung thực tế.
+"all" scope chỉ define phạm vi review, KHÔNG override scaling — Haiku judge dựa trên **data thực** (LOC, file count, file names), không phải scope label.
 
 Launch subagents theo scale đã chọn:
 
