@@ -21,7 +21,8 @@
 ├── settings.json                   # Quyền, hooks, env vars
 ├── rules/
 │   ├── communication.md            # ✅ Auto-import (essential mỗi turn)
-│   └── security.md                 # ✅ Auto-import (essential mọi task)
+│   ├── security.md                 # ✅ Auto-import (essential mọi task)
+│   └── verification.md             # ✅ Auto-import (verify & avoid past mistakes)
 ├── references/
 │   ├── coding-standards.md         # ⏸️ @-reference khi cần
 │   └── git-workflow.md             # ⏸️ @-reference khi cần
@@ -69,7 +70,7 @@
     └── skill-evals.json            # → <skill>/evals/evals.json (eval-driven optimize)
 ```
 
-**Baseline tokens** — đo thực tế bằng `/context` (Opus 4.7 1M context, snapshot session start, 2026-05-10, 15 agents):
+**Baseline tokens** — đo thực tế bằng `/context` (Opus 4.7 1M context, snapshot session start, 2026-05-10, 15 agents, 9 skills):
 
 | Category                      | Tokens     | % of 1M   |
 | ----------------------------- | ---------- | --------- |
@@ -479,7 +480,7 @@ Câu hỏi thường gặp:
 
 ### 9.1 Tại sao tách rules và references?
 
-3 rules (`communication`, `security`, `verification`) auto-load mọi session (~4,400 tokens). 2 references (`coding-standards`, `git-workflow`) KHÔNG auto-load để tiết kiệm context — Claude tự đọc khi gặp task liên quan, hoặc user `@`-reference khi cần.
+3 rules (`communication`, `security`, `verification`) auto-load mọi session (~7,700 tokens). 2 references (`coding-standards`, `git-workflow`) KHÔNG auto-load để tiết kiệm context — Claude tự đọc khi gặp task liên quan, hoặc user `@`-reference khi cần.
 
 ### 9.2 Tại sao [REFERENCE.md](docs/REFERENCE.md) không auto-load vào [CLAUDE.md](CLAUDE.md)?
 
