@@ -74,7 +74,7 @@ Tôi viết brief **NGẮN** (≤300 từ nội dung, không tính headings) the
 - Copy thủ công vào session mới, HOẶC
 - Tôi tiếp tục với `/compact <brief>` để giữ continuity.
 
-**Nếu user chạy `/handoff --save`** → ghi brief vào `<project>/.claude/HANDOFF.md` (cần thêm vào `.gitignore` — xem template project setup).
+**Nếu user chạy `/handoff --save`** → ghi brief vào `<project>/.claude/HANDOFF.md`. Trước khi ghi: check `.gitignore` có entry `HANDOFF.md` chưa — nếu chưa thì thêm `.claude/HANDOFF.md` vào `.gitignore` (tránh commit notes nội bộ).
 - Session mới sẽ tự đọc khi user nói "đọc HANDOFF.md".
 
 **Nếu user chạy `/handoff --inject`** → in 1 dòng paste-ready để user paste vào session mới:

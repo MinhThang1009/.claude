@@ -46,7 +46,7 @@ Nếu user không có instruction đặc biệt → 1 commit/PR scope nhỏ thì
 | `fix`      | Sửa bug có ảnh hưởng đến hành vi                          |
 | `refactor` | Sửa code KHÔNG đổi behavior                               |
 | `perf`     | Tối ưu performance                                        |
-| `docs`     | Chỉ docs (`*.md`, comment, JSDoc)                         |
+| `docs`     | Chỉ docs (`*.md`, comment, docstring)                     |
 | `test`     | Chỉ test                                                  |
 | `style`    | Format, lint (không đổi logic)                            |
 | `build`    | Build system, dependency                                  |

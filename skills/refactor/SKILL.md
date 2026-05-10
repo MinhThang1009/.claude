@@ -112,5 +112,5 @@ Các bước đã thực hiện:
 
 - **Refactor = giữ behavior**. Test phải pass TRƯỚC và SAU. Nếu khác → feature/fix, không phải refactor.
 - **Không có test → viết characterization test trước**. Refactor blind rất nguy hiểm với code legacy.
-- **Đổi tên file/symbol** = đổi nhiều import. Dùng IDE refactor tool nếu có, không grep & replace blind (dễ miss case-sensitive, comment, string literal).
+- **Đổi tên file/symbol** = đổi nhiều import. Dùng Grep tìm tất cả references trước khi rename — không naive search & replace (dễ miss case-sensitive, comment, string literal). Nếu project có LSP rename script, ưu tiên dùng.
 - **Performance thay đổi = optimize, không phải refactor**. Tách 2 loại commit riêng để revert dễ.

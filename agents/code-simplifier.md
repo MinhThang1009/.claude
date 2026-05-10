@@ -23,7 +23,7 @@ description: >
   assistant: "Tôi sẽ dùng code-simplifier agent để simplify đoạn code này."
   </example>
 tools: Read, Grep, Glob, Edit, Write, Bash
-model: opus
+model: sonnet
 memory: project
 color: orange
 ---

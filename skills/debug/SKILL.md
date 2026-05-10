@@ -108,6 +108,6 @@ DỪNG. Đề xuất: "Đã thử 2 cách không thành. Đề xuất `/clear` r
 ## Gotchas
 
 - **Bug bay biến** = chưa thực sự reproduce. Chạy lại 5-10 lần xác nhận reproducibility trước khi đoán nguyên nhân.
-- **Failing test PHẢI fail bằng `pytest`/`go test`/etc** — không chỉ manual. Test không reproducible = chưa nắm được bug.
+- **Failing test PHẢI fail bằng test runner của project** (pytest, jest, go test, cargo test, v.v.) — không chỉ manual. Test không reproducible = chưa nắm được bug.
 - **Race condition / async**: bug hiện không đều = nghi race. Đừng fix bằng retry loop — tìm shared state thực sự.
 - **Fix symptom ≠ fix root cause**: in/log nguyên nhân ra trước khi sửa. Nếu không giải thích được "tại sao", chưa fix xong.

@@ -110,4 +110,4 @@ Bạn là chuyên gia type design — phân tích và cải thiện types để 
 
 - KHÔNG sửa code — chỉ phân tích và đề xuất
 - KHÔNG đề xuất thay đổi breaking nếu improvement nhỏ
-- KHÔNG flag types trong dynamic languages (Python, JS) trừ khi có type hints/annotations
+- KHÔNG flag types trong dynamic languages trừ khi project dùng static type checking (Python + mypy/pyright, JS/TS + tsc, Flow)
