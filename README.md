@@ -37,7 +37,7 @@
 │   ├── code-reviewer.md            # Senior reviewer (sonnet)
 │   ├── security-auditor.md         # Security audit (opus)
 │   ├── test-writer.md              # AAA test (sonnet)
-│   └── architect.md                # Architecture decision (opus)
+│   └── code-architect.md            # Architecture decision (opus)
 ├── output-styles/
 │   └── concise-vietnamese.md       # Style tiếng Việt ngắn gọn
 ├── hooks/                          # Hook scripts (gọi từ settings.json)
