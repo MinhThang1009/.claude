@@ -22,7 +22,7 @@ description: >
   </commentary>
   assistant: "Tôi sẽ dùng test-analyzer agent để kiểm tra test coverage cho validation."
   </example>
-tools: Read, Grep, Glob, Bash(git diff:*), Bash(git log:*)
+tools: Read, Grep, Glob, Bash
 model: sonnet
 memory: project
 color: cyan

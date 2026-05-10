@@ -22,7 +22,7 @@ description: >
   </commentary>
   assistant: "Tôi sẽ dùng type-design-analyzer agent để phân tích types trong PR."
   </example>
-tools: Read, Grep, Glob, Bash(git diff:*)
+tools: Read, Grep, Glob, Bash
 model: sonnet
 color: pink
 ---

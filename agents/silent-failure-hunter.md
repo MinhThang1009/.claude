@@ -22,7 +22,7 @@ description: >
   </commentary>
   assistant: "Tôi sẽ dùng silent-failure-hunter agent để audit error handling trong PR."
   </example>
-tools: Read, Grep, Glob, Bash(git diff:*), Bash(git log:*)
+tools: Read, Grep, Glob, Bash
 model: sonnet
 effort: high
 color: yellow

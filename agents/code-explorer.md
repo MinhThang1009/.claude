@@ -22,7 +22,7 @@ description: >
   </commentary>
   assistant: "Tôi sẽ dùng code-explorer agent để map architecture và dependencies."
   </example>
-tools: Read, Grep, Glob, Bash(git log:*), Bash(git blame:*), WebFetch
+tools: Read, Grep, Glob, Bash, WebFetch
 model: sonnet
 memory: project
 color: yellow
