@@ -23,7 +23,6 @@ description: >
   assistant: "Tôi sẽ dùng comment-analyzer agent để verify comments trong PR."
   </example>
 tools: Read, Grep, Glob, Bash
-disallowedTools: Edit, Write, NotebookEdit
 model: sonnet
 color: cyan
 ---

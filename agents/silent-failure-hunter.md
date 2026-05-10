@@ -23,7 +23,6 @@ description: >
   assistant: "Tôi sẽ dùng silent-failure-hunter agent để audit error handling trong PR."
   </example>
 tools: Read, Grep, Glob, Bash
-disallowedTools: Edit, Write, NotebookEdit
 model: sonnet
 effort: high
 color: yellow
