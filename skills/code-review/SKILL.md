@@ -2,6 +2,7 @@
 name: code-review
 description: Review code thay đổi trong working tree, branch hiện tại, hoặc PR. Tìm bug, vấn đề security, performance, style, test coverage. Dùng khi user nói "review code", "review pr", "kiểm tra code", hoặc gọi /code-review.
 allowed-tools: Read Grep Glob Bash(git diff:*) Bash(git log:*) Bash(git status:*) Bash(gh pr view:*) Bash(gh pr diff:*)
+context: fork
 argument-hint: "[tùy chọn — số PR hoặc đường dẫn cụ thể]"
 ---
 

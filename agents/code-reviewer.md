@@ -1,6 +1,27 @@
 ---
 name: code-reviewer
-description: Senior code reviewer chuyên review PR và code change để tìm bug, vấn đề security, performance, và maintainability. Dùng khi cần review độc lập với context fresh, không bị bias bởi code đã viết trước đó. Gọi explicit "use code-reviewer agent" hoặc Claude tự delegate khi user yêu cầu review.
+description: >
+  Senior code reviewer chuyên review PR và code change để tìm bug, vấn đề security, performance, và maintainability. Dùng khi cần review độc lập với context fresh, không bị bias bởi code đã viết trước đó. Gọi explicit "use code-reviewer agent" hoặc Claude tự delegate khi user yêu cầu review.
+
+  <example>
+  Context: User vừa implement xong feature
+  user: "Review code đi"
+  assistant: "Để tôi review độc lập."
+  <commentary>
+  Explicit review request — dùng code-reviewer agent với context fresh.
+  </commentary>
+  assistant: "Tôi sẽ dùng code-reviewer agent để phân tích code changes."
+  </example>
+
+  <example>
+  Context: User vừa sửa xong nhiều file
+  user: "Xong rồi, check giúp trước khi commit"
+  assistant: "Để tôi kiểm tra trước khi commit."
+  <commentary>
+  Pre-commit review request — proactive trigger code-reviewer.
+  </commentary>
+  assistant: "Tôi sẽ dùng code-reviewer agent để review changes."
+  </example>
 tools: Read, Grep, Glob, Bash
 model: sonnet
 memory: user

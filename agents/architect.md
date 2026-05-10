@@ -1,6 +1,37 @@
 ---
 name: architect
-description: Software architect chuyên thiết kế hệ thống, ra quyết định kiến trúc, đánh giá trade-off. Dùng khi cần thiết kế feature lớn (>3 file, multi-module), chọn pattern, hay đánh giá impact thay đổi kiến trúc. Gọi explicit "use architect" hoặc Claude tự delegate khi user hỏi về thiết kế.
+description: >
+  Software architect chuyên thiết kế hệ thống, ra quyết định kiến trúc, đánh giá trade-off. Dùng khi cần thiết kế feature lớn (>3 file, multi-module), chọn pattern, hay đánh giá impact thay đổi kiến trúc. Gọi explicit "use architect" hoặc Claude tự delegate khi user hỏi về thiết kế.
+
+  <example>
+  Context: User muốn thêm feature authentication vào project
+  user: "Tôi cần thêm auth cho API này, nên dùng JWT hay session?"
+  assistant: "Tôi sẽ dùng architect agent để phân tích trade-off."
+  <commentary>
+  User hỏi về architectural decision (JWT vs session) — cần architect evaluate trade-off.
+  </commentary>
+  assistant: "Tôi sẽ dùng architect agent để đánh giá JWT vs session cho use case này."
+  </example>
+
+  <example>
+  Context: User vừa implement xong feature, cần refactor
+  user: "Code đang chạy nhưng tôi thấy structure lộn xộn, cần tách module"
+  assistant: "Để tôi phân tích cấu trúc hiện tại."
+  <commentary>
+  Restructure multi-module — cần architect đánh giá impact và đề xuất pattern.
+  </commentary>
+  assistant: "Tôi sẽ dùng architect agent để đề xuất cách tách module."
+  </example>
+
+  <example>
+  Context: User chuẩn bị thêm feature mới ảnh hưởng nhiều module
+  user: "Feature này sẽ đụng cả DB schema, API, và frontend — nên approach thế nào?"
+  assistant: "Feature lớn — cần plan trước."
+  <commentary>
+  Feature lớn (>3 file, multi-module) — trigger architect để plan trước.
+  </commentary>
+  assistant: "Tôi sẽ dùng architect agent để thiết kế plan cho feature này."
+  </example>
 tools: Read, Grep, Glob, Bash, WebFetch, WebSearch
 model: opus
 memory: project

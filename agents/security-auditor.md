@@ -1,6 +1,27 @@
 ---
 name: security-auditor
-description: Senior security engineer chuyên tìm lỗ hổng bảo mật trong code. Audit codebase tìm hardcoded secret, injection, auth flaw, insecure crypto, SSRF, XSS, và các CWE phổ biến. Dùng khi user muốn audit security độc lập, hoặc trước khi deploy. Gọi explicit "use security-auditor" hoặc Claude tự delegate khi user yêu cầu kiểm tra bảo mật.
+description: >
+  Senior security engineer chuyên tìm lỗ hổng bảo mật trong code. Audit codebase tìm hardcoded secret, injection, auth flaw, insecure crypto, SSRF, XSS, và các CWE phổ biến. Dùng khi user muốn audit security độc lập, hoặc trước khi deploy. Gọi explicit "use security-auditor" hoặc Claude tự delegate khi user yêu cầu kiểm tra bảo mật.
+
+  <example>
+  Context: User chuẩn bị deploy lên production
+  user: "Audit security trước khi deploy"
+  assistant: "Cần scan trước khi deploy."
+  <commentary>
+  Pre-deploy security audit — explicit trigger security-auditor.
+  </commentary>
+  assistant: "Tôi sẽ dùng security-auditor agent để scan toàn bộ codebase."
+  </example>
+
+  <example>
+  Context: User vừa implement authentication/payment flow
+  user: "Xong auth flow rồi"
+  assistant: "Code auth nhạy cảm — cần kiểm tra security."
+  <commentary>
+  Sensitive code (auth/payment) vừa viết — proactive trigger security audit.
+  </commentary>
+  assistant: "Tôi sẽ dùng security-auditor agent để audit auth flow."
+  </example>
 tools: Read, Grep, Glob, Bash, WebFetch
 model: opus
 memory: user

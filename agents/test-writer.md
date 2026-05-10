@@ -1,6 +1,27 @@
 ---
 name: test-writer
-description: Chuyên viết test cho code có sẵn. Phân tích hàm/module, viết test cover happy path + edge case + error path, theo test framework của project. Dùng khi cần thêm test cho code chưa được test, hoặc bổ sung edge case. Gọi explicit "use test-writer" hoặc Claude tự delegate.
+description: >
+  Chuyên viết test cho code có sẵn. Phân tích hàm/module, viết test cover happy path + edge case + error path, theo test framework của project. Dùng khi cần thêm test cho code chưa được test, hoặc bổ sung edge case. Gọi explicit "use test-writer" hoặc Claude tự delegate.
+
+  <example>
+  Context: User vừa implement function mới
+  user: "Viết test cho function này"
+  assistant: "Để tôi phân tích function và viết test."
+  <commentary>
+  Explicit test request — trigger test-writer agent.
+  </commentary>
+  assistant: "Tôi sẽ dùng test-writer agent để viết test cover đầy đủ."
+  </example>
+
+  <example>
+  Context: User implement feature nhưng chưa có test
+  user: "Feature xong rồi, giờ cần test"
+  assistant: "Feature cần test trước khi merge."
+  <commentary>
+  Post-implementation test request — test-writer analyze code rồi viết.
+  </commentary>
+  assistant: "Tôi sẽ dùng test-writer agent để viết test cho feature này."
+  </example>
 tools: Read, Grep, Glob, Edit, Write, Bash
 model: sonnet
 memory: project
