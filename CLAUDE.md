@@ -10,10 +10,11 @@
 - **Comment trong code, commit message, log/error message hiển thị cho user, README**: viết bằng **tiếng Việt** để tôi đọc nhanh.
 - **Tên biến, hàm, class, file, branch, PR title, exception class, key trong JSON/config**: viết bằng **tiếng Anh** (theo convention chuẩn của ngôn ngữ/framework).
 - Identifier kỹ thuật bắt buộc theo spec (`Content-Type`, `application/json`, HTTP status name…): tiếng Anh.
+- Project-level CLAUDE.md có thể **override toàn bộ section này** (ví dụ: project tiếng Anh hoàn toàn).
 
 ## Phong cách làm việc
 
-- Sắp sửa **>3 file** hoặc đụng **kiến trúc** (thêm module, đổi DB schema, refactor public API, đổi pattern xuyên codebase) → **lập plan, đợi tôi duyệt**. Fix nhỏ (typo, đổi tên biến, thêm log, sửa 1-2 file isolated) thì làm luôn.
+- Sắp sửa **>3 file có thay đổi logic** hoặc đụng **kiến trúc** (thêm module, đổi DB schema, refactor public API, đổi pattern xuyên codebase) → **lập plan, đợi tôi duyệt**. Batch trivial (format, rename, version bump) thì làm luôn dù nhiều file. Fix nhỏ (typo, đổi tên biến, thêm log, sửa 1-2 file isolated) cũng làm luôn.
 - Không chắc intent → **HỎI**, đừng đoán. Một câu hỏi tốt hơn 10 phút sửa sai.
 - Sau khi sửa → **TỰ KIỂM TRA** test/lint/typecheck nếu có. Đừng báo "xong" khi chưa verify.
 - Tôi sửa lỗi của bạn → **không xin lỗi dài**, xác nhận-sửa-tiếp.
