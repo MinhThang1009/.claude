@@ -1,6 +1,6 @@
 ---
 name: full-review
-description: Multi-agent review dispatch 3 agents song song (code-review + security-audit + test-analyzer), validate findings, consolidate report. Dùng khi cần review toàn diện trước deploy, merge PR lớn, hoặc audit codebase.
+description: Multi-agent review — adaptive dispatch 1-3 agents (code-review + security-audit + test-analyzer) theo complexity, validate findings, consolidate report. Dùng khi cần review toàn diện trước deploy, merge PR lớn, hoặc audit codebase.
 allowed-tools: Read Grep Glob Bash(git diff:*) Bash(git log:*) Bash(git status:*) WebFetch
 argument-hint: "[scope: PR #N | branch | files | all]"
 ---
@@ -17,7 +17,7 @@ Skill này dispatch 3 subagents song song, validate findings, rồi consolidate 
 1. Xác định scope từ `$ARGUMENTS` (PR, branch, files, hoặc all)
 2. Collect diff stats:
    - Scope diff: `git diff --stat` → đếm dòng thay đổi, số files
-   - Scope all: `find . -name "*.py" -o -name "*.ts" ... | xargs wc -l` → đếm LOC codebase
+   - Scope all: `find . -type f -not -path '*/.git/*' -not -path '*/node_modules/*' -not -path '*/dist/*' -not -path '*/__pycache__/*' | wc -l` (đếm files) + `wc -l` trên source files → đếm LOC codebase (không hardcode extensions — hoạt động với mọi ngôn ngữ)
    - Scope PR: `gh pr diff <N> --stat`
 3. Collect file list: `git diff --name-only` hoặc `find` → liệt kê file names
 4. Nếu clean (0 changes cho diff scope) → báo user, dừng

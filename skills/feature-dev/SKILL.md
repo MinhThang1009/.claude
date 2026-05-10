@@ -81,9 +81,9 @@ Review tất cả approaches, form opinion. Trình bày user:
 
 **Feature nhỏ** (≤3 files changed): 1 code-reviewer agent đủ.
 **Feature vừa/lớn**: Launch **2-3 agents song song**:
-- Agent 1 (code-reviewer): simplicity, DRY, readability
-- Agent 2 (code-reviewer): bugs, functional correctness
-- Agent 3 (code-reviewer): project conventions, abstractions
+- Agent 1 (code-reviewer): simplicity, DRY, readability, bugs
+- Agent 2 (code-reviewer): functional correctness, project conventions
+- Agent 3 (security-auditor): **chỉ nếu** feature đụng auth, payment, crypto, user input, API endpoint mới. Nếu không → skip, giữ 2 agents.
 
 Consolidate findings (đếm, dedup, severity cao hơn wins). Trình bày user:
 - Issues tìm được (grouped by severity)
