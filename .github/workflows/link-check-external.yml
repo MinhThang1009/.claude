@@ -37,7 +37,7 @@ jobs:
           output: ./lychee-report.md
 
       - name: Upload report artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: lychee-external-link-report
