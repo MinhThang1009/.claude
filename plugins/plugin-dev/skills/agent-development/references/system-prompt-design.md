@@ -1,45 +1,45 @@
-# Các Pattern Thiết Kế System Prompt
+# System Prompt Design Patterns
 
-Hướng dẫn đầy đủ về cách viết system prompt agent hiệu quả, cho phép vận hành tự chủ và chất lượng cao.
+Complete guide to writing effective agent system prompts that enable autonomous, high-quality operation.
 
-## Cấu trúc cốt lõi
+## Core Structure
 
-Mọi system prompt agent nên tuân theo cấu trúc đã được kiểm chứng này:
+Every agent system prompt should follow this proven structure:
 
 ```markdown
 You are [specific role] specializing in [specific domain].
 
 **Your Core Responsibilities:**
-1. [Trách nhiệm chính — task chính]
-2. [Trách nhiệm phụ — task hỗ trợ]
-3. [Các trách nhiệm bổ sung nếu cần]
+1. [Primary responsibility - the main task]
+2. [Secondary responsibility - supporting task]
+3. [Additional responsibilities as needed]
 
 **[Task Name] Process:**
-1. [Bước cụ thể đầu tiên]
-2. [Bước cụ thể thứ hai]
-3. [Tiếp tục với các bước rõ ràng]
+1. [First concrete step]
+2. [Second concrete step]
+3. [Continue with clear steps]
 [...]
 
 **Quality Standards:**
-- [Tiêu chuẩn 1 với chi tiết cụ thể]
-- [Tiêu chuẩn 2 với chi tiết cụ thể]
-- [Tiêu chuẩn 3 với chi tiết cụ thể]
+- [Standard 1 with specifics]
+- [Standard 2 with specifics]
+- [Standard 3 with specifics]
 
 **Output Format:**
 Provide results structured as:
-- [Thành phần 1]
-- [Thành phần 2]
-- [Bao gồm yêu cầu format cụ thể]
+- [Component 1]
+- [Component 2]
+- [Include specific formatting requirements]
 
 **Edge Cases:**
 Handle these situations:
-- [Edge case 1]: [Cách xử lý cụ thể]
-- [Edge case 2]: [Cách xử lý cụ thể]
+- [Edge case 1]: [Specific handling approach]
+- [Edge case 2]: [Specific handling approach]
 ```
 
-## Pattern 1: Agent phân tích
+## Pattern 1: Analysis Agents
 
-Cho agent phân tích code, PR, hoặc tài liệu:
+For agents that analyze code, PRs, or documentation:
 
 ```markdown
 You are an expert [domain] analyzer specializing in [specific analysis type].
@@ -68,10 +68,10 @@ You are an expert [domain] analyzer specializing in [specific analysis type].
 
 **Output Format:**
 ## Summary
-[Tổng quan 2-3 câu]
+[2-3 sentence overview]
 
 ## Critical Issues
-- [file:line] - [Mô tả vấn đề] - [Khuyến nghị]
+- [file:line] - [Issue description] - [Recommendation]
 
 ## Major Issues
 [...]
@@ -88,9 +88,9 @@ You are an expert [domain] analyzer specializing in [specific analysis type].
 - Unclear code: Request clarification rather than guessing
 ```
 
-## Pattern 2: Agent tạo sinh
+## Pattern 2: Generation Agents
 
-Cho agent tạo code, test, hoặc tài liệu:
+For agents that create code, tests, or documentation:
 
 ```markdown
 You are an expert [domain] engineer specializing in creating high-quality [output type].
@@ -131,9 +131,9 @@ Create [what] with:
 - Complex requirements: Break into smaller pieces
 ```
 
-## Pattern 3: Agent kiểm tra
+## Pattern 3: Validation Agents
 
-Cho agent validate, check, hoặc verify:
+For agents that validate, check, or verify:
 
 ```markdown
 You are an expert [domain] validator specializing in ensuring [quality aspect].
@@ -163,7 +163,7 @@ You are an expert [domain] validator specializing in ensuring [quality aspect].
 ## Validation Result: [PASS/FAIL]
 
 ## Summary
-[Đánh giá tổng thể]
+[Overall assessment]
 
 ## Violations Found: [count]
 ### Critical ([count])
@@ -173,7 +173,7 @@ You are an expert [domain] validator specializing in ensuring [quality aspect].
 - [Location]: [Issue] - [Fix]
 
 ## Recommendations
-[Cách khắc phục vi phạm]
+[How to fix violations]
 
 **Edge Cases:**
 - No violations: Confirm validation passed
@@ -181,9 +181,9 @@ You are an expert [domain] validator specializing in ensuring [quality aspect].
 - Ambiguous rules: Document uncertainty, request clarification
 ```
 
-## Pattern 4: Agent điều phối
+## Pattern 4: Orchestration Agents
 
-Cho agent phối hợp nhiều tool hoặc bước:
+For agents that coordinate multiple tools or steps:
 
 ```markdown
 You are an expert [domain] orchestrator specializing in coordinating [complex workflow].
@@ -221,7 +221,7 @@ You are an expert [domain] orchestrator specializing in coordinating [complex wo
 - [Output 2]
 
 ### Next Steps
-[Nếu có]
+[If applicable]
 
 **Edge Cases:**
 - Phase failure: Attempt retry, then report and stop
@@ -229,11 +229,11 @@ You are an expert [domain] orchestrator specializing in coordinating [complex wo
 - Timeout: Report partial completion
 ```
 
-## Hướng dẫn phong cách viết
+## Writing Style Guidelines
 
-### Tone và giọng văn
+### Tone and Voice
 
-**Dùng ngôi thứ hai (nói với agent):**
+**Use second person (addressing the agent):**
 ```
 ✅ You are responsible for...
 ✅ You will analyze...
@@ -244,9 +244,9 @@ You are an expert [domain] orchestrator specializing in coordinating [complex wo
 ❌ I will analyze...
 ```
 
-### Rõ ràng và cụ thể
+### Clarity and Specificity
 
-**Cụ thể, không mơ hồ:**
+**Be specific, not vague:**
 ```
 ✅ Check for SQL injection by examining all database queries for parameterization
 ❌ Look for security issues
@@ -258,9 +258,9 @@ You are an expert [domain] orchestrator specializing in coordinating [complex wo
 ❌ Rate the severity of issues
 ```
 
-### Hướng dẫn có thể thực thi
+### Actionable Instructions
 
-**Đưa ra bước cụ thể:**
+**Give concrete steps:**
 ```
 ✅ Read the file using the Read tool, then search for patterns using Grep
 ❌ Analyze the code
@@ -269,9 +269,9 @@ You are an expert [domain] orchestrator specializing in coordinating [complex wo
 ❌ Create tests
 ```
 
-## Các lỗi thường gặp
+## Common Pitfalls
 
-### Trách nhiệm mơ hồ
+### ❌ Vague Responsibilities
 
 ```markdown
 **Your Core Responsibilities:**
@@ -280,9 +280,9 @@ You are an expert [domain] orchestrator specializing in coordinating [complex wo
 3. Be helpful
 ```
 
-**Tại sao tệ:** Không đủ cụ thể để định hướng hành vi.
+**Why bad:** Not specific enough to guide behavior.
 
-### Trách nhiệm cụ thể
+### ✅ Specific Responsibilities
 
 ```markdown
 **Your Core Responsibilities:**
@@ -291,15 +291,15 @@ You are an expert [domain] orchestrator specializing in coordinating [complex wo
 3. Recommend specific type improvements with examples
 ```
 
-### Thiếu các bước quy trình
+### ❌ Missing Process Steps
 
 ```markdown
 Analyze the code and provide feedback.
 ```
 
-**Tại sao tệ:** Agent không biết CÁCH phân tích.
+**Why bad:** Agent doesn't know HOW to analyze.
 
-### Quy trình rõ ràng
+### ✅ Clear Process
 
 ```markdown
 **Analysis Process:**
@@ -310,102 +310,102 @@ Analyze the code and provide feedback.
 5. List findings with file:line references
 ```
 
-### Output không xác định
+### ❌ Undefined Output
 
 ```markdown
 Provide a report.
 ```
 
-**Tại sao tệ:** Agent không biết dùng format gì.
+**Why bad:** Agent doesn't know what format to use.
 
-### Format output được định nghĩa
+### ✅ Defined Output Format
 
 ```markdown
 **Output Format:**
 ## Type Safety Report
 
 ### Summary
-[Tổng quan findings]
+[Overview of findings]
 
 ### Issues Found
 - `file.ts:42` - Missing return type on `processData`
 - `utils.ts:15` - Unsafe 'any' usage in parameter
 
 ### Recommendations
-[Bản sửa cụ thể với ví dụ]
+[Specific fixes with examples]
 ```
 
-## Hướng dẫn về độ dài
+## Length Guidelines
 
-### Agent tối thiểu khả dụng
+### Minimum Viable Agent
 
-**Tối thiểu ~500 từ:**
-- Mô tả vai trò
-- 3 trách nhiệm cốt lõi
-- Quy trình 5 bước
-- Format output
+**~500 words minimum:**
+- Role description
+- 3 core responsibilities
+- 5-step process
+- Output format
 
-### Agent tiêu chuẩn
+### Standard Agent
 
-**~1.000–2.000 từ:**
-- Vai trò và chuyên môn chi tiết
-- 5–8 trách nhiệm
-- Quy trình 8–12 bước
-- Tiêu chuẩn chất lượng
-- Format output
-- 3–5 edge case
+**~1,000-2,000 words:**
+- Detailed role and expertise
+- 5-8 responsibilities
+- 8-12 process steps
+- Quality standards
+- Output format
+- 3-5 edge cases
 
-### Agent toàn diện
+### Comprehensive Agent
 
-**~2.000–5.000 từ:**
-- Vai trò đầy đủ với background
-- Trách nhiệm toàn diện
-- Quy trình đa giai đoạn chi tiết
-- Tiêu chuẩn chất lượng mở rộng
-- Nhiều format output
-- Nhiều edge case
-- Ví dụ trong system prompt
+**~2,000-5,000 words:**
+- Complete role with background
+- Comprehensive responsibilities
+- Detailed multi-phase process
+- Extensive quality standards
+- Multiple output formats
+- Many edge cases
+- Examples within system prompt
 
-**Tránh > 10.000 từ:** Quá dài, hiệu suất giảm dần.
+**Avoid > 10,000 words:** Too long, diminishing returns.
 
-## Kiểm thử system prompt
+## Testing System Prompts
 
-### Kiểm tra tính đầy đủ
+### Test Completeness
 
-Agent có thể xử lý những trường hợp này chỉ dựa vào system prompt không?
+Can the agent handle these based on system prompt alone?
 
-- [ ] Thực thi task thông thường
-- [ ] Các edge case đã nêu
-- [ ] Tình huống lỗi
-- [ ] Yêu cầu không rõ ràng
-- [ ] Input lớn/phức tạp
-- [ ] Input rỗng/thiếu
+- [ ] Typical task execution
+- [ ] Edge cases mentioned
+- [ ] Error scenarios
+- [ ] Unclear requirements
+- [ ] Large/complex inputs
+- [ ] Empty/missing inputs
 
-### Kiểm tra tính rõ ràng
+### Test Clarity
 
-Đọc system prompt và hỏi:
+Read the system prompt and ask:
 
-- Developer khác có hiểu agent này làm gì không?
-- Các bước quy trình có rõ ràng và có thể thực thi không?
-- Format output có rõ ràng không?
-- Tiêu chuẩn chất lượng có đo lường được không?
+- Can another developer understand what this agent does?
+- Are process steps clear and actionable?
+- Is output format unambiguous?
+- Are quality standards measurable?
 
-### Lặp lại dựa trên kết quả
+### Iterate Based on Results
 
-Sau khi kiểm thử agent:
-1. Xác định nơi nó gặp khó khăn
-2. Thêm hướng dẫn còn thiếu vào system prompt
-3. Làm rõ hướng dẫn mơ hồ
-4. Thêm bước quy trình cho edge case
-5. Kiểm thử lại
+After testing agent:
+1. Identify where it struggled
+2. Add missing guidance to system prompt
+3. Clarify ambiguous instructions
+4. Add process steps for edge cases
+5. Re-test
 
-## Kết luận
+## Conclusion
 
-System prompt hiệu quả là:
-- **Cụ thể**: Rõ ràng về cái gì và làm thế nào
-- **Có cấu trúc**: Tổ chức với các section rõ ràng
-- **Đầy đủ**: Bao phủ cả trường hợp thông thường và edge case
-- **Có thể thực thi**: Cung cấp các bước cụ thể
-- **Có thể kiểm thử**: Định nghĩa tiêu chuẩn đo lường được
+Effective system prompts are:
+- **Specific**: Clear about what and how
+- **Structured**: Organized with clear sections
+- **Complete**: Covers normal and edge cases
+- **Actionable**: Provides concrete steps
+- **Testable**: Defines measurable standards
 
-Dùng các pattern trên làm template, tùy chỉnh cho domain của bạn, và lặp lại dựa trên hiệu suất agent.
+Use the patterns above as templates, customize for your domain, and iterate based on agent performance.

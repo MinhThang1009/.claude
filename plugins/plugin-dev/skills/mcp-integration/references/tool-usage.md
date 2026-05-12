@@ -1,12 +1,12 @@
-# Sử Dụng MCP Tool trong Command và Agent
+# Using MCP Tools in Commands and Agents
 
-Hướng dẫn đầy đủ về cách sử dụng MCP tool hiệu quả trong command và agent của Claude Code plugin.
+Complete guide to using MCP tools effectively in Claude Code plugin commands and agents.
 
-## Tổng Quan
+## Overview
 
-Sau khi MCP server được cấu hình, các tool của nó trở nên khả dụng với tiền tố `mcp__plugin_<plugin-name>_<server-name>__<tool-name>`. Dùng các tool này trong command và agent giống như Claude Code tool tích hợp sẵn.
+Once an MCP server is configured, its tools become available with the prefix `mcp__plugin_<plugin-name>_<server-name>__<tool-name>`. Use these tools in commands and agents just like built-in Claude Code tools.
 
-## Quy Ước Đặt Tên Tool
+## Tool Naming Convention
 
 ### Format
 
@@ -14,36 +14,36 @@ Sau khi MCP server được cấu hình, các tool của nó trở nên khả d�
 mcp__plugin_<plugin-name>_<server-name>__<tool-name>
 ```
 
-### Ví Dụ
+### Examples
 
-**Plugin Asana với server asana:**
+**Asana plugin with asana server:**
 - `mcp__plugin_asana_asana__asana_create_task`
 - `mcp__plugin_asana_asana__asana_search_tasks`
 - `mcp__plugin_asana_asana__asana_get_project`
 
-**Plugin tùy chỉnh với database server:**
+**Custom plugin with database server:**
 - `mcp__plugin_myplug_database__query`
 - `mcp__plugin_myplug_database__execute`
 - `mcp__plugin_myplug_database__list_tables`
 
-### Khám Phá Tên Tool
+### Discovering Tool Names
 
-**Dùng lệnh `/mcp`:**
+**Use `/mcp` command:**
 ```bash
 /mcp
 ```
 
-Lệnh này hiển thị:
-- Tất cả MCP server có sẵn
-- Tool do mỗi server cung cấp
-- Schema và mô tả tool
-- Tên tool đầy đủ để dùng trong cấu hình
+This shows:
+- All available MCP servers
+- Tools provided by each server
+- Tool schemas and descriptions
+- Full tool names for use in configuration
 
-## Sử Dụng Tool trong Command
+## Using Tools in Commands
 
-### Pre-Allow Tool
+### Pre-Allowing Tools
 
-Khai báo MCP tool trong frontmatter của command:
+Specify MCP tools in command frontmatter:
 
 ```markdown
 ---
@@ -61,7 +61,7 @@ To create a task:
 3. Confirm creation to user
 ```
 
-### Nhiều Tool
+### Multiple Tools
 
 ```markdown
 ---
@@ -73,7 +73,7 @@ allowed-tools: [
 ---
 ```
 
-### Wildcard (Dùng Tiết Kiệm)
+### Wildcard (Use Sparingly)
 
 ```markdown
 ---
@@ -81,11 +81,11 @@ allowed-tools: ["mcp__plugin_asana_asana__*"]
 ---
 ```
 
-**Lưu ý:** Chỉ dùng wildcard nếu command thực sự cần truy cập tất cả tool từ một server.
+**Caution:** Only use wildcards if the command truly needs access to all tools from a server.
 
-### Hướng Dẫn Dùng Tool trong Command
+### Tool Usage in Command Instructions
 
-**Ví dụ command:**
+**Example command:**
 ```markdown
 ---
 description: Search and create Asana tasks
@@ -117,11 +117,11 @@ To create a task:
 3. Show confirmation with task link
 ```
 
-## Sử Dụng Tool trong Agent
+## Using Tools in Agents
 
-### Cấu Hình Agent
+### Agent Configuration
 
-Agent có thể dùng MCP tool tự chủ mà không cần pre-allow:
+Agents can use MCP tools autonomously without pre-allowing them:
 
 ```markdown
 ---
@@ -147,73 +147,73 @@ Autonomous agent for generating Asana project status reports.
 The agent has access to all Asana MCP tools without pre-approval.
 ```
 
-### Quyền Truy Cập Tool của Agent
+### Agent Tool Access
 
-Agent có quyền truy cập tool rộng hơn command:
-- Có thể dùng bất kỳ tool nào Claude xác định là cần thiết
-- Không cần danh sách pre-allow
-- Nên ghi lại các tool thường dùng
+Agents have broader tool access than commands:
+- Can use any tool Claude determines is necessary
+- Don't need pre-allowed lists
+- Should document which tools they typically use
 
-## Các Pattern Gọi Tool
+## Tool Call Patterns
 
-### Pattern 1: Gọi Tool Đơn Giản
+### Pattern 1: Simple Tool Call
 
-Gọi một tool kèm validation:
-
-```markdown
-Các bước:
-1. Validate người dùng đã cung cấp trường bắt buộc
-2. Gọi mcp__plugin_api_server__create_item với dữ liệu đã validate
-3. Kiểm tra lỗi
-4. Hiển thị xác nhận
-```
-
-### Pattern 2: Tool Tuần Tự
-
-Chuỗi nhiều lần gọi tool:
+Single tool call with validation:
 
 ```markdown
-Các bước:
-1. Tìm kiếm item hiện có: mcp__plugin_api_server__search
-2. Nếu không tìm thấy, tạo mới: mcp__plugin_api_server__create
-3. Thêm metadata: mcp__plugin_api_server__update_metadata
-4. Trả về ID item cuối cùng
+Steps:
+1. Validate user provided required fields
+2. Call mcp__plugin_api_server__create_item with validated data
+3. Check for errors
+4. Display confirmation
 ```
 
-### Pattern 3: Batch Operation
+### Pattern 2: Sequential Tools
 
-Nhiều lần gọi với cùng tool:
+Chain multiple tool calls:
 
 ```markdown
-Các bước:
-1. Lấy danh sách item cần xử lý
-2. Với mỗi item:
-   - Gọi mcp__plugin_api_server__update_item
-   - Theo dõi thành công/thất bại
-3. Báo cáo tóm tắt kết quả
+Steps:
+1. Search for existing items: mcp__plugin_api_server__search
+2. If not found, create new: mcp__plugin_api_server__create
+3. Add metadata: mcp__plugin_api_server__update_metadata
+4. Return final item ID
 ```
 
-### Pattern 4: Xử Lý Lỗi
+### Pattern 3: Batch Operations
 
-Xử lý lỗi graceful:
+Multiple calls with same tool:
 
 ```markdown
-Các bước:
-1. Thử gọi mcp__plugin_api_server__get_data
-2. Nếu lỗi (rate limit, network, v.v.):
-   - Chờ và thử lại (tối đa 3 lần)
-   - Nếu vẫn thất bại, thông báo người dùng
-   - Gợi ý kiểm tra cấu hình
-3. Khi thành công, xử lý dữ liệu
+Steps:
+1. Get list of items to process
+2. For each item:
+   - Call mcp__plugin_api_server__update_item
+   - Track success/failure
+3. Report results summary
 ```
 
-## Tham Số Tool
+### Pattern 4: Error Handling
 
-### Hiểu Tool Schema
+Graceful error handling:
 
-Mỗi MCP tool có schema định nghĩa tham số. Xem bằng `/mcp`.
+```markdown
+Steps:
+1. Try to call mcp__plugin_api_server__get_data
+2. If error (rate limit, network, etc.):
+   - Wait and retry (max 3 attempts)
+   - If still failing, inform user
+   - Suggest checking configuration
+3. On success, process data
+```
 
-**Ví dụ schema:**
+## Tool Parameters
+
+### Understanding Tool Schemas
+
+Each MCP tool has a schema defining its parameters. View with `/mcp`.
+
+**Example schema:**
 ```json
 {
   "name": "asana_create_task",
@@ -239,9 +239,9 @@ Mỗi MCP tool có schema định nghĩa tham số. Xem bằng `/mcp`.
 }
 ```
 
-### Gọi Tool với Tham Số
+### Calling Tools with Parameters
 
-Claude tự động cấu trúc tool call dựa trên schema:
+Claude automatically structures tool calls based on schema:
 
 ```typescript
 // Claude generates this internally
@@ -257,128 +257,128 @@ Claude tự động cấu trúc tool call dựa trên schema:
 }
 ```
 
-### Validate Tham Số
+### Parameter Validation
 
-**Trong command, validate trước khi gọi:**
+**In commands, validate before calling:**
 
 ```markdown
-Các bước:
-1. Kiểm tra tham số bắt buộc:
-   - Tiêu đề không rỗng
-   - Workspace ID được cung cấp
-   - Ngày hết hạn đúng format (YYYY-MM-DD)
-2. Nếu validation thất bại, yêu cầu người dùng cung cấp dữ liệu thiếu
-3. Nếu validation pass, gọi MCP tool
-4. Xử lý lỗi tool gracefully
+Steps:
+1. Check required parameters:
+   - Title is not empty
+   - Workspace ID is provided
+   - Due date is valid format (YYYY-MM-DD)
+2. If validation fails, ask user to provide missing data
+3. If validation passes, call MCP tool
+4. Handle tool errors gracefully
 ```
 
-## Xử Lý Response
+## Response Handling
 
-### Response Thành Công
+### Success Responses
 
 ```markdown
-Các bước:
-1. Gọi MCP tool
-2. Khi thành công:
-   - Trích xuất dữ liệu liên quan từ response
-   - Format để hiển thị cho người dùng
-   - Cung cấp thông báo xác nhận
-   - Bao gồm link hoặc ID liên quan
+Steps:
+1. Call MCP tool
+2. On success:
+   - Extract relevant data from response
+   - Format for user display
+   - Provide confirmation message
+   - Include relevant links or IDs
 ```
 
-### Response Lỗi
+### Error Responses
 
 ```markdown
-Các bước:
-1. Gọi MCP tool
-2. Khi lỗi:
-   - Kiểm tra loại lỗi (auth, rate limit, validation, v.v.)
-   - Cung cấp thông báo lỗi hữu ích
-   - Gợi ý các bước khắc phục
-   - Không để lộ chi tiết lỗi nội bộ cho người dùng
+Steps:
+1. Call MCP tool
+2. On error:
+   - Check error type (auth, rate limit, validation, etc.)
+   - Provide helpful error message
+   - Suggest remediation steps
+   - Don't expose internal error details to user
 ```
 
-### Thành Công Một Phần
+### Partial Success
 
 ```markdown
-Các bước:
-1. Batch operation với nhiều lần gọi MCP
-2. Theo dõi thành công và thất bại riêng biệt
-3. Báo cáo tóm tắt:
-   - "Đã xử lý thành công 8 trong 10 item"
-   - "Item thất bại: [item1, item2] do [lý do]"
-   - Gợi ý thử lại hoặc can thiệp thủ công
+Steps:
+1. Batch operation with multiple MCP calls
+2. Track successes and failures separately
+3. Report summary:
+   - "Successfully processed 8 of 10 items"
+   - "Failed items: [item1, item2] due to [reason]"
+   - Suggest retry or manual intervention
 ```
 
-## Tối Ưu Hiệu Suất
+## Performance Optimization
 
-### Batch Request
+### Batching Requests
 
-**Tốt: Query đơn với filter**
+**Good: Single query with filters**
 ```markdown
-Các bước:
-1. Gọi mcp__plugin_api_server__search với filter:
+Steps:
+1. Call mcp__plugin_api_server__search with filters:
    - project_id: "123"
    - status: "active"
    - limit: 100
-2. Xử lý tất cả kết quả
+2. Process all results
 ```
 
-**Tránh: Nhiều query riêng lẻ**
+**Avoid: Many individual queries**
 ```markdown
-Các bước:
-1. Với mỗi item ID:
-   - Gọi mcp__plugin_api_server__get_item
-   - Xử lý item
+Steps:
+1. For each item ID:
+   - Call mcp__plugin_api_server__get_item
+   - Process item
 ```
 
-### Cache Kết Quả
+### Caching Results
 
 ```markdown
-Các bước:
-1. Gọi thao tác MCP tốn kém: mcp__plugin_api_server__analyze
-2. Lưu kết quả trong biến để tái sử dụng
-3. Dùng kết quả đã cache cho các thao tác tiếp theo
-4. Chỉ fetch lại khi dữ liệu thay đổi
+Steps:
+1. Call expensive MCP operation: mcp__plugin_api_server__analyze
+2. Store results in variable for reuse
+3. Use cached results for subsequent operations
+4. Only re-fetch if data changes
 ```
 
-### Gọi Tool Song Song
+### Parallel Tool Calls
 
-Khi các tool không phụ thuộc vào nhau, gọi song song:
+When tools don't depend on each other, call in parallel:
 
 ```markdown
-Các bước:
-1. Thực hiện gọi song song (Claude xử lý tự động):
+Steps:
+1. Make parallel calls (Claude handles this automatically):
    - mcp__plugin_api_server__get_project
    - mcp__plugin_api_server__get_users
    - mcp__plugin_api_server__get_tags
-2. Chờ tất cả hoàn thành
-3. Kết hợp kết quả
+2. Wait for all to complete
+3. Combine results
 ```
 
-## Best Practices Tích Hợp
+## Integration Best Practices
 
-### Trải Nghiệm Người Dùng
+### User Experience
 
-**Cung cấp feedback:**
+**Provide feedback:**
 ```markdown
-Các bước:
-1. Thông báo người dùng: "Đang tìm kiếm Asana task..."
-2. Gọi mcp__plugin_asana_asana__asana_search_tasks
-3. Hiển thị tiến độ: "Tìm thấy 15 task, đang phân tích..."
-4. Trình bày kết quả
+Steps:
+1. Inform user: "Searching Asana tasks..."
+2. Call mcp__plugin_asana_asana__asana_search_tasks
+3. Show progress: "Found 15 tasks, analyzing..."
+4. Present results
 ```
 
-**Xử lý thao tác lâu:**
+**Handle long operations:**
 ```markdown
-Các bước:
-1. Cảnh báo người dùng: "Thao tác này có thể mất một phút..."
-2. Chia nhỏ thành các bước nhỏ hơn với cập nhật
-3. Hiển thị tiến độ từng bước
-4. Tóm tắt cuối khi hoàn thành
+Steps:
+1. Warn user: "This may take a minute..."
+2. Break into smaller steps with updates
+3. Show incremental progress
+4. Final summary when complete
 ```
 
-### Thông Báo Lỗi
+### Error Messages
 
 **Good error messages:**
 ```
@@ -393,7 +393,7 @@ Các bước:
 ❌ "Error: MCP tool returned 403"
 ```
 
-### Tài Liệu Hóa
+### Documentation
 
 **Document MCP tool usage in command:**
 ```markdown
@@ -407,47 +407,47 @@ This command uses the following Asana MCP tools:
 Ensure you're authenticated to Asana before running this command.
 ```
 
-## Kiểm Thử Việc Dùng Tool
+## Testing Tool Usage
 
-### Kiểm Thử Local
+### Local Testing
 
-1. **Cấu hình MCP server** trong `.mcp.json`
-2. **Cài plugin local** trong `.claude-plugin/`
-3. **Xác minh tool có sẵn** với `/mcp`
-4. **Kiểm thử command** dùng tool
-5. **Kiểm tra debug output**: `claude --debug`
+1. **Configure MCP server** in `.mcp.json`
+2. **Install plugin locally** in `.claude-plugin/`
+3. **Verify tools available** with `/mcp`
+4. **Test command** that uses tools
+5. **Check debug output**: `claude --debug`
 
-### Kịch Bản Kiểm Thử
+### Test Scenarios
 
-**Kiểm thử gọi thành công:**
+**Test successful calls:**
 ```markdown
-Các bước:
-1. Tạo dữ liệu test trong service bên ngoài
-2. Chạy command query dữ liệu này
-3. Xác minh kết quả trả về đúng
+Steps:
+1. Create test data in external service
+2. Run command that queries this data
+3. Verify correct results returned
 ```
 
-**Kiểm thử trường hợp lỗi:**
+**Test error cases:**
 ```markdown
-Các bước:
-1. Kiểm thử khi thiếu authentication
-2. Kiểm thử với tham số không hợp lệ
-3. Kiểm thử với resource không tồn tại
-4. Xác minh xử lý lỗi graceful
+Steps:
+1. Test with missing authentication
+2. Test with invalid parameters
+3. Test with non-existent resources
+4. Verify graceful error handling
 ```
 
-**Kiểm thử edge case:**
+**Test edge cases:**
 ```markdown
-Các bước:
-1. Kiểm thử với kết quả rỗng
-2. Kiểm thử với kết quả tối đa
-3. Kiểm thử với ký tự đặc biệt
-4. Kiểm thử với truy cập đồng thời
+Steps:
+1. Test with empty results
+2. Test with maximum results
+3. Test with special characters
+4. Test with concurrent access
 ```
 
-## Các Pattern Phổ Biến
+## Common Patterns
 
-### Pattern: CRUD Operation
+### Pattern: CRUD Operations
 
 ```markdown
 ---
@@ -474,65 +474,65 @@ Use update_item with item ID and changes...
 Use delete_item with item ID (ask for confirmation first)...
 ```
 
-### Pattern: Tìm Kiếm và Xử Lý
+### Pattern: Search and Process
 
 ```markdown
-Các bước:
-1. **Tìm kiếm**: mcp__plugin_api_server__search với filter
-2. **Lọc**: Áp dụng filter local bổ sung nếu cần
-3. **Biến đổi**: Xử lý từng kết quả
-4. **Trình bày**: Format và hiển thị cho người dùng
+Steps:
+1. **Search**: mcp__plugin_api_server__search with filters
+2. **Filter**: Apply additional local filtering if needed
+3. **Transform**: Process each result
+4. **Present**: Format and display to user
 ```
 
-### Pattern: Workflow Nhiều Bước
+### Pattern: Multi-Step Workflow
 
 ```markdown
-Các bước:
-1. **Chuẩn bị**: Thu thập tất cả thông tin cần thiết
-2. **Validate**: Kiểm tra tính đầy đủ của dữ liệu
-3. **Thực thi**: Chuỗi MCP tool call:
-   - Tạo resource cha
-   - Tạo resource con
-   - Liên kết các resource
-   - Thêm metadata
-4. **Xác minh**: Xác nhận tất cả bước thành công
-5. **Báo cáo**: Cung cấp tóm tắt cho người dùng
+Steps:
+1. **Setup**: Gather all required information
+2. **Validate**: Check data completeness
+3. **Execute**: Chain of MCP tool calls:
+   - Create parent resource
+   - Create child resources
+   - Link resources together
+   - Add metadata
+4. **Verify**: Confirm all steps succeeded
+5. **Report**: Provide summary to user
 ```
 
-## Xử Lý Sự Cố
+## Troubleshooting
 
-### Tool Không Khả Dụng
+### Tools Not Available
 
-**Kiểm tra:**
-- MCP server được cấu hình đúng
-- Server đã kết nối (kiểm tra `/mcp`)
-- Tên tool khớp chính xác (phân biệt chữ hoa/thường)
-- Restart Claude Code sau khi thay đổi config
+**Check:**
+- MCP server configured correctly
+- Server connected (check `/mcp`)
+- Tool names match exactly (case-sensitive)
+- Restart Claude Code after config changes
 
-### Gọi Tool Thất Bại
+### Tool Calls Failing
 
-**Kiểm tra:**
-- Authentication hợp lệ
-- Tham số khớp tool schema
-- Tham số bắt buộc được cung cấp
-- Kiểm tra log `claude --debug`
+**Check:**
+- Authentication is valid
+- Parameters match tool schema
+- Required parameters provided
+- Check `claude --debug` logs
 
-### Vấn Đề Hiệu Suất
+### Performance Issues
 
-**Kiểm tra:**
-- Batch query thay vì gọi riêng lẻ
-- Cache kết quả khi phù hợp
-- Không thực hiện tool call không cần thiết
-- Gọi song song khi có thể
+**Check:**
+- Batching queries instead of individual calls
+- Caching results when appropriate
+- Not making unnecessary tool calls
+- Parallel calls when possible
 
-## Kết Luận
+## Conclusion
 
-Sử dụng MCP tool hiệu quả đòi hỏi:
-1. **Hiểu tool schema** qua `/mcp`
-2. **Pre-allow tool** trong command phù hợp
-3. **Xử lý lỗi gracefully**
-4. **Tối ưu hiệu suất** với batch và cache
-5. **Cung cấp UX tốt** với feedback và thông báo lỗi rõ ràng
-6. **Kiểm thử kỹ lưỡng** trước khi deploy
+Effective MCP tool usage requires:
+1. **Understanding tool schemas** via `/mcp`
+2. **Pre-allowing tools** in commands appropriately
+3. **Handling errors gracefully**
+4. **Optimizing performance** with batching and caching
+5. **Providing good UX** with feedback and clear errors
+6. **Testing thoroughly** before deployment
 
-Tuân theo các pattern này để tích hợp MCP tool bền vững trong command và agent của plugin.
+Follow these patterns for robust MCP tool integration in your plugin commands and agents.

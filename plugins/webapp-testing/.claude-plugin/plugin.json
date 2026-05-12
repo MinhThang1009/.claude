@@ -1,0 +1,5 @@
+{
+  "name": "webapp-testing",
+  "description": "Test local web applications with Playwright, taking screenshots, checking console logs, and automating browser interactions",
+  "author": { "name": "Minh Thang" }
+}

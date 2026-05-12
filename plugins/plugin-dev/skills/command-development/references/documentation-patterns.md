@@ -1,14 +1,14 @@
-# Các Pattern Tài Liệu cho Command
+# Command Documentation Patterns
 
-Chiến lược tạo command tự tài liệu hóa, dễ bảo trì và mang lại trải nghiệm người dùng xuất sắc.
+Strategies for creating self-documenting, maintainable commands with excellent user experience.
 
-## Tổng quan
+## Overview
 
-Command được tài liệu hóa tốt thì dễ sử dụng, dễ bảo trì và dễ phân phối hơn. Tài liệu nên được nhúng trực tiếp vào command, giúp người dùng và người bảo trì truy cập ngay lập tức.
+Well-documented commands are easier to use, maintain, and distribute. Documentation should be embedded in the command itself, making it immediately accessible to users and maintainers.
 
-## Cấu Trúc Command Tự Tài Liệu Hóa
+## Self-Documenting Command Structure
 
-### Template Command Hoàn Chỉnh
+### Complete Command Template
 
 ```markdown
 ---
@@ -59,63 +59,63 @@ CHANGELOG:
   v0.9.0 (2025-01-10): Beta version
 -->
 
-# Triển Khai Command
+# Command Implementation
 
-[Nội dung prompt của command...]
+[Command prompt content here...]
 
-[Giải thích điều gì sẽ xảy ra...]
+[Explain what will happen...]
 
-[Hướng dẫn người dùng qua từng bước...]
+[Guide user through steps...]
 
-[Cung cấp output rõ ràng...]
+[Provide clear output...]
 ```
 
-### Các Section Comment Tài Liệu
+### Documentation Comment Sections
 
-**PURPOSE**: Lý do command tồn tại
-- Vấn đề nó giải quyết
-- Các trường hợp sử dụng
-- Khi nào nên dùng và không nên dùng
+**PURPOSE**: Why the command exists
+- Problem it solves
+- Use cases
+- When to use vs when not to use
 
-**USAGE**: Cú pháp cơ bản
-- Pattern gọi command
-- Argument bắt buộc vs tùy chọn
-- Giá trị mặc định
+**USAGE**: Basic syntax
+- Command invocation pattern
+- Required vs optional arguments
+- Default values
 
-**ARGUMENTS**: Tài liệu argument chi tiết
-- Mô tả từng argument
-- Thông tin kiểu dữ liệu
-- Giá trị/phạm vi hợp lệ
-- Giá trị mặc định
+**ARGUMENTS**: Detailed argument documentation
+- Each argument described
+- Type information
+- Valid values/ranges
+- Defaults
 
-**EXAMPLES**: Ví dụ sử dụng cụ thể
-- Các trường hợp sử dụng phổ biến
-- Các trường hợp biên
-- Output mong đợi
+**EXAMPLES**: Concrete usage examples
+- Common use cases
+- Edge cases
+- Expected outputs
 
-**REQUIREMENTS**: Điều kiện tiên quyết
-- Các phụ thuộc
-- Quyền hạn
-- Cài đặt môi trường
+**REQUIREMENTS**: Prerequisites
+- Dependencies
+- Permissions
+- Environmental setup
 
-**RELATED COMMANDS**: Các kết nối
-- Command tương tự
-- Command bổ sung
-- Cách tiếp cận thay thế
+**RELATED COMMANDS**: Connections
+- Similar commands
+- Complementary commands
+- Alternative approaches
 
-**TROUBLESHOOTING**: Các vấn đề thường gặp
-- Vấn đề đã biết
-- Giải pháp
-- Cách xử lý tạm thời
+**TROUBLESHOOTING**: Common issues
+- Known problems
+- Solutions
+- Workarounds
 
-**CHANGELOG**: Lịch sử phiên bản
-- Thay đổi gì và khi nào
-- Breaking change được làm nổi bật
-- Hướng dẫn migration
+**CHANGELOG**: Version history
+- What changed when
+- Breaking changes highlighted
+- Migration guidance
 
-## Các Pattern Tài Liệu Nội Tuyến
+## In-Line Documentation Patterns
 
-### Section Có Comment
+### Commented Sections
 
 ```markdown
 ---
@@ -123,28 +123,28 @@ description: Complex multi-step command
 ---
 
 <!-- SECTION 1: VALIDATION -->
-<!-- Section này kiểm tra điều kiện tiên quyết trước khi tiếp tục -->
+<!-- This section checks prerequisites before proceeding -->
 
-Đang kiểm tra điều kiện tiên quyết...
+Checking prerequisites...
 - Git repository: !`git rev-parse --git-dir 2>/dev/null`
-- Branch tồn tại: [logic validation]
+- Branch exists: [validation logic]
 
 <!-- SECTION 2: ANALYSIS -->
-<!-- Phân tích sự khác biệt giữa các branch -->
+<!-- Analyzes the differences between branches -->
 
-Đang phân tích sự khác biệt giữa $1 và $2...
-[Logic phân tích...]
+Analyzing differences between $1 and $2...
+[Analysis logic...]
 
 <!-- SECTION 3: RECOMMENDATIONS -->
-<!-- Cung cấp khuyến nghị có thể thực thi -->
+<!-- Provides actionable recommendations -->
 
-Dựa trên phân tích, khuyến nghị:
-[Khuyến nghị...]
+Based on analysis, recommend:
+[Recommendations...]
 
-<!-- END: Các bước tiếp theo cho người dùng -->
+<!-- END: Next steps for user -->
 ```
 
-### Giải Thích Nội Tuyến
+### Inline Explanations
 
 ```markdown
 ---
@@ -153,44 +153,44 @@ description: Deployment command with inline docs
 
 # Deploy to $1
 
-## Kiểm Tra Trước Khi Bay
+## Pre-flight Checks
 
-<!-- Kiểm tra trạng thái branch để tránh deploy từ branch sai -->
-Branch hiện tại: !`git branch --show-current`
+<!-- We check branch status to prevent deploying from wrong branch -->
+Current branch: !`git branch --show-current`
 
-<!-- Deploy lên production phải từ main/master -->
+<!-- Production deploys must come from main/master -->
 if [ "$1" = "production" ] && [ "$(git branch --show-current)" != "main" ]; then
-  ⚠️  CẢNH BÁO: Không ở main branch để deploy lên production
-  Điều này bất thường. Xác nhận đây là cố ý.
+  ⚠️  WARNING: Not on main branch for production deploy
+  This is unusual. Confirm this is intentional.
 fi
 
-<!-- Trạng thái test đảm bảo không deploy code lỗi -->
-Đang chạy test: !`npm test`
+<!-- Test status ensures we don't deploy broken code -->
+Running tests: !`npm test`
 
-✓ Tất cả kiểm tra đã pass
+✓ All checks passed
 
 ## Deployment
 
-<!-- Deployment thực sự diễn ra ở đây -->
-<!-- Dùng chiến lược blue-green để không downtime -->
-Đang deploy lên môi trường $1...
-[Các bước deployment...]
+<!-- Actual deployment happens here -->
+<!-- Uses blue-green strategy for zero-downtime -->
+Deploying to $1 environment...
+[Deployment steps...]
 
-<!-- Xác minh sau deployment -->
-Đang xác minh tình trạng deployment...
-[Health check...]
+<!-- Post-deployment verification -->
+Verifying deployment health...
+[Health checks...]
 
-Deployment hoàn tất!
+Deployment complete!
 
-## Các Bước Tiếp Theo
+## Next Steps
 
-<!-- Hướng dẫn người dùng làm gì sau khi deploy -->
-1. Theo dõi log: /logs $1
-2. Chạy smoke test: /smoke-test $1
-3. Thông báo team: /notify-deployment $1
+<!-- Guide user on what to do after deployment -->
+1. Monitor logs: /logs $1
+2. Run smoke tests: /smoke-test $1
+3. Notify team: /notify-deployment $1
 ```
 
-### Tài Liệu Điểm Quyết Định
+### Decision Point Documentation
 
 ```markdown
 ---
@@ -199,36 +199,36 @@ description: Interactive deployment command
 
 # Interactive Deployment
 
-## Xem Lại Cấu Hình
+## Configuration Review
 
 Target: $1
-Phiên bản hiện tại: !`cat version.txt`
-Phiên bản mới: $2
+Current version: !`cat version.txt`
+New version: $2
 
-<!-- ĐIỂM QUYẾT ĐỊNH: Người dùng xác nhận cấu hình -->
-<!-- Dừng ở đây để người dùng kiểm tra lại mọi thứ -->
-<!-- Không thể tự động tiếp tục vì deployment có rủi ro -->
+<!-- DECISION POINT: User confirms configuration -->
+<!-- This pause allows user to verify everything is correct -->
+<!-- We can't automatically proceed because deployment is risky -->
 
-Hãy xem lại cấu hình trên.
+Review the above configuration.
 
-**Tiếp tục với deployment?**
-- Trả lời "yes" để tiến hành
-- Trả lời "no" để hủy
-- Trả lời "edit" để chỉnh sửa cấu hình
+**Continue with deployment?**
+- Reply "yes" to proceed
+- Reply "no" to cancel
+- Reply "edit" to modify configuration
 
-[Chờ input từ người dùng trước khi tiếp tục...]
+[Await user input before continuing...]
 
-<!-- Sau khi người dùng xác nhận, tiến hành deployment -->
-<!-- Tất cả các bước tiếp theo được tự động hóa -->
+<!-- After user confirms, we proceed with deployment -->
+<!-- All subsequent steps are automated -->
 
-Đang tiến hành deployment...
+Proceeding with deployment...
 ```
 
-## Các Pattern Help Text
+## Help Text Patterns
 
-### Command Help Tích Hợp
+### Built-in Help Command
 
-Tạo subcommand help cho command phức tạp:
+Create a help subcommand for complex commands:
 
 ```markdown
 ---
@@ -239,36 +239,36 @@ argument-hint: [subcommand] [args]
 # Command Processor
 
 if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
-  **Trợ Giúp Command**
+  **Command Help**
 
-  CÁCH DÙNG:
+  USAGE:
     /command [subcommand] [args]
 
   SUBCOMMANDS:
-    init [name]       Khởi tạo cấu hình mới
-    deploy [env]      Deploy lên môi trường
-    status            Hiển thị trạng thái hiện tại
-    rollback          Rollback lần deploy cuối
-    help              Hiển thị trợ giúp này
+    init [name]       Initialize new configuration
+    deploy [env]      Deploy to environment
+    status            Show current status
+    rollback          Rollback last deployment
+    help              Show this help
 
-  VÍ DỤ:
+  EXAMPLES:
     /command init my-project
     /command deploy staging
     /command status
     /command rollback
 
-  Để xem trợ giúp chi tiết về subcommand:
+  For detailed help on a subcommand:
     /command [subcommand] --help
 
-  Thoát.
+  Exit.
 fi
 
-[Xử lý command thông thường...]
+[Regular command processing...]
 ```
 
-### Help Theo Ngữ Cảnh
+### Contextual Help
 
-Cung cấp help dựa trên ngữ cảnh:
+Provide help based on context:
 
 ```markdown
 ---
@@ -279,31 +279,31 @@ argument-hint: [operation] [target]
 # Context-Aware Operation
 
 if [ -z "$1" ]; then
-  **Chưa chỉ định thao tác**
+  **No operation specified**
 
-  Các thao tác có sẵn:
-  - analyze: Phân tích target để tìm vấn đề
-  - fix: Áp dụng sửa lỗi tự động
-  - report: Tạo báo cáo chi tiết
+  Available operations:
+  - analyze: Analyze target for issues
+  - fix: Apply automatic fixes
+  - report: Generate detailed report
 
-  Cách dùng: /command [operation] [target]
+  Usage: /command [operation] [target]
 
-  Ví dụ:
+  Examples:
     /command analyze src/
     /command fix src/app.js
     /command report
 
-  Chạy /command help để biết thêm chi tiết.
+  Run /command help for more details.
 
-  Thoát.
+  Exit.
 fi
 
-[Command tiếp tục nếu operation đã được cung cấp...]
+[Command continues if operation provided...]
 ```
 
-## Tài Liệu Thông Báo Lỗi
+## Error Message Documentation
 
-### Thông Báo Lỗi Hữu Ích
+### Helpful Error Messages
 
 ```markdown
 ---
@@ -313,43 +313,43 @@ description: Command with good error messages
 # Validation Command
 
 if [ -z "$1" ]; then
-  ❌ LỖI: Thiếu argument bắt buộc
+  ❌ ERROR: Missing required argument
 
-  Argument 'file-path' là bắt buộc.
+  The 'file-path' argument is required.
 
-  CÁCH DÙNG:
+  USAGE:
     /validate [file-path]
 
-  VÍ DỤ:
+  EXAMPLE:
     /validate src/app.js
 
-  Hãy thử lại với đường dẫn file.
+  Try again with a file path.
 
-  Thoát.
+  Exit.
 fi
 
 if [ ! -f "$1" ]; then
-  ❌ LỖI: Không tìm thấy file: $1
+  ❌ ERROR: File not found: $1
 
-  File được chỉ định không tồn tại hoặc không thể truy cập.
+  The specified file does not exist or is not accessible.
 
-  NGUYÊN NHÂN THƯỜNG GẶP:
-  1. Lỗi đánh máy trong đường dẫn file
-  2. File đã bị xóa hoặc di chuyển
-  3. Không đủ quyền truy cập
+  COMMON CAUSES:
+  1. Typo in file path
+  2. File was deleted or moved
+  3. Insufficient permissions
 
-  GỢI Ý:
-  - Kiểm tra chính tả: $1
-  - Xác nhận file tồn tại: ls -la $(dirname "$1")
-  - Kiểm tra quyền: ls -l "$1"
+  SUGGESTIONS:
+  - Check spelling: $1
+  - Verify file exists: ls -la $(dirname "$1")
+  - Check permissions: ls -l "$1"
 
-  Thoát.
+  Exit.
 fi
 
-[Command tiếp tục nếu validation pass...]
+[Command continues if validation passes...]
 ```
 
-### Hướng Dẫn Phục Hồi Lỗi
+### Error Recovery Guidance
 
 ```markdown
 ---
@@ -358,41 +358,41 @@ description: Command with recovery guidance
 
 # Operation Command
 
-Đang chạy thao tác...
+Running operation...
 
 !`risky-operation.sh`
 
 if [ $? -ne 0 ]; then
-  ❌ THAO TÁC THẤT BẠI
+  ❌ OPERATION FAILED
 
-  Thao tác gặp lỗi và không thể hoàn thành.
+  The operation encountered an error and could not complete.
 
-  ĐIỀU GÌ ĐÃ XẢY RA:
-  Script risky-operation.sh trả về exit code khác không.
+  WHAT HAPPENED:
+  The risky-operation.sh script returned a non-zero exit code.
 
-  ĐIỀU NÀY CÓ NGHĨA:
-  - Thay đổi có thể đã được áp dụng một phần
-  - Hệ thống có thể đang ở trạng thái không nhất quán
-  - Có thể cần can thiệp thủ công
+  WHAT THIS MEANS:
+  - Changes may be partially applied
+  - System may be in inconsistent state
+  - Manual intervention may be needed
 
-  CÁC BƯỚC PHỤC HỒI:
-  1. Kiểm tra log thao tác: cat /tmp/operation.log
-  2. Xác minh trạng thái hệ thống: /check-state
-  3. Nếu cần, rollback: /rollback-operation
-  4. Sửa vấn đề gốc rễ
-  5. Thử lại thao tác: /retry-operation
+  RECOVERY STEPS:
+  1. Check operation logs: cat /tmp/operation.log
+  2. Verify system state: /check-state
+  3. If needed, rollback: /rollback-operation
+  4. Fix underlying issue
+  5. Retry operation: /retry-operation
 
-  CẦN TRỢ GIÚP?
-  - Xem hướng dẫn troubleshooting: /help troubleshooting
-  - Liên hệ hỗ trợ với mã lỗi: ERR_OP_FAILED_001
+  NEED HELP?
+  - Check troubleshooting guide: /help troubleshooting
+  - Contact support with error code: ERR_OP_FAILED_001
 
-  Thoát.
+  Exit.
 fi
 ```
 
-## Tài Liệu Ví Dụ Sử Dụng
+## Usage Example Documentation
 
-### Ví Dụ Nhúng Trực Tiếp
+### Embedded Examples
 
 ```markdown
 ---
@@ -401,55 +401,55 @@ description: Command with embedded examples
 
 # Feature Command
 
-Command này thực hiện phân tích feature với nhiều tùy chọn.
+This command performs feature analysis with multiple options.
 
-## Sử Dụng Cơ Bản
+## Basic Usage
 
 \`\`\`
 /feature analyze src/
 \`\`\`
 
-Phân tích tất cả file trong thư mục src/ để tìm feature đang dùng.
+Analyzes all files in src/ directory for feature usage.
 
-## Sử Dụng Nâng Cao
+## Advanced Usage
 
 \`\`\`
 /feature analyze src/ --detailed
 \`\`\`
 
-Cung cấp phân tích chi tiết bao gồm:
-- Phân tích feature theo file
-- Các pattern sử dụng
-- Đề xuất tối ưu hóa
+Provides detailed analysis including:
+- Feature breakdown by file
+- Usage patterns
+- Optimization suggestions
 
-## Các Trường Hợp Sử Dụng
+## Use Cases
 
-**Trường hợp 1: Tổng quan nhanh**
+**Use Case 1: Quick overview**
 \`\`\`
 /feature analyze .
 \`\`\`
-Lấy tóm tắt feature cấp cao của toàn bộ project.
+Get high-level feature summary of entire project.
 
-**Trường hợp 2: Thư mục cụ thể**
+**Use Case 2: Specific directory**
 \`\`\`
 /feature analyze src/components
 \`\`\`
-Tập trung phân tích vào thư mục components.
+Focus analysis on components directory only.
 
-**Trường hợp 3: So sánh**
+**Use Case 3: Comparison**
 \`\`\`
 /feature analyze src/ --compare baseline.json
 \`\`\`
-So sánh feature hiện tại với baseline.
+Compare current features against baseline.
 
 ---
 
-Đang xử lý yêu cầu của bạn...
+Now processing your request...
 
-[Triển khai command...]
+[Command implementation...]
 ```
 
-### Tài Liệu Lấy Ví Dụ Làm Trung Tâm
+### Example-Driven Documentation
 
 ```markdown
 ---
@@ -458,13 +458,13 @@ description: Example-heavy command
 
 # Transformation Command
 
-## Command Này Làm Gì
+## What This Does
 
-Chuyển đổi dữ liệu từ định dạng này sang định dạng khác.
+Transforms data from one format to another.
 
-## Ví Dụ Trước
+## Examples First
 
-### Ví dụ 1: JSON sang YAML
+### Example 1: JSON to YAML
 **Input:** `data.json`
 \`\`\`json
 {"name": "test", "value": 42}
@@ -478,7 +478,7 @@ name: test
 value: 42
 \`\`\`
 
-### Ví dụ 2: CSV sang JSON
+### Example 2: CSV to JSON
 **Input:** `data.csv`
 \`\`\`csv
 name,value
@@ -492,24 +492,24 @@ test,42
 [{"name": "test", "value": "42"}]
 \`\`\`
 
-### Ví dụ 3: Với Tùy Chọn
+### Example 3: With Options
 **Command:** `/transform data.json yaml --pretty --sort-keys`
 
-**Kết quả:** YAML được định dạng với key đã sắp xếp
+**Result:** Formatted YAML with sorted keys
 
 ---
 
-## Chuyển Đổi Của Bạn
+## Your Transformation
 
 File: $1
 Format: $2
 
-[Thực hiện chuyển đổi...]
+[Perform transformation...]
 ```
 
-## Tài Liệu Bảo Trì
+## Maintenance Documentation
 
-### Phiên Bản và Changelog
+### Version and Changelog
 
 ```markdown
 <!--
@@ -519,134 +519,134 @@ AUTHOR: DevOps Team
 
 CHANGELOG:
   v2.1.0 (2025-01-15):
-    - Thêm hỗ trợ cấu hình YAML
-    - Cải thiện thông báo lỗi
-    - Sửa bug với ký tự đặc biệt trong argument
+    - Added support for YAML configuration
+    - Improved error messages
+    - Fixed bug with special characters in arguments
 
   v2.0.0 (2025-01-01):
-    - BREAKING: Đổi thứ tự argument
-    - BREAKING: Bỏ --old-flag đã deprecated
-    - Thêm kiểm tra validation mới
-    - Hướng dẫn migration: /migration-v2
+    - BREAKING: Changed argument order
+    - BREAKING: Removed deprecated --old-flag
+    - Added new validation checks
+    - Migration guide: /migration-v2
 
   v1.5.0 (2024-12-15):
-    - Thêm flag --verbose
-    - Cải thiện hiệu năng 50%
+    - Added --verbose flag
+    - Improved performance by 50%
 
   v1.0.0 (2024-12-01):
-    - Phát hành ổn định đầu tiên
+    - Initial stable release
 
 MIGRATION NOTES:
-  Từ v1.x lên v2.0:
-    Cũ: /command arg1 arg2 --old-flag
-    Mới: /command arg2 arg1
+  From v1.x to v2.0:
+    Old: /command arg1 arg2 --old-flag
+    New: /command arg2 arg1
 
-  --old-flag đã bị xóa. Dùng --new-flag thay thế.
+  The --old-flag is removed. Use --new-flag instead.
 
 DEPRECATION WARNINGS:
-  - Flag --legacy-mode đã deprecated từ v2.1.0
-  - Sẽ bị xóa trong v3.0.0 (ước tính 2025-06-01)
-  - Dùng --modern-mode thay thế
+  - The --legacy-mode flag is deprecated as of v2.1.0
+  - Will be removed in v3.0.0 (estimated 2025-06-01)
+  - Use --modern-mode instead
 
 KNOWN ISSUES:
-  - #123: Hiệu năng chậm với file lớn (cách xử lý tạm: dùng flag --stream)
-  - #456: Ký tự đặc biệt trên Windows (dự kiến sửa trong v2.2.0)
+  - #123: Slow performance with large files (workaround: use --stream flag)
+  - #456: Special characters in Windows (fix planned for v2.2.0)
 -->
 ```
 
-### Ghi Chú Bảo Trì
+### Maintenance Notes
 
 ```markdown
 <!--
 MAINTENANCE NOTES:
 
-CẤU TRÚC CODE:
-  - Dòng 1–50: Phân tích và validation argument
-  - Dòng 51–100: Logic xử lý chính
-  - Dòng 101–150: Định dạng output
-  - Dòng 151–200: Xử lý lỗi
+CODE STRUCTURE:
+  - Lines 1-50: Argument parsing and validation
+  - Lines 51-100: Main processing logic
+  - Lines 101-150: Output formatting
+  - Lines 151-200: Error handling
 
 DEPENDENCIES:
-  - Yêu cầu git 2.x trở lên
-  - Dùng jq để xử lý JSON
-  - Cần bash 4.0+ cho associative array
+  - Requires git 2.x or later
+  - Uses jq for JSON processing
+  - Needs bash 4.0+ for associative arrays
 
 PERFORMANCE:
-  - Fast path cho input nhỏ (< 1MB)
-  - Stream file lớn để tránh vấn đề bộ nhớ
-  - Cache kết quả trong /tmp trong 1 giờ
+  - Fast path for small inputs (< 1MB)
+  - Streams large files to avoid memory issues
+  - Caches results in /tmp for 1 hour
 
 SECURITY CONSIDERATIONS:
-  - Validate tất cả input để ngăn injection
-  - Dùng allowed-tools để giới hạn quyền Bash
-  - Không có credentials trong file command
+  - Validates all inputs to prevent injection
+  - Uses allowed-tools to limit Bash access
+  - No credentials in command file
 
 TESTING:
-  - Unit test: tests/command-test.sh
-  - Integration test: tests/integration/
-  - Checklist test thủ công: tests/manual-checklist.md
+  - Unit tests: tests/command-test.sh
+  - Integration tests: tests/integration/
+  - Manual test checklist: tests/manual-checklist.md
 
 FUTURE IMPROVEMENTS:
-  - TODO: Thêm hỗ trợ định dạng TOML
-  - TODO: Triển khai xử lý song song
-  - TODO: Thêm progress bar cho file lớn
+  - TODO: Add support for TOML format
+  - TODO: Implement parallel processing
+  - TODO: Add progress bar for large files
 
 RELATED FILES:
-  - lib/parser.sh: Logic phân tích dùng chung
-  - lib/formatter.sh: Định dạng output
-  - config/defaults.yml: Cấu hình mặc định
+  - lib/parser.sh: Shared parsing logic
+  - lib/formatter.sh: Output formatting
+  - config/defaults.yml: Default configuration
 -->
 ```
 
-## Tài Liệu README
+## README Documentation
 
-Command nên có file README đi kèm:
+Commands should have companion README files:
 
 ```markdown
-# Tên Command
+# Command Name
 
-Mô tả ngắn về command làm gì.
+Brief description of what the command does.
 
-## Cài Đặt
+## Installation
 
-Command này là một phần của plugin [plugin-name].
+This command is part of the [plugin-name] plugin.
 
-Cài đặt với:
+Install with:
 \`\`\`
 /plugin install plugin-name
 \`\`\`
 
-## Cách Dùng
+## Usage
 
-Cách dùng cơ bản:
+Basic usage:
 \`\`\`
 /command-name [arg1] [arg2]
 \`\`\`
 
-## Argument
+## Arguments
 
-- `arg1`: Mô tả (bắt buộc)
-- `arg2`: Mô tả (tùy chọn, mặc định là X)
+- `arg1`: Description (required)
+- `arg2`: Description (optional, defaults to X)
 
-## Ví Dụ
+## Examples
 
-### Ví dụ 1: Cơ Bản
+### Example 1: Basic Usage
 \`\`\`
 /command-name value1 value2
 \`\`\`
 
-Mô tả điều gì xảy ra.
+Description of what happens.
 
-### Ví dụ 2: Nâng Cao
+### Example 2: Advanced Usage
 \`\`\`
 /command-name value1 --option
 \`\`\`
 
-Mô tả tính năng nâng cao.
+Description of advanced feature.
 
-## Cấu Hình
+## Configuration
 
-File cấu hình tùy chọn: `.claude/command-name.local.md`
+Optional configuration file: `.claude/command-name.local.md`
 
 \`\`\`markdown
 ---
@@ -655,85 +655,85 @@ enable_feature: true
 ---
 \`\`\`
 
-## Yêu Cầu
+## Requirements
 
-- Git 2.x trở lên
-- jq (để xử lý JSON)
-- Node.js 14+ (tùy chọn, cho tính năng nâng cao)
+- Git 2.x or later
+- jq (for JSON processing)
+- Node.js 14+ (optional, for advanced features)
 
 ## Troubleshooting
 
-### Vấn đề: Command không tìm thấy
+### Issue: Command not found
 
-**Giải pháp:** Đảm bảo plugin đã được cài đặt và kích hoạt.
+**Solution:** Ensure plugin is installed and enabled.
 
-### Vấn đề: Bị từ chối quyền truy cập
+### Issue: Permission denied
 
-**Giải pháp:** Kiểm tra quyền file và cài đặt allowed-tools.
+**Solution:** Check file permissions and allowed-tools setting.
 
-## Đóng Góp
+## Contributing
 
-Hoan nghênh đóng góp! Xem [CONTRIBUTING.md](CONTRIBUTING.md).
+Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Giấy Phép
+## License
 
-MIT License — Xem [LICENSE](LICENSE).
+MIT License - See [LICENSE](LICENSE).
 
-## Hỗ Trợ
+## Support
 
 - Issues: https://github.com/user/plugin/issues
 - Docs: https://docs.example.com
 - Email: support@example.com
 ```
 
-## Các Nguyên Tắc Tốt Nhất
+## Best Practices
 
-### Nguyên Tắc Tài Liệu
+### Documentation Principles
 
-1. **Viết cho bản thân tương lai**: Giả sử bạn sẽ quên mọi chi tiết
-2. **Ví dụ trước rồi mới giải thích**: Cho thấy, sau đó kể
-3. **Tiết lộ dần dần**: Thông tin cơ bản trước, chi tiết có sẵn khi cần
-4. **Giữ cập nhật**: Cập nhật docs khi code thay đổi
-5. **Kiểm tra docs của bạn**: Xác nhận ví dụ thực sự chạy được
+1. **Write for your future self**: Assume you'll forget details
+2. **Examples before explanations**: Show, then tell
+3. **Progressive disclosure**: Basic info first, details available
+4. **Keep it current**: Update docs when code changes
+5. **Test your docs**: Verify examples actually work
 
-### Vị Trí Tài Liệu
+### Documentation Locations
 
-1. **Trong file command**: Cách dùng cốt lõi, ví dụ, giải thích nội tuyến
-2. **README**: Cài đặt, cấu hình, troubleshooting
-3. **Docs riêng**: Hướng dẫn chi tiết, tutorial, tài liệu API
-4. **Comment**: Chi tiết triển khai dành cho người bảo trì
+1. **In command file**: Core usage, examples, inline explanations
+2. **README**: Installation, configuration, troubleshooting
+3. **Separate docs**: Detailed guides, tutorials, API reference
+4. **Comments**: Implementation details for maintainers
 
-### Phong Cách Tài Liệu
+### Documentation Style
 
-1. **Rõ ràng và ngắn gọn**: Không dùng từ thừa
-2. **Giọng chủ động**: "Chạy command" thay vì "Command có thể được chạy"
-3. **Thuật ngữ nhất quán**: Dùng cùng thuật ngữ xuyên suốt
-4. **Định dạng tốt**: Dùng heading, list, code block
-5. **Dễ tiếp cận**: Giả sử người đọc là người mới
+1. **Clear and concise**: No unnecessary words
+2. **Active voice**: "Run the command" not "The command can be run"
+3. **Consistent terminology**: Use same terms throughout
+4. **Formatted well**: Use headings, lists, code blocks
+5. **Accessible**: Assume reader is beginner
 
-### Bảo Trì Tài Liệu
+### Documentation Maintenance
 
-1. **Đánh phiên bản mọi thứ**: Theo dõi thay đổi gì khi nào
-2. **Deprecated khéo léo**: Cảnh báo trước khi xóa tính năng
-3. **Hướng dẫn migration**: Giúp người dùng nâng cấp
-4. **Lưu trữ docs cũ**: Giữ cho phiên bản cũ có thể truy cập
-5. **Xem xét định kỳ**: Đảm bảo docs khớp với thực tế
+1. **Version everything**: Track what changed when
+2. **Deprecate gracefully**: Warn before removing features
+3. **Migration guides**: Help users upgrade
+4. **Archive old docs**: Keep old versions accessible
+5. **Review regularly**: Ensure docs match reality
 
-## Checklist Tài Liệu
+## Documentation Checklist
 
-Trước khi phát hành command:
+Before releasing a command:
 
-- [ ] Description trong frontmatter rõ ràng
-- [ ] argument-hint ghi lại tất cả argument
-- [ ] Ví dụ sử dụng có trong comment
-- [ ] Các trường hợp sử dụng phổ biến được hiển thị
-- [ ] Thông báo lỗi hữu ích
-- [ ] Yêu cầu đã được ghi lại
-- [ ] Các command liên quan đã được liệt kê
-- [ ] Changelog được duy trì
-- [ ] Số phiên bản đã cập nhật
-- [ ] README đã tạo/cập nhật
-- [ ] Ví dụ thực sự chạy được
-- [ ] Section troubleshooting hoàn chỉnh
+- [ ] Description in frontmatter is clear
+- [ ] argument-hint documents all arguments
+- [ ] Usage examples in comments
+- [ ] Common use cases shown
+- [ ] Error messages are helpful
+- [ ] Requirements documented
+- [ ] Related commands listed
+- [ ] Changelog maintained
+- [ ] Version number updated
+- [ ] README created/updated
+- [ ] Examples actually work
+- [ ] Troubleshooting section complete
 
-Với tài liệu tốt, command trở thành self-service, giảm gánh nặng hỗ trợ và cải thiện trải nghiệm người dùng.
+With good documentation, commands become self-service, reducing support burden and improving user experience.

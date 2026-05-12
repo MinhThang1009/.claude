@@ -1,8 +1,8 @@
-# Deploy lên Cloudflare Workers
+# Deploy to Cloudflare Workers
 
-Con đường nhanh nhất từ zero đến một MCP URL `https://` live. Free tier, không cần thẻ tín dụng để bắt đầu, hai lệnh để deploy.
+Fastest path from zero to a live `https://` MCP URL. Free tier, no credit card to start, two commands to deploy.
 
-**Đánh đổi:** Đây là scaffold native của Workers, không phải deploy target cho Express scaffold trong `remote-http-scaffold.md`. Runtime khác nhau. Nếu bạn cần portability qua nhiều host, hãy dùng Express. Nếu bạn chỉ muốn nó live, bắt đầu ở đây.
+**Trade-off:** This is a Workers-native scaffold, not a deploy target for the Express scaffold in `remote-http-scaffold.md`. Different runtime. If you need portability across hosts, stick with Express. If you just want it live, start here.
 
 ---
 
@@ -14,13 +14,13 @@ npm create cloudflare@latest -- my-mcp-server \
 cd my-mcp-server
 ```
 
-Lệnh này kéo một template tối giản với các dep đúng (`agents`, `zod`) và một `wrangler.jsonc` hoạt động được.
+This pulls a minimal template with the right deps (`agents`, `zod`) and a working `wrangler.jsonc`.
 
 ---
 
 ## `src/index.ts`
 
-Thay thế ví dụ calculator của template bằng tool của bạn. Dùng `registerTool()` (cùng API với Express scaffold — instance `McpServer` là giống hệt nhau):
+Replace the template's calculator example with your tools. Use `registerTool()` (same API as the Express scaffold — the `McpServer` instance is identical):
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -63,13 +63,13 @@ export default {
 };
 ```
 
-`McpAgent` là wrapper của Cloudflare — nó xử lý streamable-HTTP transport, session routing, và Durable Object plumbing. Code của bạn chỉ chạm vào `this.server`, vốn là class `McpServer` giống nhau từ SDK. Mọi thứ trong `tool-design.md` và `server-capabilities.md` áp dụng không thay đổi.
+`McpAgent` is Cloudflare's wrapper — it handles the streamable-HTTP transport, session routing, and Durable Object plumbing. Your code only touches `this.server`, which is the same `McpServer` class from the SDK. Everything in `tool-design.md` and `server-capabilities.md` applies unchanged.
 
 ---
 
 ## `wrangler.jsonc`
 
-Template đi kèm với file này. Block Durable Objects là **boilerplate** — `McpAgent` dùng DO cho session state. Bạn không tương tác trực tiếp với nó.
+The template ships this. The Durable Objects block is **boilerplate** — `McpAgent` uses DO for session state. You don't interact with it directly.
 
 ```jsonc
 {
@@ -84,23 +84,23 @@ Template đi kèm với file này. Block Durable Objects là **boilerplate** —
 }
 ```
 
-Nếu bạn đổi tên class `MyMCP`, hãy cập nhật cả `new_sqlite_classes` và `class_name` cho khớp.
+If you rename the `MyMCP` class, update both `new_sqlite_classes` and `class_name` to match.
 
 ---
 
-## Chạy và deploy
+## Run and deploy
 
 ```bash
 npx wrangler dev     # → http://localhost:8787/mcp
 npx wrangler deploy  # → https://my-mcp-server.<account>.workers.dev/mcp
 ```
 
-`wrangler deploy` in ra URL live. Đó là URL user dán vào Claude.
+`wrangler deploy` prints the live URL. That's the URL users paste into Claude.
 
-Secret (upstream API key): `npx wrangler secret put UPSTREAM_API_KEY`, sau đó đọc `env.UPSTREAM_API_KEY` bên trong `init()`.
+Secrets (upstream API keys): `npx wrangler secret put UPSTREAM_API_KEY`, then read `env.UPSTREAM_API_KEY` inside `init()`.
 
 ---
 
 ## OAuth
 
-Cloudflare cung cấp `@cloudflare/workers-oauth-provider` — một drop-in xử lý phía authorization server (CIMD/DCR endpoint, phát hành token, consent UI). Nó wrap `McpAgent` của bạn và chặn `/mcp` sau khi kiểm tra token. Xem `auth.md` để biết chi tiết giao thức; template CF `cloudflare/ai/demos/remote-mcp-github-oauth` cho thấy cách nối dây.
+Cloudflare ships `@cloudflare/workers-oauth-provider` — a drop-in that handles the authorization server side (CIMD/DCR endpoints, token issuance, consent UI). It wraps your `McpAgent` and gates `/mcp` behind a token check. See `auth.md` for the protocol details; the CF template `cloudflare/ai/demos/remote-mcp-github-oauth` shows the wiring.

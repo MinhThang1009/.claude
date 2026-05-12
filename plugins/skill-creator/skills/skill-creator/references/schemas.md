@@ -1,12 +1,12 @@
 # JSON Schemas
 
-Tài liệu này định nghĩa các JSON schema được skill-creator sử dụng.
+This document defines the JSON schemas used by skill-creator.
 
 ---
 
 ## evals.json
 
-Định nghĩa các eval cho một skill. Nằm tại `evals/evals.json` trong thư mục skill.
+Defines the evals for a skill. Located at `evals/evals.json` within the skill directory.
 
 ```json
 {
@@ -26,19 +26,19 @@ Tài liệu này định nghĩa các JSON schema được skill-creator sử d�
 }
 ```
 
-**Các field:**
-- `skill_name`: Tên khớp với frontmatter của skill
-- `evals[].id`: Định danh số nguyên unique
-- `evals[].prompt`: Tác vụ cần thực thi
-- `evals[].expected_output`: Mô tả thành công cho người đọc
-- `evals[].files`: Danh sách đường dẫn file input tùy chọn (tương đối với skill root)
-- `evals[].expectations`: Danh sách các phát biểu có thể kiểm tra
+**Fields:**
+- `skill_name`: Name matching the skill's frontmatter
+- `evals[].id`: Unique integer identifier
+- `evals[].prompt`: The task to execute
+- `evals[].expected_output`: Human-readable description of success
+- `evals[].files`: Optional list of input file paths (relative to skill root)
+- `evals[].expectations`: List of verifiable statements
 
 ---
 
 ## history.json
 
-Theo dõi tiến trình version trong Improve mode. Nằm tại workspace root.
+Tracks version progression in Improve mode. Located at workspace root.
 
 ```json
 {
@@ -71,21 +71,21 @@ Theo dõi tiến trình version trong Improve mode. Nằm tại workspace root.
 }
 ```
 
-**Các field:**
-- `started_at`: Timestamp ISO lúc bắt đầu cải thiện
-- `skill_name`: Tên skill đang được cải thiện
-- `current_best`: Định danh version của version hoạt động tốt nhất
-- `iterations[].version`: Định danh version (v0, v1, ...)
-- `iterations[].parent`: Version cha mà version này được derive từ đó
-- `iterations[].expectation_pass_rate`: Tỉ lệ pass từ grading
-- `iterations[].grading_result`: "baseline", "won", "lost", hoặc "tie"
-- `iterations[].is_current_best`: Version này có phải là version tốt nhất hiện tại không
+**Fields:**
+- `started_at`: ISO timestamp of when improvement started
+- `skill_name`: Name of the skill being improved
+- `current_best`: Version identifier of the best performer
+- `iterations[].version`: Version identifier (v0, v1, ...)
+- `iterations[].parent`: Parent version this was derived from
+- `iterations[].expectation_pass_rate`: Pass rate from grading
+- `iterations[].grading_result`: "baseline", "won", "lost", or "tie"
+- `iterations[].is_current_best`: Whether this is the current best version
 
 ---
 
 ## grading.json
 
-Output từ grader agent. Nằm tại `<run-dir>/grading.json`.
+Output from the grader agent. Located at `<run-dir>/grading.json`.
 
 ```json
 {
@@ -149,20 +149,20 @@ Output từ grader agent. Nằm tại `<run-dir>/grading.json`.
 }
 ```
 
-**Các field:**
-- `expectations[]`: Expectation đã được chấm điểm kèm bằng chứng
-- `summary`: Tổng hợp số pass/fail
-- `execution_metrics`: Lượng dùng tool và kích thước output (từ metrics.json của executor)
-- `timing`: Thời gian thực (từ timing.json)
-- `claims`: Các claim được trích xuất và kiểm tra từ output
-- `user_notes_summary`: Vấn đề được executor gắn cờ
-- `eval_feedback`: (tùy chọn) Gợi ý cải thiện cho eval, chỉ có khi grader xác định vấn đề đáng đề cập
+**Fields:**
+- `expectations[]`: Graded expectations with evidence
+- `summary`: Aggregate pass/fail counts
+- `execution_metrics`: Tool usage and output size (from executor's metrics.json)
+- `timing`: Wall clock timing (from timing.json)
+- `claims`: Extracted and verified claims from the output
+- `user_notes_summary`: Issues flagged by the executor
+- `eval_feedback`: (optional) Improvement suggestions for the evals, only present when the grader identifies issues worth raising
 
 ---
 
 ## metrics.json
 
-Output từ executor agent. Nằm tại `<run-dir>/outputs/metrics.json`.
+Output from the executor agent. Located at `<run-dir>/outputs/metrics.json`.
 
 ```json
 {
@@ -183,22 +183,22 @@ Output từ executor agent. Nằm tại `<run-dir>/outputs/metrics.json`.
 }
 ```
 
-**Các field:**
-- `tool_calls`: Số lần gọi theo từng loại tool
-- `total_tool_calls`: Tổng tất cả tool call
-- `total_steps`: Số bước thực thi chính
-- `files_created`: Danh sách file output được tạo
-- `errors_encountered`: Số lỗi xảy ra trong quá trình thực thi
-- `output_chars`: Tổng số ký tự của file output
-- `transcript_chars`: Số ký tự của transcript
+**Fields:**
+- `tool_calls`: Count per tool type
+- `total_tool_calls`: Sum of all tool calls
+- `total_steps`: Number of major execution steps
+- `files_created`: List of output files created
+- `errors_encountered`: Number of errors during execution
+- `output_chars`: Total character count of output files
+- `transcript_chars`: Character count of transcript
 
 ---
 
 ## timing.json
 
-Thời gian thực cho một lần chạy. Nằm tại `<run-dir>/timing.json`.
+Wall clock timing for a run. Located at `<run-dir>/timing.json`.
 
-**Cách capture:** Khi tác vụ subagent hoàn thành, thông báo tác vụ bao gồm `total_tokens` và `duration_ms`. Lưu ngay lập tức — chúng không được persist ở bất kỳ đâu và không thể khôi phục sau đó.
+**How to capture:** When a subagent task completes, the task notification includes `total_tokens` and `duration_ms`. Save these immediately — they are not persisted anywhere else and cannot be recovered after the fact.
 
 ```json
 {
@@ -218,7 +218,7 @@ Thời gian thực cho một lần chạy. Nằm tại `<run-dir>/timing.json`.
 
 ## benchmark.json
 
-Output từ Benchmark mode. Nằm tại `benchmarks/<timestamp>/benchmark.json`.
+Output from Benchmark mode. Located at `benchmarks/<timestamp>/benchmark.json`.
 
 ```json
 {
@@ -285,30 +285,30 @@ Output từ Benchmark mode. Nằm tại `benchmarks/<timestamp>/benchmark.json`.
 }
 ```
 
-**Các field:**
-- `metadata`: Thông tin về lần chạy benchmark
-  - `skill_name`: Tên skill
-  - `timestamp`: Thời điểm chạy benchmark
-  - `evals_run`: Danh sách tên hoặc ID eval
-  - `runs_per_configuration`: Số lần chạy mỗi cấu hình (ví dụ 3)
-- `runs[]`: Kết quả chạy từng lần
-  - `eval_id`: Định danh eval dạng số
-  - `eval_name`: Tên eval cho người đọc (dùng làm tiêu đề section trong viewer)
-  - `configuration`: Phải là `"with_skill"` hoặc `"without_skill"` (viewer dùng chính xác chuỗi này để nhóm và tô màu)
-  - `run_number`: Số nguyên lần chạy (1, 2, 3...)
-  - `result`: Object lồng nhau với `pass_rate`, `passed`, `total`, `time_seconds`, `tokens`, `errors`
-- `run_summary`: Tổng hợp thống kê theo từng cấu hình
-  - `with_skill` / `without_skill`: Mỗi cái chứa object `pass_rate`, `time_seconds`, `tokens` với field `mean` và `stddev`
-  - `delta`: Chuỗi chênh lệch như `"+0.50"`, `"+13.0"`, `"+1700"`
-- `notes`: Quan sát tự do từ analyzer
+**Fields:**
+- `metadata`: Information about the benchmark run
+  - `skill_name`: Name of the skill
+  - `timestamp`: When the benchmark was run
+  - `evals_run`: List of eval names or IDs
+  - `runs_per_configuration`: Number of runs per config (e.g. 3)
+- `runs[]`: Individual run results
+  - `eval_id`: Numeric eval identifier
+  - `eval_name`: Human-readable eval name (used as section header in the viewer)
+  - `configuration`: Must be `"with_skill"` or `"without_skill"` (the viewer uses this exact string for grouping and color coding)
+  - `run_number`: Integer run number (1, 2, 3...)
+  - `result`: Nested object with `pass_rate`, `passed`, `total`, `time_seconds`, `tokens`, `errors`
+- `run_summary`: Statistical aggregates per configuration
+  - `with_skill` / `without_skill`: Each contains `pass_rate`, `time_seconds`, `tokens` objects with `mean` and `stddev` fields
+  - `delta`: Difference strings like `"+0.50"`, `"+13.0"`, `"+1700"`
+- `notes`: Freeform observations from the analyzer
 
-**Quan trọng:** Viewer đọc chính xác các tên field này. Dùng `config` thay vì `configuration`, hoặc đặt `pass_rate` ở cấp cao nhất của run thay vì lồng trong `result`, sẽ khiến viewer hiển thị giá trị trống/zero. Luôn tham chiếu schema này khi tạo benchmark.json thủ công.
+**Important:** The viewer reads these field names exactly. Using `config` instead of `configuration`, or putting `pass_rate` at the top level of a run instead of nested under `result`, will cause the viewer to show empty/zero values. Always reference this schema when generating benchmark.json manually.
 
 ---
 
 ## comparison.json
 
-Output từ blind comparator. Nằm tại `<grading-dir>/comparison-N.json`.
+Output from blind comparator. Located at `<grading-dir>/comparison-N.json`.
 
 ```json
 {
@@ -383,7 +383,7 @@ Output từ blind comparator. Nằm tại `<grading-dir>/comparison-N.json`.
 
 ## analysis.json
 
-Output từ post-hoc analyzer. Nằm tại `<grading-dir>/analysis.json`.
+Output from post-hoc analyzer. Located at `<grading-dir>/analysis.json`.
 
 ```json
 {

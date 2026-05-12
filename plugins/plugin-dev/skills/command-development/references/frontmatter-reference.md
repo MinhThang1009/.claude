@@ -1,10 +1,10 @@
-# Tài Liệu Tham Chiếu Frontmatter của Command
+# Command Frontmatter Reference
 
-Tài liệu tham chiếu đầy đủ về các trường YAML frontmatter trong slash command.
+Complete reference for YAML frontmatter fields in slash commands.
 
-## Tổng Quan về Frontmatter
+## Frontmatter Overview
 
-YAML frontmatter là metadata tùy chọn ở đầu file command:
+YAML frontmatter is optional metadata at the start of command files:
 
 ```markdown
 ---
@@ -14,23 +14,23 @@ model: sonnet
 argument-hint: [arg1] [arg2]
 ---
 
-Nội dung prompt command ở đây...
+Command prompt content here...
 ```
 
-Tất cả trường đều tùy chọn. Command hoạt động tốt ngay cả khi không có frontmatter.
+All fields are optional. Commands work without any frontmatter.
 
-## Các Trường Cụ Thể
+## Field Specifications
 
 ### description
 
-**Kiểu:** String
-**Bắt buộc:** Không
-**Mặc định:** Dòng đầu tiên của prompt command
-**Độ dài tối đa:** ~60 ký tự được khuyến nghị để hiển thị trong `/help`
+**Type:** String
+**Required:** No
+**Default:** First line of command prompt
+**Max Length:** ~60 characters recommended for `/help` display
 
-**Mục đích:** Mô tả command làm gì, hiển thị trong output của `/help`
+**Purpose:** Describes what the command does, shown in `/help` output
 
-**Ví dụ:**
+**Examples:**
 ```yaml
 description: Review code for security issues
 ```
@@ -41,43 +41,43 @@ description: Deploy to staging environment
 description: Generate API documentation
 ```
 
-**Nguyên tắc tốt nhất:**
-- Giữ dưới 60 ký tự để hiển thị gọn
-- Bắt đầu bằng động từ (Review, Deploy, Generate)
-- Cụ thể về việc command làm gì
-- Tránh dùng từ thừa "command" hay "slash command"
+**Best practices:**
+- Keep under 60 characters for clean display
+- Start with verb (Review, Deploy, Generate)
+- Be specific about what command does
+- Avoid redundant "command" or "slash command"
 
-**Đúng:**
+**Good:**
 - ✅ "Review PR for code quality and security"
 - ✅ "Deploy application to specified environment"
 - ✅ "Generate comprehensive API documentation"
 
-**Sai:**
-- ❌ "This command reviews PRs" (thừa "This command")
-- ❌ "Review" (quá mơ hồ)
-- ❌ "A command that reviews pull requests for code quality, security issues, and best practices" (quá dài)
+**Bad:**
+- ❌ "This command reviews PRs" (unnecessary "This command")
+- ❌ "Review" (too vague)
+- ❌ "A command that reviews pull requests for code quality, security issues, and best practices" (too long)
 
 ### allowed-tools
 
-**Kiểu:** String hoặc Array of strings
-**Bắt buộc:** Không
-**Mặc định:** Kế thừa từ quyền của conversation
+**Type:** String or Array of strings
+**Required:** No
+**Default:** Inherits from conversation permissions
 
-**Mục đích:** Giới hạn hoặc chỉ định tool nào command có thể sử dụng
+**Purpose:** Restrict or specify which tools command can use
 
-**Các định dạng:**
+**Formats:**
 
-**Một tool:**
+**Single tool:**
 ```yaml
 allowed-tools: Read
 ```
 
-**Nhiều tool (phân cách bằng dấu phẩy):**
+**Multiple tools (comma-separated):**
 ```yaml
 allowed-tools: Read, Write, Edit
 ```
 
-**Nhiều tool (array):**
+**Multiple tools (array):**
 ```yaml
 allowed-tools:
   - Read
@@ -85,75 +85,75 @@ allowed-tools:
   - Bash(git:*)
 ```
 
-**Các Pattern Tool:**
+**Tool Patterns:**
 
-**Tool cụ thể:**
+**Specific tools:**
 ```yaml
 allowed-tools: Read, Grep, Edit
 ```
 
-**Bash với bộ lọc lệnh:**
+**Bash with command filter:**
 ```yaml
-allowed-tools: Bash(git:*)           # Chỉ lệnh git
-allowed-tools: Bash(npm:*)           # Chỉ lệnh npm
-allowed-tools: Bash(docker:*)        # Chỉ lệnh docker
+allowed-tools: Bash(git:*)           # Only git commands
+allowed-tools: Bash(npm:*)           # Only npm commands
+allowed-tools: Bash(docker:*)        # Only docker commands
 ```
 
-**Tất cả tool (không khuyến nghị):**
+**All tools (not recommended):**
 ```yaml
 allowed-tools: "*"
 ```
 
-**Khi nào dùng:**
+**When to use:**
 
-1. **Bảo mật:** Giới hạn command chỉ thực hiện thao tác an toàn
+1. **Security:** Restrict command to safe operations
    ```yaml
-   allowed-tools: Read, Grep  # Command chỉ đọc
+   allowed-tools: Read, Grep  # Read-only command
    ```
 
-2. **Rõ ràng:** Ghi lại các tool cần thiết
+2. **Clarity:** Document required tools
    ```yaml
    allowed-tools: Bash(git:*), Read
    ```
 
-3. **Thực thi Bash:** Cho phép output lệnh bash
+3. **Bash execution:** Enable bash command output
    ```yaml
    allowed-tools: Bash(git status:*), Bash(git diff:*)
    ```
 
-**Nguyên tắc tốt nhất:**
-- Giới hạn càng chặt càng tốt
-- Dùng bộ lọc lệnh cho Bash (ví dụ: `git:*` thay vì `*`)
-- Chỉ chỉ định khi khác với quyền của conversation
-- Ghi lại lý do cần tool cụ thể
+**Best practices:**
+- Be as restrictive as possible
+- Use command filters for Bash (e.g., `git:*` not `*`)
+- Only specify when different from conversation permissions
+- Document why specific tools are needed
 
 ### model
 
-**Kiểu:** String
-**Bắt buộc:** Không
-**Mặc định:** Kế thừa từ conversation
-**Giá trị:** `sonnet`, `opus`, `haiku`
+**Type:** String
+**Required:** No
+**Default:** Inherits from conversation
+**Values:** `sonnet`, `opus`, `haiku`
 
-**Mục đích:** Chỉ định model Claude nào thực thi command
+**Purpose:** Specify which Claude model executes the command
 
-**Ví dụ:**
+**Examples:**
 ```yaml
-model: haiku    # Nhanh, hiệu quả cho tác vụ đơn giản
+model: haiku    # Fast, efficient for simple tasks
 ```
 ```yaml
-model: sonnet   # Hiệu năng cân bằng (mặc định)
+model: sonnet   # Balanced performance (default)
 ```
 ```yaml
-model: opus     # Khả năng tối đa cho tác vụ phức tạp
+model: opus     # Maximum capability for complex tasks
 ```
 
-**Khi nào dùng:**
+**When to use:**
 
-**Dùng `haiku` khi:**
-- Command đơn giản, có công thức
-- Cần thực thi nhanh
-- Tác vụ ít phức tạp
-- Gọi thường xuyên
+**Use `haiku` for:**
+- Simple, formulaic commands
+- Fast execution needed
+- Low complexity tasks
+- Frequent invocations
 
 ```yaml
 ---
@@ -162,10 +162,10 @@ model: haiku
 ---
 ```
 
-**Dùng `sonnet` khi:**
-- Command tiêu chuẩn (mặc định)
-- Cân bằng tốc độ/chất lượng
-- Hầu hết các trường hợp sử dụng
+**Use `sonnet` for:**
+- Standard commands (default)
+- Balanced speed/quality
+- Most common use cases
 
 ```yaml
 ---
@@ -174,11 +174,11 @@ model: sonnet
 ---
 ```
 
-**Dùng `opus` khi:**
-- Phân tích phức tạp
-- Quyết định kiến trúc
-- Hiểu code sâu
-- Tác vụ quan trọng
+**Use `opus` for:**
+- Complex analysis
+- Architectural decisions
+- Deep code understanding
+- Critical tasks
 
 ```yaml
 ---
@@ -187,57 +187,57 @@ model: opus
 ---
 ```
 
-**Nguyên tắc tốt nhất:**
-- Bỏ qua nếu không có nhu cầu cụ thể
-- Dùng `haiku` để tăng tốc khi có thể
-- Dành `opus` cho tác vụ thực sự phức tạp
-- Thử nghiệm với các model khác nhau để tìm sự cân bằng phù hợp
+**Best practices:**
+- Omit unless specific need
+- Use `haiku` for speed when possible
+- Reserve `opus` for genuinely complex tasks
+- Test with different models to find right balance
 
 ### argument-hint
 
-**Kiểu:** String
-**Bắt buộc:** Không
-**Mặc định:** Không có
+**Type:** String
+**Required:** No
+**Default:** None
 
-**Mục đích:** Ghi lại argument mong đợi cho người dùng và autocomplete
+**Purpose:** Document expected arguments for users and autocomplete
 
-**Định dạng:**
+**Format:**
 ```yaml
 argument-hint: [arg1] [arg2] [optional-arg]
 ```
 
-**Ví dụ:**
+**Examples:**
 
-**Một argument:**
+**Single argument:**
 ```yaml
 argument-hint: [pr-number]
 ```
 
-**Nhiều argument bắt buộc:**
+**Multiple required arguments:**
 ```yaml
 argument-hint: [environment] [version]
 ```
 
-**Argument tùy chọn:**
+**Optional arguments:**
 ```yaml
 argument-hint: [file-path] [options]
 ```
 
-**Tên mô tả:**
+**Descriptive names:**
 ```yaml
 argument-hint: [source-branch] [target-branch] [commit-message]
 ```
 
-**Nguyên tắc tốt nhất:**
-- Dùng dấu ngoặc vuông `[]` cho mỗi argument
-- Dùng tên mô tả (không phải `arg1`, `arg2`)
-- Chỉ rõ tùy chọn vs bắt buộc trong phần mô tả
-- Thứ tự khớp với argument vị trí trong command
-- Ngắn gọn nhưng rõ ràng
+**Best practices:**
+- Use square brackets `[]` for each argument
+- Use descriptive names (not `arg1`, `arg2`)
+- Indicate optional vs required in description
+- Match order to positional arguments in command
+- Keep concise but clear
 
-**Ví dụ theo pattern:**
+**Examples by pattern:**
 
-**Command đơn giản:**
+**Simple command:**
 ```yaml
 ---
 description: Fix issue by number
@@ -247,7 +247,7 @@ argument-hint: [issue-number]
 Fix issue #$1...
 ```
 
-**Nhiều argument:**
+**Multi-argument:**
 ```yaml
 ---
 description: Deploy to environment
@@ -257,7 +257,7 @@ argument-hint: [app-name] [environment] [version]
 Deploy $1 to $2 using version $3...
 ```
 
-**Với tùy chọn:**
+**With options:**
 ```yaml
 ---
 description: Run tests with options
@@ -269,20 +269,20 @@ Run tests matching $1 with options: $2
 
 ### disable-model-invocation
 
-**Kiểu:** Boolean
-**Bắt buộc:** Không
-**Mặc định:** false
+**Type:** Boolean
+**Required:** No
+**Default:** false
 
-**Mục đích:** Ngăn tool SlashCommand gọi command theo chương trình
+**Purpose:** Prevent SlashCommand tool from programmatically invoking command
 
-**Ví dụ:**
+**Examples:**
 ```yaml
 disable-model-invocation: true
 ```
 
-**Khi nào dùng:**
+**When to use:**
 
-1. **Command chỉ thủ công:** Command yêu cầu phán đoán của người dùng
+1. **Manual-only commands:** Commands requiring user judgment
    ```yaml
    ---
    description: Approve deployment to production
@@ -290,7 +290,7 @@ disable-model-invocation: true
    ---
    ```
 
-2. **Thao tác destructive:** Command có hiệu quả không thể hoàn tác
+2. **Destructive operations:** Commands with irreversible effects
    ```yaml
    ---
    description: Delete all test data
@@ -298,7 +298,7 @@ disable-model-invocation: true
    ---
    ```
 
-3. **Workflow tương tác:** Command cần input từ người dùng
+3. **Interactive workflows:** Commands needing user input
    ```yaml
    ---
    description: Walk through setup wizard
@@ -306,34 +306,34 @@ disable-model-invocation: true
    ---
    ```
 
-**Hành vi mặc định (false):**
-- Command có sẵn cho tool SlashCommand
-- Claude có thể gọi theo chương trình
-- Vẫn có thể gọi thủ công
+**Default behavior (false):**
+- Command available to SlashCommand tool
+- Claude can invoke programmatically
+- Still available for manual invocation
 
-**Khi true:**
-- Command chỉ có thể gọi bởi người dùng gõ `/command`
-- Không có sẵn cho tool SlashCommand
-- An toàn hơn cho thao tác nhạy cảm
+**When true:**
+- Command only invokable by user typing `/command`
+- Not available to SlashCommand tool
+- Safer for sensitive operations
 
-**Nguyên tắc tốt nhất:**
-- Dùng tiết kiệm (hạn chế quyền tự chủ của Claude)
-- Ghi lại lý do trong comment command
-- Cân nhắc xem command có nên tồn tại không nếu luôn là thủ công
+**Best practices:**
+- Use sparingly (limits Claude's autonomy)
+- Document why in command comments
+- Consider if command should exist if always manual
 
-## Ví Dụ Hoàn Chỉnh
+## Complete Examples
 
-### Command Tối Giản
+### Minimal Command
 
-Không cần frontmatter:
+No frontmatter needed:
 
 ```markdown
 Review this code for common issues and suggest improvements.
 ```
 
-### Command Đơn Giản
+### Simple Command
 
-Chỉ description:
+Just description:
 
 ```markdown
 ---
@@ -343,9 +343,9 @@ description: Review code for issues
 Review this code for common issues and suggest improvements.
 ```
 
-### Command Tiêu Chuẩn
+### Standard Command
 
-Description và tool:
+Description and tools:
 
 ```markdown
 ---
@@ -361,9 +361,9 @@ Review each changed file for:
 - Best practices
 ```
 
-### Command Phức Tạp
+### Complex Command
 
-Tất cả trường phổ biến:
+All common fields:
 
 ```markdown
 ---
@@ -383,9 +383,9 @@ Pre-deployment checks:
 Proceed with deployment following deployment runbook.
 ```
 
-### Command Chỉ Thủ Công
+### Manual-Only Command
 
-Giới hạn cách gọi:
+Restricted invocation:
 
 ```markdown
 ---
@@ -415,49 +415,49 @@ Type "APPROVED" to confirm deployment.
 
 ## Validation
 
-### Lỗi Thường Gặp
+### Common Errors
 
-**Cú pháp YAML không hợp lệ:**
+**Invalid YAML syntax:**
 ```yaml
 ---
 description: Missing quote
 allowed-tools: Read, Write
 model: sonnet
----  # ❌ Thiếu dấu ngoặc đóng ở trên
+---  # ❌ Missing closing quote above
 ```
 
-**Sửa:** Validate cú pháp YAML
+**Fix:** Validate YAML syntax
 
-**Chỉ định tool không đúng:**
+**Incorrect tool specification:**
 ```yaml
-allowed-tools: Bash  # ❌ Thiếu bộ lọc lệnh
+allowed-tools: Bash  # ❌ Missing command filter
 ```
 
-**Sửa:** Dùng định dạng `Bash(git:*)`
+**Fix:** Use `Bash(git:*)` format
 
-**Tên model không hợp lệ:**
+**Invalid model name:**
 ```yaml
-model: gpt4  # ❌ Không phải model Claude hợp lệ
+model: gpt4  # ❌ Not a valid Claude model
 ```
 
-**Sửa:** Dùng `sonnet`, `opus`, hoặc `haiku`
+**Fix:** Use `sonnet`, `opus`, or `haiku`
 
-### Checklist Validation
+### Validation Checklist
 
-Trước khi commit command:
-- [ ] Cú pháp YAML hợp lệ (không có lỗi)
-- [ ] Description dưới 60 ký tự
-- [ ] allowed-tools dùng đúng định dạng
-- [ ] model là giá trị hợp lệ nếu được chỉ định
-- [ ] argument-hint khớp với argument vị trí
-- [ ] disable-model-invocation được dùng đúng chỗ
+Before committing command:
+- [ ] YAML syntax valid (no errors)
+- [ ] Description under 60 characters
+- [ ] allowed-tools uses proper format
+- [ ] model is valid value if specified
+- [ ] argument-hint matches positional arguments
+- [ ] disable-model-invocation used appropriately
 
-## Tóm Tắt Nguyên Tắc Tốt Nhất
+## Best Practices Summary
 
-1. **Bắt đầu tối giản:** Chỉ thêm frontmatter khi cần thiết
-2. **Ghi lại argument:** Luôn dùng argument-hint khi có argument
-3. **Giới hạn tool:** Dùng allowed-tools ít quyền nhất mà vẫn hoạt động
-4. **Chọn model phù hợp:** Dùng haiku để tăng tốc, opus cho phức tạp
-5. **Dùng chỉ thủ công tiết kiệm:** Chỉ dùng disable-model-invocation khi cần thiết
-6. **Description rõ ràng:** Giúp command dễ khám phá trong `/help`
-7. **Test kỹ lưỡng:** Xác nhận frontmatter hoạt động đúng như mong đợi
+1. **Start minimal:** Add frontmatter only when needed
+2. **Document arguments:** Always use argument-hint with arguments
+3. **Restrict tools:** Use most restrictive allowed-tools that works
+4. **Choose right model:** Use haiku for speed, opus for complexity
+5. **Manual-only sparingly:** Only use disable-model-invocation when necessary
+6. **Clear descriptions:** Make commands discoverable in `/help`
+7. **Test thoroughly:** Verify frontmatter works as expected

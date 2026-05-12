@@ -1,36 +1,36 @@
-# Schema Manifest MCPB (v0.4)
+# MCPB Manifest Schema (v0.4)
 
-Được validate theo `github.com/anthropics/mcpb/schemas/mcpb-manifest-v0.4.schema.json`. Schema dùng `additionalProperties: false` — key không xác định sẽ bị từ chối. Thêm `"$schema"` vào manifest để có validation trong editor.
+Validated against `github.com/anthropics/mcpb/schemas/mcpb-manifest-v0.4.schema.json`. The schema uses `additionalProperties: false` — unknown keys are rejected. Add `"$schema"` to your manifest for editor validation.
 
 ---
 
-## Các Field Cấp Cao Nhất
+## Top-level fields
 
-| Field | Bắt buộc | Mô tả |
+| Field | Required | Description |
 |---|---|---|
-| `manifest_version` | ✅ | Phiên bản schema. Dùng `"0.4"`. |
-| `name` | ✅ | Định danh package (chữ thường, dấu gạch ngang). Phải unique. |
-| `version` | ✅ | Phiên bản semver của package CỦA BẠN. |
-| `description` | ✅ | Tóm tắt một dòng. Hiển thị trên marketplace. |
+| `manifest_version` | ✅ | Schema version. Use `"0.4"`. |
+| `name` | ✅ | Package identifier (lowercase, hyphens). Must be unique. |
+| `version` | ✅ | Semver version of YOUR package. |
+| `description` | ✅ | One-line summary. Shown in marketplace. |
 | `author` | ✅ | `{name, email?, url?}` |
-| `server` | ✅ | Entry point và cấu hình khởi động. Xem bên dưới. |
-| `display_name` | | Tên thân thiện với người đọc. Fallback về `name` nếu không có. |
-| `long_description` | | Markdown. Hiển thị trên trang chi tiết. |
-| `icon` / `icons` | | Đường dẫn đến file icon trong bundle. |
-| `homepage` / `repository` / `documentation` / `support` | | Các URL. |
-| `license` | | Định danh SPDX. |
-| `keywords` | | Mảng chuỗi dùng để tìm kiếm. |
-| `user_config` | | Các field cấu hình lúc cài đặt. Xem bên dưới. |
-| `compatibility` | | Yêu cầu host/platform/runtime. Xem bên dưới. |
-| `tools` / `prompts` | | Danh sách khai báo tùy chọn để hiển thị trên marketplace. Không được thực thi lúc runtime. |
-| `tools_generated` / `prompts_generated` | | `true` nếu tool/prompt là dynamic (không thể liệt kê tĩnh). |
-| `screenshots` | | Mảng đường dẫn ảnh. |
-| `localization` | | Bundle i18n. |
-| `privacy_policies` | | Các URL. |
+| `server` | ✅ | Entry point and launch config. See below. |
+| `display_name` | | Human-friendly name. Falls back to `name`. |
+| `long_description` | | Markdown. Shown on detail page. |
+| `icon` / `icons` | | Path(s) to icon file(s) in the bundle. |
+| `homepage` / `repository` / `documentation` / `support` | | URLs. |
+| `license` | | SPDX identifier. |
+| `keywords` | | String array for search. |
+| `user_config` | | Install-time config fields. See below. |
+| `compatibility` | | Host/platform/runtime requirements. See below. |
+| `tools` / `prompts` | | Optional declarative list for marketplace display. Not enforced at runtime. |
+| `tools_generated` / `prompts_generated` | | `true` if tools/prompts are dynamic (can't list statically). |
+| `screenshots` | | Array of image paths. |
+| `localization` | | i18n bundles. |
+| `privacy_policies` | | URLs. |
 
 ---
 
-## `server` — Cấu Hình Khởi Động
+## `server` — launch configuration
 
 ```json
 "server": {
@@ -47,24 +47,24 @@
 }
 ```
 
-| Field | Mô tả |
+| Field | Description |
 |---|---|
-| `type` | `"node"`, `"python"`, hoặc `"binary"` |
-| `entry_point` | Đường dẫn tương đối đến file chính. Chỉ mang tính thông tin. |
-| `mcp_config.command` | Executable để khởi động. |
-| `mcp_config.args` | Mảng argv. Dùng `${__dirname}` cho đường dẫn tương đối với bundle. |
-| `mcp_config.env` | Biến môi trường. Dùng `${user_config.KEY}` để substitute config người dùng. |
+| `type` | `"node"`, `"python"`, or `"binary"` |
+| `entry_point` | Relative path to main file. Informational. |
+| `mcp_config.command` | Executable to launch. |
+| `mcp_config.args` | Argv array. Use `${__dirname}` for bundle-relative paths. |
+| `mcp_config.env` | Environment variables. Use `${user_config.KEY}` to substitute user config. |
 
-**Biến substitution** (chỉ trong `args` và `env`):
-- `${__dirname}` — đường dẫn tuyệt đối đến thư mục bundle đã giải nén
-- `${user_config.<key>}` — giá trị người dùng nhập lúc cài đặt
-- `${HOME}` — thư mục home của người dùng
+**Substitution variables** (in `args` and `env` only):
+- `${__dirname}` — absolute path to the unpacked bundle directory
+- `${user_config.<key>}` — value the user entered at install time
+- `${HOME}` — user's home directory
 
-**Không có env var nào được tự động thêm tiền tố.** Tên env var mà server của bạn đọc chính xác là những gì bạn khai báo trong `mcp_config.env`. Nếu bạn viết `"ROOT_DIR": "${user_config.rootDir}"`, server của bạn đọc `process.env.ROOT_DIR`.
+**There are no auto-prefixed env vars.** The env var names your server reads are exactly what you declare in `mcp_config.env`. If you write `"ROOT_DIR": "${user_config.rootDir}"`, your server reads `process.env.ROOT_DIR`.
 
 ---
 
-## `user_config` — Cài Đặt Lúc Cài Đặt
+## `user_config` — install-time settings
 
 ```json
 "user_config": {
@@ -92,22 +92,22 @@
 }
 ```
 
-| Field | Bắt buộc | Mô tả |
+| Field | Required | Description |
 |---|---|---|
 | `type` | ✅ | `"string"`, `"number"`, `"boolean"`, `"directory"`, `"file"` |
-| `title` | ✅ | Nhãn của form. |
-| `description` | ✅ | Text hướng dẫn dưới input. |
-| `default` | | Giá trị điền sẵn. Hỗ trợ `${HOME}`. |
-| `required` | | Nếu `true`, chặn cài đặt cho đến khi được điền. |
-| `sensitive` | | Nếu `true`, được lưu trong OS keychain và ẩn trong UI. **KHÔNG phải `secret`** — field đó không tồn tại. |
-| `multiple` | | Nếu `true`, người dùng có thể nhập nhiều giá trị (mảng). |
-| `min` / `max` | | Giới hạn số (dành cho `type: "number"`). |
+| `title` | ✅ | Form label. |
+| `description` | ✅ | Help text under the input. |
+| `default` | | Pre-filled value. Supports `${HOME}`. |
+| `required` | | If `true`, install blocks until filled. |
+| `sensitive` | | If `true`, stored in OS keychain + masked in UI. **NOT `secret`** — that field doesn't exist. |
+| `multiple` | | If `true`, user can enter multiple values (array). |
+| `min` / `max` | | Numeric bounds (for `type: "number"`). |
 
-Kiểu `directory` và `file` render native OS picker — ưu tiên dùng thay vì free-text path để UX và validation tốt hơn.
+`directory` and `file` types render native OS pickers — prefer these over free-text paths for UX and validation.
 
 ---
 
-## `compatibility` — Chặn Cài Đặt
+## `compatibility` — gate installs
 
 ```json
 "compatibility": {
@@ -117,15 +117,15 @@ Kiểu `directory` và `file` render native OS picker — ưu tiên dùng thay v
 }
 ```
 
-| Field | Mô tả |
+| Field | Description |
 |---|---|
-| `claude_desktop` | Semver range. Chặn cài đặt nếu host cũ hơn. |
-| `platforms` | Allowlist hệ điều hành. Tập con của `["darwin", "win32", "linux"]`. |
-| `runtimes` | Phiên bản runtime cần thiết, ví dụ `{"node": ">=20"}` hoặc `{"python": ">=3.11"}`. |
+| `claude_desktop` | Semver range. Install blocked if host is older. |
+| `platforms` | OS allowlist. Subset of `["darwin", "win32", "linux"]`. |
+| `runtimes` | Required runtime versions, e.g. `{"node": ">=20"}` or `{"python": ">=3.11"}`. |
 
 ---
 
-## Manifest Tối Giản Hợp Lệ
+## Minimal valid manifest
 
 ```json
 {
@@ -148,9 +148,9 @@ Kiểu `directory` và `file` render native OS picker — ưu tiên dùng thay v
 
 ---
 
-## Những Gì MCPB KHÔNG Có
+## What MCPB does NOT have
 
-- **Không có block `permissions`.** Không có filesystem/network/process scoping cấp manifest. Server chạy với toàn quyền người dùng. Thực thi ranh giới trong tool handler — xem `local-security.md`.
-- **Không có tiền tố env var tự động.** Không có convention `MCPB_CONFIG_*`. Bạn wire config → env tường minh trong `server.mcp_config.env`.
-- **Không có field `entry`.** Đó là `server` với `entry_point` bên trong.
-- **Không có `minHostVersion`.** Đó là `compatibility.claude_desktop`.
+- **No `permissions` block.** There is no manifest-level filesystem/network/process scoping. The server runs with full user privileges. Enforce boundaries in your tool handlers — see `local-security.md`.
+- **No auto env var prefix.** No `MCPB_CONFIG_*` convention. You wire config → env explicitly in `server.mcp_config.env`.
+- **No `entry` field.** It's `server` with `entry_point` inside.
+- **No `minHostVersion`.** It's `compatibility.claude_desktop`.

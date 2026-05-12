@@ -1,114 +1,114 @@
 # Agent Triggering: Best Practices
 
-Hướng dẫn đầy đủ về cách viết mô tả trigger để agent được dispatch một cách đáng tin cậy.
+Complete guide to writing trigger descriptions that cause an agent to be dispatched reliably.
 
-## Trigger description nằm ở đâu
+## Where trigger descriptions live
 
-Một file agent có hai nơi nói về triggering:
+An agent file has two places that talk about triggering:
 
-1. **Trường `description:` trong YAML frontmatter.** Được load vào context bất cứ khi nào agent được đăng ký, dùng bởi harness để quyết định khi nào dispatch. Giữ dạng flat prose.
-2. **Section "When to invoke" trong body agent.** Chỉ được load khi agent thực sự được gọi. Đây là nơi chứa các kịch bản cụ thể, dưới dạng danh sách bullet prose.
+1. **`description:` field in YAML frontmatter.** Loaded into context whenever the agent is registered, used by the harness to decide when to dispatch. Keep it flat prose.
+2. **A "When to invoke" section in the agent body.** Loaded only when the agent is actually invoked. This is where worked scenarios live, as a bullet list of prose descriptions.
 
 ## Format
 
-### Trường `description:`
+### `description:` field
 
 ```
 description: Use this agent when [conditions]. Typical triggers include [scenario 1 phrased as a prose noun phrase], [scenario 2], and [scenario 3]. See "When to invoke" in the agent body for worked scenarios.
 ```
 
-Quy tắc:
-- Một dòng flat prose trong YAML scalar.
-- Nêu 2–4 kịch bản trigger dưới dạng noun phrase.
-- Kết thúc bằng con trỏ tới section "When to invoke" trong body.
+Rules:
+- Single line of flat prose within the YAML scalar.
+- Name 2-4 trigger scenarios as noun phrases.
+- End with the pointer to the body's "When to invoke" section.
 
-### Section "When to invoke" trong body
+### "When to invoke" body section
 
 ```markdown
 ## When to invoke
 
-[Hai đến bốn kịch bản đại diện dưới dạng bullet prose. Mỗi kịch bản mô tả tình huống
-theo ngôi thứ ba và agent nên làm gì.]
+[Two to four representative scenarios as prose bullets. Each describes the situation
+in third person and what the agent should do.]
 
-- **[Tên kịch bản ngắn].** [Tình huống trông như thế nào — điều gì vừa xảy ra hoặc
-  người dùng đang yêu cầu gì — và agent nên làm gì để phản hồi.]
-- **[Tên kịch bản ngắn].** [Như trên.]
+- **[Short scenario name].** [What the situation looks like — what just happened or what
+  the user is asking for — and what the agent should do in response.]
+- **[Short scenario name].** [Same.]
 ```
 
-## Giải phẫu một kịch bản tốt
+## Anatomy of a good scenario
 
-### Tên kịch bản (phần in đậm đầu tiên)
+### Scenario name (the bold lead)
 
-**Mục đích:** Một noun phrase ngắn xác định loại tình huống.
+**Purpose:** A short noun phrase identifying the situation type.
 
-**Tên tốt:**
+**Good names:**
 - *User-requested review after a feature lands.*
 - *Proactive review of newly-written code.*
 - *Pre-PR sanity check.*
 - *PR updated with new logic.*
 
-**Tên tệ:**
-- *Normal usage.* (không cụ thể)
-- *User needs help.* (mơ hồ)
+**Bad names:**
+- *Normal usage.* (not specific)
+- *User needs help.* (vague)
 
-### Body kịch bản (sau phần dẫn)
+### Scenario body (after the lead)
 
-**Mục đích:** Mô tả điều gì xảy ra và agent nên làm gì — bằng prose, ngôi thứ ba, không có câu trích dẫn.
+**Purpose:** Describe what happens and what the agent should do — in prose, third person, no quoted utterances.
 
-**Tốt:**
+**Good:**
 > The user has just implemented a feature (often spanning several files) and asks whether everything looks good. Run a review of the recent diff and report findings.
 
-**Tệ (dạng transcript — không dùng):**
+**Bad (transcript shape — do not use):**
 > ```
 > user: "Can you check if everything looks good?"
 > assistant: "I'll use the reviewer agent..."
 > ```
 
-Phiên bản tệ trộn lẫn dạng turn-marker vào file agent. Giữ kịch bản là mô tả tình huống bằng prose.
+The bad version mixes a turn-marker shape into the agent file. Keep scenarios as situation descriptions in prose.
 
-## Các loại trigger cần bao phủ
+## Trigger types to cover
 
-Nhắm tới 2–4 kịch bản bao gồm các trục sau:
+Aim for 2-4 scenarios that span these axes:
 
-### Yêu cầu rõ ràng
-Người dùng yêu cầu trực tiếp những gì agent làm.
-- *User-requested security check.* Người dùng yêu cầu rõ ràng một security review cho code gần đây.
+### Explicit request
+The user directly asks for what the agent does.
+- *User-requested security check.* The user explicitly asks for a security review of recent code.
 
-### Trigger chủ động
-Assistant gọi agent mà không có yêu cầu rõ ràng, sau công việc liên quan.
-- *Proactive review after writing database code.* Assistant vừa viết code truy cập database và nên kiểm tra SQL injection và các rủi ro tầng database khác trước khi khai báo task hoàn thành.
+### Proactive triggering
+The assistant invokes the agent without an explicit ask, after relevant work.
+- *Proactive review after writing database code.* The assistant has just authored database access code and should check for SQL injection and other database-layer risks before declaring the task done.
 
-### Yêu cầu ngầm định
-Người dùng gợi ý nhu cầu mà không nêu tên agent.
-- *Code-clarity complaint.* Người dùng mô tả code hiện tại là khó hiểu hoặc khó theo dõi. Coi như yêu cầu refactor để dễ đọc hơn.
+### Implicit request
+The user implies need without naming the agent.
+- *Code-clarity complaint.* The user describes existing code as confusing or hard to follow. Treat as a request to refactor for readability.
 
-### Pattern sử dụng tool
-Agent nên tuân theo một pattern sử dụng tool cụ thể.
-- *Post-test-edit verification.* Assistant vừa thực hiện nhiều edit vào file test. Xác minh các test đã edit vẫn đáp ứng tiêu chuẩn chất lượng và coverage trước khi tiếp tục.
+### Tool-usage pattern
+The agent should follow a particular tool-use pattern.
+- *Post-test-edit verification.* The assistant has just made multiple edits to test files. Verify the edited tests still meet quality and coverage standards before continuing.
 
-## Biến thể cách diễn đạt
+## Phrasing variation
 
-Nếu cùng một intent thường được diễn đạt nhiều cách, đề cập điều đó bằng prose:
+If the same intent is commonly phrased multiple ways, mention that in prose:
 
 > **Pre-PR sanity check.** The user signals (in any phrasing — "ready to open a PR", "I think we're done here", "let's ship this") that they're about to open a pull request.
 
-Không viết ba kịch bản gần giống nhau chỉ khác nhau ở cụm từ nguyên văn — gộp chúng thành một kịch bản prose đề cập biến thể.
+Don't write three near-duplicate scenarios that differ only in the literal phrase — collapse them into one prose scenario that names the variation.
 
-## Bao nhiêu kịch bản là đủ?
+## How many scenarios?
 
-- **Tối thiểu: 2.** Thường là một explicit + một proactive.
-- **Khuyến nghị: 3–4.** Explicit, proactive, và một implicit hoặc edge case.
-- **Tối đa: 5.** Nhiều hơn thế làm phình body mà không thêm tín hiệu routing.
+- **Minimum: 2.** Usually one explicit + one proactive.
+- **Recommended: 3-4.** Explicit, proactive, and one implicit or edge case.
+- **Maximum: 5.** More than that bloats the body without adding routing signal.
 
-## Ví dụ cụ thể
+## Worked example
 
-### Trigger dạng prose trong `description:`
+### Prose triggers in `description:`
 
 ```yaml
 description: Use this agent when you need to review code. Typical triggers include user-requested review after a feature lands, proactive review of freshly-written code, and a pre-PR sanity check. See "When to invoke" in the agent body for worked scenarios.
 ```
 
-### Kịch bản là mô tả tình huống trong body
+### Scenarios as situation descriptions in the body
 
 ```markdown
 ## When to invoke
@@ -116,15 +116,15 @@ description: Use this agent when you need to review code. Typical triggers inclu
 - **User-requested review.** The user asks for a review of recent changes (any phrasing). Run a review of the unstaged diff.
 ```
 
-### Chỉ điều kiện trigger — format output để ở nơi khác
+### Trigger condition only — output format goes elsewhere
 
 ```markdown
 - **Review.** The user asks for a review. Run the review and report findings as specified in the Output Format section.
 ```
 
-## Thư viện template
+## Template library
 
-### Agent review code
+### Code review agent
 
 ```yaml
 description: Use this agent when you need to review code for adherence to project guidelines and best practices. Typical triggers include the user asking for a review of a feature they just implemented, proactive review of newly-written code before declaring a task done, and a pre-PR sanity check. See "When to invoke" in the agent body.
@@ -138,7 +138,7 @@ description: Use this agent when you need to review code for adherence to projec
 - **Pre-PR sanity check.** The user signals readiness to open a pull request. Review the full diff first.
 ```
 
-### Agent tạo test
+### Test generation agent
 
 ```yaml
 description: Use this agent when you need to generate tests for code that lacks them. Typical triggers include the user explicitly asking for tests for a function or module, and the assistant proactively generating tests after writing new code that has no test coverage. See "When to invoke" in the agent body.
@@ -151,7 +151,7 @@ description: Use this agent when you need to generate tests for code that lacks 
 - **Proactive coverage after new code.** The assistant has just written new code with no accompanying tests. Generate tests before declaring the task done.
 ```
 
-### Agent tài liệu
+### Documentation agent
 
 ```yaml
 description: Use this agent when you need to write or improve documentation for code, especially APIs. Typical triggers include the user asking for docs on a specific function or endpoint, and proactive documentation generation after the assistant adds new API surface. See "When to invoke" in the agent body.
@@ -164,7 +164,7 @@ description: Use this agent when you need to write or improve documentation for 
 - **Proactive docs for new API surface.** The assistant has just added new API endpoints or public functions without docstrings.
 ```
 
-### Agent validation
+### Validation agent
 
 ```yaml
 description: Use this agent when you need to validate code before commit or merge. Typical triggers include the user signaling readiness to commit, and an explicit validation request. See "When to invoke" in the agent body.
@@ -177,41 +177,41 @@ description: Use this agent when you need to validate code before commit or merg
 - **Explicit validation request.** The user asks for the code to be validated.
 ```
 
-## Debug các vấn đề triggering
+## Debugging triggering issues
 
-### Agent không trigger
+### Agent not triggering
 
-Kiểm tra:
-1. Prose trong `description:` có nêu đúng kịch bản trigger không.
-2. Các kịch bản trong body có bao phủ cách diễn đạt người dùng thực sự dùng không.
-3. Có agent cạnh tranh cụ thể hơn đang thắng quyết định routing không.
+Check:
+1. The `description:` prose names the right trigger scenarios.
+2. The scenarios in the body cover the actual phrasings the user uses.
+3. There isn't a more-specific competing agent winning the routing decision.
 
-Giải pháp: thêm hoặc mở rộng kịch bản trong body, và thắt chặt tóm tắt prose trong `description:`.
+Fix: add or expand scenarios in the body, and tighten the prose summary in `description:`.
 
-### Agent trigger quá thường xuyên
+### Agent triggers too often
 
-Kiểm tra:
-1. Các kịch bản trigger có quá chung chung hoặc chồng chéo với agent khác không.
-2. `description:` có nói khi nào KHÔNG dùng agent không.
+Check:
+1. The trigger scenarios are too generic or overlap with other agents.
+2. The `description:` doesn't say when NOT to use the agent.
 
-Giải pháp: thu hẹp kịch bản; thêm dòng "Do not invoke when..." vào `description:` nếu cần.
+Fix: narrow the scenarios; add a "Do not invoke when..." line to `description:` if needed.
 
-### Agent trigger sai kịch bản
+### Agent triggers in the wrong scenarios
 
-Kiểm tra:
-1. Liệu các kịch bản trong body có khớp với khả năng thực tế của agent không.
+Check:
+1. Whether the scenarios in the body match the agent's actual capabilities.
 
-Giải pháp: viết lại kịch bản để khớp với những gì agent thực sự làm.
+Fix: rewrite scenarios to match what the agent actually does.
 
-## Tóm tắt best practices
+## Best practices summary
 
-- Giữ `description:` dạng flat prose với tóm tắt ngắn về kịch bản trigger
-- Đặt kịch bản chi tiết trong section "When to invoke" trong body, dưới dạng bullet prose
-- Bao phủ cả triggering explicit và proactive
-- Mô tả tình huống agent nên phản hồi
-- Đề cập biến thể cách diễn đạt bằng prose ("any phrasing — 'ready to ship', 'looks done'") thay vì qua nhiều kịch bản gần giống nhau
-- Giữ kịch bản trigger tách biệt với format output
+- Keep `description:` as flat prose with a short summary of trigger scenarios
+- Put detailed scenarios in a "When to invoke" body section, as prose bullets
+- Cover both explicit and proactive triggering
+- Describe situations the agent should respond to
+- Mention phrasing variation in prose ("any phrasing — 'ready to ship', 'looks done'") rather than via multiple near-duplicate scenarios
+- Keep trigger scenarios separate from output format
 
-## Kết luận
+## Conclusion
 
-Triggering đáng tin cậy đến từ mô tả prose về các tình huống mà agent nên phản hồi.
+Reliable triggering comes from prose descriptions of the situations an agent should respond to.

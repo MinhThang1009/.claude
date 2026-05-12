@@ -1,25 +1,25 @@
-# Các Pattern Xác Thực MCP
+# MCP Authentication Patterns
 
-Hướng dẫn đầy đủ về các phương thức xác thực cho MCP server trong Claude Code plugin.
+Complete guide to authentication methods for MCP servers in Claude Code plugins.
 
-## Tổng Quan
+## Overview
 
-MCP server hỗ trợ nhiều phương thức xác thực tùy theo loại server và yêu cầu của service. Chọn phương thức phù hợp nhất với use case và yêu cầu bảo mật của bạn.
+MCP servers support multiple authentication methods depending on the server type and service requirements. Choose the method that best matches your use case and security requirements.
 
-## OAuth (Tự Động)
+## OAuth (Automatic)
 
-### Cách Hoạt Động
+### How It Works
 
-Claude Code tự động xử lý toàn bộ OAuth 2.0 flow cho SSE và HTTP server:
+Claude Code automatically handles the complete OAuth 2.0 flow for SSE and HTTP servers:
 
-1. Người dùng cố dùng MCP tool
-2. Claude Code phát hiện cần xác thực
-3. Mở browser cho OAuth consent
-4. Người dùng ủy quyền trong browser
-5. Token được lưu an toàn bởi Claude Code
-6. Tự động refresh token
+1. User attempts to use MCP tool
+2. Claude Code detects authentication needed
+3. Opens browser for OAuth consent
+4. User authorizes in browser
+5. Tokens stored securely by Claude Code
+6. Automatic token refresh
 
-### Cấu Hình
+### Configuration
 
 ```json
 {
@@ -30,60 +30,60 @@ Claude Code tự động xử lý toàn bộ OAuth 2.0 flow cho SSE và HTTP ser
 }
 ```
 
-Không cần cấu hình auth thêm! Claude Code xử lý tất cả.
+No additional auth configuration needed! Claude Code handles everything.
 
-### Các Service Được Hỗ Trợ
+### Supported Services
 
-**MCP server đã biết có OAuth:**
+**Known OAuth-enabled MCP servers:**
 - Asana: `https://mcp.asana.com/sse`
-- GitHub (khi có sẵn)
-- Google services (khi có sẵn)
-- Custom OAuth server
+- GitHub (when available)
+- Google services (when available)
+- Custom OAuth servers
 
-### OAuth Scope
+### OAuth Scopes
 
-OAuth scope do MCP server quy định. Người dùng thấy scope cần thiết trong quá trình consent flow.
+OAuth scopes are determined by the MCP server. Users see required scopes during the consent flow.
 
-**Ghi lại scope cần thiết trong README:**
+**Document required scopes in your README:**
 ```markdown
-## Xác Thực
+## Authentication
 
-Plugin này yêu cầu các quyền Asana sau:
-- Đọc task và project
-- Tạo và cập nhật task
-- Truy cập dữ liệu workspace
+This plugin requires the following Asana permissions:
+- Read tasks and projects
+- Create and update tasks
+- Access workspace data
 ```
 
-### Lưu Trữ Token
+### Token Storage
 
-Token được lưu an toàn bởi Claude Code:
-- Không thể truy cập bởi plugin
-- Mã hóa khi lưu trữ
-- Tự động refresh
-- Xóa khi đăng xuất
+Tokens are stored securely by Claude Code:
+- Not accessible to plugins
+- Encrypted at rest
+- Automatic refresh
+- Cleared on sign-out
 
-### Xử Lý Sự Cố OAuth
+### Troubleshooting OAuth
 
 **Authentication loop:**
-- Xóa token đã cache (đăng xuất và đăng nhập lại)
-- Kiểm tra OAuth redirect URL
-- Xác minh cấu hình OAuth của server
+- Clear cached tokens (sign out and sign in)
+- Check OAuth redirect URLs
+- Verify server OAuth configuration
 
-**Vấn đề về scope:**
-- Người dùng có thể cần cấp quyền lại cho scope mới
-- Kiểm tra tài liệu server về scope cần thiết
+**Scope issues:**
+- User may need to re-authorize for new scopes
+- Check server documentation for required scopes
 
-**Token hết hạn:**
-- Claude Code tự động refresh
-- Nếu refresh thất bại, nhắc xác thực lại
+**Token expiration:**
+- Claude Code auto-refreshes
+- If refresh fails, prompts re-authentication
 
-## Xác Thực Dựa Trên Token
+## Token-Based Authentication
 
-### Bearer Token
+### Bearer Tokens
 
-Phổ biến nhất cho HTTP và WebSocket server.
+Most common for HTTP and WebSocket servers.
 
-**Cấu hình:**
+**Configuration:**
 ```json
 {
   "api": {
@@ -96,16 +96,16 @@ Phổ biến nhất cho HTTP và WebSocket server.
 }
 ```
 
-**Biến môi trường:**
+**Environment variable:**
 ```bash
 export API_TOKEN="your-secret-token-here"
 ```
 
-### API Key
+### API Keys
 
-Thay thế cho Bearer token, thường dùng trong custom header.
+Alternative to Bearer tokens, often in custom headers.
 
-**Cấu hình:**
+**Configuration:**
 ```json
 {
   "api": {
@@ -119,11 +119,11 @@ Thay thế cho Bearer token, thường dùng trong custom header.
 }
 ```
 
-### Custom Header
+### Custom Headers
 
-Một số service dùng custom header để xác thực.
+Services may use custom authentication headers.
 
-**Cấu hình:**
+**Configuration:**
 ```json
 {
   "service": {
@@ -138,43 +138,43 @@ Một số service dùng custom header để xác thực.
 }
 ```
 
-### Ghi Lại Yêu Cầu Token
+### Documenting Token Requirements
 
-Luôn ghi lại trong README:
+Always document in your README:
 
 ```markdown
-## Cài Đặt
+## Setup
 
-### Biến Môi Trường Cần Thiết
+### Required Environment Variables
 
-Đặt các biến môi trường này trước khi dùng plugin:
+Set these environment variables before using the plugin:
 
 \`\`\`bash
 export API_TOKEN="your-token-here"
 export API_SECRET="your-secret-here"
 \`\`\`
 
-### Lấy Token
+### Obtaining Tokens
 
-1. Truy cập https://api.example.com/tokens
-2. Tạo API token mới
-3. Copy token và secret
-4. Đặt biến môi trường như trên
+1. Visit https://api.example.com/tokens
+2. Create a new API token
+3. Copy the token and secret
+4. Set environment variables as shown above
 
-### Quyền Token
+### Token Permissions
 
-API token cần các quyền sau:
-- Quyền đọc resource
-- Quyền ghi để tạo item
-- Quyền xóa (tùy chọn, cho thao tác dọn dẹp)
+The API token needs the following permissions:
+- Read access to resources
+- Write access for creating items
+- Delete access (optional, for cleanup operations)
 \`\`\`
 ```
 
-## Xác Thực Biến Môi Trường (stdio)
+## Environment Variable Authentication (stdio)
 
-### Truyền Credential vào Server
+### Passing Credentials to Server
 
-Với stdio server, truyền credential qua biến môi trường:
+For stdio servers, pass credentials via environment variables:
 
 ```json
 {
@@ -190,21 +190,21 @@ Với stdio server, truyền credential qua biến môi trường:
 }
 ```
 
-### Biến Môi Trường Người Dùng
+### User Environment Variables
 
 ```bash
-# Người dùng đặt trong shell của họ
+# User sets these in their shell
 export DATABASE_URL="postgresql://localhost/mydb"
 export DB_USER="myuser"
 export DB_PASSWORD="mypassword"
 ```
 
-### Template Tài Liệu
+### Documentation Template
 
 ```markdown
-## Cấu Hình Database
+## Database Configuration
 
-Đặt các biến môi trường sau:
+Set these environment variables:
 
 \`\`\`bash
 export DATABASE_URL="postgresql://host:port/database"
@@ -212,7 +212,7 @@ export DB_USER="username"
 export DB_PASSWORD="password"
 \`\`\`
 
-Hoặc tạo file `.env` (thêm vào `.gitignore`):
+Or create a `.env` file (add to `.gitignore`):
 
 \`\`\`
 DATABASE_URL=postgresql://localhost:5432/mydb
@@ -220,15 +220,15 @@ DB_USER=myuser
 DB_PASSWORD=mypassword
 \`\`\`
 
-Load bằng: \`source .env\` hoặc \`export $(cat .env | xargs)\`
+Load with: \`source .env\` or \`export $(cat .env | xargs)\`
 \`\`\`
 ```
 
-## Dynamic Header
+## Dynamic Headers
 
-### Script Helper cho Header
+### Headers Helper Script
 
-Với token thay đổi hoặc hết hạn, dùng script helper:
+For tokens that change or expire, use a helper script:
 
 ```json
 {
@@ -243,12 +243,12 @@ Với token thay đổi hoặc hết hạn, dùng script helper:
 **Script (get-headers.sh):**
 ```bash
 #!/bin/bash
-# Tạo authentication header động
+# Generate dynamic authentication headers
 
-# Lấy token mới
+# Fetch fresh token
 TOKEN=$(get-fresh-token-from-somewhere)
 
-# Output JSON header
+# Output JSON headers
 cat <<EOF
 {
   "Authorization": "Bearer $TOKEN",
@@ -257,18 +257,18 @@ cat <<EOF
 EOF
 ```
 
-### Use Case cho Dynamic Header
+### Use Cases for Dynamic Headers
 
-- Token thời gian ngắn cần refresh
-- Token có HMAC signature
-- Xác thực dựa trên thời gian
-- Chọn tenant/workspace động
+- Short-lived tokens that need refresh
+- Tokens with HMAC signatures
+- Time-based authentication
+- Dynamic tenant/workspace selection
 
-## Best Practices Bảo Mật
+## Security Best Practices
 
-### NÊN
+### DO
 
-✅ **Dùng biến môi trường:**
+✅ **Use environment variables:**
 ```json
 {
   "headers": {
@@ -277,42 +277,42 @@ EOF
 }
 ```
 
-✅ **Ghi lại các biến cần thiết trong README**
+✅ **Document required variables in README**
 
-✅ **Luôn dùng HTTPS/WSS**
+✅ **Use HTTPS/WSS always**
 
-✅ **Triển khai token rotation**
+✅ **Implement token rotation**
 
-✅ **Lưu token an toàn (env var, không phải file)**
+✅ **Store tokens securely (env vars, not files)**
 
-✅ **Để OAuth xử lý xác thực khi có sẵn**
+✅ **Let OAuth handle authentication when available**
 
-### KHÔNG NÊN
+### DON'T
 
-❌ **Hardcode token:**
+❌ **Hardcode tokens:**
 ```json
 {
   "headers": {
-    "Authorization": "Bearer sk-abc123..."  // KHÔNG BAO GIỜ!
+    "Authorization": "Bearer sk-abc123..."  // NEVER!
   }
 }
 ```
 
-❌ **Commit token lên git**
+❌ **Commit tokens to git**
 
-❌ **Chia sẻ token trong tài liệu**
+❌ **Share tokens in documentation**
 
-❌ **Dùng HTTP thay vì HTTPS**
+❌ **Use HTTP instead of HTTPS**
 
-❌ **Lưu token trong file plugin**
+❌ **Store tokens in plugin files**
 
-❌ **Log token hoặc header nhạy cảm**
+❌ **Log tokens or sensitive headers**
 
-## Các Pattern Multi-Tenancy
+## Multi-Tenancy Patterns
 
-### Chọn Workspace/Tenant
+### Workspace/Tenant Selection
 
-**Qua biến môi trường:**
+**Via environment variable:**
 ```json
 {
   "api": {
@@ -326,7 +326,7 @@ EOF
 }
 ```
 
-**Qua URL:**
+**Via URL:**
 ```json
 {
   "api": {
@@ -336,76 +336,76 @@ EOF
 }
 ```
 
-### Cấu Hình Per-User
+### Per-User Configuration
 
-Người dùng đặt workspace của riêng họ:
+Users set their own workspace:
 
 ```bash
 export WORKSPACE_ID="my-workspace-123"
 export TENANT_ID="my-company"
 ```
 
-## Xử Lý Sự Cố Xác Thực
+## Authentication Troubleshooting
 
-### Vấn Đề Thường Gặp
+### Common Issues
 
 **401 Unauthorized:**
-- Kiểm tra token được đặt đúng
-- Xác minh token chưa hết hạn
-- Kiểm tra token có đủ quyền
-- Đảm bảo format header đúng
+- Check token is set correctly
+- Verify token hasn't expired
+- Check token has required permissions
+- Ensure header format is correct
 
 **403 Forbidden:**
-- Token hợp lệ nhưng thiếu quyền
-- Kiểm tra scope/quyền
-- Xác minh workspace/tenant ID
-- Có thể cần phê duyệt admin
+- Token valid but lacks permissions
+- Check scope/permissions
+- Verify workspace/tenant ID
+- May need admin approval
 
-**Token không tìm thấy:**
+**Token not found:**
 ```bash
-# Kiểm tra biến môi trường đã được đặt
+# Check environment variable is set
 echo $API_TOKEN
 
-# Nếu trống, đặt lại
+# If empty, set it
 export API_TOKEN="your-token"
 ```
 
-**Token sai format:**
+**Token in wrong format:**
 ```json
-// Đúng
+// Correct
 "Authorization": "Bearer sk-abc123"
 
-// Sai
+// Wrong
 "Authorization": "sk-abc123"
 ```
 
-### Debug Xác Thực
+### Debugging Authentication
 
-**Bật chế độ debug:**
+**Enable debug mode:**
 ```bash
 claude --debug
 ```
 
-Tìm kiếm:
-- Giá trị authentication header (đã sanitize)
-- Tiến trình OAuth flow
-- Lần thử refresh token
-- Lỗi xác thực
+Look for:
+- Authentication header values (sanitized)
+- OAuth flow progress
+- Token refresh attempts
+- Authentication errors
 
-**Kiểm tra xác thực riêng lẻ:**
+**Test authentication separately:**
 ```bash
 # Test HTTP endpoint
 curl -H "Authorization: Bearer $API_TOKEN" \
      https://api.example.com/mcp/health
 
-# Phải trả về 200 OK
+# Should return 200 OK
 ```
 
-## Các Pattern Migration
+## Migration Patterns
 
-### Từ Hardcoded sang Biến Môi Trường
+### From Hardcoded to Environment Variables
 
-**Trước:**
+**Before:**
 ```json
 {
   "headers": {
@@ -414,7 +414,7 @@ curl -H "Authorization: Bearer $API_TOKEN" \
 }
 ```
 
-**Sau:**
+**After:**
 ```json
 {
   "headers": {
@@ -423,16 +423,16 @@ curl -H "Authorization: Bearer $API_TOKEN" \
 }
 ```
 
-**Các bước migration:**
-1. Thêm biến môi trường vào README plugin
-2. Cập nhật cấu hình để dùng ${VAR}
-3. Kiểm thử với biến đã đặt
-4. Xóa giá trị hardcoded
-5. Commit thay đổi
+**Migration steps:**
+1. Add environment variable to plugin README
+2. Update configuration to use ${VAR}
+3. Test with variable set
+4. Remove hardcoded value
+5. Commit changes
 
-### Từ Basic Auth sang OAuth
+### From Basic Auth to OAuth
 
-**Trước:**
+**Before:**
 ```json
 {
   "headers": {
@@ -441,7 +441,7 @@ curl -H "Authorization: Bearer $API_TOKEN" \
 }
 ```
 
-**Sau:**
+**After:**
 ```json
 {
   "type": "sse",
@@ -449,21 +449,21 @@ curl -H "Authorization: Bearer $API_TOKEN" \
 }
 ```
 
-**Lợi ích:**
-- Bảo mật tốt hơn
-- Không quản lý credential
-- Tự động refresh token
-- Quyền có scope
+**Benefits:**
+- Better security
+- No credential management
+- Automatic token refresh
+- Scoped permissions
 
-## Xác Thực Nâng Cao
+## Advanced Authentication
 
 ### Mutual TLS (mTLS)
 
-Một số service enterprise yêu cầu certificate của client.
+Some enterprise services require client certificates.
 
-**Không được hỗ trợ trực tiếp trong cấu hình MCP.**
+**Not directly supported in MCP configuration.**
 
-**Workaround:** Bọc trong stdio server xử lý mTLS:
+**Workaround:** Wrap in stdio server that handles mTLS:
 
 ```json
 {
@@ -477,15 +477,15 @@ Một số service enterprise yêu cầu certificate của client.
 }
 ```
 
-### JWT Token
+### JWT Tokens
 
-Tạo JWT token động với headers helper:
+Generate JWT tokens dynamically with headers helper:
 
 ```bash
 #!/bin/bash
 # generate-jwt.sh
 
-# Tạo JWT (dùng library hoặc API call)
+# Generate JWT (using library or API call)
 JWT=$(generate-jwt-token)
 
 echo "{\"Authorization\": \"Bearer $JWT\"}"
@@ -497,9 +497,9 @@ echo "{\"Authorization\": \"Bearer $JWT\"}"
 }
 ```
 
-### HMAC Signature
+### HMAC Signatures
 
-Với API yêu cầu ký request:
+For APIs requiring request signing:
 
 ```bash
 #!/bin/bash
@@ -517,33 +517,33 @@ cat <<EOF
 EOF
 ```
 
-## Tóm Tắt Best Practices
+## Best Practices Summary
 
-### Cho Developer Plugin
+### For Plugin Developers
 
-1. **Ưu tiên OAuth** khi service hỗ trợ
-2. **Dùng biến môi trường** cho token
-3. **Ghi lại tất cả biến cần thiết** trong README
-4. **Cung cấp hướng dẫn cài đặt** có ví dụ
-5. **Không bao giờ commit credential**
-6. **Chỉ dùng HTTPS/WSS**
-7. **Kiểm thử xác thực kỹ lưỡng**
+1. **Prefer OAuth** when service supports it
+2. **Use environment variables** for tokens
+3. **Document all required variables** in README
+4. **Provide setup instructions** with examples
+5. **Never commit credentials**
+6. **Use HTTPS/WSS only**
+7. **Test authentication thoroughly**
 
-### Cho Người Dùng Plugin
+### For Plugin Users
 
-1. **Đặt biến môi trường** trước khi dùng plugin
-2. **Giữ token an toàn** và riêng tư
-3. **Rotate token thường xuyên**
-4. **Dùng token khác nhau** cho dev/prod
-5. **Không commit file .env** lên git
-6. **Xem lại OAuth scope** trước khi ủy quyền
+1. **Set environment variables** before using plugin
+2. **Keep tokens secure** and private
+3. **Rotate tokens regularly**
+4. **Use different tokens** for dev/prod
+5. **Don't commit .env files** to git
+6. **Review OAuth scopes** before authorizing
 
-## Kết Luận
+## Conclusion
 
-Chọn phương thức xác thực phù hợp với yêu cầu MCP server:
-- **OAuth** cho cloud service (dễ dùng nhất cho người dùng)
-- **Bearer token** cho API service
-- **Biến môi trường** cho stdio server
-- **Dynamic header** cho authentication flow phức tạp
+Choose the authentication method that matches your MCP server's requirements:
+- **OAuth** for cloud services (easiest for users)
+- **Bearer tokens** for API services
+- **Environment variables** for stdio servers
+- **Dynamic headers** for complex auth flows
 
-Luôn ưu tiên bảo mật và cung cấp tài liệu cài đặt rõ ràng cho người dùng.
+Always prioritize security and provide clear setup documentation for users.

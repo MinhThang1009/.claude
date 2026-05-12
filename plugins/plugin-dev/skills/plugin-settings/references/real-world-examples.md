@@ -1,10 +1,10 @@
-# Ví Dụ Thực Tế về Plugin Settings
+# Real-World Plugin Settings Examples
 
-Phân tích chi tiết cách các plugin production sử dụng pattern `.claude/plugin-name.local.md`.
+Detailed analysis of how production plugins use the `.claude/plugin-name.local.md` pattern.
 
-## Plugin multi-agent-swarm
+## multi-agent-swarm Plugin
 
-### Cấu Trúc File Settings
+### Settings File Structure
 
 **.claude/multi-agent-swarm.local.md:**
 
@@ -39,13 +39,13 @@ Depends on Task 3.4 (user model).
 Report status to 'team-leader' session.
 ```
 
-### Cách Sử Dụng
+### How It's Used
 
 **File:** `hooks/agent-stop-notification.sh`
 
-**Mục đích:** Gửi thông báo cho coordinator khi agent trở thành idle
+**Purpose:** Send notifications to coordinator when agent becomes idle
 
-**Triển khai:**
+**Implementation:**
 
 ```bash
 #!/bin/bash
@@ -53,27 +53,27 @@ set -euo pipefail
 
 SWARM_STATE_FILE=".claude/multi-agent-swarm.local.md"
 
-# Thoát nhanh nếu không có swarm đang hoạt động
+# Quick exit if no swarm active
 if [[ ! -f "$SWARM_STATE_FILE" ]]; then
   exit 0
 fi
 
-# Phân tích frontmatter
+# Parse frontmatter
 FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$SWARM_STATE_FILE")
 
-# Trích xuất cấu hình
+# Extract configuration
 COORDINATOR_SESSION=$(echo "$FRONTMATTER" | grep '^coordinator_session:' | sed 's/coordinator_session: *//' | sed 's/^"\(.*\)"$/\1/')
 AGENT_NAME=$(echo "$FRONTMATTER" | grep '^agent_name:' | sed 's/agent_name: *//' | sed 's/^"\(.*\)"$/\1/')
 TASK_NUMBER=$(echo "$FRONTMATTER" | grep '^task_number:' | sed 's/task_number: *//' | sed 's/^"\(.*\)"$/\1/')
 PR_NUMBER=$(echo "$FRONTMATTER" | grep '^pr_number:' | sed 's/pr_number: *//' | sed 's/^"\(.*\)"$/\1/')
 ENABLED=$(echo "$FRONTMATTER" | grep '^enabled:' | sed 's/enabled: *//')
 
-# Kiểm tra có bật không
+# Check if enabled
 if [[ "$ENABLED" != "true" ]]; then
   exit 0
 fi
 
-# Gửi thông báo cho coordinator
+# Send notification to coordinator
 NOTIFICATION="🤖 Agent ${AGENT_NAME} (Task ${TASK_NUMBER}, PR #${PR_NUMBER}) is idle."
 
 if tmux has-session -t "$COORDINATOR_SESSION" 2>/dev/null; then
@@ -85,17 +85,17 @@ fi
 exit 0
 ```
 
-**Các pattern chính:**
-1. **Thoát nhanh** (dòng 7–9): Trả về ngay nếu file không tồn tại
-2. **Trích xuất trường** (dòng 11–17): Phân tích từng trường frontmatter
-3. **Kiểm tra enabled** (dòng 19–21): Tôn trọng flag enabled
-4. **Hành động dựa trên settings** (dòng 23–29): Dùng coordinator_session để gửi thông báo
+**Key patterns:**
+1. **Quick exit** (line 7-9): Returns immediately if file doesn't exist
+2. **Field extraction** (lines 11-17): Parses each frontmatter field
+3. **Enabled check** (lines 19-21): Respects enabled flag
+4. **Action based on settings** (lines 23-29): Uses coordinator_session to send notification
 
-### Tạo File
+### Creation
 
 **File:** `commands/launch-swarm.md`
 
-File settings được tạo trong quá trình khởi chạy swarm với:
+Settings files are created during swarm launch with:
 
 ```bash
 cat > "$WORKTREE_PATH/.claude/multi-agent-swarm.local.md" <<EOF
@@ -115,20 +115,20 @@ $TASK_DETAILS
 EOF
 ```
 
-### Cập Nhật
+### Updates
 
-Số PR được cập nhật sau khi tạo PR:
+PR number updated after PR creation:
 
 ```bash
-# Cập nhật trường pr_number
+# Update pr_number field
 sed "s/^pr_number: .*/pr_number: $PR_NUM/" \
   ".claude/multi-agent-swarm.local.md" > temp.md
 mv temp.md ".claude/multi-agent-swarm.local.md"
 ```
 
-## Plugin ralph-loop
+## ralph-loop Plugin
 
-### Cấu Trúc File Settings
+### Settings File Structure
 
 **.claude/ralph-loop.local.md:**
 
@@ -145,13 +145,13 @@ Make sure tests pass after each fix.
 Document any changes needed in CLAUDE.md.
 ```
 
-### Cách Sử Dụng
+### How It's Used
 
 **File:** `hooks/stop-hook.sh`
 
-**Mục đích:** Ngăn session thoát và đưa output của Claude trở lại làm input
+**Purpose:** Prevent session exit and loop Claude's output back as input
 
-**Triển khai:**
+**Implementation:**
 
 ```bash
 #!/bin/bash
@@ -159,53 +159,53 @@ set -euo pipefail
 
 RALPH_STATE_FILE=".claude/ralph-loop.local.md"
 
-# Thoát nhanh nếu không có vòng lặp đang hoạt động
+# Quick exit if no active loop
 if [[ ! -f "$RALPH_STATE_FILE" ]]; then
   exit 0
 fi
 
-# Phân tích frontmatter
+# Parse frontmatter
 FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$RALPH_STATE_FILE")
 
-# Trích xuất cấu hình
+# Extract configuration
 ITERATION=$(echo "$FRONTMATTER" | grep '^iteration:' | sed 's/iteration: *//')
 MAX_ITERATIONS=$(echo "$FRONTMATTER" | grep '^max_iterations:' | sed 's/max_iterations: *//')
 COMPLETION_PROMISE=$(echo "$FRONTMATTER" | grep '^completion_promise:' | sed 's/completion_promise: *//' | sed 's/^"\(.*\)"$/\1/')
 
-# Kiểm tra số iteration tối đa
+# Check max iterations
 if [[ $MAX_ITERATIONS -gt 0 ]] && [[ $ITERATION -ge $MAX_ITERATIONS ]]; then
-  echo "🛑 Ralph loop: Đạt số iteration tối đa ($MAX_ITERATIONS)."
+  echo "🛑 Ralph loop: Max iterations ($MAX_ITERATIONS) reached."
   rm "$RALPH_STATE_FILE"
   exit 0
 fi
 
-# Lấy transcript và kiểm tra completion promise
+# Get transcript and check for completion promise
 TRANSCRIPT_PATH=$(echo "$HOOK_INPUT" | jq -r '.transcript_path')
 LAST_OUTPUT=$(grep '"role":"assistant"' "$TRANSCRIPT_PATH" | tail -1 | jq -r '.message.content | map(select(.type == "text")) | map(.text) | join("\n")')
 
-# Kiểm tra completion
+# Check for completion
 if [[ "$COMPLETION_PROMISE" != "null" ]] && [[ -n "$COMPLETION_PROMISE" ]]; then
   PROMISE_TEXT=$(echo "$LAST_OUTPUT" | perl -0777 -pe 's/.*?<promise>(.*?)<\/promise>.*/$1/s; s/^\s+|\s+$//g')
 
   if [[ "$PROMISE_TEXT" = "$COMPLETION_PROMISE" ]]; then
-    echo "✅ Ralph loop: Phát hiện hoàn thành"
+    echo "✅ Ralph loop: Detected completion"
     rm "$RALPH_STATE_FILE"
     exit 0
   fi
 fi
 
-# Tiếp tục vòng lặp — tăng iteration
+# Continue loop - increment iteration
 NEXT_ITERATION=$((ITERATION + 1))
 
-# Trích xuất prompt từ body markdown
+# Extract prompt from markdown body
 PROMPT_TEXT=$(awk '/^---$/{i++; next} i>=2' "$RALPH_STATE_FILE")
 
-# Cập nhật iteration counter
+# Update iteration counter
 TEMP_FILE="${RALPH_STATE_FILE}.tmp.$$"
 sed "s/^iteration: .*/iteration: $NEXT_ITERATION/" "$RALPH_STATE_FILE" > "$TEMP_FILE"
 mv "$TEMP_FILE" "$RALPH_STATE_FILE"
 
-# Chặn thoát và đưa prompt trở lại
+# Block exit and feed prompt back
 jq -n \
   --arg prompt "$PROMPT_TEXT" \
   --arg msg "🔄 Ralph iteration $NEXT_ITERATION" \
@@ -218,15 +218,15 @@ jq -n \
 exit 0
 ```
 
-**Các pattern chính:**
-1. **Thoát nhanh** (dòng 7–9): Bỏ qua nếu không hoạt động
-2. **Theo dõi iteration** (dòng 11–20): Đếm và áp dụng giới hạn iteration tối đa
-3. **Phát hiện promise** (dòng 25–33): Kiểm tra tín hiệu hoàn thành trong output
-4. **Trích xuất prompt** (dòng 38): Đọc body markdown làm prompt tiếp theo
-5. **Cập nhật trạng thái** (dòng 40–43): Tăng iteration theo kiểu atomic
-6. **Tiếp tục vòng lặp** (dòng 45–53): Chặn thoát và đưa prompt trở lại
+**Key patterns:**
+1. **Quick exit** (line 7-9): Skip if not active
+2. **Iteration tracking** (lines 11-20): Count and enforce max iterations
+3. **Promise detection** (lines 25-33): Check for completion signal in output
+4. **Prompt extraction** (line 38): Read markdown body as next prompt
+5. **State update** (lines 40-43): Increment iteration atomically
+6. **Loop continuation** (lines 45-53): Block exit and feed prompt back
 
-### Tạo File
+### Creation
 
 **File:** `scripts/setup-ralph-loop.sh`
 
@@ -236,7 +236,7 @@ PROMPT="$1"
 MAX_ITERATIONS="${2:-0}"
 COMPLETION_PROMISE="${3:-}"
 
-# Tạo state file
+# Create state file
 cat > ".claude/ralph-loop.local.md" <<EOF
 ---
 iteration: 1
@@ -248,48 +248,48 @@ started_at: "$(date -Iseconds)"
 $PROMPT
 EOF
 
-echo "Đã khởi tạo ralph loop: .claude/ralph-loop.local.md"
+echo "Ralph loop initialized: .claude/ralph-loop.local.md"
 ```
 
-## So Sánh Các Pattern
+## Pattern Comparison
 
-| Tính năng | multi-agent-swarm | ralph-loop |
-|-----------|-------------------|--------------|
+| Feature | multi-agent-swarm | ralph-loop |
+|---------|-------------------|--------------|
 | **File** | `.claude/multi-agent-swarm.local.md` | `.claude/ralph-loop.local.md` |
-| **Mục đích** | Trạng thái điều phối agent | Trạng thái iteration vòng lặp |
-| **Frontmatter** | Metadata agent | Cấu hình vòng lặp |
-| **Body** | Phân công task | Prompt cần lặp |
-| **Cập nhật** | Số PR, trạng thái | Iteration counter |
-| **Xóa** | Thủ công hoặc khi hoàn thành | Khi thoát vòng lặp |
-| **Hook** | Stop (thông báo) | Stop (kiểm soát vòng lặp) |
+| **Purpose** | Agent coordination state | Loop iteration state |
+| **Frontmatter** | Agent metadata | Loop configuration |
+| **Body** | Task assignment | Prompt to loop |
+| **Updates** | PR number, status | Iteration counter |
+| **Deletion** | Manual or on completion | On loop exit |
+| **Hook** | Stop (notifications) | Stop (loop control) |
 
-## Nguyên Tắc Tốt Nhất Từ Plugin Thực Tế
+## Best Practices from Real Plugins
 
-### 1. Pattern Thoát Nhanh
+### 1. Quick Exit Pattern
 
-Cả hai plugin đều kiểm tra sự tồn tại của file trước:
+Both plugins check file existence first:
 
 ```bash
 if [[ ! -f "$STATE_FILE" ]]; then
-  exit 0  # Không hoạt động
+  exit 0  # Not active
 fi
 ```
 
-**Tại sao:** Tránh lỗi khi plugin chưa được cấu hình và thực thi nhanh hơn.
+**Why:** Avoids errors when plugin isn't configured and performs fast.
 
-### 2. Flag Enabled
+### 2. Enabled Flag
 
-Cả hai dùng trường `enabled` để kiểm soát tường minh:
+Both use an `enabled` field for explicit control:
 
 ```yaml
 enabled: true
 ```
 
-**Tại sao:** Cho phép tắt tạm thời mà không cần xóa file.
+**Why:** Allows temporary deactivation without deleting file.
 
-### 3. Cập Nhật Atomic
+### 3. Atomic Updates
 
-Cả hai dùng temp file + atomic move:
+Both use temp file + atomic move:
 
 ```bash
 TEMP_FILE="${FILE}.tmp.$$"
@@ -297,99 +297,99 @@ sed "s/^field: .*/field: $NEW_VALUE/" "$FILE" > "$TEMP_FILE"
 mv "$TEMP_FILE" "$FILE"
 ```
 
-**Tại sao:** Ngăn file bị hỏng nếu process bị gián đoạn.
+**Why:** Prevents corruption if process is interrupted.
 
-### 4. Xử Lý Dấu Nháy
+### 4. Quote Handling
 
-Cả hai đều strip dấu nháy bao quanh từ giá trị YAML:
+Both strip surrounding quotes from YAML values:
 
 ```bash
 sed 's/^"\(.*\)"$/\1/'
 ```
 
-**Tại sao:** YAML cho phép cả `field: value` và `field: "value"`.
+**Why:** YAML allows both `field: value` and `field: "value"`.
 
-### 5. Xử Lý Lỗi
+### 5. Error Handling
 
-Cả hai xử lý file thiếu/hỏng khéo léo:
+Both handle missing/corrupt files gracefully:
 
 ```bash
 if [[ ! -f "$FILE" ]]; then
-  exit 0  # Không lỗi, chỉ là chưa cấu hình
+  exit 0  # No error, just not configured
 fi
 
 if [[ -z "$CRITICAL_FIELD" ]]; then
-  echo "File settings bị hỏng" >&2
-  rm "$FILE"  # Dọn dẹp
+  echo "Settings file corrupt" >&2
+  rm "$FILE"  # Clean up
   exit 0
 fi
 ```
 
-**Tại sao:** Thất bại khéo léo thay vì crash.
+**Why:** Fails gracefully instead of crashing.
 
-## Anti-Pattern Cần Tránh
+## Anti-Patterns to Avoid
 
-### ❌ Đường Dẫn Hardcoded
+### ❌ Hardcoded Paths
 
 ```bash
-# XẤU
+# BAD
 FILE="/Users/alice/.claude/my-plugin.local.md"
 
-# TỐT
+# GOOD
 FILE=".claude/my-plugin.local.md"
 ```
 
-### ❌ Biến Không Đặt Trong Dấu Nháy
+### ❌ Unquoted Variables
 
 ```bash
-# XẤU
+# BAD
 echo $VALUE
 
-# TỐT
+# GOOD
 echo "$VALUE"
 ```
 
-### ❌ Cập Nhật Không Atomic
+### ❌ Non-Atomic Updates
 
 ```bash
-# XẤU: Có thể làm hỏng file nếu bị gián đoạn
+# BAD: Can corrupt file if interrupted
 sed -i "s/field: .*/field: $VALUE/" "$FILE"
 
-# TỐT: Atomic
+# GOOD: Atomic
 TEMP_FILE="${FILE}.tmp.$$"
 sed "s/field: .*/field: $VALUE/" "$FILE" > "$TEMP_FILE"
 mv "$TEMP_FILE" "$FILE"
 ```
 
-### ❌ Không Có Giá Trị Mặc Định
+### ❌ No Default Values
 
 ```bash
-# XẤU: Thất bại nếu trường thiếu
+# BAD: Fails if field missing
 if [[ $MAX -gt 100 ]]; then
-  # MAX có thể trống!
+  # MAX might be empty!
 fi
 
-# TỐT: Cung cấp giá trị mặc định
+# GOOD: Provide default
 MAX=${MAX:-10}
 ```
 
-### ❌ Bỏ Qua Trường Hợp Biên
+### ❌ Ignoring Edge Cases
 
 ```bash
-# XẤU: Giả sử đúng 2 marker ---
+# BAD: Assumes exactly 2 --- markers
 sed -n '/^---$/,/^---$/{ /^---$/d; p; }'
 
-# TỐT: Xử lý --- trong body
-awk '/^---$/{i++; next} i>=2'  # Cho body
+# GOOD: Handles --- in body
+awk '/^---$/{i++; next} i>=2'  # For body
 ```
 
-## Kết Luận
+## Conclusion
 
-Pattern `.claude/plugin-name.local.md` cung cấp:
-- Cấu hình đơn giản, có thể đọc được bởi con người
-- Thân thiện với version control (gitignored)
-- Settings theo từng project
-- Dễ phân tích bằng tool bash tiêu chuẩn
-- Hỗ trợ cả cấu hình có cấu trúc (YAML) và nội dung tự do (markdown)
+The `.claude/plugin-name.local.md` pattern provides:
+- Simple, human-readable configuration
+- Version-control friendly (gitignored)
+- Per-project settings
+- Easy parsing with standard bash tools
+- Supports both structured config (YAML) and freeform content (markdown)
 
-Dùng pattern này cho bất kỳ plugin nào cần hành vi có thể cấu hình bởi người dùng hoặc lưu trữ trạng thái bền vững.
+Use this pattern for any plugin that needs user-configurable behavior or state persistence.

@@ -1,29 +1,29 @@
-# Resources & Prompts — hai primitive còn lại
+# Resources & Prompts — the other two primitives
 
-MCP định nghĩa ba primitive phía server. Tool do model điều khiển (Claude quyết định khi nào gọi chúng). Hai cái còn lại khác nhau:
+MCP defines three server-side primitives. Tools are model-controlled (Claude decides when to call them). The other two are different:
 
-- **Resource** do ứng dụng điều khiển — host quyết định cái gì được kéo vào context
-- **Prompt** do user điều khiển — được hiển thị dưới dạng slash command hoặc menu item
+- **Resources** are application-controlled — the host decides what to pull into context
+- **Prompts** are user-controlled — surfaced as slash commands or menu items
 
-Hầu hết server chỉ cần tool. Hãy dùng đến hai thứ này khi shape của integration không vừa với "Claude gọi một function."
+Most servers only need tools. Reach for these when the shape of your integration doesn't fit "Claude calls a function."
 
 ---
 
 ## Resources
 
-Resource là dữ liệu được xác định bằng URI. Không giống tool, nó không được *gọi* — nó được *đọc*. Host duyệt qua các resource có sẵn và quyết định cái nào được tải vào context.
+A resource is data identified by a URI. Unlike a tool, it's not *called* — it's *read*. The host browses available resources and decides which to load into context.
 
-**Khi resource tốt hơn tool:**
-- Dữ liệu tham chiếu lớn (docs, schema, config) mà Claude nên có thể duyệt qua
-- Nội dung thay đổi độc lập với cuộc hội thoại (log file, live data)
-- Bất cứ thứ gì mà "Claude quyết định fetch" là mental model sai
+**When a resource beats a tool:**
+- Large reference data (docs, schemas, configs) that Claude should be able to browse
+- Content that changes independently of conversation (log files, live data)
+- Anything where "Claude decides to fetch" is the wrong mental model
 
-**Khi tool tốt hơn:**
-- Thao tác có side effect
-- Kết quả phụ thuộc vào tham số Claude chọn
-- Bạn muốn Claude (không phải host UI) quyết định khi nào kéo nó vào
+**When a tool is better:**
+- The operation has side effects
+- The result depends on parameters Claude chooses
+- You want Claude (not the host UI) to decide when to pull it in
 
-### Static resource
+### Static resources
 
 ```typescript
 // TypeScript SDK
@@ -45,9 +45,9 @@ def get_settings() -> str:
     return json.dumps(config)
 ```
 
-### Dynamic resource (URI template)
+### Dynamic resources (URI templates)
 
-Template RFC 6570 cho phép một lần đăng ký phục vụ nhiều URI:
+RFC 6570 templates let one registration serve many URIs:
 
 ```typescript
 import { ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -68,17 +68,17 @@ def read_file(path: str) -> str:
     return Path(path).read_text()
 ```
 
-### Subscription
+### Subscriptions
 
-Resource có thể thông báo cho client khi chúng thay đổi. Khai báo `subscribe: true` trong capabilities, sau đó emit `notifications/resources/updated`. Host đọc lại. Hữu ích cho log tail, live dashboard, watched file.
+Resources can notify the client when they change. Declare `subscribe: true` in capabilities, then emit `notifications/resources/updated`. The host re-reads. Useful for log tails, live dashboards, watched files.
 
 ---
 
-## Prompt
+## Prompts
 
-Prompt là message template có tham số. Host hiển thị nó dưới dạng slash command hoặc menu item. User chọn nó, điền tham số, và các message kết quả được đưa vào cuộc hội thoại.
+A prompt is a parameterized message template. The host surfaces it as a slash command or menu item. The user picks it, fills in arguments, and the resulting messages land in the conversation.
 
-**Khi nào dùng:** các workflow đóng gói sẵn mà user chạy lặp lại — `/summarize-thread`, `/draft-reply`, `/explain-error`. Code gần như không có, đổi lại UX cao.
+**When to use:** canned workflows users run repeatedly — `/summarize-thread`, `/draft-reply`, `/explain-error`. Near-zero code, high UX leverage.
 
 ```typescript
 server.registerPrompt(
@@ -104,19 +104,19 @@ def summarize(text: str, max_words: str = "100") -> str:
     return f"Summarize in {max_words} words:\n\n{text}"
 ```
 
-**Ràng buộc:**
-- Argument chỉ là **string** (không có number, boolean, object) — convert bên trong handler
-- Trả về mảng `messages[]` — có thể bao gồm embedded resource/image, không chỉ text
-- Không có side effect — handler chỉ build message, không *làm* bất cứ điều gì
+**Constraints:**
+- Arguments are **string-only** (no numbers, booleans, objects) — convert inside the handler
+- Returns a `messages[]` array — can include embedded resources/images, not just text
+- No side effects — the handler just builds a message, it doesn't *do* anything
 
 ---
 
-## Bảng quyết định nhanh
+## Quick decision table
 
-| Bạn muốn... | Dùng |
+| You want to... | Use |
 |---|---|
-| Để Claude fetch thứ gì đó theo yêu cầu, với tham số | **Tool** |
-| Expose context có thể duyệt được (file, doc, schema) | **Resource** |
-| Expose một họ dynamic (`db://{table}`) | **Resource template** |
-| Cho user một workflow một click | **Prompt** |
-| Hỏi user điều gì đó giữa chừng tool | **Elicitation** (xem `elicitation.md`) |
+| Let Claude fetch something on demand, with parameters | **Tool** |
+| Expose browsable context (files, docs, schemas) | **Resource** |
+| Expose a dynamic family of things (`db://{table}`) | **Resource template** |
+| Give users a one-click workflow | **Prompt** |
+| Ask the user something mid-tool | **Elicitation** (see `elicitation.md`) |

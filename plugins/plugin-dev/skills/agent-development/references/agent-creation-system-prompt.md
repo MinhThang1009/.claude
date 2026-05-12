@@ -1,6 +1,6 @@
-# System Prompt Tạo Agent
+# Agent Creation System Prompt
 
-Đây là system prompt để điều khiển việc tạo agent có hỗ trợ AI. Định dạng ví dụ sử dụng trigger dạng prose trong `whenToUse` và phần "When to invoke" trong body của `systemPrompt`.
+This is the system prompt to drive AI-assisted agent generation. The example format uses prose triggers in `whenToUse` and a "When to invoke" body section in `systemPrompt`.
 
 ## The Prompt
 
@@ -64,18 +64,18 @@ Key principles for your system prompts:
 Remember: The agents you create should be autonomous experts capable of handling their designated tasks with minimal additional guidance. Your system prompts are their complete operational manual.
 ```
 
-## Cách dùng
+## Usage Pattern
 
-Dùng prompt này để tạo cấu hình agent:
+Use this prompt to generate agent configurations:
 
-**Input của người dùng:** "I need an agent that reviews pull requests for code quality issues"
+**User input:** "I need an agent that reviews pull requests for code quality issues"
 
-**Bạn gửi cho Claude với system prompt trên:**
+**You send to Claude with the system prompt above:**
 ```
 Create an agent configuration based on this request: "I need an agent that reviews pull requests for code quality issues"
 ```
 
-**Claude trả về JSON (lưu ý: `whenToUse` dạng prose, phần "When to invoke" trong `systemPrompt`):**
+**Claude returns JSON (note: prose `whenToUse`, "When to invoke" section in `systemPrompt`):**
 ```json
 {
   "identifier": "pr-quality-reviewer",
@@ -84,9 +84,9 @@ Create an agent configuration based on this request: "I need an agent that revie
 }
 ```
 
-## Chuyển sang file agent
+## Converting to Agent File
 
-Lấy JSON output và tạo file agent markdown:
+Take the JSON output and create the agent markdown file:
 
 **agents/pr-quality-reviewer.md:**
 ```markdown
@@ -110,31 +110,31 @@ You are an expert code quality reviewer...
 ...
 ```
 
-## Mẹo tùy chỉnh
+## Customization Tips
 
-### Điều chỉnh System Prompt
+### Adapt the System Prompt
 
-Prompt cơ bản trên có thể được mở rộng cho các nhu cầu cụ thể:
+The base prompt above can be enhanced for specific needs:
 
-**Cho agent tập trung vào bảo mật:**
+**For security-focused agents:**
 ```
-Thêm sau "Architect Comprehensive Instructions":
+Add after "Architect Comprehensive Instructions":
 - Include OWASP top 10 security considerations
 - Check for common vulnerabilities (injection, XSS, etc.)
 - Validate input sanitization
 ```
 
-**Cho agent tạo test:**
+**For test-generation agents:**
 ```
-Thêm sau "Optimize for Performance":
+Add after "Optimize for Performance":
 - Follow AAA pattern (Arrange, Act, Assert)
 - Include edge cases and error scenarios
 - Ensure test isolation and cleanup
 ```
 
-**Cho agent tài liệu:**
+**For documentation agents:**
 ```
-Thêm sau "Design Expert Persona":
+Add after "Design Expert Persona":
 - Use clear, concise language
 - Include code examples
 - Follow project documentation standards from CLAUDE.md
@@ -142,30 +142,30 @@ Thêm sau "Design Expert Persona":
 
 ## Best Practices
 
-### 1. Xem xét context của project
+### 1. Consider Project Context
 
-Prompt đề cập cụ thể đến việc dùng context từ CLAUDE.md:
-- Agent nên căn chỉnh với pattern của project
-- Tuân theo coding standard đặc thù của project
-- Tôn trọng các pattern đã được thiết lập
+The prompt specifically mentions using CLAUDE.md context:
+- Agent should align with project patterns
+- Follow project-specific coding standards
+- Respect established practices
 
-### 2. Thiết kế agent proactive
+### 2. Proactive Agent Design
 
-Khi agent nên được trigger chủ động (không cần yêu cầu rõ ràng từ người dùng), thêm một kịch bản trigger proactive vào phần "When to invoke". Mô tả tình huống bằng prose:
+When the agent should be triggered proactively (without explicit user request), include a proactive trigger scenario in the "When to invoke" section. Describe the situation in prose:
 
 > - **Proactive review after new code.** The assistant has just written or modified code in response to a user request. Run a self-review for quality and security before declaring the task done.
 
-### 3. Giả định về scope
+### 3. Scope Assumptions
 
-Với agent review code, giả định "code vừa viết" chứ không phải toàn bộ codebase:
+For code review agents, assume "recently written code" not entire codebase:
 ```
 For agents that review code, assume recent changes unless explicitly
 stated otherwise.
 ```
 
-### 4. Cấu trúc output
+### 4. Output Structure
 
-Luôn định nghĩa rõ format output trong system prompt:
+Always define clear output format in system prompt:
 ```
 **Output Format:**
 Provide results as:
@@ -174,16 +174,16 @@ Provide results as:
 3. Recommendations (action items)
 ```
 
-## Tích hợp với Plugin-Dev
+## Integration with Plugin-Dev
 
-Dùng system prompt này khi tạo agent cho plugin của bạn:
+Use this system prompt when creating agents for your plugins:
 
-1. Nhận yêu cầu của người dùng về chức năng agent
-2. Feed cho Claude với system prompt này
-3. Nhận JSON output (`identifier`, `whenToUse`, `systemPrompt`)
-4. Chuyển thành file agent markdown với frontmatter
-5. Validate file với quy tắc validation agent
-6. Kiểm tra điều kiện trigger
-7. Thêm vào thư mục `agents/` của plugin
+1. Take user request for agent functionality
+2. Feed to Claude with this system prompt
+3. Get JSON output (`identifier`, `whenToUse`, `systemPrompt`)
+4. Convert to agent markdown file with frontmatter
+5. Validate the file with agent validation rules
+6. Test triggering conditions
+7. Add to plugin's `agents/` directory
 
-Quy trình này cung cấp tính năng tạo agent có hỗ trợ AI.
+This provides AI-assisted agent generation.

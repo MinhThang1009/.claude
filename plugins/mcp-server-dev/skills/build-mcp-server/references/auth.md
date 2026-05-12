@@ -1,50 +1,50 @@
-# Auth cho MCP Servers
+# Auth for MCP Servers
 
-Auth là lý do hầu hết mọi người cuối cùng phải dùng server **remote** ngay cả khi server local đơn giản hơn. OAuth redirect, lưu trữ token, và refresh token đều hoạt động gọn gàng khi có một endpoint được host thực sự để redirect về.
+Auth is the reason most people end up needing a **remote** server even when a local one would be simpler. OAuth redirects, token storage, and refresh all work cleanly when there's a real hosted endpoint to redirect back to.
 
-## Xác thực dành riêng cho Claude
+## Claude-specific authentication
 
-MCP client của Claude hỗ trợ một tập auth type cụ thể — không phải mọi flow tuân thủ spec đều hoạt động. Tham chiếu đầy đủ: https://claude.com/docs/connectors/building/authentication
+Claude's MCP client supports a specific set of auth types — not every spec-compliant flow works. Full reference: https://claude.com/docs/connectors/building/authentication
 
-| Type | Ghi chú |
+| Type | Notes |
 |---|---|
-| `oauth_dcr` | Được hỗ trợ. Với các directory entry có lưu lượng lớn, ưu tiên dùng CIMD hoặc Anthropic-held creds — DCR đăng ký một client mới mỗi lần kết nối mới. |
-| `oauth_cimd` | Được hỗ trợ, khuyến nghị dùng thay DCR cho directory entry. |
-| `oauth_anthropic_creds` | Partner cung cấp `client_id`/`client_secret` cho Anthropic; yêu cầu sự đồng ý của user. Liên hệ `mcp-review@anthropic.com`. |
-| `custom_connection` | User cung cấp URL/creds lúc kết nối (theo kiểu Snowflake). Liên hệ `mcp-review@anthropic.com`. |
-| `none` | Không xác thực. |
+| `oauth_dcr` | Supported. For high-volume directory entries, prefer CIMD or Anthropic-held creds — DCR registers a new client on every fresh connection. |
+| `oauth_cimd` | Supported, recommended over DCR for directory entries. |
+| `oauth_anthropic_creds` | Partner provides `client_id`/`client_secret` to Anthropic; user-consent-gated. Contact `mcp-review@anthropic.com`. |
+| `custom_connection` | User supplies URL/creds at connect time (Snowflake-style). Contact `mcp-review@anthropic.com`. |
+| `none` | Authless. |
 
-**Không được hỗ trợ:** bearer token do user dán vào (`static_bearer`); grant `client_credentials` thuần machine-to-machine không có sự đồng ý của user.
+**Not supported:** user-pasted bearer tokens (`static_bearer`); pure machine-to-machine `client_credentials` grant without user consent.
 
-**Callback URL** (duy nhất, tất cả các bề mặt): `https://claude.ai/api/mcp/auth_callback`
+**Callback URL** (single, all surfaces): `https://claude.ai/api/mcp/auth_callback`
 
 ---
 
-## Ba tầng
+## The three tiers
 
-### Tầng 1: Không auth / static API key
+### Tier 1: No auth / static API key
 
-Server đọc key từ env. User cung cấp một lần lúc setup. Xong.
+Server reads a key from env. User provides it once at setup. Done.
 
 ```typescript
 const apiKey = process.env.UPSTREAM_API_KEY;
 if (!apiKey) throw new Error("UPSTREAM_API_KEY not set");
 ```
 
-Hoạt động với local stdio, MCPB, và remote server như nhau. Nếu đây là tất cả những gì bạn cần, dừng ở đây.
+Works for local stdio, MCPB, and remote servers alike. If this is all you need, stop here.
 
-### Tầng 2: OAuth 2.0 qua CIMD (ưu tiên theo spec 2025-11-25)
+### Tier 2: OAuth 2.0 via CIMD (preferred per spec 2025-11-25)
 
-**Client ID Metadata Document.** MCP host công bố client metadata của mình tại một HTTPS URL và dùng URL đó *làm* `client_id`. Authorization server của bạn fetch document đó, validate nó, và tiến hành auth-code flow. Không có registration endpoint, không có client record được lưu.
+**Client ID Metadata Document.** The MCP host publishes its client metadata at an HTTPS URL and uses that URL *as* its `client_id`. Your authorization server fetches the document, validates it, and proceeds with the auth-code flow. No registration endpoint, no stored client records.
 
-Spec 2025-11-25 đã nâng CIMD lên SHOULD (ưu tiên). Quảng bá hỗ trợ qua `client_id_metadata_document_supported: true` trong OAuth AS metadata của bạn.
+Spec 2025-11-25 promoted CIMD to SHOULD (preferred). Advertise support via `client_id_metadata_document_supported: true` in your OAuth AS metadata.
 
-**Trách nhiệm của server:**
+**Server responsibilities:**
 
-1. Phục vụ OAuth Authorization Server Metadata (RFC 8414) tại `/.well-known/oauth-authorization-server` với `client_id_metadata_document_supported: true`
-2. Phục vụ một MCP protected-resource metadata document trỏ tới (1)
-3. Khi authorize: fetch `client_id` như một HTTPS URL, validate client metadata trả về, tiếp tục
-4. Validate bearer token trên các request `/mcp` đến
+1. Serve OAuth Authorization Server Metadata (RFC 8414) at `/.well-known/oauth-authorization-server` with `client_id_metadata_document_supported: true`
+2. Serve an MCP-protected-resource metadata document pointing at (1)
+3. At authorize time: fetch `client_id` as an HTTPS URL, validate the returned client metadata, proceed
+4. Validate bearer tokens on incoming `/mcp` requests
 
 ```
 ┌─────────┐  client_id=https://...  ┌──────────────┐   upstream OAuth   ┌──────────┐
@@ -52,57 +52,57 @@ Spec 2025-11-25 đã nâng CIMD lên SHOULD (ưu tiên). Quảng bá hỗ trợ 
 └─────────┘ <─── bearer token ───── └──────────────┘ <── access token ──└──────────┘
 ```
 
-### Tầng 3: OAuth 2.0 qua Dynamic Client Registration (DCR)
+### Tier 3: OAuth 2.0 via Dynamic Client Registration (DCR)
 
-**Fallback tương thích ngược** — spec 2025-11-25 đã hạ DCR xuống MAY. Host tìm `registration_endpoint` của bạn, POST metadata của nó để tự đăng ký làm client, nhận `client_id`, sau đó chạy auth-code flow.
+**Backward-compat fallback** — spec 2025-11-25 demoted DCR to MAY. The host discovers your `registration_endpoint`, POSTs its metadata to register itself as a client, gets back a `client_id`, then runs the auth-code flow.
 
-Triển khai DCR nếu bạn cần hỗ trợ các host chưa chuyển sang CIMD. Trách nhiệm server giống như CIMD, nhưng thay vì fetch URL `client_id` bạn chạy một registration endpoint lưu trữ client record.
+Implement DCR if you need to support hosts that haven't moved to CIMD yet. Same server responsibilities as CIMD, but instead of fetching the `client_id` URL you run a registration endpoint that stores client records.
 
-**Thứ tự ưu tiên của client:** pre-registered → CIMD (nếu AS quảng bá `client_id_metadata_document_supported`) → DCR (nếu AS có `registration_endpoint`) → hỏi user.
-
----
-
-## Các nhà cung cấp hosting tích hợp sẵn DCR/CIMD
-
-Một số nhà cung cấp hosting tập trung vào MCP xử lý OAuth plumbing cho bạn — bạn chỉ implement logic của tool, họ chạy authorization server. Xem docs của họ để biết khả năng hiện tại. Nếu user không có yêu cầu hosting cụ thể, đây thường là con đường nhanh nhất để có một OAuth-protected server hoạt động.
+**Client priority order:** pre-registered → CIMD (if AS advertises `client_id_metadata_document_supported`) → DCR (if AS has `registration_endpoint`) → prompt user.
 
 ---
 
-## Server local và OAuth
+## Hosting providers with built-in DCR/CIMD support
 
-Server local stdio **có thể** dùng OAuth (mở browser, bắt redirect trên một localhost port, lưu token vào OS keychain). Nhưng cách này hay bị lỗi:
-
-- Bị lỗi trong môi trường headless/remote
-- Mỗi user phải lặp lại toàn bộ quy trình
-- Không có token refresh hoặc revocation tập trung
-
-Nếu OAuth là bắt buộc, hãy nghiêng mạnh về phía remote HTTP. Nếu bạn *buộc phải* ship local + OAuth, `@modelcontextprotocol/sdk` có sẵn localhost-redirect helper, và MCPB là đúng packaging để ít nhất runtime có thể dự đoán được.
+Several MCP-focused hosting providers handle the OAuth plumbing for you — you implement tool logic, they run the authorization server. Check their docs for current capabilities. If the user doesn't have strong hosting preferences, this is usually the fastest path to a working OAuth-protected server.
 
 ---
 
-## Lưu trữ token
+## Local servers and OAuth
 
-| Deployment | Lưu token ở |
+Local stdio servers **can** do OAuth (open a browser, catch the redirect on a localhost port, stash the token in the OS keychain). It's fragile:
+
+- Breaks in headless/remote environments
+- Every user re-does the dance
+- No central token refresh or revocation
+
+If OAuth is required, lean hard toward remote HTTP. If you *must* ship local + OAuth, the `@modelcontextprotocol/sdk` includes a localhost-redirect helper, and MCPB is the right packaging so at least the runtime is predictable.
+
+---
+
+## Token storage
+
+| Deployment | Store tokens in |
 |---|---|
-| Remote, stateless | Không lưu — host gửi bearer theo từng request |
-| Remote, stateful | Session store theo MCP session ID (Redis, v.v.) |
-| MCPB / local | OS keychain (`keytar` trên Node, `keyring` trên Python). **Không bao giờ lưu plaintext trên disk.** |
+| Remote, stateless | Nowhere — host sends bearer each request |
+| Remote, stateful | Session store keyed by MCP session ID (Redis, etc.) |
+| MCPB / local | OS keychain (`keytar` on Node, `keyring` on Python). **Never plaintext on disk.** |
 
 ---
 
-## Validate token audience (MUST theo spec)
+## Token audience validation (spec MUST)
 
-Validate "đây có phải bearer token hợp lệ không" là chưa đủ. Spec yêu cầu validate "token này có được phát hành *cho server này* không" — RFC 8707 audience. Token được phát hành cho `api.other-service.com` phải bị từ chối dù chữ ký hợp lệ.
+Validating "is this a valid bearer token" isn't enough. The spec requires validating "was this token minted *for this server*" — RFC 8707 audience. A token issued for `api.other-service.com` must be rejected even if the signature checks out.
 
-**Token passthrough bị cấm tuyệt đối.** Không nhận token rồi chuyển tiếp nó upstream. Nếu server của bạn cần gọi một service khác, hãy exchange token hoặc dùng credential riêng của nó.
+**Token passthrough is explicitly forbidden.** Don't accept a token, then forward it upstream. If your server needs to call another service, exchange the token or use its own credentials.
 
 ---
 
-## SDK helpers — đừng tự viết lại
+## SDK helpers — don't hand-roll
 
-`@modelcontextprotocol/sdk/server/auth` cung cấp:
-- `mcpAuthRouter()` — Express router cho toàn bộ OAuth AS surface (metadata, authorize, token)
-- `bearerAuth` — middleware validate bearer token đối chiếu với verifier của bạn
-- `proxyProvider` — chuyển tiếp auth tới upstream IdP
+`@modelcontextprotocol/sdk/server/auth` ships:
+- `mcpAuthRouter()` — Express router for the full OAuth AS surface (metadata, authorize, token)
+- `bearerAuth` — middleware that validates bearer tokens against your verifier
+- `proxyProvider` — forward auth to an upstream IdP
 
-Nếu bạn đang tự nối auth từ đầu, hãy kiểm tra những thứ này trước.
+If you're wiring auth from scratch, check these first.

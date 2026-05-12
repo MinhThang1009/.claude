@@ -1,38 +1,38 @@
-# Tài Liệu Tham Chiếu Tính Năng Command Dành Riêng cho Plugin
+# Plugin-Specific Command Features Reference
 
-Tài liệu này bao gồm các tính năng và pattern dành riêng cho command được đóng gói trong Claude Code plugin.
+This reference covers features and patterns specific to commands bundled in Claude Code plugins.
 
-## Mục Lục
+## Table of Contents
 
-- [Khám Phá Command của Plugin](#khám-phá-command-của-plugin)
-- [Biến Môi Trường CLAUDE_PLUGIN_ROOT](#biến-môi-trường-claude_plugin_root)
-- [Các Pattern Command của Plugin](#các-pattern-command-của-plugin)
-- [Tích Hợp với Các Thành Phần Plugin](#tích-hợp-với-các-thành-phần-plugin)
-- [Các Pattern Validation](#các-pattern-validation)
+- [Plugin Command Discovery](#plugin-command-discovery)
+- [CLAUDE_PLUGIN_ROOT Environment Variable](#claude_plugin_root-environment-variable)
+- [Plugin Command Patterns](#plugin-command-patterns)
+- [Integration with Plugin Components](#integration-with-plugin-components)
+- [Validation Patterns](#validation-patterns)
 
-## Khám Phá Command của Plugin
+## Plugin Command Discovery
 
 ### Auto-Discovery
 
-Claude Code tự động khám phá command trong plugin ở các vị trí sau:
+Claude Code automatically discovers commands in plugins using the following locations:
 
 ```
 plugin-name/
-├── commands/              # Command được tự động khám phá
+├── commands/              # Auto-discovered commands
 │   ├── foo.md            # /foo (plugin:plugin-name)
 │   └── bar.md            # /bar (plugin:plugin-name)
 └── plugin.json           # Plugin manifest
 ```
 
-**Các điểm quan trọng:**
-- Command được khám phá khi plugin được tải
-- Không cần đăng ký thủ công
-- Command xuất hiện trong `/help` với nhãn "(plugin:plugin-name)"
-- Thư mục con tạo namespace
+**Key points:**
+- Commands are discovered at plugin load time
+- No manual registration required
+- Commands appear in `/help` with "(plugin:plugin-name)" label
+- Subdirectories create namespaces
 
-### Command Plugin có Namespace
+### Namespaced Plugin Commands
 
-Tổ chức command trong thư mục con để nhóm logic:
+Organize commands in subdirectories for logical grouping:
 
 ```
 plugin-name/
@@ -45,48 +45,48 @@ plugin-name/
         └── prod.md        # /prod (plugin:plugin-name:deploy)
 ```
 
-**Hành vi namespace:**
-- Tên thư mục con trở thành namespace
-- Hiển thị là "(plugin:plugin-name:namespace)" trong `/help`
-- Giúp tổ chức các command liên quan
-- Dùng khi plugin có 5+ command
+**Namespace behavior:**
+- Subdirectory name becomes namespace
+- Shown as "(plugin:plugin-name:namespace)" in `/help`
+- Helps organize related commands
+- Use when plugin has 5+ commands
 
-### Quy Ước Đặt Tên Command
+### Command Naming Conventions
 
-**Tên command của plugin nên:**
-1. Mô tả rõ và định hướng hành động
-2. Tránh conflict với tên command phổ biến
-3. Dùng dấu gạch ngang cho tên nhiều từ
-4. Cân nhắc thêm prefix tên plugin để đảm bảo độc đáo
+**Plugin command names should:**
+1. Be descriptive and action-oriented
+2. Avoid conflicts with common command names
+3. Use hyphens for multi-word names
+4. Consider prefixing with plugin name for uniqueness
 
-**Ví dụ:**
+**Examples:**
 ```
-Tốt:
-- /mylyn-sync          (prefix đặc thù plugin)
-- /analyze-performance (hành động mô tả)
-- /docker-compose-up   (mục đích rõ ràng)
+Good:
+- /mylyn-sync          (plugin-specific prefix)
+- /analyze-performance (descriptive action)
+- /docker-compose-up   (clear purpose)
 
-Tránh:
-- /test               (conflict với tên phổ biến)
-- /run                (quá chung)
-- /do-stuff           (không mô tả)
+Avoid:
+- /test               (conflicts with common name)
+- /run                (too generic)
+- /do-stuff           (not descriptive)
 ```
 
-## Biến Môi Trường CLAUDE_PLUGIN_ROOT
+## CLAUDE_PLUGIN_ROOT Environment Variable
 
-### Mục Đích
+### Purpose
 
-`${CLAUDE_PLUGIN_ROOT}` là biến môi trường đặc biệt có sẵn trong command của plugin, trỏ tới đường dẫn tuyệt đối của thư mục plugin.
+`${CLAUDE_PLUGIN_ROOT}` is a special environment variable available in plugin commands that resolves to the absolute path of the plugin directory.
 
-**Tại sao quan trọng:**
-- Cho phép đường dẫn portable trong plugin
-- Cho phép tham chiếu đến file và script của plugin
-- Hoạt động qua các cài đặt khác nhau
-- Cần thiết cho thao tác plugin nhiều file
+**Why it matters:**
+- Enables portable paths within plugin
+- Allows referencing plugin files and scripts
+- Works across different installations
+- Essential for multi-file plugin operations
 
-### Cách Dùng Cơ Bản
+### Basic Usage
 
-Tham chiếu file trong plugin của bạn:
+Reference files within your plugin:
 
 ```markdown
 ---
@@ -94,21 +94,21 @@ description: Analyze using plugin script
 allowed-tools: Bash(node:*), Read
 ---
 
-Chạy phân tích: !`node ${CLAUDE_PLUGIN_ROOT}/scripts/analyze.js`
+Run analysis: !`node ${CLAUDE_PLUGIN_ROOT}/scripts/analyze.js`
 
-Đọc template: @${CLAUDE_PLUGIN_ROOT}/templates/report.md
+Read template: @${CLAUDE_PLUGIN_ROOT}/templates/report.md
 ```
 
-**Mở rộng thành:**
+**Expands to:**
 ```
-Chạy phân tích: !`node /path/to/plugins/plugin-name/scripts/analyze.js`
+Run analysis: !`node /path/to/plugins/plugin-name/scripts/analyze.js`
 
-Đọc template: @/path/to/plugins/plugin-name/templates/report.md
+Read template: @/path/to/plugins/plugin-name/templates/report.md
 ```
 
-### Các Pattern Phổ Biến
+### Common Patterns
 
-#### 1. Thực Thi Script của Plugin
+#### 1. Executing Plugin Scripts
 
 ```markdown
 ---
@@ -116,12 +116,12 @@ description: Run custom linter from plugin
 allowed-tools: Bash(node:*)
 ---
 
-Kết quả lint: !`node ${CLAUDE_PLUGIN_ROOT}/bin/lint.js $1`
+Lint results: !`node ${CLAUDE_PLUGIN_ROOT}/bin/lint.js $1`
 
-Review output lint và đề xuất sửa.
+Review the linting output and suggest fixes.
 ```
 
-#### 2. Tải File Cấu Hình
+#### 2. Loading Configuration Files
 
 ```markdown
 ---
@@ -129,24 +129,24 @@ description: Deploy using plugin configuration
 allowed-tools: Read, Bash(*)
 ---
 
-Cấu hình: @${CLAUDE_PLUGIN_ROOT}/config/deploy-config.json
+Configuration: @${CLAUDE_PLUGIN_ROOT}/config/deploy-config.json
 
-Deploy ứng dụng dùng cấu hình trên cho môi trường $1.
+Deploy application using the configuration above for $1 environment.
 ```
 
-#### 3. Truy Cập Tài Nguyên Plugin
+#### 3. Accessing Plugin Resources
 
 ```markdown
 ---
 description: Generate report from template
 ---
 
-Dùng template này: @${CLAUDE_PLUGIN_ROOT}/templates/api-report.md
+Use this template: @${CLAUDE_PLUGIN_ROOT}/templates/api-report.md
 
-Tạo báo cáo cho @$1 theo định dạng template.
+Generate a report for @$1 following the template format.
 ```
 
-#### 4. Workflow Plugin Nhiều Bước
+#### 4. Multi-Step Plugin Workflows
 
 ```markdown
 ---
@@ -154,25 +154,25 @@ description: Complete plugin workflow
 allowed-tools: Bash(*), Read
 ---
 
-Bước 1 — Chuẩn bị: !`bash ${CLAUDE_PLUGIN_ROOT}/scripts/prepare.sh $1`
-Bước 2 — Config: @${CLAUDE_PLUGIN_ROOT}/config/$1.json
-Bước 3 — Thực thi: !`${CLAUDE_PLUGIN_ROOT}/bin/execute $1`
+Step 1 - Prepare: !`bash ${CLAUDE_PLUGIN_ROOT}/scripts/prepare.sh $1`
+Step 2 - Config: @${CLAUDE_PLUGIN_ROOT}/config/$1.json
+Step 3 - Execute: !`${CLAUDE_PLUGIN_ROOT}/bin/execute $1`
 
-Review kết quả và báo cáo trạng thái.
+Review results and report status.
 ```
 
-### Nguyên Tắc Tốt Nhất
+### Best Practices
 
-1. **Luôn dùng cho đường dẫn nội bộ plugin:**
+1. **Always use for plugin-internal paths:**
    ```markdown
-   # Tốt
+   # Good
    @${CLAUDE_PLUGIN_ROOT}/templates/foo.md
 
-   # Xấu
-   @./templates/foo.md  # Tương đối so với thư mục hiện tại, không phải plugin
+   # Bad
+   @./templates/foo.md  # Relative to current directory, not plugin
    ```
 
-2. **Validate sự tồn tại của file:**
+2. **Validate file existence:**
    ```markdown
    ---
    description: Use plugin config if exists
@@ -181,48 +181,48 @@ Review kết quả và báo cáo trạng thái.
 
    !`test -f ${CLAUDE_PLUGIN_ROOT}/config.json && echo "exists" || echo "missing"`
 
-   Nếu config tồn tại, tải nó: @${CLAUDE_PLUGIN_ROOT}/config.json
-   Nếu không, dùng giá trị mặc định...
+   If config exists, load it: @${CLAUDE_PLUGIN_ROOT}/config.json
+   Otherwise, use defaults...
    ```
 
-3. **Ghi lại cấu trúc file plugin:**
+3. **Document plugin file structure:**
    ```markdown
    <!--
-   Cấu trúc plugin:
+   Plugin structure:
    ${CLAUDE_PLUGIN_ROOT}/
-   ├── scripts/analyze.js  (script phân tích)
-   ├── templates/          (template báo cáo)
-   └── config/             (file cấu hình)
+   ├── scripts/analyze.js  (analysis script)
+   ├── templates/          (report templates)
+   └── config/             (configuration files)
    -->
    ```
 
-4. **Kết hợp với argument:**
+4. **Combine with arguments:**
    ```markdown
-   Chạy: !`${CLAUDE_PLUGIN_ROOT}/bin/process.sh $1 $2`
+   Run: !`${CLAUDE_PLUGIN_ROOT}/bin/process.sh $1 $2`
    ```
 
 ### Troubleshooting
 
-**Biến không mở rộng:**
-- Đảm bảo command được tải từ plugin
-- Kiểm tra thực thi bash được phép
-- Xác minh cú pháp chính xác: `${CLAUDE_PLUGIN_ROOT}`
+**Variable not expanding:**
+- Ensure command is loaded from plugin
+- Check bash execution is allowed
+- Verify syntax is exact: `${CLAUDE_PLUGIN_ROOT}`
 
-**Lỗi không tìm thấy file:**
-- Xác minh file tồn tại trong thư mục plugin
-- Kiểm tra đường dẫn file đúng so với plugin root
-- Đảm bảo quyền file cho phép đọc/thực thi
+**File not found errors:**
+- Verify file exists in plugin directory
+- Check file path is correct relative to plugin root
+- Ensure file permissions allow reading/execution
 
-**Đường dẫn có khoảng trắng:**
-- Lệnh Bash tự động xử lý khoảng trắng
-- Tham chiếu file hoạt động với khoảng trắng trong đường dẫn
-- Không cần quote đặc biệt
+**Path with spaces:**
+- Bash commands automatically handle spaces
+- File references work with spaces in paths
+- No special quoting needed
 
-## Các Pattern Command của Plugin
+## Plugin Command Patterns
 
-### Pattern 1: Command Dựa Trên Cấu Hình
+### Pattern 1: Configuration-Based Commands
 
-Command tải cấu hình đặc thù plugin:
+Commands that load plugin-specific configuration:
 
 ```markdown
 ---
@@ -230,21 +230,21 @@ description: Deploy using plugin settings
 allowed-tools: Read, Bash(*)
 ---
 
-Tải cấu hình: @${CLAUDE_PLUGIN_ROOT}/deploy-config.json
+Load configuration: @${CLAUDE_PLUGIN_ROOT}/deploy-config.json
 
-Deploy lên môi trường $1 dùng:
-1. Các cài đặt cấu hình trên
-2. Git branch hiện tại: !`git branch --show-current`
-3. Phiên bản ứng dụng: !`cat package.json | grep version`
+Deploy to $1 environment using:
+1. Configuration settings above
+2. Current git branch: !`git branch --show-current`
+3. Application version: !`cat package.json | grep version`
 
-Thực thi deployment và theo dõi tiến độ.
+Execute deployment and monitor progress.
 ```
 
-**Khi nào dùng:** Command cần cài đặt nhất quán qua các lần gọi
+**When to use:** Commands that need consistent settings across invocations
 
-### Pattern 2: Tạo Dựa Trên Template
+### Pattern 2: Template-Based Generation
 
-Command dùng template của plugin:
+Commands that use plugin templates:
 
 ```markdown
 ---
@@ -254,19 +254,19 @@ argument-hint: [component-name]
 
 Template: @${CLAUDE_PLUGIN_ROOT}/templates/component-docs.md
 
-Tạo tài liệu cho component $1 theo cấu trúc template.
-Bao gồm:
-- Mục đích và cách dùng component
-- Tài liệu tham chiếu API
-- Ví dụ
-- Hướng dẫn kiểm thử
+Generate documentation for $1 component following the template structure.
+Include:
+- Component purpose and usage
+- API reference
+- Examples
+- Testing guidelines
 ```
 
-**Khi nào dùng:** Tạo output theo chuẩn
+**When to use:** Standardized output generation
 
-### Pattern 3: Workflow Nhiều Script
+### Pattern 3: Multi-Script Workflow
 
-Command điều phối nhiều script của plugin:
+Commands that orchestrate multiple plugin scripts:
 
 ```markdown
 ---
@@ -278,18 +278,18 @@ Build: !`bash ${CLAUDE_PLUGIN_ROOT}/scripts/build.sh`
 Validate: !`bash ${CLAUDE_PLUGIN_ROOT}/scripts/validate.sh`
 Test: !`bash ${CLAUDE_PLUGIN_ROOT}/scripts/test.sh`
 
-Review tất cả output và báo cáo:
-1. Trạng thái build
-2. Kết quả validation
-3. Kết quả test
-4. Bước tiếp theo được khuyến nghị
+Review all outputs and report:
+1. Build status
+2. Validation results
+3. Test results
+4. Recommended next steps
 ```
 
-**Khi nào dùng:** Workflow plugin phức tạp với nhiều bước
+**When to use:** Complex plugin workflows with multiple steps
 
-### Pattern 4: Command Thích Ứng Theo Môi Trường
+### Pattern 4: Environment-Aware Commands
 
-Command thích ứng theo môi trường:
+Commands that adapt to environment:
 
 ```markdown
 ---
@@ -297,19 +297,19 @@ description: Deploy based on environment
 argument-hint: [dev|staging|prod]
 ---
 
-Config môi trường: @${CLAUDE_PLUGIN_ROOT}/config/$1.json
+Environment config: @${CLAUDE_PLUGIN_ROOT}/config/$1.json
 
-Kiểm tra môi trường: !`echo "Đang deploy lên: $1"`
+Environment check: !`echo "Deploying to: $1"`
 
-Deploy ứng dụng dùng cấu hình môi trường $1.
-Xác minh deployment và chạy smoke test.
+Deploy application using $1 environment configuration.
+Verify deployment and run smoke tests.
 ```
 
-**Khi nào dùng:** Command có hành vi khác nhau theo môi trường
+**When to use:** Commands that behave differently per environment
 
-### Pattern 5: Quản Lý Dữ Liệu Plugin
+### Pattern 5: Plugin Data Management
 
-Command quản lý dữ liệu đặc thù plugin:
+Commands that manage plugin-specific data:
 
 ```markdown
 ---
@@ -317,21 +317,21 @@ description: Save analysis results to plugin cache
 allowed-tools: Bash(*), Read, Write
 ---
 
-Thư mục cache: ${CLAUDE_PLUGIN_ROOT}/cache/
+Cache directory: ${CLAUDE_PLUGIN_ROOT}/cache/
 
-Phân tích @$1 và lưu kết quả vào cache:
+Analyze @$1 and save results to cache:
 !`mkdir -p ${CLAUDE_PLUGIN_ROOT}/cache && date > ${CLAUDE_PLUGIN_ROOT}/cache/last-run.txt`
 
-Lưu trữ phân tích để tham khảo và so sánh sau này.
+Store analysis for future reference and comparison.
 ```
 
-**Khi nào dùng:** Command cần lưu trữ dữ liệu bền vững
+**When to use:** Commands that need persistent data storage
 
-## Tích Hợp với Các Thành Phần Plugin
+## Integration with Plugin Components
 
-### Gọi Agent của Plugin
+### Invoking Plugin Agents
 
-Command có thể kích hoạt agent của plugin dùng tool Task:
+Commands can trigger plugin agents using the Task tool:
 
 ```markdown
 ---
@@ -339,25 +339,25 @@ description: Deep analysis using plugin agent
 argument-hint: [file-path]
 ---
 
-Khởi tạo phân tích code sâu cho @$1 dùng agent code-analyzer.
+Initiate deep code analysis of @$1 using the code-analyzer agent.
 
-Agent sẽ:
-1. Phân tích cấu trúc code
-2. Xác định các pattern
-3. Đề xuất cải thiện
-4. Tạo báo cáo chi tiết
+The agent will:
+1. Analyze code structure
+2. Identify patterns
+3. Suggest improvements
+4. Generate detailed report
 
-Lưu ý: Dùng tool Task để khởi chạy agent code-analyzer của plugin.
+Note: This uses the Task tool to launch the plugin's code-analyzer agent.
 ```
 
-**Các điểm quan trọng:**
-- Agent phải được định nghĩa trong thư mục `agents/` của plugin
-- Claude sẽ tự động dùng tool Task để khởi chạy agent
-- Agent có quyền truy cập tài nguyên plugin tương tự
+**Key points:**
+- Agent must be defined in plugin's `agents/` directory
+- Claude will automatically use Task tool to launch agent
+- Agent has access to same plugin resources
 
-### Gọi Skill của Plugin
+### Invoking Plugin Skills
 
-Command có thể tham chiếu skill của plugin để có kiến thức chuyên sâu:
+Commands can reference plugin skills for specialized knowledge:
 
 ```markdown
 ---
@@ -365,26 +365,26 @@ description: API documentation with best practices
 argument-hint: [api-file]
 ---
 
-Viết tài liệu cho API trong @$1 theo tiêu chuẩn tài liệu API của chúng ta.
+Document the API in @$1 following our API documentation standards.
 
-Dùng skill api-docs-standards để đảm bảo tài liệu bao gồm:
-- Mô tả endpoint
-- Đặc tả tham số
-- Định dạng response
-- Mã lỗi
-- Ví dụ sử dụng
+Use the api-docs-standards skill to ensure documentation includes:
+- Endpoint descriptions
+- Parameter specifications
+- Response formats
+- Error codes
+- Usage examples
 
-Lưu ý: Điều này tận dụng skill api-docs-standards của plugin để nhất quán.
+Note: This leverages the plugin's api-docs-standards skill for consistency.
 ```
 
-**Các điểm quan trọng:**
-- Skill phải được định nghĩa trong thư mục `skills/` của plugin
-- Đề cập skill theo tên để gợi ý Claude nên gọi nó
-- Skill cung cấp kiến thức domain chuyên sâu
+**Key points:**
+- Skill must be defined in plugin's `skills/` directory
+- Mention skill by name to hint Claude should invoke it
+- Skills provide specialized domain knowledge
 
-### Phối Hợp với Hook của Plugin
+### Coordinating with Plugin Hooks
 
-Command có thể được thiết kế để làm việc với hook của plugin:
+Commands can be designed to work with plugin hooks:
 
 ```markdown
 ---
@@ -392,22 +392,22 @@ description: Commit with pre-commit validation
 allowed-tools: Bash(git:*)
 ---
 
-Stage thay đổi: !\`git add $1\`
+Stage changes: !\`git add $1\`
 
-Commit thay đổi: !\`git commit -m "$2"\`
+Commit changes: !\`git commit -m "$2"\`
 
-Lưu ý: Commit này sẽ kích hoạt pre-commit hook của plugin để validation.
-Review output của hook để tìm vấn đề.
+Note: This commit will trigger the plugin's pre-commit hook for validation.
+Review hook output for any issues.
 ```
 
-**Các điểm quan trọng:**
-- Hook thực thi tự động khi có sự kiện
-- Command có thể chuẩn bị trạng thái cho hook
-- Ghi lại sự tương tác với hook trong command
+**Key points:**
+- Hooks execute automatically on events
+- Commands can prepare state for hooks
+- Document hook interaction in command
 
-### Command Plugin Nhiều Thành Phần
+### Multi-Component Plugin Commands
 
-Command điều phối nhiều thành phần plugin:
+Commands that coordinate multiple plugin components:
 
 ```markdown
 ---
@@ -415,32 +415,32 @@ description: Comprehensive code review workflow
 argument-hint: [file-path]
 ---
 
-File cần review: @$1
+File to review: @$1
 
-Thực thi review toàn diện:
+Execute comprehensive review:
 
-1. **Phân Tích Tĩnh** (qua script plugin)
+1. **Static Analysis** (via plugin scripts)
    !`node ${CLAUDE_PLUGIN_ROOT}/scripts/lint.js $1`
 
-2. **Review Sâu** (qua agent plugin)
-   Khởi chạy agent code-reviewer để phân tích chi tiết.
+2. **Deep Review** (via plugin agent)
+   Launch the code-reviewer agent for detailed analysis.
 
-3. **Nguyên Tắc Tốt Nhất** (qua skill plugin)
-   Dùng skill code-standards để đảm bảo tuân thủ.
+3. **Best Practices** (via plugin skill)
+   Use the code-standards skill to ensure compliance.
 
-4. **Tài Liệu** (qua template plugin)
+4. **Documentation** (via plugin template)
    Template: @${CLAUDE_PLUGIN_ROOT}/templates/review-report.md
 
-Tạo báo cáo cuối kết hợp tất cả output.
+Generate final report combining all outputs.
 ```
 
-**Khi nào dùng:** Workflow phức tạp tận dụng nhiều khả năng của plugin
+**When to use:** Complex workflows leveraging multiple plugin capabilities
 
-## Các Pattern Validation
+## Validation Patterns
 
-### Validation Input
+### Input Validation
 
-Command nên validate input trước khi xử lý:
+Commands should validate inputs before processing:
 
 ```markdown
 ---
@@ -448,22 +448,22 @@ description: Deploy to environment with validation
 argument-hint: [environment]
 ---
 
-Validate môi trường: !`echo "$1" | grep -E "^(dev|staging|prod)$" || echo "INVALID"`
+Validate environment: !`echo "$1" | grep -E "^(dev|staging|prod)$" || echo "INVALID"`
 
 $IF($1 in [dev, staging, prod],
-  Deploy lên môi trường $1 dùng cấu hình đã validate,
-  LỖI: Môi trường không hợp lệ '$1'. Phải là một trong: dev, staging, prod
+  Deploy to $1 environment using validated configuration,
+  ERROR: Invalid environment '$1'. Must be one of: dev, staging, prod
 )
 ```
 
-**Các cách tiếp cận validation:**
-1. Validation Bash dùng grep/test
-2. Validation inline trong prompt
-3. Validation dùng script
+**Validation approaches:**
+1. Bash validation using grep/test
+2. Inline validation in prompt
+3. Script-based validation
 
-### Kiểm Tra File Tồn Tại
+### File Existence Checks
 
-Xác minh file cần thiết tồn tại:
+Verify required files exist:
 
 ```markdown
 ---
@@ -471,19 +471,19 @@ description: Process configuration file
 argument-hint: [config-file]
 ---
 
-Kiểm tra file: !`test -f $1 && echo "EXISTS" || echo "MISSING"`
+Check file: !`test -f $1 && echo "EXISTS" || echo "MISSING"`
 
-Xử lý cấu hình nếu file tồn tại: @$1
+Process configuration if file exists: @$1
 
-Nếu file không tồn tại, giải thích:
-- Vị trí mong đợi
-- Định dạng bắt buộc
-- Cách tạo file
+If file doesn't exist, explain:
+- Expected location
+- Required format
+- How to create it
 ```
 
-### Argument Bắt Buộc
+### Required Arguments
 
-Validate argument bắt buộc đã được cung cấp:
+Validate required arguments provided:
 
 ```markdown
 ---
@@ -491,17 +491,17 @@ description: Create deployment with version
 argument-hint: [environment] [version]
 ---
 
-Validate input: !`test -n "$1" -a -n "$2" && echo "OK" || echo "MISSING"`
+Validate inputs: !`test -n "$1" -a -n "$2" && echo "OK" || echo "MISSING"`
 
 $IF($1 AND $2,
-  Deploy phiên bản $2 lên môi trường $1,
-  LỖI: Cần cả environment và version. Cách dùng: /deploy [env] [version]
+  Deploy version $2 to $1 environment,
+  ERROR: Both environment and version required. Usage: /deploy [env] [version]
 )
 ```
 
-### Validation Tài Nguyên Plugin
+### Plugin Resource Validation
 
-Xác minh tài nguyên plugin có sẵn:
+Verify plugin resources available:
 
 ```markdown
 ---
@@ -509,18 +509,18 @@ description: Run analysis with plugin tools
 allowed-tools: Bash(test:*)
 ---
 
-Validate thiết lập plugin:
-- Config tồn tại: !`test -f ${CLAUDE_PLUGIN_ROOT}/config.json && echo "✓" || echo "✗"`
-- Script tồn tại: !`test -d ${CLAUDE_PLUGIN_ROOT}/scripts && echo "✓" || echo "✗"`
-- Tool có sẵn: !`test -x ${CLAUDE_PLUGIN_ROOT}/bin/analyze && echo "✓" || echo "✗"`
+Validate plugin setup:
+- Config exists: !`test -f ${CLAUDE_PLUGIN_ROOT}/config.json && echo "✓" || echo "✗"`
+- Scripts exist: !`test -d ${CLAUDE_PLUGIN_ROOT}/scripts && echo "✓" || echo "✗"`
+- Tools available: !`test -x ${CLAUDE_PLUGIN_ROOT}/bin/analyze && echo "✓" || echo "✗"`
 
-Nếu tất cả kiểm tra pass, tiến hành phân tích.
-Nếu không, báo cáo thành phần còn thiếu và các bước cài đặt.
+If all checks pass, proceed with analysis.
+Otherwise, report missing components and installation steps.
 ```
 
-### Validation Output
+### Output Validation
 
-Validate kết quả thực thi command:
+Validate command execution results:
 
 ```markdown
 ---
@@ -532,15 +532,15 @@ Build: !`bash ${CLAUDE_PLUGIN_ROOT}/scripts/build.sh`
 
 Validate output:
 - Exit code: !`echo $?`
-- Output tồn tại: !`test -d dist && echo "✓" || echo "✗"`
-- Số file: !`find dist -type f | wc -l`
+- Output exists: !`test -d dist && echo "✓" || echo "✗"`
+- File count: !`find dist -type f | wc -l`
 
-Báo cáo trạng thái build và các lỗi validation.
+Report build status and any validation failures.
 ```
 
-### Xử Lý Lỗi Khéo Léo
+### Graceful Error Handling
 
-Xử lý lỗi khéo léo với thông báo hữu ích:
+Handle errors gracefully with helpful messages:
 
 ```markdown
 ---
@@ -548,62 +548,62 @@ description: Process file with error handling
 argument-hint: [file-path]
 ---
 
-Thử xử lý: !`node ${CLAUDE_PLUGIN_ROOT}/scripts/process.js $1 2>&1 || echo "ERROR: $?"`
+Try processing: !`node ${CLAUDE_PLUGIN_ROOT}/scripts/process.js $1 2>&1 || echo "ERROR: $?"`
 
-Nếu xử lý thành công:
-- Báo cáo kết quả
-- Gợi ý bước tiếp theo
+If processing succeeded:
+- Report results
+- Suggest next steps
 
-Nếu xử lý thất bại:
-- Giải thích nguyên nhân có thể
-- Cung cấp bước troubleshooting
-- Đề xuất cách tiếp cận thay thế
+If processing failed:
+- Explain likely causes
+- Provide troubleshooting steps
+- Suggest alternative approaches
 ```
 
-## Tóm Tắt Nguyên Tắc Tốt Nhất
+## Best Practices Summary
 
-### Command Plugin Nên:
+### Plugin Commands Should:
 
-1. **Dùng ${CLAUDE_PLUGIN_ROOT} cho tất cả đường dẫn nội bộ plugin**
-   - Script, template, cấu hình, tài nguyên
+1. **Use ${CLAUDE_PLUGIN_ROOT} for all plugin-internal paths**
+   - Scripts, templates, configuration, resources
 
-2. **Validate input sớm**
-   - Kiểm tra argument bắt buộc
-   - Xác minh file tồn tại
-   - Validate định dạng argument
+2. **Validate inputs early**
+   - Check required arguments
+   - Verify file existence
+   - Validate argument formats
 
-3. **Ghi lại cấu trúc plugin**
-   - Giải thích các file cần thiết
-   - Ghi lại mục đích script
-   - Làm rõ các dependency
+3. **Document plugin structure**
+   - Explain required files
+   - Document script purposes
+   - Clarify dependencies
 
-4. **Tích hợp với các thành phần plugin**
-   - Tham chiếu agent cho tác vụ phức tạp
-   - Dùng skill cho kiến thức chuyên sâu
-   - Phối hợp với hook khi liên quan
+4. **Integrate with plugin components**
+   - Reference agents for complex tasks
+   - Use skills for specialized knowledge
+   - Coordinate with hooks when relevant
 
-5. **Cung cấp thông báo lỗi hữu ích**
-   - Giải thích điều gì đã sai
-   - Đề xuất cách sửa
-   - Đưa ra phương án thay thế
+5. **Provide helpful error messages**
+   - Explain what went wrong
+   - Suggest how to fix
+   - Offer alternatives
 
-6. **Xử lý trường hợp biên**
-   - File thiếu
-   - Argument không hợp lệ
-   - Thực thi script thất bại
-   - Dependency còn thiếu
+6. **Handle edge cases**
+   - Missing files
+   - Invalid arguments
+   - Failed script execution
+   - Missing dependencies
 
-7. **Giữ command tập trung**
-   - Một mục đích rõ ràng mỗi command
-   - Ủy thác logic phức tạp cho script
-   - Dùng agent cho workflow nhiều bước
+7. **Keep commands focused**
+   - One clear purpose per command
+   - Delegate complex logic to scripts
+   - Use agents for multi-step workflows
 
-8. **Test trên nhiều cài đặt**
-   - Xác minh đường dẫn hoạt động ở mọi nơi
-   - Test với các argument khác nhau
-   - Validate các trường hợp lỗi
+8. **Test across installations**
+   - Verify paths work everywhere
+   - Test with different arguments
+   - Validate error cases
 
 ---
 
-Để phát triển command chung, xem SKILL.md chính.
-Để xem ví dụ command, xem thư mục examples/.
+For general command development, see main SKILL.md.
+For command examples, see examples/ directory.

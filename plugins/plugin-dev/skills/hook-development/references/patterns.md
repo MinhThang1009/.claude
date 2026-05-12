@@ -1,10 +1,10 @@
-# Các Pattern Hook Phổ Biến
+# Common Hook Patterns
 
-Tài liệu tham khảo này cung cấp các pattern phổ biến, đã được kiểm chứng để triển khai Claude Code hook. Dùng các pattern này làm điểm bắt đầu cho các use case hook thông thường.
+This reference provides common, proven patterns for implementing Claude Code hooks. Use these patterns as starting points for typical hook use cases.
 
 ## Pattern 1: Security Validation
 
-Chặn ghi file nguy hiểm bằng prompt hook:
+Block dangerous file writes using prompt-based hooks:
 
 ```json
 {
@@ -22,11 +22,11 @@ Chặn ghi file nguy hiểm bằng prompt hook:
 }
 ```
 
-**Dùng cho:** Ngăn ghi vào file nhạy cảm hoặc thư mục hệ thống.
+**Use for:** Preventing writes to sensitive files or system directories.
 
 ## Pattern 2: Test Enforcement
 
-Đảm bảo test được chạy trước khi dừng:
+Ensure tests run before stopping:
 
 ```json
 {
@@ -44,11 +44,11 @@ Chặn ghi file nguy hiểm bằng prompt hook:
 }
 ```
 
-**Dùng cho:** Đảm bảo tiêu chuẩn chất lượng và ngăn công việc chưa hoàn chỉnh.
+**Use for:** Enforcing quality standards and preventing incomplete work.
 
 ## Pattern 3: Context Loading
 
-Load context đặc thù của project lúc bắt đầu session:
+Load project-specific context at session start:
 
 ```json
 {
@@ -66,12 +66,12 @@ Load context đặc thù của project lúc bắt đầu session:
 }
 ```
 
-**Ví dụ script (load-context.sh):**
+**Example script (load-context.sh):**
 ```bash
 #!/bin/bash
 cd "$CLAUDE_PROJECT_DIR" || exit 1
 
-# Phát hiện loại project
+# Detect project type
 if [ -f "package.json" ]; then
   echo "📦 Node.js project detected"
   echo "export PROJECT_TYPE=nodejs" >> "$CLAUDE_ENV_FILE"
@@ -81,11 +81,11 @@ elif [ -f "Cargo.toml" ]; then
 fi
 ```
 
-**Dùng cho:** Tự động phát hiện và cấu hình thiết lập đặc thù của project.
+**Use for:** Automatically detecting and configuring project-specific settings.
 
 ## Pattern 4: Notification Logging
 
-Ghi log tất cả notification để kiểm tra hoặc phân tích:
+Log all notifications for audit or analysis:
 
 ```json
 {
@@ -103,11 +103,11 @@ Ghi log tất cả notification để kiểm tra hoặc phân tích:
 }
 ```
 
-**Dùng cho:** Theo dõi notification của người dùng hoặc tích hợp với hệ thống logging bên ngoài.
+**Use for:** Tracking user notifications or integration with external logging systems.
 
 ## Pattern 5: MCP Tool Monitoring
 
-Giám sát và validate việc sử dụng MCP tool:
+Monitor and validate MCP tool usage:
 
 ```json
 {
@@ -125,11 +125,11 @@ Giám sát và validate việc sử dụng MCP tool:
 }
 ```
 
-**Dùng cho:** Bảo vệ khỏi các thao tác MCP destructive.
+**Use for:** Protecting against destructive MCP operations.
 
 ## Pattern 6: Build Verification
 
-Đảm bảo project được build sau khi thay đổi code:
+Ensure project builds after code changes:
 
 ```json
 {
@@ -147,11 +147,11 @@ Giám sát và validate việc sử dụng MCP tool:
 }
 ```
 
-**Dùng cho:** Bắt lỗi build trước khi commit hoặc kết thúc công việc.
+**Use for:** Catching build errors before committing or stopping work.
 
 ## Pattern 7: Permission Confirmation
 
-Hỏi người dùng trước các thao tác nguy hiểm:
+Ask user before dangerous operations:
 
 ```json
 {
@@ -169,11 +169,11 @@ Hỏi người dùng trước các thao tác nguy hiểm:
 }
 ```
 
-**Dùng cho:** Xác nhận từ người dùng trước các lệnh có thể destructive.
+**Use for:** User confirmation on potentially destructive commands.
 
 ## Pattern 8: Code Quality Checks
 
-Chạy linter hoặc formatter khi edit file:
+Run linters or formatters on file edits:
 
 ```json
 {
@@ -191,23 +191,23 @@ Chạy linter hoặc formatter khi edit file:
 }
 ```
 
-**Ví dụ script (check-quality.sh):**
+**Example script (check-quality.sh):**
 ```bash
 #!/bin/bash
 input=$(cat)
 file_path=$(echo "$input" | jq -r '.tool_input.file_path')
 
-# Chạy linter nếu áp dụng được
+# Run linter if applicable
 if [[ "$file_path" == *.js ]] || [[ "$file_path" == *.ts ]]; then
   npx eslint "$file_path" 2>&1 || true
 fi
 ```
 
-**Dùng cho:** Tự động đảm bảo chất lượng code.
+**Use for:** Automatic code quality enforcement.
 
-## Kết Hợp Pattern
+## Pattern Combinations
 
-Kết hợp nhiều pattern để bảo vệ toàn diện:
+Combine multiple patterns for comprehensive protection:
 
 ```json
 {
@@ -256,71 +256,71 @@ Kết hợp nhiều pattern để bảo vệ toàn diện:
 }
 ```
 
-Cách này cung cấp bảo vệ và tự động hóa nhiều lớp.
+This provides multi-layered protection and automation.
 
-## Pattern 9: Hook Kích Hoạt Tạm Thời
+## Pattern 9: Temporarily Active Hooks
 
-Tạo hook chỉ chạy khi được bật rõ ràng qua flag file:
+Create hooks that only run when explicitly enabled via flag files:
 
 ```bash
 #!/bin/bash
-# Hook chỉ hoạt động khi flag file tồn tại
+# Hook only active when flag file exists
 FLAG_FILE="$CLAUDE_PROJECT_DIR/.enable-security-scan"
 
 if [ ! -f "$FLAG_FILE" ]; then
-  # Thoát nhanh khi bị vô hiệu hóa
+  # Quick exit when disabled
   exit 0
 fi
 
-# Flag hiện diện, chạy validation
+# Flag present, run validation
 input=$(cat)
 file_path=$(echo "$input" | jq -r '.tool_input.file_path')
 
-# Chạy security scan
+# Run security scan
 security-scanner "$file_path"
 ```
 
-**Kích hoạt:**
+**Activation:**
 ```bash
-# Bật hook
+# Enable the hook
 touch .enable-security-scan
 
-# Tắt hook
+# Disable the hook
 rm .enable-security-scan
 ```
 
-**Dùng cho:**
-- Hook debug tạm thời
-- Feature flag cho development
-- Validation đặc thù project theo opt-in
-- Kiểm tra tốn hiệu năng chỉ khi cần
+**Use for:**
+- Temporary debugging hooks
+- Feature flags for development
+- Project-specific validation that's opt-in
+- Performance-intensive checks only when needed
 
-**Lưu ý:** Phải restart Claude Code sau khi tạo/xóa flag file để hook nhận thấy thay đổi.
+**Note:** Must restart Claude Code after creating/removing flag files for hooks to recognize changes.
 
-## Pattern 10: Hook Điều Khiển Bởi Cấu Hình
+## Pattern 10: Configuration-Driven Hooks
 
-Dùng JSON config để điều khiển hành vi hook:
+Use JSON configuration to control hook behavior:
 
 ```bash
 #!/bin/bash
 CONFIG_FILE="$CLAUDE_PROJECT_DIR/.claude/my-plugin.local.json"
 
-# Đọc cấu hình
+# Read configuration
 if [ -f "$CONFIG_FILE" ]; then
   strict_mode=$(jq -r '.strictMode // false' "$CONFIG_FILE")
   max_file_size=$(jq -r '.maxFileSize // 1000000' "$CONFIG_FILE")
 else
-  # Giá trị mặc định
+  # Defaults
   strict_mode=false
   max_file_size=1000000
 fi
 
-# Bỏ qua nếu không ở strict mode
+# Skip if not in strict mode
 if [ "$strict_mode" != "true" ]; then
   exit 0
 fi
 
-# Áp dụng giới hạn đã cấu hình
+# Apply configured limits
 input=$(cat)
 file_size=$(echo "$input" | jq -r '.tool_input.content | length')
 
@@ -330,7 +330,7 @@ if [ "$file_size" -gt "$max_file_size" ]; then
 fi
 ```
 
-**File cấu hình (.claude/my-plugin.local.json):**
+**Configuration file (.claude/my-plugin.local.json):**
 ```json
 {
   "strictMode": true,
@@ -339,8 +339,8 @@ fi
 }
 ```
 
-**Dùng cho:**
-- Hành vi hook có thể cấu hình bởi người dùng
-- Thiết lập per-project
-- Quy tắc đặc thù của team
-- Tiêu chí validation động
+**Use for:**
+- User-configurable hook behavior
+- Per-project settings
+- Team-specific rules
+- Dynamic validation criteria

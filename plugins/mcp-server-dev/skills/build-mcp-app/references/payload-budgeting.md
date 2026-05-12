@@ -1,22 +1,32 @@
-# Quản lý ngân sách payload
+# Payload budgeting
 
-Host giới hạn text của kết quả tool. claude.ai và Claude Desktop truncate ở khoảng **150.000 ký tự**; Claude Code ở ~25k token. Khi kết quả tool vượt giới hạn, host thay thế bằng một chuỗi file-pointer thay cho JSON của bạn. Widget sau đó nhận non-JSON trong `ontoolresult`, `JSON.parse` throw, và người dùng thấy thứ gì đó như *"Bad payload: SyntaxError: Unexpected token 'E'"* — không có gợi ý nào cho thấy kích thước là nguyên nhân.
+Hosts cap tool-result text. claude.ai and Claude Desktop truncate at roughly
+**150,000 characters**; Claude Code at ~25k tokens. When a tool result exceeds
+the cap, the host substitutes a file-pointer string in place of your JSON. The
+widget then receives non-JSON in `ontoolresult`, `JSON.parse` throws, and the
+user sees something like *"Bad payload: SyntaxError: Unexpected token 'E'"* —
+with no hint that size was the cause.
 
-## Triệu chứng → nguyên nhân
+## Symptom → cause
 
-| Triệu chứng | Nguyên nhân có thể |
+| Symptom | Likely cause |
 |---|---|
-| Widget hiện lỗi JSON parse trên `content[0].text` | Kết quả vượt giới hạn host; host đã thay bằng chuỗi file-pointer |
-| Hoạt động với một query, lỗi với "tất cả X" | Số hàng × số cột đã vượt giới hạn |
-| Hoạt động trong MCP Inspector, lỗi trong Desktop | Inspector không có giới hạn; Desktop thì có |
+| Widget shows a JSON parse error on `content[0].text` | Result over the host cap; host swapped in a file-pointer string |
+| Works for one query, breaks for "all of X" | Row count × column count crossed the cap |
+| Works in MCP Inspector, breaks in Desktop | Inspector has no cap; Desktop does |
 
-## Chiến lược
+## Strategy
 
-Giới hạn payload của bạn ở ~130KB và degrade theo thứ tự:
+Cap your own payload at ~130KB and degrade in order:
 
-1. **Gửi đầy đủ hàng** khi `JSON.stringify(rows).length` dưới giới hạn.
-2. **Cắt bỏ cột** chỉ giữ những cột mà rendering spec thực sự tham chiếu. Duyệt spec cho cả key `field: "..."` *và* `datum.X` / `datum['X']` bên trong chuỗi expression — nếu spec alias một cột qua transform `calculate`, alias xuất hiện dưới dạng `field:` nhưng cột nguồn chỉ xuất hiện dưới dạng `datum.X`, và việc bỏ nó đi sẽ để widget với NaN.
-3. **Truncate hàng** như biện pháp cuối cùng và thêm `{ truncated: N }` vào payload để widget có thể ghi nhãn.
+1. **Ship full rows** when `JSON.stringify(rows).length` is under the cap.
+2. **Prune columns** to those the rendering spec actually references. Walk the
+   spec for both `field: "..."` keys *and* `datum.X` / `datum['X']` inside
+   expression strings — if the spec aliases a column via a `calculate`
+   transform, the alias appears as `field:` but the source column only appears
+   as `datum.X`, and dropping it leaves the widget with NaN.
+3. **Truncate rows** as a last resort and include `{ truncated: N }` in the
+   payload so the widget can label it.
 
 ```ts
 const MAX = 130_000;
@@ -31,12 +41,14 @@ if (JSON.stringify(out).length > MAX) {
 }
 ```
 
-## Asset nặng đi qua `callServerTool`, không phải trong kết quả
+## Heavy assets go via `callServerTool`, not the result
 
-Geometry, image byte, hoặc bất kỳ blob nào widget cần nhưng Claude không cần nên được phục vụ bởi một tool riêng mà widget gọi sau khi mount:
+Geometry, image bytes, or any blob the widget needs but Claude doesn't should
+be served by a separate tool the widget calls after mount:
 
 ```js
 const topo = await app.callServerTool({ name: "get-topojson", arguments: { level } });
 ```
 
-Đánh dấu tool helper đó với `_meta.ui.visibility: ["app"]` để nó không xuất hiện trong danh sách tool của Claude.
+Mark that helper tool with `_meta.ui.visibility: ["app"]` so it doesn't appear
+in Claude's tool list.

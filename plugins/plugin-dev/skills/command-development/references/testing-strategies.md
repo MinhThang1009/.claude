@@ -1,37 +1,37 @@
-# Các Chiến Lược Kiểm Thử Command
+# Command Testing Strategies
 
-Các chiến lược toàn diện để kiểm thử slash command trước khi triển khai và phân phối.
+Comprehensive strategies for testing slash commands before deployment and distribution.
 
-## Tổng Quan
+## Overview
 
-Kiểm thử command đảm bảo chúng hoạt động đúng, xử lý trường hợp biên và mang lại trải nghiệm người dùng tốt. Một cách tiếp cận kiểm thử có hệ thống phát hiện vấn đề sớm và xây dựng sự tin tưởng vào độ tin cậy của command.
+Testing commands ensures they work correctly, handle edge cases, and provide good user experience. A systematic testing approach catches issues early and builds confidence in command reliability.
 
-## Các Cấp Kiểm Thử
+## Testing Levels
 
-### Cấp 1: Validation Cú Pháp và Cấu Trúc
+### Level 1: Syntax and Structure Validation
 
-**Những gì cần kiểm thử:**
-- Cú pháp YAML frontmatter
-- Định dạng Markdown
-- Vị trí và tên file
+**What to test:**
+- YAML frontmatter syntax
+- Markdown format
+- File location and naming
 
-**Cách kiểm thử:**
+**How to test:**
 
 ```bash
 # Validate YAML frontmatter
 head -n 20 .claude/commands/my-command.md | grep -A 10 "^---"
 
-# Kiểm tra marker đóng frontmatter
-head -n 20 .claude/commands/my-command.md | grep -c "^---" # Phải là 2
+# Check for closing frontmatter marker
+head -n 20 .claude/commands/my-command.md | grep -c "^---" # Should be 2
 
-# Xác minh file có phần mở rộng .md
+# Verify file has .md extension
 ls .claude/commands/*.md
 
-# Kiểm tra file ở đúng vị trí
+# Check file is in correct location
 test -f .claude/commands/my-command.md && echo "Found" || echo "Missing"
 ```
 
-**Script validation tự động:**
+**Automated validation script:**
 
 ```bash
 #!/bin/bash
@@ -40,44 +40,44 @@ test -f .claude/commands/my-command.md && echo "Found" || echo "Missing"
 COMMAND_FILE="$1"
 
 if [ ! -f "$COMMAND_FILE" ]; then
-  echo "LỖI: Không tìm thấy file: $COMMAND_FILE"
+  echo "ERROR: File not found: $COMMAND_FILE"
   exit 1
 fi
 
-# Kiểm tra phần mở rộng .md
+# Check .md extension
 if [[ ! "$COMMAND_FILE" =~ \.md$ ]]; then
-  echo "LỖI: File phải có phần mở rộng .md"
+  echo "ERROR: File must have .md extension"
   exit 1
 fi
 
-# Validate YAML frontmatter nếu có
+# Validate YAML frontmatter if present
 if head -n 1 "$COMMAND_FILE" | grep -q "^---"; then
-  # Đếm marker frontmatter
+  # Count frontmatter markers
   MARKERS=$(head -n 50 "$COMMAND_FILE" | grep -c "^---")
   if [ "$MARKERS" -ne 2 ]; then
-    echo "LỖI: YAML frontmatter không hợp lệ (cần đúng 2 marker '---')"
+    echo "ERROR: Invalid YAML frontmatter (need exactly 2 '---' markers)"
     exit 1
   fi
-  echo "✓ Cú pháp YAML frontmatter hợp lệ"
+  echo "✓ YAML frontmatter syntax valid"
 fi
 
-# Kiểm tra file trống
+# Check for empty file
 if [ ! -s "$COMMAND_FILE" ]; then
-  echo "LỖI: File trống"
+  echo "ERROR: File is empty"
   exit 1
 fi
 
-echo "✓ Cấu trúc file command hợp lệ"
+echo "✓ Command file structure valid"
 ```
 
-### Cấp 2: Validation Trường Frontmatter
+### Level 2: Frontmatter Field Validation
 
-**Những gì cần kiểm thử:**
-- Kiểu trường đúng
-- Giá trị trong phạm vi hợp lệ
-- Các trường bắt buộc có mặt (nếu có)
+**What to test:**
+- Field types correct
+- Values in valid ranges
+- Required fields present (if any)
 
-**Script validation:**
+**Validation script:**
 
 ```bash
 #!/bin/bash
@@ -85,94 +85,94 @@ echo "✓ Cấu trúc file command hợp lệ"
 
 COMMAND_FILE="$1"
 
-# Trích xuất YAML frontmatter
+# Extract YAML frontmatter
 FRONTMATTER=$(sed -n '/^---$/,/^---$/p' "$COMMAND_FILE" | sed '1d;$d')
 
 if [ -z "$FRONTMATTER" ]; then
-  echo "Không có frontmatter để validate"
+  echo "No frontmatter to validate"
   exit 0
 fi
 
-# Kiểm tra trường 'model' nếu có
+# Check 'model' field if present
 if echo "$FRONTMATTER" | grep -q "^model:"; then
   MODEL=$(echo "$FRONTMATTER" | grep "^model:" | cut -d: -f2 | tr -d ' ')
   if ! echo "sonnet opus haiku" | grep -qw "$MODEL"; then
-    echo "LỖI: Model không hợp lệ '$MODEL' (phải là sonnet, opus, hoặc haiku)"
+    echo "ERROR: Invalid model '$MODEL' (must be sonnet, opus, or haiku)"
     exit 1
   fi
-  echo "✓ Trường model hợp lệ: $MODEL"
+  echo "✓ Model field valid: $MODEL"
 fi
 
-# Kiểm tra định dạng trường 'allowed-tools'
+# Check 'allowed-tools' field format
 if echo "$FRONTMATTER" | grep -q "^allowed-tools:"; then
-  echo "✓ Trường allowed-tools có mặt"
-  # Có thể thêm validation phức tạp hơn ở đây
+  echo "✓ allowed-tools field present"
+  # Could add more sophisticated validation here
 fi
 
-# Kiểm tra độ dài 'description'
+# Check 'description' length
 if echo "$FRONTMATTER" | grep -q "^description:"; then
   DESC=$(echo "$FRONTMATTER" | grep "^description:" | cut -d: -f2-)
   LENGTH=${#DESC}
   if [ "$LENGTH" -gt 80 ]; then
-    echo "CẢNH BÁO: Độ dài description $LENGTH (khuyến nghị < 60 ký tự)"
+    echo "WARNING: Description length $LENGTH (recommend < 60 chars)"
   else
-    echo "✓ Độ dài description chấp nhận được: $LENGTH ký tự"
+    echo "✓ Description length acceptable: $LENGTH chars"
   fi
 fi
 
-echo "✓ Các trường frontmatter hợp lệ"
+echo "✓ Frontmatter fields valid"
 ```
 
-### Cấp 3: Gọi Command Thủ Công
+### Level 3: Manual Command Invocation
 
-**Những gì cần kiểm thử:**
-- Command xuất hiện trong `/help`
-- Command thực thi không có lỗi
-- Output như mong đợi
+**What to test:**
+- Command appears in `/help`
+- Command executes without errors
+- Output is as expected
 
-**Quy trình kiểm thử:**
+**Test procedure:**
 
 ```bash
-# 1. Khởi động Claude Code
+# 1. Start Claude Code
 claude --debug
 
-# 2. Kiểm tra command xuất hiện trong help
+# 2. Check command appears in help
 > /help
-# Tìm command của bạn trong danh sách
+# Look for your command in the list
 
-# 3. Gọi command không có argument
+# 3. Invoke command without arguments
 > /my-command
-# Kiểm tra xử lý hợp lý hoặc hành vi phù hợp
+# Check for reasonable error or behavior
 
-# 4. Gọi với argument hợp lệ
+# 4. Invoke with valid arguments
 > /my-command arg1 arg2
-# Xác minh hành vi mong đợi
+# Verify expected behavior
 
-# 5. Kiểm tra debug log
+# 5. Check debug logs
 tail -f ~/.claude/debug-logs/latest
-# Tìm lỗi hoặc cảnh báo
+# Look for errors or warnings
 ```
 
-### Cấp 4: Kiểm Thử Argument
+### Level 4: Argument Testing
 
-**Những gì cần kiểm thử:**
-- Argument vị trí hoạt động ($1, $2, v.v.)
-- $ARGUMENTS bắt được tất cả argument
-- Thiếu argument được xử lý khéo léo
-- Argument không hợp lệ được phát hiện
+**What to test:**
+- Positional arguments work ($1, $2, etc.)
+- $ARGUMENTS captures all arguments
+- Missing arguments handled gracefully
+- Invalid arguments detected
 
-**Ma trận kiểm thử:**
+**Test matrix:**
 
-| Test Case | Command | Kết Quả Mong Đợi |
-|-----------|---------|------------------|
-| Không có arg | `/cmd` | Xử lý khéo léo hoặc thông báo hữu ích |
-| Một arg | `/cmd arg1` | $1 được thay thế đúng |
-| Hai arg | `/cmd arg1 arg2` | $1 và $2 được thay thế |
-| Arg thừa | `/cmd a b c d` | Tất cả được bắt hoặc phần thừa được xử lý phù hợp |
-| Ký tự đặc biệt | `/cmd "arg with spaces"` | Dấu nháy được xử lý đúng |
-| Arg trống | `/cmd ""` | Chuỗi rỗng được xử lý |
+| Test Case | Command | Expected Result |
+|-----------|---------|-----------------|
+| No args | `/cmd` | Graceful handling or useful message |
+| One arg | `/cmd arg1` | $1 substituted correctly |
+| Two args | `/cmd arg1 arg2` | $1 and $2 substituted |
+| Extra args | `/cmd a b c d` | All captured or extras ignored appropriately |
+| Special chars | `/cmd "arg with spaces"` | Quotes handled correctly |
+| Empty arg | `/cmd ""` | Empty string handled |
 
-**Script kiểm thử:**
+**Test script:**
 
 ```bash
 #!/bin/bash
@@ -180,198 +180,198 @@ tail -f ~/.claude/debug-logs/latest
 
 COMMAND="$1"
 
-echo "Kiểm thử xử lý argument cho /$COMMAND"
+echo "Testing argument handling for /$COMMAND"
 echo
 
-echo "Test 1: Không có argument"
+echo "Test 1: No arguments"
 echo "  Command: /$COMMAND"
-echo "  Mong đợi: [mô tả hành vi mong đợi]"
-echo "  Cần kiểm thử thủ công"
+echo "  Expected: [describe expected behavior]"
+echo "  Manual test required"
 echo
 
-echo "Test 2: Một argument"
+echo "Test 2: Single argument"
 echo "  Command: /$COMMAND test-value"
-echo "  Mong đợi: 'test-value' xuất hiện trong output"
-echo "  Cần kiểm thử thủ công"
+echo "  Expected: 'test-value' appears in output"
+echo "  Manual test required"
 echo
 
-echo "Test 3: Nhiều argument"
+echo "Test 3: Multiple arguments"
 echo "  Command: /$COMMAND arg1 arg2 arg3"
-echo "  Mong đợi: Tất cả argument được dùng phù hợp"
-echo "  Cần kiểm thử thủ công"
+echo "  Expected: All arguments used appropriately"
+echo "  Manual test required"
 echo
 
-echo "Test 4: Ký tự đặc biệt"
+echo "Test 4: Special characters"
 echo "  Command: /$COMMAND \"value with spaces\""
-echo "  Mong đợi: Toàn bộ cụm từ được bắt"
-echo "  Cần kiểm thử thủ công"
+echo "  Expected: Entire phrase captured"
+echo "  Manual test required"
 ```
 
-### Cấp 5: Kiểm Thử Tham Chiếu File
+### Level 5: File Reference Testing
 
-**Những gì cần kiểm thử:**
-- Cú pháp @ tải nội dung file
-- File không tồn tại được xử lý
-- File lớn được xử lý phù hợp
-- Nhiều tham chiếu file hoạt động
+**What to test:**
+- @ syntax loads file contents
+- Non-existent files handled
+- Large files handled appropriately
+- Multiple file references work
 
-**Quy trình kiểm thử:**
+**Test procedure:**
 
 ```bash
-# Tạo file kiểm thử
+# Create test files
 echo "Test content" > /tmp/test-file.txt
 echo "Second file" > /tmp/test-file-2.txt
 
-# Kiểm thử tham chiếu một file
+# Test single file reference
 > /my-command /tmp/test-file.txt
-# Xác minh nội dung file được đọc
+# Verify file content is read
 
-# Kiểm thử file không tồn tại
+# Test non-existent file
 > /my-command /tmp/nonexistent.txt
-# Xác minh xử lý lỗi khéo léo
+# Verify graceful error handling
 
-# Kiểm thử nhiều file
+# Test multiple files
 > /my-command /tmp/test-file.txt /tmp/test-file-2.txt
-# Xác minh cả hai file được xử lý
+# Verify both files processed
 
-# Kiểm thử file lớn
+# Test large file
 dd if=/dev/zero of=/tmp/large-file.bin bs=1M count=100
 > /my-command /tmp/large-file.bin
-# Xác minh hành vi hợp lý (có thể truncate hoặc cảnh báo)
+# Verify reasonable behavior (may truncate or warn)
 
-# Dọn dẹp
+# Cleanup
 rm /tmp/test-file*.txt /tmp/large-file.bin
 ```
 
-### Cấp 6: Kiểm Thử Thực Thi Bash
+### Level 6: Bash Execution Testing
 
-**Những gì cần kiểm thử:**
-- Lệnh !` thực thi đúng
-- Output lệnh được đưa vào prompt
-- Thất bại lệnh được xử lý
-- Bảo mật: chỉ các lệnh được phép chạy
+**What to test:**
+- !` commands execute correctly
+- Command output included in prompt
+- Command failures handled
+- Security: only allowed commands run
 
-**Quy trình kiểm thử:**
+**Test procedure:**
 
 ```bash
-# Tạo command kiểm thử với thực thi bash
+# Create test command with bash execution
 cat > .claude/commands/test-bash.md << 'EOF'
 ---
 description: Test bash execution
 allowed-tools: Bash(echo:*), Bash(date:*)
 ---
 
-Ngày hiện tại: !`date`
-Output kiểm thử: !`echo "Hello from bash"`
+Current date: !`date`
+Test output: !`echo "Hello from bash"`
 
-Phân tích output trên...
+Analysis of output above...
 EOF
 
-# Kiểm thử trong Claude Code
+# Test in Claude Code
 > /test-bash
-# Xác minh:
-# 1. Ngày xuất hiện đúng
-# 2. Output echo xuất hiện
-# 3. Không có lỗi trong debug log
+# Verify:
+# 1. Date appears correctly
+# 2. Echo output appears
+# 3. No errors in debug logs
 
-# Kiểm thử với lệnh không được phép (nên thất bại hoặc bị chặn)
+# Test with disallowed command (should fail or be blocked)
 cat > .claude/commands/test-forbidden.md << 'EOF'
 ---
 description: Test forbidden command
 allowed-tools: Bash(echo:*)
 ---
 
-Thử lệnh bị cấm: !`ls -la /`
+Trying forbidden: !`ls -la /`
 EOF
 
 > /test-forbidden
-# Xác minh: Bị từ chối quyền hoặc lỗi phù hợp
+# Verify: Permission denied or appropriate error
 ```
 
-### Cấp 7: Kiểm Thử Tích Hợp
+### Level 7: Integration Testing
 
-**Những gì cần kiểm thử:**
-- Command hoạt động với các thành phần plugin khác
-- Command tương tác đúng với nhau
-- Quản lý trạng thái hoạt động qua các lần gọi
-- Command workflow thực thi theo thứ tự
+**What to test:**
+- Commands work with other plugin components
+- Commands interact correctly with each other
+- State management works across invocations
+- Workflow commands execute in sequence
 
-**Các kịch bản kiểm thử:**
+**Test scenarios:**
 
-**Kịch bản 1: Tích Hợp Command + Hook**
+**Scenario 1: Command + Hook Integration**
 
 ```bash
-# Thiết lập: Command kích hoạt một hook
-# Test: Gọi command, xác minh hook thực thi
+# Setup: Command that triggers a hook
+# Test: Invoke command, verify hook executes
 
 # Command: .claude/commands/risky-operation.md
-# Hook: PreToolUse validate thao tác
+# Hook: PreToolUse that validates the operation
 
 > /risky-operation
-# Xác minh: Hook thực thi và validate trước khi command hoàn tất
+# Verify: Hook executes and validates before command completes
 ```
 
-**Kịch bản 2: Chuỗi Command**
+**Scenario 2: Command Sequence**
 
 ```bash
-# Thiết lập: Workflow nhiều command
+# Setup: Multi-command workflow
 > /workflow-init
-# Xác minh: State file được tạo
+# Verify: State file created
 
 > /workflow-step2
-# Xác minh: State file được đọc, bước 2 thực thi
+# Verify: State file read, step 2 executes
 
 > /workflow-complete
-# Xác minh: State file được dọn dẹp
+# Verify: State file cleaned up
 ```
 
-**Kịch bản 3: Tích Hợp Command + MCP**
+**Scenario 3: Command + MCP Integration**
 
 ```bash
-# Thiết lập: Command dùng tool MCP
-# Test: Xác minh MCP server có thể truy cập
+# Setup: Command uses MCP tools
+# Test: Verify MCP server accessible
 
 > /mcp-command
-# Xác minh:
-# 1. MCP server khởi động (nếu là stdio)
-# 2. Gọi tool thành công
-# 3. Kết quả được đưa vào output
+# Verify:
+# 1. MCP server starts (if stdio)
+# 2. Tool calls succeed
+# 3. Results included in output
 ```
 
-## Các Cách Tiếp Cận Kiểm Thử Tự Động
+## Automated Testing Approaches
 
-### Bộ Kiểm Thử Command
+### Command Test Suite
 
-Tạo script bộ kiểm thử:
+Create a test suite script:
 
 ```bash
 #!/bin/bash
-# test-commands.sh - Bộ kiểm thử command
+# test-commands.sh - Command test suite
 
 TEST_DIR=".claude/commands"
 FAILED_TESTS=0
 
-echo "Bộ Kiểm Thử Command"
+echo "Command Test Suite"
 echo "=================="
 echo
 
 for cmd_file in "$TEST_DIR"/*.md; do
   cmd_name=$(basename "$cmd_file" .md)
-  echo "Kiểm thử: $cmd_name"
+  echo "Testing: $cmd_name"
 
-  # Validate cấu trúc
+  # Validate structure
   if ./validate-command.sh "$cmd_file"; then
-    echo "  ✓ Cấu trúc hợp lệ"
+    echo "  ✓ Structure valid"
   else
-    echo "  ✗ Cấu trúc không hợp lệ"
+    echo "  ✗ Structure invalid"
     ((FAILED_TESTS++))
   fi
 
   # Validate frontmatter
   if ./validate-frontmatter.sh "$cmd_file"; then
-    echo "  ✓ Frontmatter hợp lệ"
+    echo "  ✓ Frontmatter valid"
   else
-    echo "  ✗ Frontmatter không hợp lệ"
+    echo "  ✗ Frontmatter invalid"
     ((FAILED_TESTS++))
   fi
 
@@ -379,44 +379,44 @@ for cmd_file in "$TEST_DIR"/*.md; do
 done
 
 echo "=================="
-echo "Kiểm thử hoàn tất"
-echo "Thất bại: $FAILED_TESTS"
+echo "Tests complete"
+echo "Failed: $FAILED_TESTS"
 
 exit $FAILED_TESTS
 ```
 
 ### Pre-Commit Hook
 
-Validate command trước khi commit:
+Validate commands before committing:
 
 ```bash
 #!/bin/bash
 # .git/hooks/pre-commit
 
-echo "Đang validate command..."
+echo "Validating commands..."
 
 COMMANDS_CHANGED=$(git diff --cached --name-only | grep "\.claude/commands/.*\.md")
 
 if [ -z "$COMMANDS_CHANGED" ]; then
-  echo "Không có command nào thay đổi"
+  echo "No commands changed"
   exit 0
 fi
 
 for cmd in $COMMANDS_CHANGED; do
-  echo "Đang kiểm tra: $cmd"
+  echo "Checking: $cmd"
 
   if ! ./scripts/validate-command.sh "$cmd"; then
-    echo "LỖI: Validation command thất bại: $cmd"
+    echo "ERROR: Command validation failed: $cmd"
     exit 1
   fi
 done
 
-echo "✓ Tất cả command hợp lệ"
+echo "✓ All commands valid"
 ```
 
-### Kiểm Thử Liên Tục
+### Continuous Testing
 
-Kiểm thử command trong CI/CD:
+Test commands in CI/CD:
 
 ```yaml
 # .github/workflows/test-commands.yml
@@ -430,10 +430,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Validate cấu trúc command
+      - name: Validate command structure
         run: |
           for cmd in .claude/commands/*.md; do
-            echo "Kiểm thử: $cmd"
+            echo "Testing: $cmd"
             ./scripts/validate-command.sh "$cmd"
           done
 
@@ -443,25 +443,25 @@ jobs:
             ./scripts/validate-frontmatter.sh "$cmd"
           done
 
-      - name: Kiểm tra TODO
+      - name: Check for TODOs
         run: |
           if grep -r "TODO" .claude/commands/; then
-            echo "LỖI: Tìm thấy TODO trong command"
+            echo "ERROR: TODOs found in commands"
             exit 1
           fi
 ```
 
-## Kiểm Thử Trường Hợp Biên
+## Edge Case Testing
 
-### Kiểm Thử Trường Hợp Biên
+### Test Edge Cases
 
-**Argument trống:**
+**Empty arguments:**
 ```bash
 > /cmd ""
 > /cmd '' ''
 ```
 
-**Ký tự đặc biệt:**
+**Special characters:**
 ```bash
 > /cmd "arg with spaces"
 > /cmd arg-with-dashes
@@ -470,12 +470,12 @@ jobs:
 > /cmd 'arg with "quotes"'
 ```
 
-**Argument dài:**
+**Long arguments:**
 ```bash
 > /cmd $(python -c "print('a' * 10000)")
 ```
 
-**Đường dẫn file bất thường:**
+**Unusual file paths:**
 ```bash
 > /cmd ./file
 > /cmd ../file
@@ -483,22 +483,22 @@ jobs:
 > /cmd "/path with spaces/file"
 ```
 
-**Trường hợp biên lệnh Bash:**
+**Bash command edge cases:**
 ```markdown
-# Lệnh có thể thất bại
+# Commands that might fail
 !`exit 1`
 !`false`
 !`command-that-does-not-exist`
 
-# Lệnh với output đặc biệt
+# Commands with special output
 !`echo ""`
 !`cat /dev/null`
 !`yes | head -n 1000000`
 ```
 
-## Kiểm Thử Hiệu Năng
+## Performance Testing
 
-### Kiểm Thử Thời Gian Phản Hồi
+### Response Time Testing
 
 ```bash
 #!/bin/bash
@@ -506,197 +506,197 @@ jobs:
 
 COMMAND="$1"
 
-echo "Kiểm thử hiệu năng của /$COMMAND"
+echo "Testing performance of /$COMMAND"
 echo
 
 for i in {1..5}; do
-  echo "Lần chạy $i:"
+  echo "Run $i:"
   START=$(date +%s%N)
 
-  # Gọi command (bước thủ công — ghi lại thời gian)
-  echo "  Gọi: /$COMMAND"
-  echo "  Thời gian bắt đầu: $START"
-  echo "  (Ghi lại thời gian kết thúc thủ công)"
+  # Invoke command (manual step - record time)
+  echo "  Invoke: /$COMMAND"
+  echo "  Start time: $START"
+  echo "  (Record end time manually)"
   echo
 done
 
-echo "Phân tích kết quả:"
-echo "  - Thời gian phản hồi trung bình"
-echo "  - Độ lệch"
-echo "  - Ngưỡng chấp nhận được: < 3 giây cho command nhanh"
+echo "Analyze results:"
+echo "  - Average response time"
+echo "  - Variance"
+echo "  - Acceptable threshold: < 3 seconds for fast commands"
 ```
 
-### Kiểm Thử Sử Dụng Tài Nguyên
+### Resource Usage Testing
 
 ```bash
-# Theo dõi Claude Code trong khi thực thi command
-# Trong terminal 1:
+# Monitor Claude Code during command execution
+# In terminal 1:
 claude --debug
 
-# Trong terminal 2:
+# In terminal 2:
 watch -n 1 'ps aux | grep claude'
 
-# Thực thi command và quan sát:
-# - Sử dụng bộ nhớ
-# - Sử dụng CPU
-# - Số lượng process
+# Execute command and observe:
+# - Memory usage
+# - CPU usage
+# - Process count
 ```
 
-## Kiểm Thử Trải Nghiệm Người Dùng
+## User Experience Testing
 
-### Checklist Khả Dụng
+### Usability Checklist
 
-- [ ] Tên command trực quan
-- [ ] Mô tả rõ ràng trong `/help`
-- [ ] Argument được ghi lại tốt
-- [ ] Thông báo lỗi hữu ích
-- [ ] Output định dạng dễ đọc
-- [ ] Command chạy lâu hiển thị tiến độ
-- [ ] Kết quả có thể thực thi được
-- [ ] Trường hợp biên có UX tốt
+- [ ] Command name is intuitive
+- [ ] Description is clear in `/help`
+- [ ] Arguments are well-documented
+- [ ] Error messages are helpful
+- [ ] Output is formatted readably
+- [ ] Long-running commands show progress
+- [ ] Results are actionable
+- [ ] Edge cases have good UX
 
 ### User Acceptance Testing
 
-Tuyển người dùng kiểm thử:
+Recruit testers:
 
 ```markdown
-# Hướng Dẫn Kiểm Thử cho Beta Tester
+# Testing Guide for Beta Testers
 
 ## Command: /my-new-command
 
-### Các Kịch Bản Kiểm Thử
+### Test Scenarios
 
-1. **Cách dùng cơ bản:**
-   - Chạy: `/my-new-command`
-   - Mong đợi: [mô tả]
-   - Đánh giá độ rõ ràng: 1–5
+1. **Basic usage:**
+   - Run: `/my-new-command`
+   - Expected: [describe]
+   - Rate clarity: 1-5
 
-2. **Với argument:**
-   - Chạy: `/my-new-command arg1 arg2`
-   - Mong đợi: [mô tả]
-   - Đánh giá tính hữu dụng: 1–5
+2. **With arguments:**
+   - Run: `/my-new-command arg1 arg2`
+   - Expected: [describe]
+   - Rate usefulness: 1-5
 
-3. **Trường hợp lỗi:**
-   - Chạy: `/my-new-command invalid-input`
-   - Mong đợi: Thông báo lỗi hữu ích
-   - Đánh giá thông báo lỗi: 1–5
+3. **Error case:**
+   - Run: `/my-new-command invalid-input`
+   - Expected: Helpful error message
+   - Rate error message: 1-5
 
-### Câu Hỏi Phản Hồi
+### Feedback Questions
 
-1. Command có dễ hiểu không?
-2. Output có đáp ứng kỳ vọng không?
-3. Bạn sẽ thay đổi gì?
-4. Bạn có dùng command này thường xuyên không?
+1. Was the command easy to understand?
+2. Did the output meet your expectations?
+3. What would you change?
+4. Would you use this command regularly?
 ```
 
-## Checklist Kiểm Thử
+## Testing Checklist
 
-Trước khi phát hành command:
+Before releasing a command:
 
-### Cấu Trúc
-- [ ] File ở đúng vị trí
-- [ ] Phần mở rộng .md đúng
-- [ ] YAML frontmatter hợp lệ (nếu có)
-- [ ] Cú pháp Markdown đúng
+### Structure
+- [ ] File in correct location
+- [ ] Correct .md extension
+- [ ] Valid YAML frontmatter (if present)
+- [ ] Markdown syntax correct
 
-### Chức Năng
-- [ ] Command xuất hiện trong `/help`
-- [ ] Mô tả rõ ràng
-- [ ] Command thực thi không có lỗi
-- [ ] Argument hoạt động như mong đợi
-- [ ] Tham chiếu file hoạt động
-- [ ] Thực thi Bash hoạt động (nếu dùng)
+### Functionality
+- [ ] Command appears in `/help`
+- [ ] Description is clear
+- [ ] Command executes without errors
+- [ ] Arguments work as expected
+- [ ] File references work
+- [ ] Bash execution works (if used)
 
-### Trường Hợp Biên
-- [ ] Thiếu argument được xử lý
-- [ ] Argument không hợp lệ được phát hiện
-- [ ] File không tồn tại được xử lý
-- [ ] Ký tự đặc biệt hoạt động
-- [ ] Input dài được xử lý
+### Edge Cases
+- [ ] Missing arguments handled
+- [ ] Invalid arguments detected
+- [ ] Non-existent files handled
+- [ ] Special characters work
+- [ ] Long inputs handled
 
-### Tích Hợp
-- [ ] Hoạt động với các command khác
-- [ ] Hoạt động với hook (nếu có)
-- [ ] Hoạt động với MCP (nếu có)
-- [ ] Quản lý trạng thái hoạt động
+### Integration
+- [ ] Works with other commands
+- [ ] Works with hooks (if applicable)
+- [ ] Works with MCP (if applicable)
+- [ ] State management works
 
-### Chất Lượng
-- [ ] Hiệu năng chấp nhận được
-- [ ] Không có vấn đề bảo mật
-- [ ] Thông báo lỗi hữu ích
-- [ ] Output định dạng tốt
-- [ ] Tài liệu đầy đủ
+### Quality
+- [ ] Performance acceptable
+- [ ] No security issues
+- [ ] Error messages helpful
+- [ ] Output formatted well
+- [ ] Documentation complete
 
-### Phân Phối
-- [ ] Đã được người khác kiểm thử
-- [ ] Phản hồi đã được tích hợp
-- [ ] README đã cập nhật
-- [ ] Ví dụ đã được cung cấp
+### Distribution
+- [ ] Tested by others
+- [ ] Feedback incorporated
+- [ ] README updated
+- [ ] Examples provided
 
-## Debug Kiểm Thử Thất Bại
+## Debugging Failed Tests
 
-### Vấn Đề Phổ Biến và Giải Pháp
+### Common Issues and Solutions
 
-**Vấn đề: Command không xuất hiện trong /help**
+**Issue: Command not appearing in /help**
 
 ```bash
-# Kiểm tra vị trí file
+# Check file location
 ls -la .claude/commands/my-command.md
 
-# Kiểm tra quyền
+# Check permissions
 chmod 644 .claude/commands/my-command.md
 
-# Kiểm tra cú pháp
+# Check syntax
 head -n 20 .claude/commands/my-command.md
 
-# Khởi động lại Claude Code
+# Restart Claude Code
 claude --debug
 ```
 
-**Vấn đề: Argument không được thay thế**
+**Issue: Arguments not substituting**
 
 ```bash
-# Xác minh cú pháp
+# Verify syntax
 grep '\$1' .claude/commands/my-command.md
 grep '\$ARGUMENTS' .claude/commands/my-command.md
 
-# Kiểm thử với command đơn giản trước
+# Test with simple command first
 echo "Test: \$1 and \$2" > .claude/commands/test-args.md
 ```
 
-**Vấn đề: Lệnh Bash không thực thi**
+**Issue: Bash commands not executing**
 
 ```bash
-# Kiểm tra allowed-tools
+# Check allowed-tools
 grep "allowed-tools" .claude/commands/my-command.md
 
-# Xác minh cú pháp lệnh
+# Verify command syntax
 grep '!\`' .claude/commands/my-command.md
 
-# Kiểm thử lệnh thủ công
+# Test command manually
 date
 echo "test"
 ```
 
-**Vấn đề: Tham chiếu file không hoạt động**
+**Issue: File references not working**
 
 ```bash
-# Kiểm tra cú pháp @
+# Check @ syntax
 grep '@' .claude/commands/my-command.md
 
-# Xác minh file tồn tại
+# Verify file exists
 ls -la /path/to/referenced/file
 
-# Kiểm tra quyền
+# Check permissions
 chmod 644 /path/to/referenced/file
 ```
 
-## Nguyên Tắc Tốt Nhất
+## Best Practices
 
-1. **Kiểm thử sớm, kiểm thử thường xuyên**: Validate khi đang phát triển
-2. **Tự động hóa validation**: Dùng script cho các kiểm tra có thể lặp lại
-3. **Kiểm thử trường hợp biên**: Đừng chỉ kiểm thử happy path
-4. **Lấy phản hồi**: Để người khác kiểm thử trước khi phát hành rộng
-5. **Ghi lại kiểm thử**: Giữ lại kịch bản kiểm thử để regression testing
-6. **Theo dõi trên production**: Theo dõi vấn đề sau khi phát hành
-7. **Lặp lại**: Cải thiện dựa trên dữ liệu sử dụng thực tế
+1. **Test early, test often**: Validate as you develop
+2. **Automate validation**: Use scripts for repeatable checks
+3. **Test edge cases**: Don't just test the happy path
+4. **Get feedback**: Have others test before wide release
+5. **Document tests**: Keep test scenarios for regression testing
+6. **Monitor in production**: Watch for issues after release
+7. **Iterate**: Improve based on real usage data

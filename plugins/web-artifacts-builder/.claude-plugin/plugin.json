@@ -1,0 +1,5 @@
+{
+  "name": "web-artifacts-builder",
+  "description": "Build complex HTML artifacts (React, Tailwind, shadcn/ui) with state management for inline rendering in Claude",
+  "author": { "name": "Minh Thang" }
+}

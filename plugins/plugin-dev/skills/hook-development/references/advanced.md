@@ -1,10 +1,10 @@
-# Các Use Case Hook Nâng Cao
+# Advanced Hook Use Cases
 
-Tài liệu tham khảo này bao gồm các pattern hook nâng cao và kỹ thuật cho workflow tự động hóa phức tạp.
+This reference covers advanced hook patterns and techniques for sophisticated automation workflows.
 
-## Validation Đa Giai Đoạn
+## Multi-Stage Validation
 
-Kết hợp command hook và prompt hook để validation theo lớp:
+Combine command and prompt hooks for layered validation:
 
 ```json
 {
@@ -28,71 +28,71 @@ Kết hợp command hook và prompt hook để validation theo lớp:
 }
 ```
 
-**Use case:** Kiểm tra deterministic nhanh, theo sau là phân tích thông minh
+**Use case:** Fast deterministic checks followed by intelligent analysis
 
-**Ví dụ quick-check.sh:**
+**Example quick-check.sh:**
 ```bash
 #!/bin/bash
 input=$(cat)
 command=$(echo "$input" | jq -r '.tool_input.command')
 
-# Chấp thuận ngay các lệnh an toàn
+# Immediate approval for safe commands
 if [[ "$command" =~ ^(ls|pwd|echo|date|whoami)$ ]]; then
   exit 0
 fi
 
-# Để prompt hook xử lý các trường hợp phức tạp
+# Let prompt hook handle complex cases
 exit 0
 ```
 
-Command hook phê duyệt nhanh các lệnh rõ ràng là an toàn, trong khi prompt hook phân tích mọi thứ còn lại.
+The command hook quickly approves obviously safe commands, while the prompt hook analyzes everything else.
 
-## Thực Thi Hook Có Điều Kiện
+## Conditional Hook Execution
 
-Thực thi hook dựa trên môi trường hoặc context:
+Execute hooks based on environment or context:
 
 ```bash
 #!/bin/bash
-# Chỉ chạy trong môi trường CI
+# Only run in CI environment
 if [ -z "$CI" ]; then
-  echo '{"continue": true}' # Bỏ qua khi không phải CI
+  echo '{"continue": true}' # Skip in non-CI
   exit 0
 fi
 
-# Chạy logic validation trong CI
+# Run validation logic in CI
 input=$(cat)
 # ... validation code ...
 ```
 
-**Use case:**
-- Hành vi khác nhau trong CI so với local development
-- Validation đặc thù của project
-- Quy tắc đặc thù của người dùng
+**Use cases:**
+- Different behavior in CI vs local development
+- Project-specific validation
+- User-specific rules
 
-**Ví dụ: Bỏ qua một số kiểm tra cho trusted user:**
+**Example: Skip certain checks for trusted users:**
 ```bash
 #!/bin/bash
-# Bỏ qua kiểm tra chi tiết cho admin user
+# Skip detailed checks for admin users
 if [ "$USER" = "admin" ]; then
   exit 0
 fi
 
-# Validation đầy đủ cho người dùng khác
+# Full validation for other users
 input=$(cat)
 # ... validation code ...
 ```
 
-## Hook Chaining qua State
+## Hook Chaining via State
 
-Chia sẻ state giữa các hook bằng file tạm:
+Share state between hooks using temporary files:
 
 ```bash
-# Hook 1: Phân tích và lưu state
+# Hook 1: Analyze and save state
 #!/bin/bash
 input=$(cat)
 command=$(echo "$input" | jq -r '.tool_input.command')
 
-# Phân tích lệnh
+# Analyze command
 risk_level=$(calculate_risk "$command")
 echo "$risk_level" > /tmp/hook-state-$$
 
@@ -100,7 +100,7 @@ exit 0
 ```
 
 ```bash
-# Hook 2: Dùng state đã lưu
+# Hook 2: Use saved state
 #!/bin/bash
 risk_level=$(cat /tmp/hook-state-$$ 2>/dev/null || echo "unknown")
 
@@ -110,31 +110,31 @@ if [ "$risk_level" = "high" ]; then
 fi
 ```
 
-**Quan trọng:** Cách này chỉ hoạt động với sequential hook event (ví dụ: PreToolUse rồi PostToolUse), không phải hook song song.
+**Important:** This only works for sequential hook events (e.g., PreToolUse then PostToolUse), not parallel hooks.
 
-## Cấu Hình Hook Động
+## Dynamic Hook Configuration
 
-Thay đổi hành vi hook dựa trên cấu hình project:
+Modify hook behavior based on project configuration:
 
 ```bash
 #!/bin/bash
 cd "$CLAUDE_PROJECT_DIR" || exit 1
 
-# Đọc config đặc thù của project
+# Read project-specific config
 if [ -f ".claude-hooks-config.json" ]; then
   strict_mode=$(jq -r '.strict_mode' .claude-hooks-config.json)
 
   if [ "$strict_mode" = "true" ]; then
-    # Áp dụng validation nghiêm ngặt
+    # Apply strict validation
     # ...
   else
-    # Áp dụng validation nhẹ nhàng hơn
+    # Apply lenient validation
     # ...
   fi
 fi
 ```
 
-**Ví dụ .claude-hooks-config.json:**
+**Example .claude-hooks-config.json:**
 ```json
 {
   "strict_mode": true,
@@ -143,9 +143,9 @@ fi
 }
 ```
 
-## Prompt Hook Nhận Thức Context
+## Context-Aware Prompt Hooks
 
-Dùng transcript và context session để ra quyết định thông minh:
+Use transcript and session context for intelligent decisions:
 
 ```json
 {
@@ -163,11 +163,11 @@ Dùng transcript và context session để ra quyết định thông minh:
 }
 ```
 
-LLM có thể đọc file transcript và đưa ra quyết định nhận thức context.
+The LLM can read the transcript file and make context-aware decisions.
 
-## Tối Ưu Hiệu Suất
+## Performance Optimization
 
-### Cache Kết Quả Validation
+### Caching Validation Results
 
 ```bash
 #!/bin/bash
@@ -176,26 +176,26 @@ file_path=$(echo "$input" | jq -r '.tool_input.file_path')
 cache_key=$(echo -n "$file_path" | md5sum | cut -d' ' -f1)
 cache_file="/tmp/hook-cache-$cache_key"
 
-# Kiểm tra cache
+# Check cache
 if [ -f "$cache_file" ]; then
   cache_age=$(($(date +%s) - $(stat -f%m "$cache_file" 2>/dev/null || stat -c%Y "$cache_file")))
-  if [ "$cache_age" -lt 300 ]; then  # Cache 5 phút
+  if [ "$cache_age" -lt 300 ]; then  # 5 minute cache
     cat "$cache_file"
     exit 0
   fi
 fi
 
-# Thực hiện validation
+# Perform validation
 result='{"decision": "approve"}'
 
-# Cache kết quả
+# Cache result
 echo "$result" > "$cache_file"
 echo "$result"
 ```
 
-### Tối Ưu Thực Thi Song Song
+### Parallel Execution Optimization
 
-Vì hook chạy song song, thiết kế chúng độc lập với nhau:
+Since hooks run in parallel, design them to be independent:
 
 ```json
 {
@@ -205,17 +205,17 @@ Vì hook chạy song song, thiết kế chúng độc lập với nhau:
       "hooks": [
         {
           "type": "command",
-          "command": "bash check-size.sh",      // Độc lập
+          "command": "bash check-size.sh",      // Independent
           "timeout": 2
         },
         {
           "type": "command",
-          "command": "bash check-path.sh",      // Độc lập
+          "command": "bash check-path.sh",      // Independent
           "timeout": 2
         },
         {
           "type": "prompt",
-          "prompt": "Check content safety",     // Độc lập
+          "prompt": "Check content safety",     // Independent
           "timeout": 10
         }
       ]
@@ -224,21 +224,21 @@ Vì hook chạy song song, thiết kế chúng độc lập với nhau:
 }
 ```
 
-Cả ba hook chạy đồng thời, giảm tổng latency.
+All three hooks run simultaneously, reducing total latency.
 
-## Workflow Xuyên Event
+## Cross-Event Workflows
 
-Phối hợp hook qua các event khác nhau:
+Coordinate hooks across different events:
 
-**SessionStart - Thiết lập tracking:**
+**SessionStart - Set up tracking:**
 ```bash
 #!/bin/bash
-# Khởi tạo session tracking
+# Initialize session tracking
 echo "0" > /tmp/test-count-$$
 echo "0" > /tmp/build-count-$$
 ```
 
-**PostToolUse - Track event:**
+**PostToolUse - Track events:**
 ```bash
 #!/bin/bash
 input=$(cat)
@@ -253,7 +253,7 @@ if [ "$tool_name" = "Bash" ]; then
 fi
 ```
 
-**Stop - Verify dựa trên tracking:**
+**Stop - Verify based on tracking:**
 ```bash
 #!/bin/bash
 test_count=$(cat /tmp/test-count-$$ 2>/dev/null || echo "0")
@@ -264,9 +264,9 @@ if [ "$test_count" -eq 0 ]; then
 fi
 ```
 
-## Tích Hợp Hệ Thống Bên Ngoài
+## Integration with External Systems
 
-### Thông báo Slack
+### Slack Notifications
 
 ```bash
 #!/bin/bash
@@ -274,7 +274,7 @@ input=$(cat)
 tool_name=$(echo "$input" | jq -r '.tool_name')
 decision="blocked"
 
-# Gửi thông báo lên Slack
+# Send notification to Slack
 curl -X POST "$SLACK_WEBHOOK" \
   -H 'Content-Type: application/json' \
   -d "{\"text\": \"Hook ${decision} ${tool_name} operation\"}" \
@@ -284,33 +284,33 @@ echo '{"decision": "deny"}' >&2
 exit 2
 ```
 
-### Ghi log vào Database
+### Database Logging
 
 ```bash
 #!/bin/bash
 input=$(cat)
 
-# Ghi log vào database
+# Log to database
 psql "$DATABASE_URL" -c "INSERT INTO hook_logs (event, data) VALUES ('PreToolUse', '$input')" \
   2>/dev/null
 
 exit 0
 ```
 
-### Thu thập Metrics
+### Metrics Collection
 
 ```bash
 #!/bin/bash
 input=$(cat)
 tool_name=$(echo "$input" | jq -r '.tool_name')
 
-# Gửi metrics lên hệ thống monitoring
+# Send metrics to monitoring system
 echo "hook.pretooluse.${tool_name}:1|c" | nc -u -w1 statsd.local 8125
 
 exit 0
 ```
 
-## Các Pattern Bảo Mật
+## Security Patterns
 
 ### Rate Limiting
 
@@ -319,7 +319,7 @@ exit 0
 input=$(cat)
 command=$(echo "$input" | jq -r '.tool_input.command')
 
-# Theo dõi tần suất lệnh
+# Track command frequency
 rate_file="/tmp/hook-rate-$$"
 current_minute=$(date +%Y%m%d%H%M)
 
@@ -354,20 +354,20 @@ input=$(cat)
 tool_name=$(echo "$input" | jq -r '.tool_name')
 timestamp=$(date -Iseconds)
 
-# Append vào audit log
+# Append to audit log
 echo "$timestamp | $USER | $tool_name | $input" >> ~/.claude/audit.log
 
 exit 0
 ```
 
-### Phát Hiện Secret
+### Secret Detection
 
 ```bash
 #!/bin/bash
 input=$(cat)
 content=$(echo "$input" | jq -r '.tool_input.content')
 
-# Kiểm tra các pattern secret phổ biến
+# Check for common secret patterns
 if echo "$content" | grep -qE "(api[_-]?key|password|secret|token).{0,20}['\"]?[A-Za-z0-9]{20,}"; then
   echo '{"decision": "deny", "reason": "Potential secret detected in content"}' >&2
   exit 2
@@ -376,15 +376,15 @@ fi
 exit 0
 ```
 
-## Kiểm Thử Hook Nâng Cao
+## Testing Advanced Hooks
 
-### Unit Testing Script Hook
+### Unit Testing Hook Scripts
 
 ```bash
 # test-hook.sh
 #!/bin/bash
 
-# Test 1: Phê duyệt lệnh an toàn
+# Test 1: Approve safe command
 result=$(echo '{"tool_input": {"command": "ls"}}' | bash validate-bash.sh)
 if [ $? -eq 0 ]; then
   echo "✓ Test 1 passed"
@@ -392,7 +392,7 @@ else
   echo "✗ Test 1 failed"
 fi
 
-# Test 2: Chặn lệnh nguy hiểm
+# Test 2: Block dangerous command
 result=$(echo '{"tool_input": {"command": "rm -rf /"}}' | bash validate-bash.sh)
 if [ $? -eq 2 ]; then
   echo "✓ Test 2 passed"
@@ -403,13 +403,13 @@ fi
 
 ### Integration Testing
 
-Tạo test scenario để kiểm thử toàn bộ hook workflow:
+Create test scenarios that exercise the full hook workflow:
 
 ```bash
 # integration-test.sh
 #!/bin/bash
 
-# Thiết lập môi trường test
+# Set up test environment
 export CLAUDE_PROJECT_DIR="/tmp/test-project"
 export CLAUDE_PLUGIN_ROOT="$(pwd)"
 mkdir -p "$CLAUDE_PROJECT_DIR"
@@ -422,51 +422,51 @@ else
   echo "✗ SessionStart hook failed"
 fi
 
-# Dọn dẹp
+# Clean up
 rm -rf "$CLAUDE_PROJECT_DIR"
 ```
 
-## Best Practices cho Hook Nâng Cao
+## Best Practices for Advanced Hooks
 
-1. **Giữ hook độc lập**: Đừng dựa vào thứ tự thực thi
-2. **Dùng timeout**: Đặt giới hạn phù hợp cho từng loại hook
-3. **Xử lý lỗi gracefully**: Cung cấp thông báo lỗi rõ ràng
-4. **Ghi lại độ phức tạp**: Giải thích các pattern nâng cao trong README
-5. **Kiểm thử kỹ lưỡng**: Bao phủ edge case và failure mode
-6. **Theo dõi hiệu suất**: Track thời gian thực thi hook
-7. **Version control cấu hình**: Dùng version control cho hook config
-8. **Cung cấp escape hatch**: Cho phép người dùng bypass hook khi cần
+1. **Keep hooks independent**: Don't rely on execution order
+2. **Use timeouts**: Set appropriate limits for each hook type
+3. **Handle errors gracefully**: Provide clear error messages
+4. **Document complexity**: Explain advanced patterns in README
+5. **Test thoroughly**: Cover edge cases and failure modes
+6. **Monitor performance**: Track hook execution time
+7. **Version configuration**: Use version control for hook configs
+8. **Provide escape hatches**: Allow users to bypass hooks when needed
 
-## Các Lỗi Thường Gặp
+## Common Pitfalls
 
-### Giả định thứ tự hook
+### ❌ Assuming Hook Order
 
 ```bash
-# TỆ: Giả định hook chạy theo thứ tự cụ thể
-# Hook 1 lưu state, Hook 2 đọc nó
-# Có thể fail vì hook chạy song song!
+# BAD: Assumes hooks run in specific order
+# Hook 1 saves state, Hook 2 reads it
+# This can fail because hooks run in parallel!
 ```
 
-### Hook chạy quá lâu
+### ❌ Long-Running Hooks
 
 ```bash
-# TỆ: Hook mất 2 phút để chạy
+# BAD: Hook takes 2 minutes to run
 sleep 120
-# Sẽ timeout và chặn workflow
+# This will timeout and block the workflow
 ```
 
-### Exception không được bắt
+### ❌ Uncaught Exceptions
 
 ```bash
-# TỆ: Script crash với input bất ngờ
+# BAD: Script crashes on unexpected input
 file_path=$(echo "$input" | jq -r '.tool_input.file_path')
-cat "$file_path"  # Fail nếu file không tồn tại
+cat "$file_path"  # Fails if file doesn't exist
 ```
 
-### Xử lý lỗi đúng cách
+### ✅ Proper Error Handling
 
 ```bash
-# TỐT: Xử lý lỗi gracefully
+# GOOD: Handles errors gracefully
 file_path=$(echo "$input" | jq -r '.tool_input.file_path')
 if [ ! -f "$file_path" ]; then
   echo '{"continue": true, "systemMessage": "File not found, skipping check"}' >&2
@@ -474,6 +474,6 @@ if [ ! -f "$file_path" ]; then
 fi
 ```
 
-## Kết Luận
+## Conclusion
 
-Các pattern hook nâng cao cho phép tự động hóa phức tạp trong khi duy trì độ tin cậy và hiệu suất. Dùng các kỹ thuật này khi hook cơ bản không đủ, nhưng luôn ưu tiên sự đơn giản và khả năng bảo trì.
+Advanced hook patterns enable sophisticated automation while maintaining reliability and performance. Use these techniques when basic hooks are insufficient, but always prioritize simplicity and maintainability.

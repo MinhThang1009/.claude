@@ -1,16 +1,16 @@
-# Các Loại MCP Server: Tham Khảo Chuyên Sâu
+# MCP Server Types: Deep Dive
 
-Tài liệu tham khảo đầy đủ về tất cả loại MCP server được hỗ trợ trong Claude Code plugin.
+Complete reference for all MCP server types supported in Claude Code plugins.
 
 ## stdio (Standard Input/Output)
 
-### Tổng Quan
+### Overview
 
-Thực thi MCP server local dưới dạng child process với giao tiếp qua stdin/stdout. Lựa chọn tốt nhất cho local tool, custom server và NPM package.
+Execute local MCP servers as child processes with communication via stdin/stdout. Best choice for local tools, custom servers, and NPM packages.
 
-### Cấu Hình
+### Configuration
 
-**Cơ bản:**
+**Basic:**
 ```json
 {
   "my-server": {
@@ -20,7 +20,7 @@ Thực thi MCP server local dưới dạng child process với giao tiếp qua s
 }
 ```
 
-**Với môi trường:**
+**With environment:**
 ```json
 {
   "my-server": {
@@ -37,14 +37,14 @@ Thực thi MCP server local dưới dạng child process với giao tiếp qua s
 
 ### Process Lifecycle
 
-1. **Startup**: Claude Code spawn process với `command` và `args`
-2. **Giao tiếp**: JSON-RPC message qua stdin/stdout
-3. **Lifecycle**: Process chạy suốt session Claude Code
-4. **Shutdown**: Process bị terminate khi Claude Code thoát
+1. **Startup**: Claude Code spawns process with `command` and `args`
+2. **Communication**: JSON-RPC messages via stdin/stdout
+3. **Lifecycle**: Process runs for entire Claude Code session
+4. **Shutdown**: Process terminated when Claude Code exits
 
-### Use Case
+### Use Cases
 
-**NPM Package:**
+**NPM Packages:**
 ```json
 {
   "filesystem": {
@@ -54,7 +54,7 @@ Thực thi MCP server local dưới dạng child process với giao tiếp qua s
 }
 ```
 
-**Custom Script:**
+**Custom Scripts:**
 ```json
 {
   "custom": {
@@ -64,7 +64,7 @@ Thực thi MCP server local dưới dạng child process với giao tiếp qua s
 }
 ```
 
-**Python Server:**
+**Python Servers:**
 ```json
 {
   "python-server": {
@@ -79,34 +79,34 @@ Thực thi MCP server local dưới dạng child process với giao tiếp qua s
 
 ### Best Practices
 
-1. **Dùng absolute path hoặc ${CLAUDE_PLUGIN_ROOT}**
-2. **Đặt PYTHONUNBUFFERED cho Python server**
-3. **Truyền cấu hình qua args hoặc env, không phải stdin**
-4. **Xử lý server crash gracefully**
-5. **Log vào stderr, không phải stdout (stdout dành cho MCP protocol)**
+1. **Use absolute paths or ${CLAUDE_PLUGIN_ROOT}**
+2. **Set PYTHONUNBUFFERED for Python servers**
+3. **Pass configuration via args or env, not stdin**
+4. **Handle server crashes gracefully**
+5. **Log to stderr, not stdout (stdout is for MCP protocol)**
 
-### Xử Lý Sự Cố
+### Troubleshooting
 
-**Server không khởi động:**
-- Kiểm tra command tồn tại và có thể thực thi
-- Xác minh file path đúng
-- Kiểm tra quyền
-- Xem log `claude --debug`
+**Server won't start:**
+- Check command exists and is executable
+- Verify file paths are correct
+- Check permissions
+- Review `claude --debug` logs
 
-**Giao tiếp thất bại:**
-- Đảm bảo server dùng stdin/stdout đúng cách
-- Kiểm tra các câu lệnh print/console.log lạc chỗ
-- Xác minh JSON-RPC format
+**Communication fails:**
+- Ensure server uses stdin/stdout correctly
+- Check for stray print/console.log statements
+- Verify JSON-RPC format
 
 ## SSE (Server-Sent Events)
 
-### Tổng Quan
+### Overview
 
-Kết nối tới hosted MCP server qua HTTP với server-sent event để stream. Tốt nhất cho cloud service và OAuth authentication.
+Connect to hosted MCP servers via HTTP with server-sent events for streaming. Best for cloud services and OAuth authentication.
 
-### Cấu Hình
+### Configuration
 
-**Cơ bản:**
+**Basic:**
 ```json
 {
   "hosted-service": {
@@ -116,7 +116,7 @@ Kết nối tới hosted MCP server qua HTTP với server-sent event để strea
 }
 ```
 
-**Với header:**
+**With headers:**
 ```json
 {
   "service": {
@@ -132,15 +132,15 @@ Kết nối tới hosted MCP server qua HTTP với server-sent event để strea
 
 ### Connection Lifecycle
 
-1. **Khởi tạo**: Thiết lập HTTP connection tới URL
-2. **Handshake**: Đàm phán MCP protocol
-3. **Streaming**: Server gửi event qua SSE
-4. **Request**: Client gửi HTTP POST cho tool call
-5. **Reconnect**: Tự động kết nối lại khi ngắt
+1. **Initialization**: HTTP connection established to URL
+2. **Handshake**: MCP protocol negotiation
+3. **Streaming**: Server sends events via SSE
+4. **Requests**: Client sends HTTP POST for tool calls
+5. **Reconnection**: Automatic reconnection on disconnect
 
-### Xác Thực
+### Authentication
 
-**OAuth (Tự động):**
+**OAuth (Automatic):**
 ```json
 {
   "asana": {
@@ -150,13 +150,13 @@ Kết nối tới hosted MCP server qua HTTP với server-sent event để strea
 }
 ```
 
-Claude Code xử lý OAuth flow:
-1. Người dùng được nhắc xác thực lần đầu sử dụng
-2. Mở browser cho OAuth flow
-3. Token được lưu an toàn
-4. Tự động refresh token
+Claude Code handles OAuth flow:
+1. User prompted to authenticate on first use
+2. Opens browser for OAuth flow
+3. Tokens stored securely
+4. Automatic token refresh
 
-**Custom Header:**
+**Custom Headers:**
 ```json
 {
   "service": {
@@ -169,47 +169,47 @@ Claude Code xử lý OAuth flow:
 }
 ```
 
-### Use Case
+### Use Cases
 
-**Service Chính Thức:**
+**Official Services:**
 - Asana: `https://mcp.asana.com/sse`
 - GitHub: `https://mcp.github.com/sse`
-- Các hosted MCP server khác
+- Other hosted MCP servers
 
-**Custom Hosted Server:**
-Deploy MCP server của riêng bạn và expose qua HTTPS + SSE.
+**Custom Hosted Servers:**
+Deploy your own MCP server and expose via HTTPS + SSE.
 
 ### Best Practices
 
-1. **Luôn dùng HTTPS, không bao giờ HTTP**
-2. **Để OAuth xử lý xác thực khi có sẵn**
-3. **Dùng biến môi trường cho token**
-4. **Xử lý connection failure gracefully**
-5. **Ghi lại OAuth scope cần thiết**
+1. **Always use HTTPS, never HTTP**
+2. **Let OAuth handle authentication when available**
+3. **Use environment variables for tokens**
+4. **Handle connection failures gracefully**
+5. **Document OAuth scopes required**
 
-### Xử Lý Sự Cố
+### Troubleshooting
 
 **Connection refused:**
-- Kiểm tra URL đúng và có thể truy cập
-- Xác minh HTTPS certificate hợp lệ
-- Kiểm tra kết nối mạng
-- Xem cài đặt firewall
+- Check URL is correct and accessible
+- Verify HTTPS certificate is valid
+- Check network connectivity
+- Review firewall settings
 
-**OAuth thất bại:**
-- Xóa token đã cache
-- Kiểm tra OAuth scope
-- Xác minh redirect URL
-- Xác thực lại
+**OAuth fails:**
+- Clear cached tokens
+- Check OAuth scopes
+- Verify redirect URLs
+- Re-authenticate
 
 ## HTTP (REST API)
 
-### Tổng Quan
+### Overview
 
-Kết nối tới RESTful MCP server qua HTTP request tiêu chuẩn. Tốt nhất cho token-based auth và stateless interaction.
+Connect to RESTful MCP servers via standard HTTP requests. Best for token-based auth and stateless interactions.
 
-### Cấu Hình
+### Configuration
 
-**Cơ bản:**
+**Basic:**
 ```json
 {
   "api": {
@@ -219,7 +219,7 @@ Kết nối tới RESTful MCP server qua HTTP request tiêu chuẩn. Tốt nhấ
 }
 ```
 
-**Với xác thực:**
+**With authentication:**
 ```json
 {
   "api": {
@@ -236,12 +236,12 @@ Kết nối tới RESTful MCP server qua HTTP request tiêu chuẩn. Tốt nhấ
 
 ### Request/Response Flow
 
-1. **Tool Discovery**: GET để khám phá tool có sẵn
-2. **Tool Invocation**: POST với tên tool và tham số
-3. **Response**: JSON response với kết quả hoặc lỗi
-4. **Stateless**: Mỗi request độc lập
+1. **Tool Discovery**: GET to discover available tools
+2. **Tool Invocation**: POST with tool name and parameters
+3. **Response**: JSON response with results or errors
+4. **Stateless**: Each request independent
 
-### Xác Thực
+### Authentication
 
 **Token-Based:**
 ```json
@@ -271,43 +271,43 @@ Kết nối tới RESTful MCP server qua HTTP request tiêu chuẩn. Tốt nhấ
 }
 ```
 
-### Use Case
+### Use Cases
 
-- REST API backend
-- Internal service
-- Microservice
-- Serverless function
+- REST API backends
+- Internal services
+- Microservices
+- Serverless functions
 
 ### Best Practices
 
-1. **Dùng HTTPS cho tất cả kết nối**
-2. **Lưu token trong biến môi trường**
-3. **Triển khai retry logic cho transient failure**
-4. **Xử lý rate limiting**
-5. **Đặt timeout phù hợp**
+1. **Use HTTPS for all connections**
+2. **Store tokens in environment variables**
+3. **Implement retry logic for transient failures**
+4. **Handle rate limiting**
+5. **Set appropriate timeouts**
 
-### Xử Lý Sự Cố
+### Troubleshooting
 
-**HTTP error:**
-- 401: Kiểm tra authentication header
-- 403: Xác minh quyền
-- 429: Triển khai rate limiting
-- 500: Kiểm tra server log
+**HTTP errors:**
+- 401: Check authentication headers
+- 403: Verify permissions
+- 429: Implement rate limiting
+- 500: Check server logs
 
-**Vấn đề timeout:**
-- Tăng timeout nếu cần
-- Kiểm tra hiệu suất server
-- Tối ưu triển khai tool
+**Timeout issues:**
+- Increase timeout if needed
+- Check server performance
+- Optimize tool implementations
 
 ## WebSocket (Real-time)
 
-### Tổng Quan
+### Overview
 
-Kết nối tới MCP server qua WebSocket cho giao tiếp hai chiều real-time. Tốt nhất cho streaming và ứng dụng độ trễ thấp.
+Connect to MCP servers via WebSocket for real-time bidirectional communication. Best for streaming and low-latency applications.
 
-### Cấu Hình
+### Configuration
 
-**Cơ bản:**
+**Basic:**
 ```json
 {
   "realtime": {
@@ -317,7 +317,7 @@ Kết nối tới MCP server qua WebSocket cho giao tiếp hai chiều real-time
 }
 ```
 
-**Với xác thực:**
+**With authentication:**
 ```json
 {
   "realtime": {
@@ -334,84 +334,84 @@ Kết nối tới MCP server qua WebSocket cho giao tiếp hai chiều real-time
 ### Connection Lifecycle
 
 1. **Handshake**: WebSocket upgrade request
-2. **Connection**: Kênh hai chiều persistent
-3. **Message**: JSON-RPC qua WebSocket
-4. **Heartbeat**: Keep-alive message
-5. **Reconnect**: Tự động khi ngắt
+2. **Connection**: Persistent bidirectional channel
+3. **Messages**: JSON-RPC over WebSocket
+4. **Heartbeat**: Keep-alive messages
+5. **Reconnection**: Automatic on disconnect
 
-### Use Case
+### Use Cases
 
-- Stream dữ liệu real-time
-- Cập nhật và thông báo trực tiếp
-- Chỉnh sửa cộng tác
-- Tool call độ trễ thấp
-- Push notification từ server
+- Real-time data streaming
+- Live updates and notifications
+- Collaborative editing
+- Low-latency tool calls
+- Push notifications from server
 
 ### Best Practices
 
-1. **Dùng WSS (secure WebSocket), không bao giờ WS**
-2. **Triển khai heartbeat/ping-pong**
-3. **Xử lý reconnection logic**
-4. **Buffer message trong thời gian ngắt kết nối**
-5. **Đặt connection timeout**
+1. **Use WSS (secure WebSocket), never WS**
+2. **Implement heartbeat/ping-pong**
+3. **Handle reconnection logic**
+4. **Buffer messages during disconnection**
+5. **Set connection timeouts**
 
-### Xử Lý Sự Cố
+### Troubleshooting
 
-**Connection drop:**
-- Triển khai reconnection logic
-- Kiểm tra độ ổn định mạng
-- Xác minh server hỗ trợ WebSocket
-- Xem cài đặt firewall
+**Connection drops:**
+- Implement reconnection logic
+- Check network stability
+- Verify server supports WebSocket
+- Review firewall settings
 
 **Message delivery:**
-- Triển khai message acknowledgment
-- Xử lý message không theo thứ tự
-- Buffer trong thời gian ngắt kết nối
+- Implement message acknowledgment
+- Handle out-of-order messages
+- Buffer during disconnection
 
-## Ma Trận So Sánh
+## Comparison Matrix
 
-| Tính năng | stdio | SSE | HTTP | WebSocket |
+| Feature | stdio | SSE | HTTP | WebSocket |
 |---------|-------|-----|------|-----------|
 | **Transport** | Process | HTTP/SSE | HTTP | WebSocket |
-| **Chiều** | Hai chiều | Server→Client | Request/Response | Hai chiều |
+| **Direction** | Bidirectional | Server→Client | Request/Response | Bidirectional |
 | **State** | Stateful | Stateful | Stateless | Stateful |
-| **Auth** | Env var | OAuth/Header | Header | Header |
-| **Use Case** | Local tool | Cloud service | REST API | Real-time |
-| **Latency** | Thấp nhất | Trung bình | Trung bình | Thấp |
-| **Cài đặt** | Dễ | Trung bình | Dễ | Trung bình |
-| **Reconnect** | Process respawn | Tự động | N/A | Tự động |
+| **Auth** | Env vars | OAuth/Headers | Headers | Headers |
+| **Use Case** | Local tools | Cloud services | REST APIs | Real-time |
+| **Latency** | Lowest | Medium | Medium | Low |
+| **Setup** | Easy | Medium | Easy | Medium |
+| **Reconnect** | Process respawn | Automatic | N/A | Automatic |
 
-## Chọn Loại Phù Hợp
+## Choosing the Right Type
 
-**Dùng stdio khi:**
-- Chạy local tool hoặc custom server
-- Cần latency thấp nhất
-- Làm việc với file system hoặc local database
-- Phân phối server kèm plugin
+**Use stdio when:**
+- Running local tools or custom servers
+- Need lowest latency
+- Working with file systems or local databases
+- Distributing server with plugin
 
-**Dùng SSE khi:**
-- Kết nối với hosted service
-- Cần OAuth authentication
-- Dùng MCP server chính thức (Asana, GitHub)
-- Muốn tự động reconnect
+**Use SSE when:**
+- Connecting to hosted services
+- Need OAuth authentication
+- Using official MCP servers (Asana, GitHub)
+- Want automatic reconnection
 
-**Dùng HTTP khi:**
-- Tích hợp với REST API
-- Cần stateless interaction
-- Dùng token-based auth
-- Pattern request/response đơn giản
+**Use HTTP when:**
+- Integrating with REST APIs
+- Need stateless interactions
+- Using token-based auth
+- Simple request/response pattern
 
-**Dùng WebSocket khi:**
-- Cần cập nhật real-time
-- Xây dựng tính năng cộng tác
-- Độ trễ là ưu tiên
-- Cần streaming hai chiều
+**Use WebSocket when:**
+- Need real-time updates
+- Building collaborative features
+- Low-latency critical
+- Bi-directional streaming required
 
-## Chuyển Đổi Giữa Các Loại
+## Migration Between Types
 
-### Từ stdio sang SSE
+### From stdio to SSE
 
-**Trước (stdio):**
+**Before (stdio):**
 ```json
 {
   "local-server": {
@@ -421,7 +421,7 @@ Kết nối tới MCP server qua WebSocket cho giao tiếp hai chiều real-time
 }
 ```
 
-**Sau (SSE - deploy server):**
+**After (SSE - deploy server):**
 ```json
 {
   "hosted-server": {
@@ -431,9 +431,9 @@ Kết nối tới MCP server qua WebSocket cho giao tiếp hai chiều real-time
 }
 ```
 
-### Từ HTTP sang WebSocket
+### From HTTP to WebSocket
 
-**Trước (HTTP):**
+**Before (HTTP):**
 ```json
 {
   "api": {
@@ -443,7 +443,7 @@ Kết nối tới MCP server qua WebSocket cho giao tiếp hai chiều real-time
 }
 ```
 
-**Sau (WebSocket):**
+**After (WebSocket):**
 ```json
 {
   "realtime": {
@@ -453,13 +453,13 @@ Kết nối tới MCP server qua WebSocket cho giao tiếp hai chiều real-time
 }
 ```
 
-Lợi ích: Cập nhật real-time, latency thấp hơn, giao tiếp hai chiều.
+Benefits: Real-time updates, lower latency, bi-directional communication.
 
-## Cấu Hình Nâng Cao
+## Advanced Configuration
 
-### Nhiều Server
+### Multiple Servers
 
-Kết hợp các loại khác nhau:
+Combine different types:
 
 ```json
 {
@@ -481,9 +481,9 @@ Kết hợp các loại khác nhau:
 }
 ```
 
-### Cấu Hình Có Điều Kiện
+### Conditional Configuration
 
-Dùng biến môi trường để chuyển server:
+Use environment variables to switch servers:
 
 ```json
 {
@@ -497,40 +497,40 @@ Dùng biến môi trường để chuyển server:
 }
 ```
 
-Đặt giá trị khác nhau cho dev/prod:
+Set different values for dev/prod:
 - Dev: `API_URL=http://localhost:8080/mcp`
 - Prod: `API_URL=https://api.production.com/mcp`
 
-## Cân Nhắc Bảo Mật
+## Security Considerations
 
-### Bảo Mật Stdio
+### Stdio Security
 
-- Validate đường dẫn command
-- Không thực thi lệnh do người dùng cung cấp
-- Hạn chế quyền truy cập biến môi trường
-- Hạn chế quyền truy cập file system
+- Validate command paths
+- Don't execute user-provided commands
+- Limit environment variable access
+- Restrict file system access
 
-### Bảo Mật Mạng
+### Network Security
 
-- Luôn dùng HTTPS/WSS
-- Validate SSL certificate
-- Không bỏ qua xác minh certificate
-- Dùng lưu trữ token an toàn
+- Always use HTTPS/WSS
+- Validate SSL certificates
+- Don't skip certificate verification
+- Use secure token storage
 
-### Quản Lý Token
+### Token Management
 
-- Không bao giờ hardcode token
-- Dùng biến môi trường
-- Rotate token thường xuyên
-- Triển khai token refresh
-- Ghi lại scope cần thiết
+- Never hardcode tokens
+- Use environment variables
+- Rotate tokens regularly
+- Implement token refresh
+- Document scopes required
 
-## Kết Luận
+## Conclusion
 
-Chọn loại MCP server dựa trên use case:
-- **stdio** cho local, custom, hoặc NPM-packaged server
-- **SSE** cho hosted service với OAuth
-- **HTTP** cho REST API với token auth
-- **WebSocket** cho giao tiếp hai chiều real-time
+Choose the MCP server type based on your use case:
+- **stdio** for local, custom, or NPM-packaged servers
+- **SSE** for hosted services with OAuth
+- **HTTP** for REST APIs with token auth
+- **WebSocket** for real-time bidirectional communication
 
-Kiểm thử kỹ lưỡng và xử lý lỗi gracefully để tích hợp MCP bền vững.
+Test thoroughly and handle errors gracefully for robust MCP integration.
