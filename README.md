@@ -35,36 +35,32 @@
 │   ├── verification.md             # ✅ Auto-import (verify & avoid past mistakes)
 │   ├── coding-standards.md         # ✅ Auto-import (coding conventions)
 │   └── git-workflow.md             # ✅ Auto-import (git workflow)
-├── skills/                         # Workflow tái sử dụng (gọi /tên)
-│   ├── commit/SKILL.md             # Conventional Commit, subject TV
-│   ├── code-review/SKILL.md        # Review 6 góc nhìn
-│   ├── debug/SKILL.md              # Reproduce → root cause → failing test → fix
-│   ├── refactor/SKILL.md           # Pre-flight → step-by-step verify
-│   ├── explain/SKILL.md            # Kim tự tháp ngược, top-down
-│   ├── handoff/SKILL.md            # Brief để chuyển session
-│   ├── context-check/SKILL.md      # Đánh giá context, đề xuất action
-│   ├── feature-dev/SKILL.md        # Guided feature development
-│   ├── full-review/SKILL.md        # Multi-agent review dispatch
-│   ├── claude-md-management/SKILL.md # Audit và cải thiện CLAUDE.md
-│   ├── frontend-design/SKILL.md    # Giao diện distinctive, tránh AI slop
-│   └── hookify/SKILL.md            # Tạo hooks ngăn unwanted behaviors
-├── agents/                         # Subagent chuyên biệt (context riêng)
-│   ├── code-reviewer.md            # Senior reviewer + a11y checklist (sonnet)
-│   ├── code-explorer.md            # Trace execution paths (sonnet)
-│   ├── code-architect.md           # Architecture + API design (opus)
-│   ├── code-simplifier.md          # Simplify + refactoring patterns (sonnet)
-│   ├── security-auditor.md         # Security audit OWASP (opus)
-│   ├── test-writer.md              # Viết test happy/edge/error (sonnet)
-│   ├── test-analyzer.md            # Đánh giá test coverage (sonnet)
-│   ├── type-design-analyzer.md     # Phân tích type design (sonnet)
-│   ├── comment-analyzer.md         # Phân tích comment quality (sonnet)
-│   ├── silent-failure-hunter.md    # Tìm silent failures (sonnet)
-│   ├── architecture-critic.md      # Adversarial architecture review (sonnet)
-│   ├── debugger.md                 # Root cause analysis + fix (sonnet)
-│   ├── documentation-engineer.md   # Viết/maintain docs (sonnet)
-│   ├── performance-engineer.md     # Profiling + optimization (sonnet)
-│   ├── dependency-manager.md       # Audit deps + bundle size (sonnet)
-│   └── nextjs-developer.md         # Next.js App Router specialist (sonnet)
+├── plugins/                        # 15 plugins (mỗi plugin có agents/ và/hoặc skills/ bên trong)
+│   ├── pr-review-toolkit/          # PR review: code-reviewer, silent-failure-hunter, type-design-analyzer...
+│   │   ├── .claude-plugin/
+│   │   ├── agents/                 # code-reviewer.md, code-simplifier.md, comment-analyzer.md...
+│   │   └── skills/                 # code-review/, full-review/, review-pr/
+│   ├── feature-dev/                # Phát triển tính năng: code-architect, code-explorer
+│   │   ├── .claude-plugin/
+│   │   ├── agents/
+│   │   └── skills/                 # explain/, feature-dev/
+│   ├── commit-commands/            # Git workflow: commit, commit-push-pr, clean-gone
+│   │   ├── .claude-plugin/
+│   │   └── skills/
+│   ├── debug/                      # Debug: debugger agent + /debug skill
+│   ├── documentation/              # Docs: documentation-engineer, nextjs-developer
+│   ├── test-toolkit/               # Test: test-writer, test-analyzer
+│   ├── security-guidance/          # Security: security-auditor (OWASP)
+│   ├── performance/                # Perf: performance-engineer, dependency-manager
+│   ├── code-modernization/         # Architecture review: architecture-critic
+│   ├── code-simplifier/            # Refactor: /refactor skill
+│   ├── hookify/                    # Tạo hooks: conversation-analyzer + /hookify skill
+│   ├── frontend-design/            # UI: /frontend-design skill
+│   ├── session/                    # Session: /context-check, /handoff
+│   ├── claude-md-management/       # Audit CLAUDE.md: /claude-md-management skill
+│   └── plugin-dev/                 # Phát triển plugin: 5 skills (agent/skill/hook/mcp/command)
+├── .claude-plugin/
+│   └── marketplace.json            # Marketplace manifest (15 plugins)
 ├── output-styles/
 │   └── concise-vietnamese.md       # Style tiếng Việt ngắn gọn
 ├── hooks/                          # Hook scripts (gọi từ settings.json)
@@ -84,7 +80,7 @@
     └── skill-evals.json            # → <skill>/evals/evals.json (eval-driven optimize)
 ```
 
-**Baseline tokens** — đo thực tế bằng `/context` (Opus 4.7 1M context, snapshot session start, 2026-05-10, 16 agents, 12 skills):
+**Baseline tokens** — đo thực tế bằng `/context` (Opus 4.7 1M context, snapshot session start, 2026-05-10, agents/skills từ plugins đã symlink):
 
 | Category                      | Tokens     | % of 1M   |
 | ----------------------------- | ---------- | --------- |
@@ -95,26 +91,14 @@
 | ├── `rules/security`          | 3,100      | —         |
 | ├── `rules/verification`      | 2,700      | —         |
 | └── `rules/communication`     | 1,900      | —         |
-| Custom agents (16)            | 6,800      | 0.7%      |
+| Custom agents (từ plugins)    | 6,800      | 0.7%      |
 | ├── `code-architect`          | 647        | —         |
 | ├── `documentation-engineer`  | 538        | —         |
 | ├── `security-auditor`        | 438        | —         |
 | ├── `test-analyzer`           | 430        | —         |
 | ├── `code-explorer`           | 422        | —         |
-| └── … (11 agents còn lại)     | 4,325      | —         |
-| Skills (12)                   | 1,400      | 0.1%      |
-| ├── `commit`                  | —          | —         |
-| ├── `code-review`             | —          | —         |
-| ├── `full-review`             | —          | —         |
-| ├── `feature-dev`             | —          | —         |
-| ├── `debug`                   | —          | —         |
-| ├── `refactor`                | —          | —         |
-| ├── `explain`                 | —          | —         |
-| ├── `handoff`                 | —          | —         |
-| ├── `context-check`           | —          | —         |
-| ├── `claude-md-management`    | —          | —         |
-| ├── `frontend-design`         | —          | —         |
-| └── `hookify`                 | —          | —         |
+| └── … (agents còn lại)        | 4,325      | —         |
+| Skills (từ plugins)           | 1,400      | 0.1%      |
 | Messages (start)              | 13         | <0.1%     |
 | **Total used (start)**        | **46,000** | **~5%**   |
 | Autocompact buffer (reserved) | 33,000     | 3.3%      |
@@ -122,7 +106,7 @@
 
 **Ghi chú**:
 - Vietnamese tokenize ~2.3 chars/token cho prose (ước lượng empirical, đo bằng `/context` trên tokenizer Claude — Anthropic không publish ratio chính thức cho từng ngôn ngữ); kém hiệu quả hơn English ~4 chars/token; baseline ~46k cao hơn config English (~10-15k) là expected.
-- 16 agents (6,800 tokens tổng descriptions) — chỉ load descriptions tại session start, body load khi spawn agent.
+- Agents và skills giờ nằm trong `plugins/` — chỉ load descriptions tại session start, body load khi spawn agent/invoke skill.
 - 5 rules auto-load mọi session (communication, security, verification, coding-standards, git-workflow).
 - Autocompact buffer 33k reserved (không tính vào used) — Claude Code dành chỗ cho compact summary khi context đầy.
 
@@ -170,19 +154,28 @@ git clone https://github.com/MinhThang1009/dotclaude.git
 
 ```bash
 mkdir -p ~/.claude
-for item in CLAUDE.md settings.json agents hooks output-styles rules skills templates; do
+for item in CLAUDE.md settings.json hooks output-styles rules templates; do
   cp -r "dotclaude/$item" ~/.claude/
 done
 ```
+
+Sau đó chạy `scripts/create-symlinks.ps1` (xem bên dưới) để tạo symlinks cho từng plugin.
 
 **Windows (PowerShell)**
 
 ```powershell
 New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude" | Out-Null
-$items = @('CLAUDE.md', 'settings.json', 'agents', 'hooks', 'output-styles', 'rules', 'skills', 'templates')
+$items = @('CLAUDE.md', 'settings.json', 'hooks', 'output-styles', 'rules', 'templates')
 foreach ($item in $items) {
   Copy-Item -Recurse -Force "dotclaude\$item" "$env:USERPROFILE\.claude\"
 }
+```
+
+Sau đó chạy script để tạo individual symlinks cho agents/skills của từng plugin:
+
+```powershell
+# Chạy từ thư mục chứa dotclaude/
+.\dotclaude\scripts\create-symlinks.ps1
 ```
 
 **Windows (CMD)**
@@ -191,10 +184,10 @@ foreach ($item in $items) {
 if not exist "%USERPROFILE%\.claude" mkdir "%USERPROFILE%\.claude"
 copy /Y "dotclaude\CLAUDE.md" "%USERPROFILE%\.claude\"
 copy /Y "dotclaude\settings.json" "%USERPROFILE%\.claude\"
-for %i in (agents hooks output-styles rules skills templates) do xcopy /E /I /Y /H "dotclaude\%i" "%USERPROFILE%\.claude\%i\"
+for %i in (hooks output-styles rules templates) do xcopy /E /I /Y /H "dotclaude\%i" "%USERPROFILE%\.claude\%i\"
 ```
 
-> CMD `for` loop syntax là `%i` interactive, `%%i` trong batch file (`.bat`/`.cmd`).
+> CMD `for` loop syntax là `%i` interactive, `%%i` trong batch file (`.bat`/`.cmd`). Sau đó dùng PowerShell để chạy `create-symlinks.ps1`.
 
 ### Bước 4 — Verify
 
@@ -329,8 +322,7 @@ Cao → thấp khi xung đột:
 | ---------------------- | ----------------------------------------------------------------------------- |
 | **CLAUDE.md**          | Hướng dẫn cần load **MỌI session** — giữ ngắn (<100 dòng)                     |
 | **rules/** auto-import | Rule áp dụng MỌI session                                                       |
-| **skills/**            | Workflow tái sử dụng — load **ON-DEMAND** khi gọi                             |
-| **agents/**            | Task chuyên biệt cần **context window riêng**                                 |
+| **plugins/**           | Nhóm agents + skills theo domain — install qua `claude plugin install` hoặc symlink |
 | **hooks**              | Hành động **BẮT BUỘC** chạy mỗi lần (CLAUDE.md là gợi ý, hooks deterministic) |
 | **MCP**                | Tool ngoài (Notion, Figma, DB, GitHub…)                                       |
 | **`permissions.deny`** | Chặn Claude đọc file nhạy cảm (`.env`, `*.key`) hoặc thư mục lớn (build, lockfile) — đây là cách ChÍNH THỨC, không có `.claudeignore` trong docs |
@@ -490,22 +482,59 @@ Sau khi dùng skills 1 thời gian, có thể measure xem description trigger c�
 - Đóng góp: [`CONTRIBUTING.md`](.github/CONTRIBUTING.md)
 - Lịch sử thay đổi: [`CHANGELOG.md`](CHANGELOG.md)
 
-## 9. Cấu trúc nội bộ — lý do thiết kế
+## 9. Marketplace
+
+Repo này có `marketplace.json` (tại `.claude-plugin/marketplace.json`), cho phép dùng trực tiếp làm plugin marketplace trong Claude Code:
+
+```bash
+claude plugin marketplace add https://github.com/MinhThang1009/dotclaude
+```
+
+Sau đó install plugin muốn dùng:
+
+```bash
+claude plugin install pr-review-toolkit
+claude plugin install feature-dev
+claude plugin install commit-commands
+# ... hoặc bất kỳ plugin nào trong 15 plugins
+```
+
+**15 plugins hiện có** (xem `.claude-plugin/marketplace.json` để đầy đủ):
+
+| Plugin | Loại | Mô tả ngắn |
+| --- | --- | --- |
+| `pr-review-toolkit` | agents + skills | Review PR: comment, test, type design, silent failures |
+| `feature-dev` | agents + skills | Phát triển tính năng: architecture, codebase exploration |
+| `commit-commands` | skills | Git workflow: commit, commit-push-pr, clean-gone |
+| `debug` | agents + skills | Debug: reproduce → failing test → fix |
+| `documentation` | agents | Viết/maintain docs, Next.js specialist |
+| `test-toolkit` | agents | Viết test, đánh giá coverage |
+| `security-guidance` | agents | Security audit OWASP |
+| `performance` | agents | Profiling, dependency audit |
+| `code-modernization` | agents | Architecture review, adversarial analysis |
+| `code-simplifier` | skills | Refactor + simplification |
+| `hookify` | agents + skills | Tạo hooks ngăn unwanted behaviors |
+| `frontend-design` | skills | UI distinctive, tránh AI slop |
+| `session` | skills | context-check, handoff |
+| `claude-md-management` | skills | Audit và cải thiện CLAUDE.md |
+| `plugin-dev` | skills | Phát triển plugin (agent/skill/hook/mcp/command) |
+
+## 10. Cấu trúc nội bộ — lý do thiết kế
 
 Câu hỏi thường gặp:
 
-### 9.1 Tại sao tất cả rules đều auto-load?
+### 10.1 Tại sao tất cả rules đều auto-load?
 
 5 rules (`communication`, `security`, `verification`, `coding-standards`, `git-workflow`) auto-load mọi session. Coding conventions và git workflow áp dụng cho hầu hết mọi task nên đưa vào rules/ thay vì để user `@`-reference thủ công.
 
-### 9.2 Tại sao [REFERENCE.md](docs/REFERENCE.md) không auto-load vào [CLAUDE.md](CLAUDE.md)?
+### 10.2 Tại sao [REFERENCE.md](docs/REFERENCE.md) không auto-load vào [CLAUDE.md](CLAUDE.md)?
 
 [REFERENCE.md](docs/REFERENCE.md) = ~2092 dòng, ~164k chars → ~57k tokens (Vietnamese prose ~2.3 chars/token, code blocks/tables ~3-4 chars/token, mix ~2.9). Auto-load = ~28% context Sonnet 200k (hoặc ~5.5% Opus 1M) mỗi session. REFERENCE phục vụ **NGƯỜI** tra cứu (mở trên màn hình thứ 2 / web), KHÔNG cho Claude đọc.
 
-### 9.3 Tại sao bỏ `/init-context`?
+### 10.3 Tại sao bỏ `/init-context`?
 
 Overlap với `/init` built-in của Claude Code v2.1+. Đã bỏ để tránh duplicate.
 
-### 9.4 Tại sao commit message tiếng Việt nhưng branch name tiếng Anh?
+### 10.4 Tại sao commit message tiếng Việt nhưng branch name tiếng Anh?
 
 Branch name vào `git log --oneline` và nhiều tool (Linear, Jira, GitHub Action) parse được khi tiếng Anh chuẩn ASCII. Commit message hiển thị cho dev đọc → tiếng Việt giúp đọc nhanh. Type/scope giữ tiếng Anh để tool Conventional Commit parse được.

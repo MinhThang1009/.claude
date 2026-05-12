@@ -141,17 +141,16 @@ def main():
     all_errors = []
     file_count = 0
 
-    # Skills: skills/<name>/SKILL.md
-    skills_dir = ROOT / "skills"
-    if skills_dir.is_dir():
-        for skill_md in skills_dir.glob("*/SKILL.md"):
+    # Skills: plugins/<plugin>/skills/<name>/SKILL.md
+    plugins_dir = ROOT / "plugins"
+    if plugins_dir.is_dir():
+        for skill_md in plugins_dir.glob("*/skills/*/SKILL.md"):
             file_count += 1
             all_errors.extend(validate(skill_md, "skill"))
 
-    # Agents: agents/*.md
-    agents_dir = ROOT / "agents"
-    if agents_dir.is_dir():
-        for agent_md in agents_dir.glob("*.md"):
+    # Agents: plugins/<plugin>/agents/*.md
+    if plugins_dir.is_dir():
+        for agent_md in plugins_dir.glob("*/agents/*.md"):
             file_count += 1
             all_errors.extend(validate(agent_md, "agent"))
 
