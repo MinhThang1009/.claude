@@ -27,7 +27,7 @@
 
 ```text
 ~/.claude/
-├── CLAUDE.md                       # Hướng dẫn global (load mọi session, ~90 dòng)
+├── CLAUDE.md                       # Hướng dẫn global (load mọi session, ~79 dòng)
 ├── settings.json                   # Quyền, hooks, env vars
 ├── rules/
 │   ├── communication.md            # ✅ Auto-import (essential mỗi turn)
@@ -35,7 +35,7 @@
 │   ├── verification.md             # ✅ Auto-import (verify & avoid past mistakes)
 │   ├── coding-standards.md         # ✅ Auto-import (coding conventions)
 │   └── git-workflow.md             # ✅ Auto-import (git workflow)
-├── plugins/                        # 15 plugins (mỗi plugin có agents/ và/hoặc skills/ bên trong)
+├── plugins/                        # 33 plugins (mỗi plugin có agents/ và/hoặc skills/ bên trong)
 │   ├── pr-review-toolkit/          # PR review: code-reviewer, silent-failure-hunter, type-design-analyzer...
 │   │   ├── .claude-plugin/
 │   │   ├── agents/                 # code-reviewer.md, code-simplifier.md, comment-analyzer.md...
@@ -60,7 +60,7 @@
 │   ├── claude-md-management/       # Audit CLAUDE.md: /claude-md-management skill
 │   └── plugin-dev/                 # Phát triển plugin: 5 skills (agent/skill/hook/mcp/command)
 ├── .claude-plugin/
-│   └── marketplace.json            # Marketplace manifest (15 plugins)
+│   └── marketplace.json            # Marketplace manifest (33 plugins)
 ├── output-styles/
 │   └── concise-vietnamese.md       # Style tiếng Việt ngắn gọn
 ├── hooks/                          # Hook scripts (gọi từ settings.json)
@@ -148,46 +148,23 @@ git clone https://github.com/MinhThang1009/dotclaude.git
 
 ### Bước 3 — Sao chép vào `~/.claude/`
 
-> Chỉ copy files Claude Code thực sự đọc. Repo metadata (`README.md`, `LICENSE`, `CHANGELOG.md`, `docs/`, `.github/`, `scripts/`, `.gitignore`...) KHÔNG copy.
-
-**macOS / Linux**
-
-```bash
-mkdir -p ~/.claude
-for item in CLAUDE.md settings.json hooks output-styles rules templates; do
-  cp -r "dotclaude/$item" ~/.claude/
-done
-```
-
-Sau đó chạy `scripts/create-symlinks.ps1` (xem bên dưới) để tạo symlinks cho từng plugin.
+Chạy script tương ứng với platform — script tự copy các files cần thiết và tạo symlinks cho tất cả plugins:
 
 **Windows (PowerShell)**
 
 ```powershell
-New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude" | Out-Null
-$items = @('CLAUDE.md', 'settings.json', 'hooks', 'output-styles', 'rules', 'templates')
-foreach ($item in $items) {
-  Copy-Item -Recurse -Force "dotclaude\$item" "$env:USERPROFILE\.claude\"
-}
+powershell -File dotclaude\scripts\create-symlinks.ps1
 ```
 
-Sau đó chạy script để tạo individual symlinks cho agents/skills của từng plugin:
+**macOS/Linux**
 
-```powershell
-# Chạy từ thư mục chứa dotclaude/
-.\dotclaude\scripts\create-symlinks.ps1
+```bash
+bash dotclaude/scripts/create-symlinks.sh
 ```
 
-**Windows (CMD)**
-
-```cmd
-if not exist "%USERPROFILE%\.claude" mkdir "%USERPROFILE%\.claude"
-copy /Y "dotclaude\CLAUDE.md" "%USERPROFILE%\.claude\"
-copy /Y "dotclaude\settings.json" "%USERPROFILE%\.claude\"
-for %i in (hooks output-styles rules templates) do xcopy /E /I /Y /H "dotclaude\%i" "%USERPROFILE%\.claude\%i\"
-```
-
-> CMD `for` loop syntax là `%i` interactive, `%%i` trong batch file (`.bat`/`.cmd`). Sau đó dùng PowerShell để chạy `create-symlinks.ps1`.
+> Script copy `CLAUDE.md`, `settings.json`, `hooks`, `output-styles`, `rules`, `templates` vào `~/.claude/`, sau đó tạo symlinks cho từng plugin. Repo metadata (`README.md`, `LICENSE`, `CHANGELOG.md`, `docs/`, `.github/`, `.gitignore`...) KHÔNG copy.
+>
+> Để chọn plugins nào load, sửa file `.claude-load.txt` trong thư mục `dotclaude/` trước khi chạy script.
 
 ### Bước 4 — Verify
 
@@ -496,10 +473,10 @@ Sau đó install plugin muốn dùng:
 claude plugin install pr-review-toolkit
 claude plugin install feature-dev
 claude plugin install commit-commands
-# ... hoặc bất kỳ plugin nào trong 15 plugins
+# ... hoặc bất kỳ plugin nào trong 33 plugins
 ```
 
-**15 plugins hiện có** (xem `.claude-plugin/marketplace.json` để đầy đủ):
+**33 plugins hiện có** (xem `.claude-plugin/marketplace.json` để đầy đủ, hoặc `.claude-load.txt` để chọn plugins load):
 
 | Plugin | Loại | Mô tả ngắn |
 | --- | --- | --- |
@@ -518,6 +495,24 @@ claude plugin install commit-commands
 | `session` | skills | context-check, handoff |
 | `claude-md-management` | skills | Audit và cải thiện CLAUDE.md |
 | `plugin-dev` | skills | Phát triển plugin (agent/skill/hook/mcp/command) |
+| `claude-api` | skills | Anthropic API reference và examples |
+| `claude-code-setup` | skills | Setup Claude Code cho project mới |
+| `code-review` | agents + skills | Code review chuyên sâu |
+| `doc-coauthoring` | agents + skills | Đồng tác giả tài liệu kỹ thuật |
+| `docx` | skills | Làm việc với file Word (.docx) |
+| `explanatory-output-style` | output-styles | Style output chi tiết, giải thích từng bước |
+| `learning-output-style` | output-styles | Style output giải thích để học |
+| `mcp-builder` | agents + skills | Xây dựng MCP server |
+| `mcp-server-dev` | agents + skills | Phát triển MCP server nâng cao |
+| `pdf` | skills | Làm việc với file PDF |
+| `playwright` | agents + skills | Test automation với Playwright |
+| `pptx` | skills | Làm việc với file PowerPoint (.pptx) |
+| `session-report` | skills | Tạo báo cáo tổng kết session |
+| `skill-creator` | agents + skills | Tạo và tối ưu skills |
+| `theme-factory` | skills | Tạo theme UI |
+| `web-artifacts-builder` | skills | Xây dựng web artifacts |
+| `webapp-testing` | agents + skills | Test web application |
+| `xlsx` | skills | Làm việc với file Excel (.xlsx) |
 
 ## 10. Cấu trúc nội bộ — lý do thiết kế
 
