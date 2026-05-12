@@ -38,7 +38,7 @@ Mỗi rule = 1 file `.claude/hookify.<rule-name>.local.md` trong **project direc
 **Naming convention**: kebab-case, bắt đầu bằng action verb: `block-dangerous-rm`, `warn-console-log`, `require-tests-before-stop`.
 Tránh: `hookify.rule1.local.md` (không mô tả), `hookify.md` (thiếu .local), `danger.local.md` (thiếu hookify prefix).
 
-### Format đơn giản (1 pattern):
+### Format đơn giản (1 pattern)
 
 ```markdown
 ---
@@ -52,7 +52,7 @@ action: <warn|block>   # optional — mặc định là warn nếu không khai b
 <Message hiển thị cho Claude khi rule trigger>
 ```
 
-### Format phức tạp (nhiều conditions):
+### Format phức tạp (nhiều conditions)
 
 ```markdown
 ---
