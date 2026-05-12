@@ -1,8 +1,8 @@
 # ext-apps messaging — widget ↔ host ↔ server
 
-The `@modelcontextprotocol/ext-apps` package provides the `App` class (browser side) and `registerAppTool`/`registerAppResource` helpers (server side). Messaging is bidirectional and persistent.
+Package `@modelcontextprotocol/ext-apps` cung cấp class `App` (phía browser) và các helper `registerAppTool`/`registerAppResource` (phía server). Messaging là hai chiều và persistent.
 
-## Construction
+## Khởi tạo
 
 ```js
 const app = new App(
@@ -12,7 +12,7 @@ const app = new App(
 );
 ```
 
-`autoResize: true` wires a `ResizeObserver` that emits `ui/notifications/size-changed` so the host iframe height tracks your rendered content. Without it the frame is fixed-height and tall renders get clipped — set it for any widget whose height depends on data.
+`autoResize: true` kết nối một `ResizeObserver` phát ra `ui/notifications/size-changed` để chiều cao iframe của host bám theo nội dung đã render. Nếu không thiết lập, frame sẽ có chiều cao cố định và các render cao sẽ bị cắt bớt — hãy bật khi widget có chiều cao phụ thuộc vào dữ liệu.
 
 ---
 
@@ -20,30 +20,30 @@ const app = new App(
 
 ### `app.sendMessage({ role, content })`
 
-Inject a visible message into the conversation. This is how user actions become conversation turns.
+Inject một message hiển thị vào cuộc hội thoại. Đây là cách hành động của người dùng trở thành lượt conversation.
 
 ```js
 app.sendMessage({
   role: "user",
-  content: [{ type: "text", text: "User selected order #1234" }],
+  content: [{ type: "text", text: "Người dùng đã chọn đơn hàng #1234" }],
 });
 ```
 
-The message appears in chat and Claude responds to it. Use `role: "user"` — the widget speaks on the user's behalf.
+Message xuất hiện trong chat và Claude phản hồi lại. Dùng `role: "user"` — widget nói thay mặt người dùng.
 
 ### `app.updateModelContext({ content })`
 
-Update Claude's context **silently** — no visible message. Use for state that informs but doesn't warrant a chat bubble.
+Cập nhật context của Claude **không hiển thị** — không có chat bubble. Dùng cho trạng thái cần thông báo cho Claude nhưng không đáng xuất hiện thành bubble.
 
 ```js
 app.updateModelContext({
-  content: [{ type: "text", text: "Currently viewing: orders from last 30 days" }],
+  content: [{ type: "text", text: "Đang xem: đơn hàng trong 30 ngày qua" }],
 });
 ```
 
 ### `app.callServerTool({ name, arguments })`
 
-Call a tool on your MCP server directly, bypassing Claude. Returns the tool result.
+Gọi trực tiếp một tool trên MCP server, bỏ qua Claude. Trả về kết quả của tool.
 
 ```js
 const result = await app.callServerTool({
@@ -52,17 +52,17 @@ const result = await app.callServerTool({
 });
 ```
 
-Use for data fetches that don't need Claude's reasoning — pagination, detail lookups, refreshes.
+Dùng cho các lần fetch dữ liệu không cần reasoning của Claude — phân trang, tra cứu chi tiết, refresh.
 
 ### `app.openLink({ url })`
 
-Open a URL in a new browser tab, host-mediated. **Required** for any outbound navigation — the iframe sandbox blocks `window.open()` and `<a target="_blank">`.
+Mở một URL trong tab browser mới, thông qua host. **Bắt buộc** cho mọi điều hướng ra ngoài — sandbox iframe chặn `window.open()` và `<a target="_blank">`.
 
 ```js
 await app.openLink({ url: "https://example.com/cart" });
 ```
 
-For anchors in rendered HTML, intercept the click:
+Với các anchor trong HTML đã render, chặn click:
 
 ```js
 card.querySelector("a").addEventListener("click", (e) => {
@@ -73,7 +73,7 @@ card.querySelector("a").addEventListener("click", (e) => {
 
 ### `app.downloadFile({ name, mimeType, content })`
 
-Host-mediated download (sandbox blocks direct `<a download>`). `content` is a base64 string.
+Download thông qua host (sandbox chặn `<a download>` trực tiếp). `content` là chuỗi base64.
 
 ```js
 const csv = rows.map((r) => Object.values(r).join(",")).join("\n");
@@ -86,7 +86,7 @@ app.downloadFile({
 
 ### `app.requestDisplayMode({ mode })`
 
-Ask the host to switch the widget between `"inline"`, `"pip"`, or `"fullscreen"`. Check `getHostContext().availableDisplayModes` first; hide the control if the mode isn't offered. The host responds by firing `onhostcontextchanged` with new `displayMode` and `containerDimensions` — re-render at the new size.
+Yêu cầu host chuyển widget giữa `"inline"`, `"pip"`, hoặc `"fullscreen"`. Kiểm tra `getHostContext().availableDisplayModes` trước; ẩn control nếu mode không được cung cấp. Host phản hồi bằng cách bắn `onhostcontextchanged` với `displayMode` và `containerDimensions` mới — re-render ở kích thước mới.
 
 ```js
 if (app.getHostContext()?.availableDisplayModes?.includes("fullscreen")) {
@@ -101,7 +101,7 @@ if (app.getHostContext()?.availableDisplayModes?.includes("fullscreen")) {
 
 ### `app.ontoolresult = ({ content }) => {...}`
 
-Fires when the tool handler's return value is piped to the widget. This is the primary data-in path.
+Bắn khi giá trị trả về của tool handler được pipe tới widget. Đây là đường dẫn dữ liệu vào chính.
 
 ```js
 app.ontoolresult = ({ content }) => {
@@ -110,28 +110,28 @@ app.ontoolresult = ({ content }) => {
 };
 ```
 
-**Set this BEFORE `await app.connect()`** — the result may arrive immediately after connection.
+**Thiết lập TRƯỚC `await app.connect()`** — kết quả có thể đến ngay sau khi kết nối.
 
 ### `app.ontoolinput = ({ arguments }) => {...}`
 
-Fires with the arguments Claude passed to the tool. Useful if the widget needs to know what was asked for (e.g., highlight the search term).
+Bắn với các arguments mà Claude đã truyền vào tool. Hữu ích nếu widget cần biết những gì đã được yêu cầu (ví dụ: highlight từ khóa tìm kiếm).
 
 ### `app.ontoolinputpartial = ({ arguments }) => {...}` / `app.ontoolcancelled = () => {...}`
 
-`ontoolinputpartial` fires while Claude is still streaming arguments — use it to show a skeleton ("Preparing: <title>…") before the result lands. `ontoolcancelled` fires if the call is aborted; clear the skeleton.
+`ontoolinputpartial` bắn trong khi Claude vẫn đang stream arguments — dùng để hiển thị skeleton ("Đang chuẩn bị: <title>…") trước khi kết quả đến. `ontoolcancelled` bắn nếu cuộc gọi bị hủy; xóa skeleton.
 
 ### `app.getHostContext()` / `app.onhostcontextchanged = (ctx) => {...}`
 
-Read and subscribe to host context. Call `getHostContext()` **after** `connect()`. Subscribe for live updates (user toggles dark mode, expands to fullscreen).
+Đọc và subscribe vào host context. Gọi `getHostContext()` **sau** `connect()`. Subscribe để nhận cập nhật trực tiếp (người dùng bật dark mode, mở rộng sang fullscreen).
 
-| `ctx.` field | Use |
+| Trường `ctx.` | Cách dùng |
 |---|---|
-| `theme` | `"light"` / `"dark"` — toggle a `.dark` class |
-| `styles.variables` | Host CSS tokens — pass to `applyHostStyleVariables()` so colors/fonts match host chrome |
-| `displayMode` / `availableDisplayModes` | Current mode and which `requestDisplayMode` targets are valid |
-| `containerDimensions.{maxHeight,width}` | Size your render to this instead of hard-coded px |
-| `deviceCapabilities.touch` | Switch hover-only affordances to tap (`pointerdown`) |
-| `safeAreaInsets` | Padding for notches / composer overlay |
+| `theme` | `"light"` / `"dark"` — toggle class `.dark` |
+| `styles.variables` | CSS token của host — truyền vào `applyHostStyleVariables()` để màu sắc/font khớp với chrome của host |
+| `displayMode` / `availableDisplayModes` | Mode hiện tại và các target `requestDisplayMode` hợp lệ |
+| `containerDimensions.{maxHeight,width}` | Điều chỉnh render theo kích thước này thay vì hard-code px |
+| `deviceCapabilities.touch` | Chuyển affordance chỉ dùng hover sang tap (`pointerdown`) |
+| `safeAreaInsets` | Padding cho notch / composer overlay |
 
 ```js
 const applyTheme = (t) =>
@@ -142,16 +142,16 @@ await app.connect();
 applyTheme(app.getHostContext()?.theme);
 ```
 
-Keep colors in CSS custom props with a `:root.dark {}` override block and set `color-scheme: light | dark` so native form controls follow.
+Giữ màu sắc trong CSS custom props với block override `:root.dark {}` và đặt `color-scheme: light | dark` để các form control native đi theo.
 
 ---
 
 ## Server → Widget (progress)
 
-For long-running operations, emit progress notifications. The client sends a `progressToken` in the request's `_meta`; the server emits against it.
+Với các thao tác chạy lâu, emit progress notification. Client gửi `progressToken` trong `_meta` của request; server emit dựa vào đó.
 
 ```typescript
-// In the tool handler
+// Trong tool handler
 async ({ query }, extra) => {
   const token = extra._meta?.progressToken;
   for (let i = 0; i < steps.length; i++) {
@@ -163,29 +163,29 @@ async ({ query }, extra) => {
     }
     await steps[i].run();
   }
-  return { content: [{ type: "text", text: "Complete" }] };
+  return { content: [{ type: "text", text: "Hoàn thành" }] };
 }
 ```
 
-No `{ notify }` destructure — `extra` is `RequestHandlerExtra`; progress goes through `sendNotification`.
+Không destructure `{ notify }` — `extra` là `RequestHandlerExtra`; progress đi qua `sendNotification`.
 
 ---
 
 ## Lifecycle
 
-1. Claude calls a tool with `_meta.ui.resourceUri` declared
-2. Host fetches the resource (your HTML) and mounts a **fresh iframe** for this call
-3. Widget script runs, sets handlers, calls `await app.connect()`
-4. Host pipes the tool's return value → `ontoolresult` fires
-5. Widget renders, user interacts
-6. Widget calls `sendMessage` / `updateModelContext` / `callServerTool` as needed
-7. Iframe persists in the transcript; **the next call to the same tool mounts another iframe** alongside it
+1. Claude gọi một tool với `_meta.ui.resourceUri` được khai báo
+2. Host fetch resource (HTML của bạn) và mount một **iframe mới** cho lần gọi này
+3. Script widget chạy, thiết lập handler, gọi `await app.connect()`
+4. Host pipe giá trị trả về của tool → `ontoolresult` bắn
+5. Widget render, người dùng tương tác
+6. Widget gọi `sendMessage` / `updateModelContext` / `callServerTool` khi cần
+7. Iframe tồn tại trong transcript; **lần gọi tiếp theo tới cùng tool sẽ mount thêm một iframe** bên cạnh nó
 
-There's no explicit "submit and close" — each instance is long-lived, but instances are not reused across calls.
+Không có "submit và đóng" rõ ràng — mỗi instance tồn tại lâu dài, nhưng instance không được tái sử dụng giữa các lần gọi.
 
 ### Supersession
 
-Because earlier instances stay mounted, a click on a stale widget can `sendMessage` after a newer one has rendered. Detect this with a `BroadcastChannel` and make older instances inert:
+Vì các instance trước vẫn được mount, một click vào widget cũ có thể `sendMessage` sau khi một widget mới hơn đã render. Phát hiện điều này bằng `BroadcastChannel` và làm các instance cũ không hoạt động:
 
 ```js
 let superseded = false;
@@ -199,7 +199,7 @@ bc.onmessage = (e) => {
 };
 bc.postMessage({ seq });
 
-// Guard outbound calls:
+// Bảo vệ các lần gọi ra ngoài:
 function safeSend(msg) {
   if (!superseded) app.sendMessage(msg);
 }
@@ -207,21 +207,21 @@ function safeSend(msg) {
 
 ---
 
-## Sandbox & CSP gotchas
+## Các vấn đề Sandbox & CSP
 
-The iframe runs under both an HTML `sandbox` attribute **and** a restrictive Content-Security-Policy. The practical effect is that almost nothing external is allowed — widgets should be self-contained.
+Iframe chạy dưới cả thuộc tính HTML `sandbox` **lẫn** Content-Security-Policy hạn chế. Hệ quả thực tế là hầu như không có gì từ bên ngoài được phép — widget nên tự cung cấp đủ.
 
-| Symptom | Cause | Fix |
+| Triệu chứng | Nguyên nhân | Giải pháp |
 |---|---|---|
-| Widget is a blank rectangle, nothing renders | CDN `import` of ext-apps blocked (transitive SDK fetches) | **Inline** the `ext-apps/app-with-deps` bundle — see `iframe-sandbox.md` |
-| Widget renders but JS doesn't run | Inline event handlers blocked | Use `addEventListener` — never `onclick="..."` in HTML |
-| `eval` / `new Function` errors | Script-src restriction | Don't use them; use JSON.parse for data |
-| `fetch()` to your API fails | Cross-origin blocked | Route through `app.callServerTool()` instead |
-| External CSS doesn't load | `style-src` restriction | Inline styles in a `<style>` tag |
-| Fonts don't load | `font-src` restriction | Use system fonts (`font: 14px system-ui`) |
-| External `<img src>` broken | CSP `img-src` + referrer hotlink blocking | Fetch server-side, inline as `data:` URL in the tool result payload |
-| `window.open()` does nothing | Sandbox lacks `allow-popups` | Use `app.openLink({url})` |
-| `<a target="_blank">` does nothing | Same | Intercept click → `preventDefault()` → `app.openLink` |
-| Edited HTML doesn't appear in Desktop | Desktop caches UI resources | Fully quit (⌘Q) + relaunch, not just window-close |
+| Widget là hình chữ nhật trắng, không render gì | CDN `import` của ext-apps bị chặn (SDK fetch transitive) | **Inline** bundle `ext-apps/app-with-deps` — xem `iframe-sandbox.md` |
+| Widget render nhưng JS không chạy | Inline event handler bị chặn | Dùng `addEventListener` — không bao giờ dùng `onclick="..."` trong HTML |
+| Lỗi `eval` / `new Function` | Hạn chế script-src | Không dùng chúng; dùng JSON.parse cho dữ liệu |
+| `fetch()` tới API thất bại | Cross-origin bị chặn | Route qua `app.callServerTool()` thay thế |
+| CSS bên ngoài không load | Hạn chế `style-src` | Inline style trong tag `<style>` |
+| Font không load | Hạn chế `font-src` | Dùng system font (`font: 14px system-ui`) |
+| `<img src>` ngoài bị lỗi | CSP `img-src` + chặn hotlink của CDN | Fetch phía server, inline dưới dạng `data:` URL trong payload kết quả tool |
+| `window.open()` không làm gì | Sandbox thiếu `allow-popups` | Dùng `app.openLink({url})` |
+| `<a target="_blank">` không làm gì | Như trên | Chặn click → `preventDefault()` → `app.openLink` |
+| HTML đã sửa không xuất hiện trong Desktop | Desktop cache UI resource | Thoát hoàn toàn (⌘Q) + khởi động lại, không chỉ đóng cửa sổ |
 
-When in doubt, open the **iframe's own** devtools console (not the main app's) — CSP violations log there. See `iframe-sandbox.md` for the bundle-inlining pattern.
+Khi không chắc, mở console devtools **của chính iframe** (không phải của app chính) — vi phạm CSP log ở đó. Xem `iframe-sandbox.md` để biết pattern bundle inlining.

@@ -1,32 +1,25 @@
-# Iframe sandbox constraints
+# Các ràng buộc của iframe sandbox
 
-MCP-app widgets run inside a sandboxed `<iframe>` in the host (Claude Desktop,
-claude.ai). The sandbox and CSP attributes lock down what the widget can do.
-Every item below was observed failing with a silent blank iframe until the
-fix was applied — the error only appears in the iframe's own devtools console,
-not the host's.
+Widget MCP app chạy bên trong `<iframe>` có sandbox trong host (Claude Desktop, claude.ai). Các thuộc tính sandbox và CSP khóa chặt những gì widget có thể làm. Mỗi mục dưới đây được quan sát thấy thất bại với một iframe trắng im lặng cho đến khi áp dụng bản sửa — lỗi chỉ xuất hiện trong console devtools của chính iframe, không phải của host.
 
 ---
 
-## Problem → fix table
+## Bảng triệu chứng → giải pháp
 
-| Symptom | Root cause | Fix |
+| Triệu chứng | Nguyên nhân gốc | Giải pháp |
 |---|---|---|
-| Widget renders as blank rectangle, no error | CSP `script-src` blocks esm.sh fetching transitive `@modelcontextprotocol/sdk` deps | Inline the `ext-apps/app-with-deps` bundle into the HTML |
-| `window.open()` does nothing | Sandbox lacks `allow-popups` | Use `app.openLink({ url })` |
-| `<a target="_blank">` does nothing | Same | `e.preventDefault()` + `app.openLink({ url })` on click |
-| External `<img src>` broken | CSP `img-src` + referrer hotlink blocking | Fetch server-side, ship as `data:` URL in the tool result payload |
-| Widget edits don't appear after server restart | Host caches UI resources | Fully quit the host (⌘Q / Alt+F4) and relaunch |
-| Top-level `await` throws | Older iframe contexts | Wrap module body in an async IIFE |
+| Widget render thành hình chữ nhật trắng, không có lỗi | CSP `script-src` chặn esm.sh fetch transitive deps `@modelcontextprotocol/sdk` | Inline bundle `ext-apps/app-with-deps` vào HTML |
+| `window.open()` không làm gì | Sandbox thiếu `allow-popups` | Dùng `app.openLink({ url })` |
+| `<a target="_blank">` không làm gì | Như trên | `e.preventDefault()` + `app.openLink({ url })` khi click |
+| `<img src>` ngoài bị lỗi | CSP `img-src` + chặn hotlink của CDN | Fetch phía server, gửi dưới dạng `data:` URL trong payload kết quả tool |
+| Sửa widget không xuất hiện sau khi restart server | Host cache UI resource | Thoát hoàn toàn host (⌘Q / Alt+F4) và khởi động lại |
+| Top-level `await` throw | Các iframe context cũ hơn | Bọc body module trong một async IIFE |
 
 ---
 
-## Inlining the ext-apps bundle
+## Inline bundle ext-apps
 
-`@modelcontextprotocol/ext-apps` ships a self-contained browser build at the
-`app-with-deps` export (~300KB). It's minified ESM ending in `export{…}`; to
-use it from an inline `<script type="module">` block, rewrite the export
-statement into a global assignment at build time:
+`@modelcontextprotocol/ext-apps` ship một browser build tự cung cấp đủ tại export `app-with-deps` (~300KB). Đây là ESM đã minify kết thúc bằng `export{…}`; để dùng từ một block `<script type="module">` inline, viết lại câu lệnh export thành một phép gán global lúc build:
 
 ```ts
 import { readFileSync } from "node:fs";
@@ -48,7 +41,7 @@ const widgetHtml = readFileSync("./widgets/widget.html", "utf8")
   .replace("/*__EXT_APPS_BUNDLE__*/", () => bundle);
 ```
 
-Widget side:
+Phía widget:
 
 ```html
 <script type="module">
@@ -61,25 +54,23 @@ const { App } = globalThis.ExtApps;
 </script>
 ```
 
-The `() => bundle` replacer form (rather than a bare string) is important —
-`String.replace` interprets `$…` sequences in a string replacement, and the
-minified bundle is full of them.
+Dạng replacer `() => bundle` (thay vì chuỗi thuần) quan trọng — `String.replace` diễn giải các chuỗi `$…` trong string replacement, và bundle đã minify đầy rẫy chúng.
 
 ---
 
-## Outbound links
+## Link ra ngoài
 
 ```js
-// ✗ blocked
+// ✗ bị chặn
 window.open(url, "_blank");
-// ✗ blocked
+// ✗ bị chặn
 <a href="…" target="_blank">…</a>
 
-// ✓ host-mediated
+// ✓ thông qua host
 await app.openLink({ url });
 ```
 
-Intercept anchor clicks:
+Chặn click anchor:
 
 ```js
 el.addEventListener("click", (e) => {
@@ -90,11 +81,9 @@ el.addEventListener("click", (e) => {
 
 ---
 
-## External images
+## Ảnh từ bên ngoài
 
-CSP `img-src` defaults (plus many CDN referrer policies) block
-`<img src="https://external-cdn/…">` from loading. Inline them server-side in
-the tool handler:
+CSP `img-src` mặc định (cộng với nhiều referrer policy của CDN) chặn `<img src="https://external-cdn/…">` không load được. Inline chúng phía server trong tool handler:
 
 ```ts
 async function toDataUrl(url: string): Promise<string | undefined> {
@@ -109,7 +98,7 @@ async function toDataUrl(url: string): Promise<string | undefined> {
   }
 }
 
-// in the tool handler
+// trong tool handler
 const inlined = await Promise.all(
   items.map(async (it) =>
     it.thumb ? { ...it, thumb: await toDataUrl(it.thumb) ?? it.thumb } : it,
@@ -117,14 +106,13 @@ const inlined = await Promise.all(
 );
 ```
 
-Add `referrerpolicy="no-referrer"` on the `<img>` as a fallback for any URL
-that survives un-inlined.
+Thêm `referrerpolicy="no-referrer"` trên `<img>` như một fallback cho URL nào vẫn còn un-inlined.
 
 ---
 
 ## Theme & host styles
 
-The host renders the iframe inside its own card chrome — paint a **transparent** background and adopt host CSS tokens so the widget blends in across light/dark and across hosts.
+Host render iframe bên trong card chrome của riêng nó — paint nền **transparent** và áp dụng CSS token của host để widget hòa vào trong cả light/dark và qua các host khác nhau.
 
 ```html
 <meta name="color-scheme" content="light dark" />
@@ -137,7 +125,7 @@ The host renders the iframe inside its own card chrome — paint a **transparent
   --line: var(--color-border-default, #e3e6ea);
 }
 html, body { background: transparent; color: var(--ink); }
-:root.dark .thumb { mix-blend-mode: normal; } /* multiply → images vanish in dark */
+:root.dark .thumb { mix-blend-mode: normal; } /* multiply → ảnh biến mất trong dark */
 ```
 
 ```js
@@ -152,13 +140,10 @@ await app.connect();
 applyHostContext(app.getHostContext());
 ```
 
-`applyHostStyleVariables` writes the host's `--color-*` / `--font-*` / `--border-radius-*` tokens onto `:root`; the hex values above are fallbacks for hosts that don't supply them.
+`applyHostStyleVariables` ghi các token `--color-*` / `--font-*` / `--border-radius-*` của host lên `:root`; các giá trị hex ở trên là fallback cho host không cung cấp chúng.
 
 ---
 
-## Debugging
+## Debug
 
-The iframe has its own console. In Claude Desktop, open DevTools (View → Toggle
-Developer Tools), then switch the context dropdown (top-left of the Console
-tab) from "top" to the widget's iframe. CSP violations, uncaught exceptions,
-and import errors all surface there — the host's main console stays silent.
+Iframe có console riêng. Trong Claude Desktop, mở DevTools (View → Toggle Developer Tools), rồi chuyển dropdown context (góc trên trái của tab Console) từ "top" sang iframe của widget. Vi phạm CSP, exception chưa bắt, và lỗi import đều hiển thị ở đó — console chính của host im lặng.

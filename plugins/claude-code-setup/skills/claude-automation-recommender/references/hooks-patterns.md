@@ -1,163 +1,163 @@
-# Hooks Recommendations
+# Gợi ý Hooks
 
-Hooks automatically run commands in response to Claude Code events. They're ideal for enforcement and automation that should happen consistently.
+Hooks tự động chạy lệnh khi Claude Code nhận sự kiện. Phù hợp nhất cho việc thực thi quy tắc và tự động hóa cần diễn ra nhất quán.
 
-**Note**: These are common patterns. Use web search to find hooks for tools/frameworks not listed here to recommend the best hooks for the user.
+**Lưu ý**: Đây là các pattern phổ biến. Dùng web search để tìm hooks cho tools/frameworks chưa có trong danh sách nhằm đề xuất hooks phù hợp nhất cho người dùng.
 
-## Auto-Formatting Hooks
+## Hooks Tự Động Format Code
 
 ### Prettier (JavaScript/TypeScript)
-| Detection | File Exists |
+| Phát hiện | File tồn tại |
 |-----------|-------------|
 | `.prettierrc`, `.prettierrc.json`, `prettier.config.js` | ✓ |
 
-**Recommend**: PostToolUse hook on Edit/Write to auto-format
-**Value**: Code stays formatted without thinking about it
+**Đề xuất**: PostToolUse hook trên Edit/Write để auto-format
+**Giá trị**: Code luôn được format mà không cần nghĩ đến
 
 ### ESLint (JavaScript/TypeScript)
-| Detection | File Exists |
+| Phát hiện | File tồn tại |
 |-----------|-------------|
 | `.eslintrc`, `.eslintrc.json`, `eslint.config.js` | ✓ |
 
-**Recommend**: PostToolUse hook on Edit/Write to auto-fix
-**Value**: Lint errors fixed automatically
+**Đề xuất**: PostToolUse hook trên Edit/Write để auto-fix
+**Giá trị**: Lỗi lint được sửa tự động
 
 ### Black/isort (Python)
-| Detection | File Exists |
+| Phát hiện | File tồn tại |
 |-----------|-------------|
-| `pyproject.toml` with black/isort, `.black`, `setup.cfg` | ✓ |
+| `pyproject.toml` với black/isort, `.black`, `setup.cfg` | ✓ |
 
-**Recommend**: PostToolUse hook to format Python files
-**Value**: Consistent Python formatting
+**Đề xuất**: PostToolUse hook để format file Python
+**Giá trị**: Format Python nhất quán
 
-### Ruff (Python - Modern)
-| Detection | File Exists |
+### Ruff (Python - Hiện đại)
+| Phát hiện | File tồn tại |
 |-----------|-------------|
-| `ruff.toml`, `pyproject.toml` with `[tool.ruff]` | ✓ |
+| `ruff.toml`, `pyproject.toml` với `[tool.ruff]` | ✓ |
 
-**Recommend**: PostToolUse hook for lint + format
-**Value**: Fast, comprehensive Python linting
+**Đề xuất**: PostToolUse hook cho lint + format
+**Giá trị**: Python linting nhanh, toàn diện
 
 ### gofmt (Go)
-| Detection | File Exists |
+| Phát hiện | File tồn tại |
 |-----------|-------------|
 | `go.mod` | ✓ |
 
-**Recommend**: PostToolUse hook to run gofmt
-**Value**: Standard Go formatting
+**Đề xuất**: PostToolUse hook để chạy gofmt
+**Giá trị**: Format Go chuẩn
 
 ### rustfmt (Rust)
-| Detection | File Exists |
+| Phát hiện | File tồn tại |
 |-----------|-------------|
 | `Cargo.toml` | ✓ |
 
-**Recommend**: PostToolUse hook to run rustfmt
-**Value**: Standard Rust formatting
+**Đề xuất**: PostToolUse hook để chạy rustfmt
+**Giá trị**: Format Rust chuẩn
 
 ---
 
-## Type Checking Hooks
+## Hooks Kiểm Tra Kiểu
 
 ### TypeScript
-| Detection | File Exists |
+| Phát hiện | File tồn tại |
 |-----------|-------------|
 | `tsconfig.json` | ✓ |
 
-**Recommend**: PostToolUse hook to run tsc --noEmit
-**Value**: Catch type errors immediately
+**Đề xuất**: PostToolUse hook để chạy tsc --noEmit
+**Giá trị**: Phát hiện lỗi kiểu ngay lập tức
 
 ### mypy/pyright (Python)
-| Detection | File Exists |
+| Phát hiện | File tồn tại |
 |-----------|-------------|
-| `mypy.ini`, `pyrightconfig.json`, pyproject.toml with mypy | ✓ |
+| `mypy.ini`, `pyrightconfig.json`, pyproject.toml với mypy | ✓ |
 
-**Recommend**: PostToolUse hook for type checking
-**Value**: Catch type errors in Python
+**Đề xuất**: PostToolUse hook để kiểm tra kiểu
+**Giá trị**: Phát hiện lỗi kiểu trong Python
 
 ---
 
-## Protection Hooks
+## Hooks Bảo Vệ
 
-### Block Sensitive File Edits
-| Detection | Presence Of |
+### Chặn Sửa File Nhạy Cảm
+| Phát hiện | Sự hiện diện của |
 |-----------|-------------|
-| `.env`, `.env.local`, `.env.production` | Environment files |
-| `credentials.json`, `secrets.yaml` | Secret files |
-| `.git/` directory | Git internals |
+| `.env`, `.env.local`, `.env.production` | File environment |
+| `credentials.json`, `secrets.yaml` | File secret |
+| Thư mục `.git/` | Git internals |
 
-**Recommend**: PreToolUse hook that blocks Edit/Write to these paths
-**Value**: Prevent accidental secret exposure or git corruption
+**Đề xuất**: PreToolUse hook chặn Edit/Write vào các path này
+**Giá trị**: Ngăn vô tình lộ secret hoặc làm hỏng git
 
-### Block Lock File Edits
-| Detection | Presence Of |
+### Chặn Sửa Lock File
+| Phát hiện | Sự hiện diện của |
 |-----------|-------------|
-| `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml` | JS lock files |
-| `Cargo.lock`, `poetry.lock`, `Pipfile.lock` | Other lock files |
+| `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml` | Lock file JS |
+| `Cargo.lock`, `poetry.lock`, `Pipfile.lock` | Lock file khác |
 
-**Recommend**: PreToolUse hook that blocks direct edits
-**Value**: Lock files should only change via package manager
+**Đề xuất**: PreToolUse hook chặn sửa trực tiếp
+**Giá trị**: Lock file chỉ nên thay đổi qua package manager
 
 ---
 
-## Test Runner Hooks
+## Hooks Chạy Test
 
 ### Jest (JavaScript/TypeScript)
-| Detection | Presence Of |
+| Phát hiện | Sự hiện diện của |
 |-----------|-------------|
-| `jest.config.js`, `jest` in package.json | Jest configured |
-| `__tests__/`, `*.test.ts`, `*.spec.ts` | Test files exist |
+| `jest.config.js`, `jest` trong package.json | Jest đã cấu hình |
+| `__tests__/`, `*.test.ts`, `*.spec.ts` | File test tồn tại |
 
-**Recommend**: PostToolUse hook to run related tests after edit
-**Value**: Immediate test feedback on changes
+**Đề xuất**: PostToolUse hook chạy test liên quan sau khi sửa
+**Giá trị**: Phản hồi test ngay lập tức khi có thay đổi
 
 ### pytest (Python)
-| Detection | Presence Of |
+| Phát hiện | Sự hiện diện của |
 |-----------|-------------|
-| `pytest.ini`, `pyproject.toml` with pytest | pytest configured |
-| `tests/`, `test_*.py` | Test files exist |
+| `pytest.ini`, `pyproject.toml` với pytest | pytest đã cấu hình |
+| `tests/`, `test_*.py` | File test tồn tại |
 
-**Recommend**: PostToolUse hook to run pytest on changed files
-**Value**: Immediate test feedback
+**Đề xuất**: PostToolUse hook chạy pytest trên file đã thay đổi
+**Giá trị**: Phản hồi test ngay lập tức
 
 ---
 
-## Quick Reference: Detection → Recommendation
+## Tham Khảo Nhanh: Phát Hiện → Đề Xuất
 
-| If You See | Recommend This Hook |
+| Nếu thấy | Đề xuất hook này |
 |------------|-------------------|
-| Prettier config | Auto-format on Edit/Write |
-| ESLint config | Auto-lint on Edit/Write |
+| Prettier config | Auto-format khi Edit/Write |
+| ESLint config | Auto-lint khi Edit/Write |
 | Ruff/Black config | Auto-format Python |
-| tsconfig.json | Type-check on Edit |
-| Test directory | Run related tests on Edit |
-| .env files | Block .env edits |
-| Lock files | Block lock file edits |
-| Go project | gofmt on Edit |
-| Rust project | rustfmt on Edit |
+| tsconfig.json | Kiểm tra kiểu khi Edit |
+| Thư mục test | Chạy test liên quan khi Edit |
+| File .env | Chặn sửa .env |
+| Lock file | Chặn sửa lock file |
+| Dự án Go | gofmt khi Edit |
+| Dự án Rust | rustfmt khi Edit |
 
 ---
 
-## Notification Hooks
+## Hooks Thông Báo
 
-Notification hooks run when Claude Code sends notifications. Use matchers to filter by notification type.
+Hooks thông báo chạy khi Claude Code gửi notification. Dùng matcher để lọc theo loại notification.
 
-### Permission Alerts
-| Matcher | Use Case |
+### Cảnh Báo Permission
+| Matcher | Trường hợp dùng |
 |---------|----------|
-| `permission_prompt` | Alert when Claude requests permissions |
+| `permission_prompt` | Cảnh báo khi Claude yêu cầu permission |
 
-**Recommend**: Play sound, send desktop notification, or log permission requests
-**Value**: Never miss permission prompts when multitasking
+**Đề xuất**: Phát âm thanh, gửi desktop notification, hoặc ghi log các yêu cầu permission
+**Giá trị**: Không bao giờ bỏ lỡ permission prompt khi đang multitask
 
-### Idle Notifications
-| Matcher | Use Case |
+### Thông Báo Idle
+| Matcher | Trường hợp dùng |
 |---------|----------|
-| `idle_prompt` | Alert when Claude is waiting for input (60+ seconds idle) |
+| `idle_prompt` | Cảnh báo khi Claude đang chờ input (idle 60+ giây) |
 
-**Recommend**: Play sound or send notification when Claude needs attention
-**Value**: Know when Claude is ready for your input
+**Đề xuất**: Phát âm thanh hoặc gửi notification khi Claude cần chú ý
+**Giá trị**: Biết khi nào Claude sẵn sàng nhận input
 
-### Example Configuration
+### Ví Dụ Cấu Hình
 
 ```json
 {
@@ -186,41 +186,41 @@ Notification hooks run when Claude Code sends notifications. Use matchers to fil
 }
 ```
 
-### Available Matchers
+### Các Matcher Có Sẵn
 
-| Matcher | Triggers When |
+| Matcher | Kích hoạt khi |
 |---------|---------------|
-| `permission_prompt` | Claude needs permission for a tool |
-| `idle_prompt` | Claude waiting for input (60+ seconds) |
-| `auth_success` | Authentication succeeds |
-| `elicitation_dialog` | MCP tool needs input |
+| `permission_prompt` | Claude cần permission cho một tool |
+| `idle_prompt` | Claude đang chờ input (60+ giây) |
+| `auth_success` | Xác thực thành công |
+| `elicitation_dialog` | MCP tool cần input |
 
 ---
 
-## Quick Reference: Detection → Recommendation
+## Tham Khảo Nhanh: Phát Hiện → Đề Xuất
 
-| If You See | Recommend This Hook |
+| Nếu thấy | Đề xuất hook này |
 |------------|-------------------|
-| Prettier config | Auto-format on Edit/Write |
-| ESLint config | Auto-lint on Edit/Write |
+| Prettier config | Auto-format khi Edit/Write |
+| ESLint config | Auto-lint khi Edit/Write |
 | Ruff/Black config | Auto-format Python |
-| tsconfig.json | Type-check on Edit |
-| Test directory | Run related tests on Edit |
-| .env files | Block .env edits |
-| Lock files | Block lock file edits |
-| Go project | gofmt on Edit |
-| Rust project | rustfmt on Edit |
-| Multitasking workflow | Notification hooks for alerts |
+| tsconfig.json | Kiểm tra kiểu khi Edit |
+| Thư mục test | Chạy test liên quan khi Edit |
+| File .env | Chặn sửa .env |
+| Lock file | Chặn sửa lock file |
+| Dự án Go | gofmt khi Edit |
+| Dự án Rust | rustfmt khi Edit |
+| Workflow multitask | Hooks thông báo để nhận cảnh báo |
 
 ---
 
-## Hook Placement
+## Vị Trí Đặt Hook
 
-Hooks go in `.claude/settings.json`:
+Hooks được đặt trong `.claude/settings.json`:
 
 ```
 .claude/
-└── settings.json  ← Hook configurations here
+└── settings.json  ← Cấu hình hooks ở đây
 ```
 
-Recommend creating the `.claude/` directory if it doesn't exist.
+Đề xuất tạo thư mục `.claude/` nếu chưa tồn tại.

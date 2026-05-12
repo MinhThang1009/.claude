@@ -1,263 +1,263 @@
-# MCP Server Recommendations
+# Gợi Ý MCP Server
 
-MCP (Model Context Protocol) servers extend Claude's capabilities by connecting to external tools and services.
+MCP (Model Context Protocol) server mở rộng khả năng của Claude bằng cách kết nối với các tool và dịch vụ bên ngoài.
 
-**Note**: These are common MCP servers. Use web search to find MCP servers specific to the codebase's services and integrations.
+**Lưu ý**: Đây là các MCP server phổ biến. Dùng web search để tìm MCP server phù hợp với các dịch vụ và tích hợp cụ thể của codebase.
 
-## Setup & Team Sharing
+## Thiết Lập & Chia Sẻ Trong Team
 
-**Connection methods:**
-1. **Project config** (`.mcp.json`) - Available only in that directory
-2. **Global config** (`~/.claude.json`) - Available across all projects
-3. **Checked-in `.mcp.json`** - Available to entire team (recommended!)
+**Phương thức kết nối:**
+1. **Project config** (`.mcp.json`) - Chỉ khả dụng trong thư mục đó
+2. **Global config** (`~/.claude.json`) - Khả dụng trên toàn bộ project
+3. **`.mcp.json` được commit** - Khả dụng cho toàn bộ team (khuyến nghị!)
 
-**Tip**: Check `.mcp.json` into git so your whole team gets the same MCP servers.
+**Mẹo**: Commit `.mcp.json` vào git để cả team dùng chung một bộ MCP server.
 
-**Debugging**: Use `claude --mcp-debug` to identify configuration issues.
+**Debug**: Dùng `claude --mcp-debug` để xác định các vấn đề cấu hình.
 
-## Documentation & Knowledge
+## Documentation & Kiến Thức
 
 ### context7
-**Best for**: Projects using popular libraries/SDKs where you want Claude to code with up-to-date documentation
+**Phù hợp nhất cho**: Các project dùng thư viện/SDK phổ biến, nơi bạn muốn Claude code với documentation cập nhật
 
-| Recommend When | Examples |
+| Khuyến nghị khi | Ví dụ |
 |----------------|----------|
-| Using React, Vue, Angular | Frontend frameworks |
-| Using Express, FastAPI, Django | Backend frameworks |
-| Using Prisma, Drizzle | ORMs |
-| Using Stripe, Twilio, SendGrid | Third-party APIs |
-| Using AWS SDK, Google Cloud | Cloud SDKs |
-| Using LangChain, OpenAI SDK | AI/ML libraries |
+| Dùng React, Vue, Angular | Frontend framework |
+| Dùng Express, FastAPI, Django | Backend framework |
+| Dùng Prisma, Drizzle | ORM |
+| Dùng Stripe, Twilio, SendGrid | Third-party API |
+| Dùng AWS SDK, Google Cloud | Cloud SDK |
+| Dùng LangChain, OpenAI SDK | Thư viện AI/ML |
 
-**Value**: Claude fetches live documentation instead of relying on training data, reducing hallucinated APIs and outdated patterns.
+**Giá trị**: Claude lấy documentation trực tiếp thay vì dựa vào dữ liệu huấn luyện, giảm thiểu API bịa đặt và pattern lỗi thời.
 
 ---
 
 ## Browser & Frontend
 
 ### Playwright MCP
-**Best for**: Frontend projects needing browser automation, testing, or screenshots
+**Phù hợp nhất cho**: Các project frontend cần tự động hóa browser, testing, hoặc chụp ảnh màn hình
 
-| Recommend When | Examples |
+| Khuyến nghị khi | Ví dụ |
 |----------------|----------|
-| React/Vue/Angular app | UI component testing |
-| E2E tests needed | User flow validation |
-| Visual regression testing | Screenshot comparisons |
-| Debugging UI issues | See what user sees |
-| Form testing | Multi-step workflows |
+| Ứng dụng React/Vue/Angular | Kiểm thử UI component |
+| Cần E2E test | Kiểm tra luồng người dùng |
+| Visual regression testing | So sánh ảnh chụp màn hình |
+| Debug vấn đề UI | Xem giao diện từ góc nhìn người dùng |
+| Kiểm thử form | Workflow nhiều bước |
 
-**Value**: Claude can interact with your running app, take screenshots, fill forms, and verify UI behavior.
+**Giá trị**: Claude có thể tương tác với ứng dụng đang chạy, chụp ảnh màn hình, điền form, và kiểm tra hành vi UI.
 
 ### Puppeteer MCP
-**Best for**: Headless browser automation, web scraping
+**Phù hợp nhất cho**: Tự động hóa browser headless, web scraping
 
-| Recommend When | Examples |
+| Khuyến nghị khi | Ví dụ |
 |----------------|----------|
-| PDF generation from HTML | Report generation |
-| Web scraping tasks | Data extraction |
-| Headless testing | CI environments |
+| Tạo PDF từ HTML | Tạo báo cáo |
+| Tác vụ web scraping | Trích xuất dữ liệu |
+| Kiểm thử headless | Môi trường CI |
 
 ---
 
 ## Databases
 
 ### Supabase MCP
-**Best for**: Projects using Supabase for backend/database
+**Phù hợp nhất cho**: Các project dùng Supabase làm backend/database
 
-| Recommend When | Examples |
+| Khuyến nghị khi | Ví dụ |
 |----------------|----------|
-| Supabase project detected | `@supabase/supabase-js` in deps |
-| Auth + database needs | User management apps |
-| Real-time features | Live data sync |
+| Phát hiện project Supabase | `@supabase/supabase-js` trong deps |
+| Cần auth + database | Ứng dụng quản lý người dùng |
+| Tính năng real-time | Đồng bộ dữ liệu trực tiếp |
 
-**Value**: Claude can query tables, manage auth, and interact with Supabase storage directly.
+**Giá trị**: Claude có thể query table, quản lý auth, và tương tác trực tiếp với Supabase storage.
 
 ### PostgreSQL MCP
-**Best for**: Direct PostgreSQL database access
+**Phù hợp nhất cho**: Truy cập trực tiếp database PostgreSQL
 
-| Recommend When | Examples |
+| Khuyến nghị khi | Ví dụ |
 |----------------|----------|
-| Raw PostgreSQL usage | No ORM layer |
-| Database migrations | Schema management |
-| Data analysis tasks | Complex queries |
-| Debugging data issues | Inspect actual data |
+| Dùng PostgreSQL thuần | Không có ORM |
+| Database migration | Quản lý schema |
+| Phân tích dữ liệu | Query phức tạp |
+| Debug vấn đề dữ liệu | Kiểm tra dữ liệu thực tế |
 
 ### Neon MCP
-**Best for**: Neon serverless Postgres users
+**Phù hợp nhất cho**: Người dùng Neon serverless Postgres
 
 ### Turso MCP
-**Best for**: Turso/libSQL edge database users
+**Phù hợp nhất cho**: Người dùng database edge Turso/libSQL
 
 ---
 
 ## Version Control & DevOps
 
 ### GitHub MCP
-**Best for**: GitHub-hosted repositories needing issue/PR integration
+**Phù hợp nhất cho**: Các repository trên GitHub cần tích hợp issue/PR
 
-| Recommend When | Examples |
+| Khuyến nghị khi | Ví dụ |
 |----------------|----------|
-| GitHub repository | `.git` with GitHub remote |
-| Issue-driven development | Reference issues in commits |
-| PR workflows | Review, merge operations |
-| GitHub Actions | CI/CD pipeline access |
-| Release management | Tag and release automation |
+| Repository GitHub | `.git` với GitHub remote |
+| Phát triển theo issue | Tham chiếu issue trong commit |
+| Workflow PR | Review, thao tác merge |
+| GitHub Actions | Truy cập CI/CD pipeline |
+| Quản lý release | Tự động hóa tag và release |
 
-**Value**: Claude can create issues, review PRs, check workflow runs, and manage releases.
+**Giá trị**: Claude có thể tạo issue, review PR, kiểm tra workflow run, và quản lý release.
 
 ### GitLab MCP
-**Best for**: GitLab-hosted repositories
+**Phù hợp nhất cho**: Các repository trên GitLab
 
 ### Linear MCP
-**Best for**: Teams using Linear for issue tracking
+**Phù hợp nhất cho**: Các team dùng Linear để theo dõi issue
 
-| Recommend When | Examples |
+| Khuyến nghị khi | Ví dụ |
 |----------------|----------|
-| Linear workspace | Issue references like `ABC-123` |
-| Sprint planning | Backlog management |
-| Issue creation from code | Auto-create issues for TODOs |
+| Workspace Linear | Tham chiếu issue dạng `ABC-123` |
+| Lập kế hoạch sprint | Quản lý backlog |
+| Tạo issue từ code | Tự động tạo issue cho TODO |
 
 ---
 
 ## Cloud Infrastructure
 
 ### AWS MCP
-**Best for**: AWS infrastructure management
+**Phù hợp nhất cho**: Quản lý hạ tầng AWS
 
-| Recommend When | Examples |
+| Khuyến nghị khi | Ví dụ |
 |----------------|----------|
-| AWS SDK in dependencies | `@aws-sdk/*` packages |
+| AWS SDK trong dependencies | Các package `@aws-sdk/*` |
 | Infrastructure as code | Terraform, CDK, SAM |
-| Lambda development | Serverless functions |
-| S3, DynamoDB usage | Cloud data services |
+| Phát triển Lambda | Serverless function |
+| Dùng S3, DynamoDB | Dịch vụ dữ liệu cloud |
 
 ### Cloudflare MCP
-**Best for**: Cloudflare Workers, Pages, R2, D1
+**Phù hợp nhất cho**: Cloudflare Workers, Pages, R2, D1
 
-| Recommend When | Examples |
+| Khuyến nghị khi | Ví dụ |
 |----------------|----------|
-| Cloudflare Workers | Edge functions |
-| Pages deployment | Static site hosting |
+| Cloudflare Workers | Edge function |
+| Pages deployment | Hosting static site |
 | R2 storage | Object storage |
 | D1 database | Edge SQL database |
 
 ### Vercel MCP
-**Best for**: Vercel deployment and configuration
+**Phù hợp nhất cho**: Deployment và cấu hình Vercel
 
 ---
 
-## Monitoring & Observtic
+## Monitoring & Observability
 
 ### Sentry MCP
-**Best for**: Error tracking and debugging
+**Phù hợp nhất cho**: Theo dõi lỗi và debug
 
-| Recommend When | Examples |
+| Khuyến nghị khi | Ví dụ |
 |----------------|----------|
-| Sentry configured | `@sentry/*` in deps |
-| Production debugging | Investigate errors |
-| Error patterns | Group similar issues |
-| Release tracking | Correlate deploys with errors |
+| Đã cấu hình Sentry | `@sentry/*` trong deps |
+| Debug production | Điều tra lỗi |
+| Pattern lỗi | Nhóm các vấn đề tương tự |
+| Theo dõi release | Liên kết deploy với lỗi |
 
-**Value**: Claude can investigate Sentry issues, find root causes, and suggest fixes.
+**Giá trị**: Claude có thể điều tra issue trên Sentry, tìm nguyên nhân gốc rễ, và gợi ý hướng sửa.
 
 ### Datadog MCP
-**Best for**: APM, logs, and metrics
+**Phù hợp nhất cho**: APM, log, và metrics
 
 ---
 
-## Communication
+## Giao Tiếp
 
 ### Slack MCP
-**Best for**: Slack workspace integration
+**Phù hợp nhất cho**: Tích hợp với workspace Slack
 
-| Recommend When | Examples |
+| Khuyến nghị khi | Ví dụ |
 |----------------|----------|
-| Team uses Slack | Send notifications |
-| Deployment notifications | Alert channels |
-| Incident response | Post updates |
+| Team dùng Slack | Gửi thông báo |
+| Thông báo deployment | Cảnh báo channel |
+| Xử lý sự cố | Đăng cập nhật |
 
 ### Notion MCP
-**Best for**: Notion workspace for documentation
+**Phù hợp nhất cho**: Workspace Notion dùng để viết documentation
 
-| Recommend When | Examples |
+| Khuyến nghị khi | Ví dụ |
 |----------------|----------|
-| Notion for docs | Read/update pages |
-| Knowledge base | Search documentation |
-| Meeting notes | Create summaries |
+| Dùng Notion cho docs | Đọc/cập nhật trang |
+| Knowledge base | Tìm kiếm documentation |
+| Ghi chú họp | Tạo tóm tắt |
 
 ---
 
-## File & Data
+## File & Dữ Liệu
 
 ### Filesystem MCP
-**Best for**: Enhanced file operations beyond built-in tools
+**Phù hợp nhất cho**: Các thao tác file nâng cao hơn tool tích hợp sẵn
 
-| Recommend When | Examples |
+| Khuyến nghị khi | Ví dụ |
 |----------------|----------|
-| Complex file operations | Batch processing |
-| File watching | Monitor changes |
-| Advanced search | Custom patterns |
+| Thao tác file phức tạp | Xử lý hàng loạt |
+| Theo dõi file | Giám sát thay đổi |
+| Tìm kiếm nâng cao | Pattern tùy chỉnh |
 
 ### Memory MCP
-**Best for**: Persistent memory across sessions
+**Phù hợp nhất cho**: Bộ nhớ bền vững xuyên suốt các session
 
-| Recommend When | Examples |
+| Khuyến nghị khi | Ví dụ |
 |----------------|----------|
-| Long-running projects | Remember context |
-| User preferences | Store settings |
-| Learning patterns | Build knowledge |
+| Project dài hạn | Ghi nhớ context |
+| Tùy chọn người dùng | Lưu cài đặt |
+| Học pattern | Xây dựng kiến thức |
 
-**Value**: Claude remembers project context, decisions, and patterns across conversations.
+**Giá trị**: Claude ghi nhớ context, quyết định, và pattern của project xuyên suốt các cuộc hội thoại.
 
 ---
 
-## Containers & DevOps
+## Container & DevOps
 
 ### Docker MCP
-**Best for**: Container management
+**Phù hợp nhất cho**: Quản lý container
 
-| Recommend When | Examples |
+| Khuyến nghị khi | Ví dụ |
 |----------------|----------|
-| Docker Compose file | Container orchestration |
-| Dockerfile present | Build images |
-| Container debugging | Inspect logs, exec |
+| Có file Docker Compose | Điều phối container |
+| Có Dockerfile | Build image |
+| Debug container | Kiểm tra log, exec |
 
 ### Kubernetes MCP
-**Best for**: Kubernetes cluster management
+**Phù hợp nhất cho**: Quản lý Kubernetes cluster
 
-| Recommend When | Examples |
+| Khuyến nghị khi | Ví dụ |
 |----------------|----------|
-| K8s manifests | Deploy, scale pods |
-| Helm charts | Package management |
-| Cluster debugging | Pod logs, status |
+| Có K8s manifest | Deploy, scale pod |
+| Có Helm chart | Quản lý package |
+| Debug cluster | Log pod, trạng thái |
 
 ---
 
 ## AI & ML
 
 ### Exa MCP
-**Best for**: Web search and research
+**Phù hợp nhất cho**: Tìm kiếm web và nghiên cứu
 
-| Recommend When | Examples |
+| Khuyến nghị khi | Ví dụ |
 |----------------|----------|
-| Research tasks | Find current info |
-| Competitive analysis | Market research |
-| Documentation gaps | Find examples |
+| Tác vụ nghiên cứu | Tìm thông tin mới nhất |
+| Phân tích cạnh tranh | Nghiên cứu thị trường |
+| Thiếu documentation | Tìm ví dụ |
 
 ---
 
-## Quick Reference: Detection Patterns
+## Tham Khảo Nhanh: Pattern Phát Hiện
 
-| Look For | Suggests MCP Server |
+| Phát hiện | Gợi ý MCP Server |
 |----------|-------------------|
-| Popular npm packages | context7 |
+| Các npm package phổ biến | context7 |
 | React/Vue/Next.js | Playwright MCP |
 | `@supabase/supabase-js` | Supabase MCP |
-| `pg` or `postgres` | PostgreSQL MCP |
+| `pg` hoặc `postgres` | PostgreSQL MCP |
 | GitHub remote | GitHub MCP |
-| `.linear` or Linear refs | Linear MCP |
+| `.linear` hoặc tham chiếu Linear | Linear MCP |
 | `@aws-sdk/*` | AWS MCP |
 | `@sentry/*` | Sentry MCP |
 | `docker-compose.yml` | Docker MCP |
-| Slack webhook URLs | Slack MCP |
-| `@anthropic-ai/sdk` | context7 for Anthropic docs |
+| Slack webhook URL | Slack MCP |
+| `@anthropic-ai/sdk` | context7 cho Anthropic docs |

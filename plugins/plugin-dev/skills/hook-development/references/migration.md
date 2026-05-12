@@ -1,21 +1,21 @@
-# Migrating from Basic to Advanced Hooks
+# Chuyển từ Hook Cơ Bản sang Hook Nâng Cao
 
-This guide shows how to migrate from basic command hooks to advanced prompt-based hooks for better maintainability and flexibility.
+Hướng dẫn này chỉ cách chuyển từ command hook cơ bản sang prompt hook nâng cao để dễ bảo trì và linh hoạt hơn.
 
-## Why Migrate?
+## Tại Sao Cần Chuyển?
 
-Prompt-based hooks offer several advantages:
+Prompt hook có một số ưu điểm:
 
-- **Natural language reasoning**: LLM understands context and intent
-- **Better edge case handling**: Adapts to unexpected scenarios
-- **No bash scripting required**: Simpler to write and maintain
-- **More flexible validation**: Can handle complex logic without coding
+- **Reasoning ngôn ngữ tự nhiên**: LLM hiểu context và intent
+- **Xử lý edge case tốt hơn**: Thích ứng với tình huống bất ngờ
+- **Không cần bash scripting**: Đơn giản hơn để viết và bảo trì
+- **Validation linh hoạt hơn**: Xử lý được logic phức tạp mà không cần code
 
-## Migration Example: Bash Command Validation
+## Ví Dụ Chuyển Đổi: Bash Command Validation
 
-### Before (Basic Command Hook)
+### Trước (Command Hook Cơ Bản)
 
-**Configuration:**
+**Cấu hình:**
 ```json
 {
   "PreToolUse": [
@@ -38,23 +38,23 @@ Prompt-based hooks offer several advantages:
 input=$(cat)
 command=$(echo "$input" | jq -r '.tool_input.command')
 
-# Hard-coded validation logic
+# Logic validation hard-coded
 if [[ "$command" == *"rm -rf"* ]]; then
   echo "Dangerous command detected" >&2
   exit 2
 fi
 ```
 
-**Problems:**
-- Only checks for exact "rm -rf" pattern
-- Doesn't catch variations like `rm -fr` or `rm -r -f`
-- Misses other dangerous commands (`dd`, `mkfs`, etc.)
-- No context awareness
-- Requires bash scripting knowledge
+**Vấn đề:**
+- Chỉ kiểm tra đúng pattern "rm -rf"
+- Không bắt các biến thể như `rm -fr` hoặc `rm -r -f`
+- Bỏ sót các lệnh nguy hiểm khác (`dd`, `mkfs`, v.v.)
+- Không nhận thức được context
+- Cần kiến thức bash scripting
 
-### After (Advanced Prompt Hook)
+### Sau (Prompt Hook Nâng Cao)
 
-**Configuration:**
+**Cấu hình:**
 ```json
 {
   "PreToolUse": [
@@ -72,19 +72,19 @@ fi
 }
 ```
 
-**Benefits:**
-- Catches all variations and patterns
-- Understands intent, not just literal strings
-- No script file needed
-- Easy to extend with new criteria
-- Context-aware decisions
-- Natural language explanation in denial
+**Lợi ích:**
+- Bắt được tất cả biến thể và pattern
+- Hiểu intent, không chỉ chuỗi ký tự nguyên văn
+- Không cần file script
+- Dễ mở rộng với tiêu chí mới
+- Quyết định nhận thức context
+- Giải thích bằng ngôn ngữ tự nhiên khi từ chối
 
-## Migration Example: File Write Validation
+## Ví Dụ Chuyển Đổi: File Write Validation
 
-### Before (Basic Command Hook)
+### Trước (Command Hook Cơ Bản)
 
-**Configuration:**
+**Cấu hình:**
 ```json
 {
   "PreToolUse": [
@@ -107,28 +107,28 @@ fi
 input=$(cat)
 file_path=$(echo "$input" | jq -r '.tool_input.file_path')
 
-# Check for path traversal
+# Kiểm tra path traversal
 if [[ "$file_path" == *".."* ]]; then
   echo '{"decision": "deny", "reason": "Path traversal detected"}' >&2
   exit 2
 fi
 
-# Check for system paths
+# Kiểm tra system path
 if [[ "$file_path" == "/etc/"* ]] || [[ "$file_path" == "/sys/"* ]]; then
   echo '{"decision": "deny", "reason": "System file"}' >&2
   exit 2
 fi
 ```
 
-**Problems:**
-- Hard-coded path patterns
-- Doesn't understand symlinks
-- Missing edge cases (e.g., `/etc` vs `/etc/`)
-- No consideration of file content
+**Vấn đề:**
+- Pattern path hard-coded
+- Không hiểu symlink
+- Bỏ sót edge case (ví dụ: `/etc` vs `/etc/`)
+- Không xem xét nội dung file
 
-### After (Advanced Prompt Hook)
+### Sau (Prompt Hook Nâng Cao)
 
-**Configuration:**
+**Cấu hình:**
 ```json
 {
   "PreToolUse": [
@@ -145,22 +145,22 @@ fi
 }
 ```
 
-**Benefits:**
-- Context-aware (considers content too)
-- Handles symlinks and edge cases
-- Natural understanding of "system directories"
-- Can detect secrets in content
-- Easy to extend criteria
+**Lợi ích:**
+- Nhận thức context (xem xét cả nội dung)
+- Xử lý symlink và edge case
+- Hiểu tự nhiên về "system directory"
+- Có thể phát hiện secret trong nội dung
+- Dễ mở rộng tiêu chí
 
-## When to Keep Command Hooks
+## Khi Nào Nên Giữ Command Hook
 
-Command hooks still have their place:
+Command hook vẫn có chỗ đứng:
 
-### 1. Deterministic Performance Checks
+### 1. Kiểm Tra Hiệu Suất Deterministic
 
 ```bash
 #!/bin/bash
-# Check file size quickly
+# Kiểm tra kích thước file nhanh chóng
 file_path=$(echo "$input" | jq -r '.tool_input.file_path')
 size=$(stat -f%z "$file_path" 2>/dev/null || stat -c%s "$file_path" 2>/dev/null)
 
@@ -170,13 +170,13 @@ if [ "$size" -gt 10000000 ]; then
 fi
 ```
 
-**Use command hooks when:** Validation is purely mathematical or deterministic.
+**Dùng command hook khi:** Validation thuần toán học hoặc deterministic.
 
-### 2. External Tool Integration
+### 2. Tích Hợp Tool Bên Ngoài
 
 ```bash
 #!/bin/bash
-# Run security scanner
+# Chạy security scanner
 file_path=$(echo "$input" | jq -r '.tool_input.file_path')
 scan_result=$(security-scanner "$file_path")
 
@@ -186,25 +186,25 @@ if [ "$?" -ne 0 ]; then
 fi
 ```
 
-**Use command hooks when:** Integrating with external tools that provide yes/no answers.
+**Dùng command hook khi:** Tích hợp với tool bên ngoài cung cấp câu trả lời có/không.
 
-### 3. Very Fast Checks (< 50ms)
+### 3. Kiểm Tra Rất Nhanh (< 50ms)
 
 ```bash
 #!/bin/bash
-# Quick regex check
+# Kiểm tra regex nhanh
 command=$(echo "$input" | jq -r '.tool_input.command')
 
 if [[ "$command" =~ ^(ls|pwd|echo)$ ]]; then
-  exit 0  # Safe commands
+  exit 0  # Lệnh an toàn
 fi
 ```
 
-**Use command hooks when:** Performance is critical and logic is simple.
+**Dùng command hook khi:** Hiệu suất là ưu tiên và logic đơn giản.
 
-## Hybrid Approach
+## Cách Tiếp Cận Kết Hợp
 
-Combine both for multi-stage validation:
+Kết hợp cả hai cho validation đa giai đoạn:
 
 ```json
 {
@@ -228,31 +228,31 @@ Combine both for multi-stage validation:
 }
 ```
 
-The command hook does fast deterministic checks, while the prompt hook handles complex reasoning.
+Command hook thực hiện kiểm tra deterministic nhanh, trong khi prompt hook xử lý reasoning phức tạp.
 
-## Migration Checklist
+## Checklist Chuyển Đổi
 
-When migrating hooks:
+Khi chuyển đổi hook:
 
-- [ ] Identify the validation logic in the command hook
-- [ ] Convert hard-coded patterns to natural language criteria
-- [ ] Test with edge cases the old hook missed
-- [ ] Verify LLM understands the intent
-- [ ] Set appropriate timeout (usually 15-30s for prompt hooks)
-- [ ] Document the new hook in README
-- [ ] Remove or archive old script files
+- [ ] Xác định logic validation trong command hook
+- [ ] Chuyển các pattern hard-coded sang tiêu chí ngôn ngữ tự nhiên
+- [ ] Kiểm thử với các edge case mà hook cũ bỏ sót
+- [ ] Xác minh LLM hiểu đúng intent
+- [ ] Đặt timeout phù hợp (thường 15–30 giây cho prompt hook)
+- [ ] Tài liệu hóa hook mới trong README
+- [ ] Xóa hoặc archive các file script cũ
 
-## Migration Tips
+## Mẹo Chuyển Đổi
 
-1. **Start with one hook**: Don't migrate everything at once
-2. **Test thoroughly**: Verify prompt hook catches what command hook caught
-3. **Look for improvements**: Use migration as opportunity to enhance validation
-4. **Keep scripts for reference**: Archive old scripts in case you need to reference the logic
-5. **Document reasoning**: Explain why prompt hook is better in README
+1. **Bắt đầu với một hook**: Đừng chuyển tất cả cùng lúc
+2. **Kiểm thử kỹ lưỡng**: Xác minh prompt hook bắt được những gì command hook bắt được
+3. **Tìm điểm cải tiến**: Dùng việc chuyển đổi như cơ hội để nâng cao validation
+4. **Giữ script để tham khảo**: Archive script cũ phòng khi cần tham chiếu logic
+5. **Ghi lại lý do**: Giải thích tại sao prompt hook tốt hơn trong README
 
-## Complete Migration Example
+## Ví Dụ Chuyển Đổi Đầy Đủ
 
-### Original Plugin Structure
+### Cấu Trúc Plugin Gốc
 
 ```
 my-plugin/
@@ -264,20 +264,20 @@ my-plugin/
     └── check-tests.sh
 ```
 
-### After Migration
+### Sau Khi Chuyển Đổi
 
 ```
 my-plugin/
 ├── .claude-plugin/plugin.json
-├── hooks/hooks.json      # Now uses prompt hooks
-└── scripts/              # Archive or delete
+├── hooks/hooks.json      # Bây giờ dùng prompt hook
+└── scripts/              # Archive hoặc xóa
     └── archive/
         ├── validate-bash.sh
         ├── validate-write.sh
         └── check-tests.sh
 ```
 
-### Updated hooks.json
+### hooks.json Đã Cập Nhật
 
 ```json
 {
@@ -315,13 +315,13 @@ my-plugin/
 }
 ```
 
-**Result:** Simpler, more maintainable, more powerful.
+**Kết quả:** Đơn giản hơn, dễ bảo trì hơn, mạnh mẽ hơn.
 
-## Common Migration Patterns
+## Các Pattern Chuyển Đổi Phổ Biến
 
-### Pattern: String Contains → Natural Language
+### Pattern: String Contains → Ngôn Ngữ Tự Nhiên
 
-**Before:**
+**Trước:**
 ```bash
 if [[ "$command" == *"sudo"* ]]; then
   echo "Privilege escalation" >&2
@@ -329,14 +329,14 @@ if [[ "$command" == *"sudo"* ]]; then
 fi
 ```
 
-**After:**
+**Sau:**
 ```
 "Check for privilege escalation (sudo, su, etc)"
 ```
 
 ### Pattern: Regex → Intent
 
-**Before:**
+**Trước:**
 ```bash
 if [[ "$file" =~ \.(env|secret|key|token)$ ]]; then
   echo "Credential file" >&2
@@ -344,14 +344,14 @@ if [[ "$file" =~ \.(env|secret|key|token)$ ]]; then
 fi
 ```
 
-**After:**
+**Sau:**
 ```
 "Verify not writing to credential files (.env, secrets, keys, tokens)"
 ```
 
-### Pattern: Multiple Conditions → Criteria List
+### Pattern: Nhiều Điều Kiện → Danh Sách Tiêu Chí
 
-**Before:**
+**Trước:**
 ```bash
 if [ condition1 ] || [ condition2 ] || [ condition3 ]; then
   echo "Invalid" >&2
@@ -359,11 +359,11 @@ if [ condition1 ] || [ condition2 ] || [ condition3 ]; then
 fi
 ```
 
-**After:**
+**Sau:**
 ```
 "Check: 1) condition1 2) condition2 3) condition3. Deny if any fail."
 ```
 
-## Conclusion
+## Kết Luận
 
-Migrating to prompt-based hooks makes plugins more maintainable, flexible, and powerful. Reserve command hooks for deterministic checks and external tool integration.
+Chuyển sang prompt hook giúp plugin dễ bảo trì, linh hoạt và mạnh mẽ hơn. Giữ lại command hook cho kiểm tra deterministic và tích hợp tool bên ngoài.

@@ -1,18 +1,16 @@
-# Connector-directory submission checklist
+# Checklist nộp connector directory
 
-Pre-flight before submitting a remote MCP app to the Claude connector
-directory. Each item is a hard review criterion.
+Kiểm tra trước khi nộp một remote MCP app lên connector directory của Claude. Mỗi mục là một tiêu chí review bắt buộc.
 
-| Area | Requirement |
+| Hạng mục | Yêu cầu |
 |---|---|
-| **Auth** | OAuth (DCR or CIMD) or **`none`** (authless). Static bearer tokens are private-deploy only and block listing. Authless is valid for public-data servers — the server holds any upstream API keys. |
-| **Tool annotations** | Every tool sets `annotations.title` plus the relevant hints: `readOnlyHint: true` for fetch/search tools, `destructiveHint` / `idempotentHint` for writes, `openWorldHint: true` if the tool reaches an external system. |
-| **Tool names** | ≤ 64 characters, snake/kebab case. |
-| **Widget layout** | Inline height ≤ 500px, no nested scroll containers, 44pt minimum touch targets, WCAG-AA contrast in both themes. |
-| **Theming** | `html, body { background: transparent }`, `<meta name="color-scheme" content="light dark">`, adopt host CSS tokens via `applyHostStyleVariables`. |
-| **External links** | Use `app.openLink`. Declare each origin (e.g. `https://api.example.com`) in the connector's *Allowed link URIs* so the link skips the confirm modal. |
-| **Helper tools** | Widget-only tools (geometry/image fetchers) carry `_meta.ui.visibility: ["app"]` so they don't appear in Claude's tool list. |
-| **Screenshots** | 3–5 PNGs, ≥ 1000px wide, cropped to the app response only — no prompt text in frame. |
+| **Auth** | OAuth (DCR hoặc CIMD) hoặc **`none`** (không xác thực). Static bearer token chỉ dành cho private-deploy và sẽ bị chặn listing. Authless hợp lệ cho server dữ liệu công khai — server giữ mọi API key upstream. |
+| **Tool annotations** | Mọi tool phải đặt `annotations.title` cộng với các hint liên quan: `readOnlyHint: true` cho tool fetch/search, `destructiveHint` / `idempotentHint` cho write, `openWorldHint: true` nếu tool tiếp cận hệ thống bên ngoài. |
+| **Tên tool** | ≤ 64 ký tự, snake/kebab case. |
+| **Layout widget** | Chiều cao inline ≤ 500px, không có nested scroll container, target cảm ứng tối thiểu 44pt, độ tương phản WCAG-AA trong cả hai theme. |
+| **Theming** | `html, body { background: transparent }`, `<meta name="color-scheme" content="light dark">`, áp dụng CSS token của host qua `applyHostStyleVariables`. |
+| **External link** | Dùng `app.openLink`. Khai báo từng origin (ví dụ: `https://api.example.com`) trong *Allowed link URIs* của connector để link bỏ qua modal xác nhận. |
+| **Helper tool** | Tool chỉ dùng cho widget (geometry/image fetcher) mang `_meta.ui.visibility: ["app"]` để không xuất hiện trong danh sách tool của Claude. |
+| **Screenshot** | 3–5 file PNG, rộng ≥ 1000px, crop vào phần response của app thôi — không có prompt text trong khung hình. |
 
-See `abuse-protection.md` for rate-limit and IP-tiering guidance once the
-authless endpoint is public.
+Xem `abuse-protection.md` để biết hướng dẫn rate-limit và IP-tiering sau khi endpoint authless được công khai.

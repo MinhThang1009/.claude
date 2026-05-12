@@ -1,12 +1,12 @@
-# JSON Schemas
+# JSON Schema
 
-This document defines the JSON schemas used by skill-creator.
+Tài liệu này định nghĩa các JSON schema được skill-creator sử dụng.
 
 ---
 
 ## evals.json
 
-Defines the evals for a skill. Located at `evals/evals.json` within the skill directory.
+Định nghĩa các eval cho một skill. Nằm tại `evals/evals.json` trong thư mục skill.
 
 ```json
 {
@@ -14,31 +14,31 @@ Defines the evals for a skill. Located at `evals/evals.json` within the skill di
   "evals": [
     {
       "id": 1,
-      "prompt": "User's example prompt",
-      "expected_output": "Description of expected result",
+      "prompt": "Prompt ví dụ của người dùng",
+      "expected_output": "Mô tả kết quả mong đợi",
       "files": ["evals/files/sample1.pdf"],
       "expectations": [
-        "The output includes X",
-        "The skill used script Y"
+        "Output bao gồm X",
+        "Skill đã dùng script Y"
       ]
     }
   ]
 }
 ```
 
-**Fields:**
-- `skill_name`: Name matching the skill's frontmatter
-- `evals[].id`: Unique integer identifier
-- `evals[].prompt`: The task to execute
-- `evals[].expected_output`: Human-readable description of success
-- `evals[].files`: Optional list of input file paths (relative to skill root)
-- `evals[].expectations`: List of verifiable statements
+**Các field:**
+- `skill_name`: Tên khớp với frontmatter của skill
+- `evals[].id`: Định danh số nguyên unique
+- `evals[].prompt`: Tác vụ cần thực thi
+- `evals[].expected_output`: Mô tả thành công cho người đọc
+- `evals[].files`: Danh sách đường dẫn file input tùy chọn (tương đối với skill root)
+- `evals[].expectations`: Danh sách các phát biểu có thể kiểm tra
 
 ---
 
 ## history.json
 
-Tracks version progression in Improve mode. Located at workspace root.
+Theo dõi tiến trình version trong Improve mode. Nằm tại workspace root.
 
 ```json
 {
@@ -71,34 +71,34 @@ Tracks version progression in Improve mode. Located at workspace root.
 }
 ```
 
-**Fields:**
-- `started_at`: ISO timestamp of when improvement started
-- `skill_name`: Name of the skill being improved
-- `current_best`: Version identifier of the best performer
-- `iterations[].version`: Version identifier (v0, v1, ...)
-- `iterations[].parent`: Parent version this was derived from
-- `iterations[].expectation_pass_rate`: Pass rate from grading
-- `iterations[].grading_result`: "baseline", "won", "lost", or "tie"
-- `iterations[].is_current_best`: Whether this is the current best version
+**Các field:**
+- `started_at`: Timestamp ISO lúc bắt đầu cải thiện
+- `skill_name`: Tên skill đang được cải thiện
+- `current_best`: Định danh version của version hoạt động tốt nhất
+- `iterations[].version`: Định danh version (v0, v1, ...)
+- `iterations[].parent`: Version cha mà version này được derive từ đó
+- `iterations[].expectation_pass_rate`: Tỉ lệ pass từ grading
+- `iterations[].grading_result`: "baseline", "won", "lost", hoặc "tie"
+- `iterations[].is_current_best`: Version này có phải là version tốt nhất hiện tại không
 
 ---
 
 ## grading.json
 
-Output from the grader agent. Located at `<run-dir>/grading.json`.
+Output từ grader agent. Nằm tại `<run-dir>/grading.json`.
 
 ```json
 {
   "expectations": [
     {
-      "text": "The output includes the name 'John Smith'",
+      "text": "Output bao gồm tên 'John Smith'",
       "passed": true,
-      "evidence": "Found in transcript Step 3: 'Extracted names: John Smith, Sarah Johnson'"
+      "evidence": "Tìm thấy trong transcript Bước 3: 'Extracted names: John Smith, Sarah Johnson'"
     },
     {
-      "text": "The spreadsheet has a SUM formula in cell B10",
+      "text": "Spreadsheet có công thức SUM trong ô B10",
       "passed": false,
-      "evidence": "No spreadsheet was created. The output was a text file."
+      "evidence": "Không có spreadsheet nào được tạo. Output là file text."
     }
   ],
   "summary": {
@@ -126,43 +126,43 @@ Output from the grader agent. Located at `<run-dir>/grading.json`.
   },
   "claims": [
     {
-      "claim": "The form has 12 fillable fields",
+      "claim": "Form có 12 fillable field",
       "type": "factual",
       "verified": true,
-      "evidence": "Counted 12 fields in field_info.json"
+      "evidence": "Đếm được 12 field trong field_info.json"
     }
   ],
   "user_notes_summary": {
-    "uncertainties": ["Used 2023 data, may be stale"],
+    "uncertainties": ["Dùng dữ liệu 2023, có thể lỗi thời"],
     "needs_review": [],
-    "workarounds": ["Fell back to text overlay for non-fillable fields"]
+    "workarounds": ["Fallback về text overlay cho field không thể điền"]
   },
   "eval_feedback": {
     "suggestions": [
       {
-        "assertion": "The output includes the name 'John Smith'",
-        "reason": "A hallucinated document that mentions the name would also pass"
+        "assertion": "Output bao gồm tên 'John Smith'",
+        "reason": "Tài liệu bịa đặt có đề cập tên này cũng sẽ pass"
       }
     ],
-    "overall": "Assertions check presence but not correctness."
+    "overall": "Assertion kiểm tra sự tồn tại nhưng không kiểm tra tính chính xác."
   }
 }
 ```
 
-**Fields:**
-- `expectations[]`: Graded expectations with evidence
-- `summary`: Aggregate pass/fail counts
-- `execution_metrics`: Tool usage and output size (from executor's metrics.json)
-- `timing`: Wall clock timing (from timing.json)
-- `claims`: Extracted and verified claims from the output
-- `user_notes_summary`: Issues flagged by the executor
-- `eval_feedback`: (optional) Improvement suggestions for the evals, only present when the grader identifies issues worth raising
+**Các field:**
+- `expectations[]`: Expectation đã được chấm điểm kèm bằng chứng
+- `summary`: Tổng hợp số pass/fail
+- `execution_metrics`: Lượng dùng tool và kích thước output (từ metrics.json của executor)
+- `timing`: Thời gian thực (từ timing.json)
+- `claims`: Các claim được trích xuất và kiểm tra từ output
+- `user_notes_summary`: Vấn đề được executor gắn cờ
+- `eval_feedback`: (tùy chọn) Gợi ý cải thiện cho eval, chỉ có khi grader xác định vấn đề đáng đề cập
 
 ---
 
 ## metrics.json
 
-Output from the executor agent. Located at `<run-dir>/outputs/metrics.json`.
+Output từ executor agent. Nằm tại `<run-dir>/outputs/metrics.json`.
 
 ```json
 {
@@ -183,22 +183,22 @@ Output from the executor agent. Located at `<run-dir>/outputs/metrics.json`.
 }
 ```
 
-**Fields:**
-- `tool_calls`: Count per tool type
-- `total_tool_calls`: Sum of all tool calls
-- `total_steps`: Number of major execution steps
-- `files_created`: List of output files created
-- `errors_encountered`: Number of errors during execution
-- `output_chars`: Total character count of output files
-- `transcript_chars`: Character count of transcript
+**Các field:**
+- `tool_calls`: Số lần gọi theo từng loại tool
+- `total_tool_calls`: Tổng tất cả tool call
+- `total_steps`: Số bước thực thi chính
+- `files_created`: Danh sách file output được tạo
+- `errors_encountered`: Số lỗi xảy ra trong quá trình thực thi
+- `output_chars`: Tổng số ký tự của file output
+- `transcript_chars`: Số ký tự của transcript
 
 ---
 
 ## timing.json
 
-Wall clock timing for a run. Located at `<run-dir>/timing.json`.
+Thời gian thực cho một lần chạy. Nằm tại `<run-dir>/timing.json`.
 
-**How to capture:** When a subagent task completes, the task notification includes `total_tokens` and `duration_ms`. Save these immediately — they are not persisted anywhere else and cannot be recovered after the fact.
+**Cách capture:** Khi tác vụ subagent hoàn thành, thông báo tác vụ bao gồm `total_tokens` và `duration_ms`. Lưu ngay lập tức — chúng không được persist ở bất kỳ đâu và không thể khôi phục sau đó.
 
 ```json
 {
@@ -218,7 +218,7 @@ Wall clock timing for a run. Located at `<run-dir>/timing.json`.
 
 ## benchmark.json
 
-Output from Benchmark mode. Located at `benchmarks/<timestamp>/benchmark.json`.
+Output từ Benchmark mode. Nằm tại `benchmarks/<timestamp>/benchmark.json`.
 
 ```json
 {
@@ -252,8 +252,8 @@ Output from Benchmark mode. Located at `benchmarks/<timestamp>/benchmark.json`.
         {"text": "...", "passed": true, "evidence": "..."}
       ],
       "notes": [
-        "Used 2023 data, may be stale",
-        "Fell back to text overlay for non-fillable fields"
+        "Dùng dữ liệu 2023, có thể lỗi thời",
+        "Fallback về text overlay cho field không thể điền"
       ]
     }
   ],
@@ -277,43 +277,43 @@ Output from Benchmark mode. Located at `benchmarks/<timestamp>/benchmark.json`.
   },
 
   "notes": [
-    "Assertion 'Output is a PDF file' passes 100% in both configurations - may not differentiate skill value",
-    "Eval 3 shows high variance (50% ± 40%) - may be flaky or model-dependent",
-    "Without-skill runs consistently fail on table extraction expectations",
-    "Skill adds 13s average execution time but improves pass rate by 50%"
+    "Assertion 'Output là file PDF' pass 100% ở cả hai cấu hình - có thể không phân biệt được giá trị skill",
+    "Eval 3 có variance cao (50% ± 40%) - có thể không ổn định hoặc phụ thuộc model",
+    "Các lần chạy without-skill liên tục fail ở expectation trích xuất bảng",
+    "Skill thêm trung bình 13s thời gian thực thi nhưng cải thiện pass rate lên 50%"
   ]
 }
 ```
 
-**Fields:**
-- `metadata`: Information about the benchmark run
-  - `skill_name`: Name of the skill
-  - `timestamp`: When the benchmark was run
-  - `evals_run`: List of eval names or IDs
-  - `runs_per_configuration`: Number of runs per config (e.g. 3)
-- `runs[]`: Individual run results
-  - `eval_id`: Numeric eval identifier
-  - `eval_name`: Human-readable eval name (used as section header in the viewer)
-  - `configuration`: Must be `"with_skill"` or `"without_skill"` (the viewer uses this exact string for grouping and color coding)
-  - `run_number`: Integer run number (1, 2, 3...)
-  - `result`: Nested object with `pass_rate`, `passed`, `total`, `time_seconds`, `tokens`, `errors`
-- `run_summary`: Statistical aggregates per configuration
-  - `with_skill` / `without_skill`: Each contains `pass_rate`, `time_seconds`, `tokens` objects with `mean` and `stddev` fields
-  - `delta`: Difference strings like `"+0.50"`, `"+13.0"`, `"+1700"`
-- `notes`: Freeform observations from the analyzer
+**Các field:**
+- `metadata`: Thông tin về lần chạy benchmark
+  - `skill_name`: Tên skill
+  - `timestamp`: Thời điểm chạy benchmark
+  - `evals_run`: Danh sách tên hoặc ID eval
+  - `runs_per_configuration`: Số lần chạy mỗi cấu hình (ví dụ 3)
+- `runs[]`: Kết quả chạy từng lần
+  - `eval_id`: Định danh eval dạng số
+  - `eval_name`: Tên eval cho người đọc (dùng làm tiêu đề section trong viewer)
+  - `configuration`: Phải là `"with_skill"` hoặc `"without_skill"` (viewer dùng chính xác chuỗi này để nhóm và tô màu)
+  - `run_number`: Số nguyên lần chạy (1, 2, 3...)
+  - `result`: Object lồng nhau với `pass_rate`, `passed`, `total`, `time_seconds`, `tokens`, `errors`
+- `run_summary`: Tổng hợp thống kê theo từng cấu hình
+  - `with_skill` / `without_skill`: Mỗi cái chứa object `pass_rate`, `time_seconds`, `tokens` với field `mean` và `stddev`
+  - `delta`: Chuỗi chênh lệch như `"+0.50"`, `"+13.0"`, `"+1700"`
+- `notes`: Quan sát tự do từ analyzer
 
-**Important:** The viewer reads these field names exactly. Using `config` instead of `configuration`, or putting `pass_rate` at the top level of a run instead of nested under `result`, will cause the viewer to show empty/zero values. Always reference this schema when generating benchmark.json manually.
+**Quan trọng:** Viewer đọc chính xác các tên field này. Dùng `config` thay vì `configuration`, hoặc đặt `pass_rate` ở cấp cao nhất của run thay vì lồng trong `result`, sẽ khiến viewer hiển thị giá trị trống/zero. Luôn tham chiếu schema này khi tạo benchmark.json thủ công.
 
 ---
 
 ## comparison.json
 
-Output from blind comparator. Located at `<grading-dir>/comparison-N.json`.
+Output từ blind comparator. Nằm tại `<grading-dir>/comparison-N.json`.
 
 ```json
 {
   "winner": "A",
-  "reasoning": "Output A provides a complete solution with proper formatting and all required fields. Output B is missing the date field and has formatting inconsistencies.",
+  "reasoning": "Output A cung cấp giải pháp hoàn chỉnh với định dạng đúng và đủ tất cả field bắt buộc. Output B thiếu field ngày và có định dạng không nhất quán.",
   "rubric": {
     "A": {
       "content": {
@@ -349,13 +349,13 @@ Output from blind comparator. Located at `<grading-dir>/comparison-N.json`.
   "output_quality": {
     "A": {
       "score": 9,
-      "strengths": ["Complete solution", "Well-formatted", "All fields present"],
-      "weaknesses": ["Minor style inconsistency in header"]
+      "strengths": ["Giải pháp hoàn chỉnh", "Định dạng tốt", "Đủ tất cả field"],
+      "weaknesses": ["Không nhất quán nhỏ về style ở header"]
     },
     "B": {
       "score": 5,
-      "strengths": ["Readable output", "Correct basic structure"],
-      "weaknesses": ["Missing date field", "Formatting inconsistencies", "Partial data extraction"]
+      "strengths": ["Output dễ đọc", "Cấu trúc cơ bản đúng"],
+      "weaknesses": ["Thiếu field ngày", "Định dạng không nhất quán", "Trích xuất dữ liệu không đầy đủ"]
     }
   },
   "expectation_results": {
@@ -364,7 +364,7 @@ Output from blind comparator. Located at `<grading-dir>/comparison-N.json`.
       "total": 5,
       "pass_rate": 0.80,
       "details": [
-        {"text": "Output includes name", "passed": true}
+        {"text": "Output bao gồm tên", "passed": true}
       ]
     },
     "B": {
@@ -372,7 +372,7 @@ Output from blind comparator. Located at `<grading-dir>/comparison-N.json`.
       "total": 5,
       "pass_rate": 0.60,
       "details": [
-        {"text": "Output includes name", "passed": true}
+        {"text": "Output bao gồm tên", "passed": true}
       ]
     }
   }
@@ -383,7 +383,7 @@ Output from blind comparator. Located at `<grading-dir>/comparison-N.json`.
 
 ## analysis.json
 
-Output from post-hoc analyzer. Located at `<grading-dir>/analysis.json`.
+Output từ post-hoc analyzer. Nằm tại `<grading-dir>/analysis.json`.
 
 ```json
 {
@@ -391,26 +391,26 @@ Output from post-hoc analyzer. Located at `<grading-dir>/analysis.json`.
     "winner": "A",
     "winner_skill": "path/to/winner/skill",
     "loser_skill": "path/to/loser/skill",
-    "comparator_reasoning": "Brief summary of why comparator chose winner"
+    "comparator_reasoning": "Tóm tắt ngắn lý do comparator chọn winner"
   },
   "winner_strengths": [
-    "Clear step-by-step instructions for handling multi-page documents",
-    "Included validation script that caught formatting errors"
+    "Hướng dẫn từng bước rõ ràng cho việc xử lý tài liệu nhiều trang",
+    "Có script validation bắt được lỗi định dạng"
   ],
   "loser_weaknesses": [
-    "Vague instruction 'process the document appropriately' led to inconsistent behavior",
-    "No script for validation, agent had to improvise"
+    "Hướng dẫn mơ hồ 'xử lý tài liệu phù hợp' dẫn đến hành vi không nhất quán",
+    "Không có script validation, agent phải tự ứng biến"
   ],
   "instruction_following": {
     "winner": {
       "score": 9,
-      "issues": ["Minor: skipped optional logging step"]
+      "issues": ["Nhỏ: bỏ qua bước logging tùy chọn"]
     },
     "loser": {
       "score": 6,
       "issues": [
-        "Did not use the skill's formatting template",
-        "Invented own approach instead of following step 3"
+        "Không dùng formatting template của skill",
+        "Tự nghĩ ra cách tiếp cận thay vì làm theo bước 3"
       ]
     }
   },
@@ -418,13 +418,13 @@ Output from post-hoc analyzer. Located at `<grading-dir>/analysis.json`.
     {
       "priority": "high",
       "category": "instructions",
-      "suggestion": "Replace 'process the document appropriately' with explicit steps",
-      "expected_impact": "Would eliminate ambiguity that caused inconsistent behavior"
+      "suggestion": "Thay 'xử lý tài liệu phù hợp' bằng các bước tường minh",
+      "expected_impact": "Sẽ loại bỏ sự mơ hồ gây ra hành vi không nhất quán"
     }
   ],
   "transcript_insights": {
-    "winner_execution_pattern": "Read skill -> Followed 5-step process -> Used validation script",
-    "loser_execution_pattern": "Read skill -> Unclear on approach -> Tried 3 different methods"
+    "winner_execution_pattern": "Đọc skill -> Làm theo quy trình 5 bước -> Dùng script validation",
+    "loser_execution_pattern": "Đọc skill -> Không rõ cách tiếp cận -> Thử 3 phương pháp khác nhau"
   }
 }
 ```

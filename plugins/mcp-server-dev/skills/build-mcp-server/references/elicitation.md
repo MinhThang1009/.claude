@@ -1,24 +1,24 @@
-# Elicitation — spec-native user input
+# Elicitation — nhập liệu từ user theo spec native
 
-Elicitation lets a server pause mid-tool-call and ask the user for structured input. The client renders a native form (no iframe, no HTML). User fills it, server continues.
+Elicitation cho phép server tạm dừng giữa chừng một tool call và hỏi user nhập dữ liệu có cấu trúc. Client render một form native (không phải iframe, không phải HTML). User điền vào, server tiếp tục.
 
-**This is the right answer for simple input.** Widgets (`build-mcp-app`) are for when you need rich UI — charts, searchable lists, visual previews. If you just need a confirmation, a picked option, or a few form fields, elicitation is simpler, spec-native, and works in any compliant host.
+**Đây là câu trả lời đúng cho input đơn giản.** Widget (`build-mcp-app`) dành cho khi bạn cần UI phong phú — chart, danh sách có tìm kiếm, preview trực quan. Nếu bạn chỉ cần xác nhận, chọn option, hoặc vài trường form, elicitation đơn giản hơn, native theo spec, và hoạt động trên mọi host tuân thủ.
 
 ---
 
-## ⚠️ Check capability first — support is new
+## ⚠️ Kiểm tra capability trước — hỗ trợ còn mới
 
-Host support is very recent:
+Hỗ trợ của host rất mới:
 
-| Host | Status |
+| Host | Trạng thái |
 |---|---|
-| Claude Code | ✅ since v2.1.76 (both `form` and `url` modes) |
-| Claude Desktop | Unconfirmed — likely not yet or very recent |
-| claude.ai | Unknown |
+| Claude Code | ✅ từ v2.1.76 (cả hai chế độ `form` và `url`) |
+| Claude Desktop | Chưa xác nhận — có thể chưa hoặc rất gần đây |
+| claude.ai | Chưa rõ |
 
-**The SDK throws `CapabilityNotSupported` if the client doesn't advertise elicitation.** There is no graceful degradation built in. You MUST check and have a fallback.
+**SDK throws `CapabilityNotSupported` nếu client không quảng bá elicitation.** Không có graceful degradation tích hợp sẵn. Bạn PHẢI kiểm tra và có fallback.
 
-### The canonical pattern
+### Pattern chuẩn
 
 ```typescript
 server.registerTool("delete_all", {
@@ -42,7 +42,7 @@ server.registerTool("delete_all", {
     }
     return { content: [{ type: "text", text: "Cancelled." }] };
   }
-  // Fallback: return text asking Claude to relay the question
+  // Fallback: trả về text yêu cầu Claude chuyển tiếp câu hỏi
   return { content: [{ type: "text", text: "Confirmation required. Please ask the user: 'Delete all items? This cannot be undone.' Then call this tool again with their answer." }] };
 });
 ```
@@ -66,34 +66,34 @@ async def delete_all(ctx: Context) -> str:
 
 ---
 
-## Schema constraints
+## Giới hạn schema
 
-Elicitation schemas are deliberately limited — keep forms simple:
+Schema elicitation bị giới hạn có chủ đích — giữ form đơn giản:
 
-- **Flat objects only** — no nesting, no arrays of objects
-- **Primitives only** — `string`, `number`, `integer`, `boolean`, `enum`
-- String formats limited to: `email`, `uri`, `date`, `date-time`
-- Use `title` and `description` on each property — they become form labels
+- **Chỉ flat object** — không nesting, không mảng object
+- **Chỉ kiểu primitive** — `string`, `number`, `integer`, `boolean`, `enum`
+- Các string format giới hạn ở: `email`, `uri`, `date`, `date-time`
+- Dùng `title` và `description` trên mỗi property — chúng trở thành label của form
 
-If your data doesn't fit these constraints, that's the signal to escalate to a widget.
+Nếu dữ liệu của bạn không vừa với các ràng buộc này, đó là tín hiệu để chuyển lên dùng widget.
 
 ---
 
-## Three-state response
+## Response ba trạng thái
 
-| Action | Meaning | `content` present? |
+| Action | Ý nghĩa | `content` có không? |
 |---|---|---|
-| `accept` | User submitted the form | ✅ validated against your schema |
-| `decline` | User explicitly said no | ❌ |
-| `cancel` | User dismissed (escape, clicked away) | ❌ |
+| `accept` | User đã submit form | ✅ đã validate theo schema của bạn |
+| `decline` | User chủ động từ chối | ❌ |
+| `cancel` | User đóng (escape, click ra ngoài) | ❌ |
 
-Treat `decline` and `cancel` differently if it matters — `decline` is intentional, `cancel` might be accidental.
+Xử lý `decline` và `cancel` khác nhau nếu cần — `decline` là cố ý, `cancel` có thể là vô tình.
 
-The TS SDK's `server.elicitInput()` auto-validates `accept` responses against your schema via Ajv. fastmcp's `ctx.elicit()` returns a typed discriminated union (`AcceptedElicitation[T] | DeclinedElicitation | CancelledElicitation`).
+`server.elicitInput()` của TS SDK tự động validate response `accept` theo schema của bạn qua Ajv. `ctx.elicit()` của fastmcp trả về một typed discriminated union (`AcceptedElicitation[T] | DeclinedElicitation | CancelledElicitation`).
 
 ---
 
-## fastmcp response_type shorthand
+## Shorthand response_type của fastmcp
 
 ```python
 await ctx.elicit("Pick a color", response_type=["red", "green", "blue"])  # enum
@@ -107,23 +107,23 @@ class ContactInfo:
 await ctx.elicit("Contact details", response_type=ContactInfo)             # flat dataclass
 ```
 
-Accepts: primitives, `list[str]` (becomes enum), dataclass, TypedDict, Pydantic BaseModel. All must be flat.
+Chấp nhận: kiểu primitive, `list[str]` (trở thành enum), dataclass, TypedDict, Pydantic BaseModel. Tất cả phải là flat.
 
 ---
 
-## Security
+## Bảo mật
 
-**MUST NOT request passwords, API keys, or tokens via elicitation** — spec requirement. Those go through OAuth or `user_config` with `sensitive: true` (MCPB), not runtime forms.
+**KHÔNG ĐƯỢC yêu cầu password, API key, hoặc token qua elicitation** — yêu cầu của spec. Những thứ đó đi qua OAuth hoặc `user_config` với `sensitive: true` (MCPB), không phải runtime form.
 
 ---
 
-## When to escalate to widgets
+## Khi nào chuyển lên dùng widget
 
-Elicitation handles: confirm dialogs, enum pickers, short flat forms.
+Elicitation xử lý được: confirm dialog, enum picker, flat form ngắn.
 
-Reach for `build-mcp-app` widgets when you need:
-- Nested or complex data structures
-- Scrollable/searchable lists (100+ items)
-- Visual preview before choosing (image thumbnails, file tree)
-- Live-updating progress or streaming content
-- Custom layouts, charts, maps
+Hãy dùng `build-mcp-app` widget khi bạn cần:
+- Cấu trúc dữ liệu lồng nhau hoặc phức tạp
+- Danh sách cuộn được/tìm kiếm được (100+ mục)
+- Preview trực quan trước khi chọn (thumbnail ảnh, file tree)
+- Progress cập nhật live hoặc nội dung streaming
+- Layout tùy chỉnh, chart, map

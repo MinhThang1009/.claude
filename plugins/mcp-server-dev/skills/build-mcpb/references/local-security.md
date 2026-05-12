@@ -1,16 +1,16 @@
-# Local MCP Security
+# Bảo Mật MCP Local
 
-**MCPB provides no sandbox.** There's no `permissions` block in the manifest, no filesystem scoping, no network allowlist enforced by the platform. The server process runs with the user's full privileges — it can read any file the user can, spawn any process, hit any network endpoint.
+**MCPB không cung cấp sandbox.** Không có block `permissions` trong manifest, không có filesystem scoping, không có network allowlist được platform thực thi. Tiến trình server chạy với toàn quyền của người dùng — nó có thể đọc bất kỳ file nào người dùng có thể đọc, khởi động bất kỳ tiến trình nào, gọi bất kỳ network endpoint nào.
 
-Claude drives it. That combination means: **tool inputs are untrusted**, even though they come from an AI the user trusts. A prompt-injected web page can make Claude call your `delete_file` tool with a path you didn't intend.
+Claude điều khiển nó. Sự kết hợp đó có nghĩa là: **input của tool là untrusted**, dù chúng đến từ một AI mà người dùng tin tưởng. Một trang web bị prompt-inject có thể khiến Claude gọi tool `delete_file` của bạn với một path bạn không hề có ý định.
 
-Your tool handlers are the only defense. Everything below is about building that defense yourself.
+Tool handler của bạn là lớp bảo vệ duy nhất. Mọi thứ bên dưới đều nói về việc tự xây dựng lớp bảo vệ đó.
 
 ---
 
-## Path traversal
+## Path Traversal
 
-The #1 bug in local MCP servers. If you take a path parameter and join it to a root, **resolve and check containment**.
+Lỗi #1 trong local MCP server. Nếu bạn nhận parameter là path rồi join với root, **hãy resolve và kiểm tra containment**.
 
 ```typescript
 import { resolve, relative, isAbsolute } from "node:path";
@@ -25,9 +25,9 @@ function safeJoin(root: string, userPath: string): string {
 }
 ```
 
-`resolve` normalizes `..`, symlink segments, etc. `relative` tells you if the result left the root. Don't just `String.includes("..")` — that misses encoded and symlink-based escapes.
+`resolve` chuẩn hóa `..`, các segment symlink, v.v. `relative` cho bạn biết liệu kết quả có thoát khỏi root không. Đừng chỉ dùng `String.includes("..")` — cách đó bỏ sót các escape dạng encoded và symlink.
 
-**Python equivalent:**
+**Tương đương Python:**
 
 ```python
 from pathlib import Path
@@ -41,9 +41,9 @@ def safe_join(root: Path, user_path: str) -> Path:
 
 ---
 
-## Roots — ask the host, don't hardcode
+## Roots — Hỏi Host, Đừng Hardcode
 
-Before hardcoding `ROOT` from a config env var, check if the host supports `roots/list`. This is the spec-native way to get user-approved workspace boundaries.
+Trước khi hardcode `ROOT` từ config env var, kiểm tra xem host có hỗ trợ `roots/list` không. Đây là cách spec-native để lấy ranh giới workspace đã được người dùng phê duyệt.
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -63,7 +63,7 @@ server.server.oninitialized = async () => {
 ```
 
 ```python
-# fastmcp — inside a tool handler
+# fastmcp — bên trong một tool handler
 async def my_tool(ctx: Context) -> str:
     try:
         roots = await ctx.list_roots()
@@ -72,46 +72,46 @@ async def my_tool(ctx: Context) -> str:
         allowed = [os.environ.get("ROOT_DIR", os.getcwd())]
 ```
 
-If roots are available, use them. If not, fall back to config. Either way, validate every path against the allowed set.
+Nếu roots có sẵn, hãy dùng chúng. Nếu không, fallback về config. Dù thế nào, hãy validate mọi path so với tập allowed.
 
 ---
 
-## Command injection
+## Command Injection
 
-If you spawn processes, **never pass user input through a shell**.
+Nếu bạn spawn tiến trình, **đừng bao giờ truyền input người dùng qua shell**.
 
 ```typescript
-// ❌ catastrophic
+// ❌ thảm họa
 exec(`git log ${branch}`);
 
-// ✅ array-args, no shell
+// ✅ array-args, không shell
 execFile("git", ["log", branch]);
 ```
 
-If you're wrapping a CLI, build the full argv as an array. Validate each flag against an allowlist if the tool accepts flags at all.
+Nếu bạn đang wrap CLI, hãy build toàn bộ argv dưới dạng array. Validate từng flag theo allowlist nếu tool nhận flag.
 
 ---
 
-## Read-only by default
+## Chỉ Đọc Theo Mặc Định
 
-Split read and write into separate tools. Most workflows only need read. A tool that's read-only can't be weaponized into data loss no matter what Claude is tricked into calling it with.
+Tách read và write thành tool riêng biệt. Hầu hết workflow chỉ cần read. Một tool chỉ đọc không thể bị vũ khí hóa để gây mất dữ liệu dù Claude bị đánh lừa gọi với bất kỳ argument nào.
 
 ```
-list_files   ← safe to call freely
-read_file    ← safe to call freely
-write_file   ← separate tool, separate scrutiny
-delete_file  ← consider not shipping this at all
+list_files   ← an toàn để gọi tự do
+read_file    ← an toàn để gọi tự do
+write_file   ← tool riêng, kiểm tra riêng
+delete_file  ← cân nhắc không ship luôn
 ```
 
-Pair this with tool annotations — `readOnlyHint: true` on every read tool, `destructiveHint: true` on delete/overwrite tools. Hosts surface these in permission UI (auto-approve reads, confirm-dialog destructive). See `../build-mcp-server/references/tool-design.md`.
+Kết hợp với tool annotation — `readOnlyHint: true` trên mọi read tool, `destructiveHint: true` trên delete/overwrite tool. Host hiển thị những thứ này trong permission UI (auto-approve read, confirm-dialog destructive). Xem `../build-mcp-server/references/tool-design.md`.
 
-If you ship write/delete, consider requiring explicit confirmation via elicitation (see `../build-mcp-server/references/elicitation.md`) or a confirmation widget (see `build-mcp-app`) so the user approves each destructive call.
+Nếu bạn ship write/delete, cân nhắc yêu cầu xác nhận tường minh qua elicitation (xem `../build-mcp-server/references/elicitation.md`) hoặc widget xác nhận (xem `build-mcp-app`) để người dùng phê duyệt từng lần gọi destructive.
 
 ---
 
-## Resource limits
+## Giới Hạn Tài Nguyên
 
-Claude will happily ask to read a 4GB log file. Cap everything:
+Claude sẽ vui vẻ yêu cầu đọc file log 4GB. Hãy giới hạn mọi thứ:
 
 ```typescript
 const MAX_BYTES = 1_000_000;
@@ -127,23 +127,23 @@ if (buf.length > MAX_BYTES) {
 }
 ```
 
-Same for directory listings (cap entry count), search results (cap matches), and anything else unbounded.
+Tương tự với directory listing (giới hạn số entry), kết quả search (giới hạn số match), và bất kỳ thứ gì không có giới hạn.
 
 ---
 
-## Secrets
+## Secret
 
-- **Config secrets** (`sensitive: true` in manifest `user_config`): host stores in OS keychain, delivers via env var. Don't log them. Don't include them in tool results.
-- **Never store secrets in plaintext files.** If the host's keychain integration isn't enough, use `keytar` (Node) / `keyring` (Python) yourself.
-- **Tool results flow into the chat transcript.** Anything you return, the user (and any log export) can see. Redact before returning.
+- **Config secret** (`sensitive: true` trong `user_config` của manifest): host lưu trong OS keychain, truyền qua env var. Đừng log chúng. Đừng đưa chúng vào tool result.
+- **Đừng bao giờ lưu secret trong file plaintext.** Nếu tích hợp keychain của host không đủ, tự dùng `keytar` (Node) / `keyring` (Python).
+- **Tool result đi vào chat transcript.** Bất cứ thứ gì bạn trả về, người dùng (và bất kỳ log export nào) đều có thể thấy. Hãy redact trước khi trả về.
 
 ---
 
-## Checklist before shipping
+## Checklist Trước Khi Ship
 
-- [ ] Every path parameter goes through containment check
-- [ ] No `exec()` / `shell=True` — `execFile` / array-argv only
-- [ ] Write/delete split from read tools; `readOnlyHint`/`destructiveHint` annotations set
-- [ ] Size caps on file reads, listing lengths, search results
-- [ ] Secrets never logged or returned in tool results
-- [ ] Tested with adversarial inputs: `../../etc/passwd`, `; rm -rf ~`, 10GB file
+- [ ] Mọi path parameter đều qua kiểm tra containment
+- [ ] Không dùng `exec()` / `shell=True` — chỉ dùng `execFile` / array-argv
+- [ ] Write/delete tách khỏi read tool; annotation `readOnlyHint`/`destructiveHint` đã set
+- [ ] Giới hạn kích thước cho file read, độ dài listing, kết quả search
+- [ ] Secret không bao giờ được log hoặc trả về trong tool result
+- [ ] Đã test với input thù địch: `../../etc/passwd`, `; rm -rf ~`, file 10GB

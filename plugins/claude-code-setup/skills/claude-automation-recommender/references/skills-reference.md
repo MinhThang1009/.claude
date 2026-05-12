@@ -1,112 +1,112 @@
-# Skills Recommendations
+# Gợi Ý Skills
 
-Skills are packaged expertise with workflows, reference materials, and best practices. Create them in `.claude/skills/<name>/SKILL.md`. Skills can be invoked by Claude automatically when relevant, or by users directly with `/skill-name`.
+Skill là kiến thức chuyên biệt được đóng gói, bao gồm workflow, tài liệu tham khảo, và best practice. Tạo chúng trong `.claude/skills/<name>/SKILL.md`. Skill có thể được Claude tự động gọi khi phù hợp, hoặc người dùng gọi trực tiếp qua `/skill-name`.
 
-Some pre-built skills are available through official plugins (install via `/plugin install`).
+Một số skill dựng sẵn có thể cài qua plugin chính thức (cài qua `/plugin install`).
 
-**Note**: These are common patterns. Use web search to find skill ideas specific to the codebase's tools and frameworks.
+**Lưu ý**: Đây là các pattern phổ biến. Dùng web search để tìm ý tưởng skill phù hợp với tool và framework cụ thể của codebase.
 
 ---
 
-## Available from Official Plugins
+## Có Sẵn Từ Plugin Chính Thức
 
-### Plugin Development (plugin-dev)
+### Phát Triển Plugin (plugin-dev)
 
-| Skill | Best For |
+| Skill | Phù hợp nhất cho |
 |-------|----------|
-| **skill-development** | Creating new skills with proper structure |
-| **hook-development** | Building hooks for automation |
-| **command-development** | Creating slash commands |
-| **agent-development** | Building specialized subagents |
-| **mcp-integration** | Integrating MCP servers into plugins |
-| **plugin-structure** | Understanding plugin architecture |
+| **skill-development** | Tạo skill mới đúng cấu trúc |
+| **hook-development** | Xây dựng hook để tự động hóa |
+| **command-development** | Tạo slash command |
+| **agent-development** | Xây dựng subagent chuyên biệt |
+| **mcp-integration** | Tích hợp MCP server vào plugin |
+| **plugin-structure** | Hiểu kiến trúc plugin |
 
-### Git Workflows (commit-commands)
+### Workflow Git (commit-commands)
 
-| Skill | Best For |
+| Skill | Phù hợp nhất cho |
 |-------|----------|
-| **commit** | Creating git commits with proper messages |
-| **commit-push-pr** | Full commit, push, and PR workflow |
+| **commit** | Tạo git commit với message chuẩn |
+| **commit-push-pr** | Toàn bộ workflow commit, push, và PR |
 
 ### Frontend (frontend-design)
 
-| Skill | Best For |
+| Skill | Phù hợp nhất cho |
 |-------|----------|
-| **frontend-design** | Creating polished UI components |
+| **frontend-design** | Tạo UI component hoàn thiện |
 
-**Value**: Creates distinctive, high-quality UI instead of generic AI aesthetics.
+**Giá trị**: Tạo UI đặc sắc, chất lượng cao thay vì thiết kế AI chung chung.
 
-### Automation Rules (hookify)
+### Quy Tắc Tự Động Hóa (hookify)
 
-| Skill | Best For |
+| Skill | Phù hợp nhất cho |
 |-------|----------|
-| **writing-rules** | Creating hookify rules for automation |
+| **writing-rules** | Tạo quy tắc hookify để tự động hóa |
 
-### Feature Development (feature-dev)
+### Phát Triển Tính Năng (feature-dev)
 
-| Skill | Best For |
+| Skill | Phù hợp nhất cho |
 |-------|----------|
-| **feature-dev** | End-to-end feature development workflow |
+| **feature-dev** | Workflow phát triển tính năng end-to-end |
 
 ---
 
-## Quick Reference: Official Plugin Skills
+## Tham Khảo Nhanh: Skill Từ Plugin Chính Thức
 
-| Codebase Signal | Skill | Plugin |
+| Dấu hiệu Codebase | Skill | Plugin |
 |-----------------|-------|--------|
-| Building plugins | skill-development | plugin-dev |
-| Git commits | commit | commit-commands |
+| Đang xây dựng plugin | skill-development | plugin-dev |
+| Commit git | commit | commit-commands |
 | React/Vue/Angular | frontend-design | frontend-design |
-| Automation rules | writing-rules | hookify |
-| Feature planning | feature-dev | feature-dev |
+| Quy tắc tự động hóa | writing-rules | hookify |
+| Lập kế hoạch tính năng | feature-dev | feature-dev |
 
 ---
 
-## Custom Project Skills
+## Skill Tùy Chỉnh Cho Project
 
-Create project-specific skills in `.claude/skills/<name>/SKILL.md`.
+Tạo skill riêng cho project trong `.claude/skills/<name>/SKILL.md`.
 
-### Skill Structure
+### Cấu Trúc Skill
 
 ```
 .claude/skills/
 └── my-skill/
-    ├── SKILL.md           # Main instructions (required)
-    ├── template.yaml      # Template to apply
+    ├── SKILL.md           # Hướng dẫn chính (bắt buộc)
+    ├── template.yaml      # Template để áp dụng
     ├── scripts/
-    │   └── validate.sh    # Script to run
-    └── examples/          # Reference examples
+    │   └── validate.sh    # Script để chạy
+    └── examples/          # Ví dụ tham khảo
 ```
 
-### Frontmatter Reference
+### Tham Khảo Frontmatter
 
 ```yaml
 ---
 name: skill-name
-description: What this skill does and when to use it
-disable-model-invocation: true  # Only user can invoke (for side effects)
-user-invocable: false           # Only Claude can invoke (for background knowledge)
-allowed-tools: Read, Grep, Glob # Restrict tool access
-context: fork                   # Run in isolated subagent
-agent: Explore                  # Which agent type when forked
+description: Skill này làm gì và khi nào dùng
+disable-model-invocation: true  # Chỉ người dùng mới gọi được (dành cho side effect)
+user-invocable: false           # Chỉ Claude gọi được (dành cho kiến thức nền)
+allowed-tools: Read, Grep, Glob # Giới hạn quyền truy cập tool
+context: fork                   # Chạy trong subagent độc lập
+agent: Explore                  # Loại agent khi fork
 ---
 ```
 
-### Invocation Control
+### Kiểm Soát Gọi Skill
 
-| Setting | User | Claude | Use for |
+| Cài đặt | Người dùng | Claude | Dùng cho |
 |---------|------|--------|---------|
-| (default) | ✓ | ✓ | General-purpose skills |
-| `disable-model-invocation: true` | ✓ | ✗ | Side effects (deploy, send) |
-| `user-invocable: false` | ✗ | ✓ | Background knowledge |
+| (mặc định) | ✓ | ✓ | Skill đa năng |
+| `disable-model-invocation: true` | ✓ | ✗ | Side effect (deploy, gửi) |
+| `user-invocable: false` | ✗ | ✓ | Kiến thức nền |
 
 ---
 
-## Custom Skill Examples
+## Ví Dụ Skill Tùy Chỉnh
 
-### API Documentation with OpenAPI Template
+### Tạo API Documentation Với OpenAPI Template
 
-Apply a YAML template to generate consistent API docs:
+Áp dụng YAML template để tạo API doc nhất quán:
 
 ```
 .claude/skills/api-doc/
@@ -118,17 +118,17 @@ Apply a YAML template to generate consistent API docs:
 ```yaml
 ---
 name: api-doc
-description: Generate OpenAPI documentation for an endpoint. Use when documenting API routes.
+description: Tạo OpenAPI documentation cho một endpoint. Dùng khi viết tài liệu cho API route.
 ---
 
-Generate OpenAPI documentation for the endpoint at $ARGUMENTS.
+Tạo OpenAPI documentation cho endpoint tại $ARGUMENTS.
 
-Use the template in [openapi-template.yaml](openapi-template.yaml) as the structure.
+Dùng template trong [openapi-template.yaml](openapi-template.yaml) làm cấu trúc.
 
-1. Read the endpoint code
-2. Extract path, method, parameters, request/response schemas
-3. Fill in the template with actual values
-4. Output the completed YAML
+1. Đọc code endpoint
+2. Trích xuất path, method, parameter, schema request/response
+3. Điền template với các giá trị thực tế
+4. Xuất ra YAML hoàn chỉnh
 ```
 
 **openapi-template.yaml:**
@@ -153,9 +153,9 @@ paths:
 
 ---
 
-### Database Migration Generator with Script
+### Tạo Database Migration Với Script
 
-Generate and validate migrations using a bundled script:
+Tạo và kiểm tra migration dùng script đi kèm:
 
 ```
 .claude/skills/create-migration/
@@ -168,31 +168,31 @@ Generate and validate migrations using a bundled script:
 ```yaml
 ---
 name: create-migration
-description: Create a database migration file
+description: Tạo file database migration
 disable-model-invocation: true
 allowed-tools: Read, Write, Bash
 ---
 
-Create a migration for: $ARGUMENTS
+Tạo migration cho: $ARGUMENTS
 
-1. Generate migration file in `migrations/` with timestamp prefix
-2. Include up and down functions
-3. Run validation: `bash ~/.claude/skills/create-migration/scripts/validate-migration.sh`
-4. Report any issues found
+1. Tạo file migration trong `migrations/` với tiền tố timestamp
+2. Bao gồm hàm up và down
+3. Chạy kiểm tra: `bash ~/.claude/skills/create-migration/scripts/validate-migration.sh`
+4. Báo cáo bất kỳ vấn đề nào tìm thấy
 ```
 
 **scripts/validate-migration.sh:**
 ```bash
 #!/bin/bash
-# Validate migration syntax
+# Kiểm tra cú pháp migration
 npx prisma validate 2>&1 || echo "Validation failed"
 ```
 
 ---
 
-### Test Generator with Examples
+### Tạo Test Với Ví Dụ
 
-Generate tests following project patterns:
+Tạo test theo pattern của project:
 
 ```
 .claude/skills/gen-test/
@@ -206,27 +206,27 @@ Generate tests following project patterns:
 ```yaml
 ---
 name: gen-test
-description: Generate tests for a file following project conventions
+description: Tạo test cho một file theo convention của project
 disable-model-invocation: true
 ---
 
-Generate tests for: $ARGUMENTS
+Tạo test cho: $ARGUMENTS
 
-Reference these examples for the expected patterns:
-- Unit tests: [examples/unit-test.ts](examples/unit-test.ts)
-- Integration tests: [examples/integration-test.ts](examples/integration-test.ts)
+Tham khảo các ví dụ sau để biết pattern mong đợi:
+- Unit test: [examples/unit-test.ts](examples/unit-test.ts)
+- Integration test: [examples/integration-test.ts](examples/integration-test.ts)
 
-1. Analyze the source file
-2. Identify functions/methods to test
-3. Generate tests matching project conventions
-4. Place in appropriate test directory
+1. Phân tích file source
+2. Xác định các hàm/method cần test
+3. Tạo test khớp với convention của project
+4. Đặt vào thư mục test phù hợp
 ```
 
 ---
 
-### Component Generator with Template
+### Tạo Component Với Template
 
-Scaffold new components from a template:
+Scaffold component mới từ template:
 
 ```
 .claude/skills/new-component/
@@ -241,26 +241,26 @@ Scaffold new components from a template:
 ```yaml
 ---
 name: new-component
-description: Scaffold a new React component with tests and stories
+description: Scaffold React component mới kèm test và story
 disable-model-invocation: true
 ---
 
-Create component: $ARGUMENTS
+Tạo component: $ARGUMENTS
 
-Use templates in [templates/](templates/) directory:
-1. Generate component from component.tsx.template
-2. Generate tests from component.test.tsx.template
-3. Generate Storybook story from component.stories.tsx.template
+Dùng template trong thư mục [templates/](templates/):
+1. Tạo component từ component.tsx.template
+2. Tạo test từ component.test.tsx.template
+3. Tạo Storybook story từ component.stories.tsx.template
 
-Replace {{ComponentName}} with the PascalCase name.
-Replace {{component-name}} with the kebab-case name.
+Thay {{ComponentName}} bằng tên PascalCase.
+Thay {{component-name}} bằng tên kebab-case.
 ```
 
 ---
 
-### PR Review with Checklist
+### Review PR Với Checklist
 
-Review PRs against a project-specific checklist:
+Review PR theo checklist riêng của project:
 
 ```
 .claude/skills/pr-check/
@@ -272,92 +272,92 @@ Review PRs against a project-specific checklist:
 ```yaml
 ---
 name: pr-check
-description: Review PR against project checklist
+description: Review PR theo checklist của project
 disable-model-invocation: true
 context: fork
 ---
 
-## PR Context
+## Context PR
 - Diff: !`gh pr diff`
-- Description: !`gh pr view`
+- Mô tả: !`gh pr view`
 
-Review against [checklist.md](checklist.md).
+Review theo [checklist.md](checklist.md).
 
-For each item, mark ✅ or ❌ with explanation.
+Với mỗi mục, đánh dấu ✅ hoặc ❌ kèm giải thích.
 ```
 
 **checklist.md:**
 ```markdown
-## PR Checklist
+## Checklist PR
 
-- [ ] Tests added for new functionality
-- [ ] No console.log statements
-- [ ] Error handling includes user-facing messages
-- [ ] API changes are backwards compatible
-- [ ] Database migrations are reversible
+- [ ] Đã thêm test cho tính năng mới
+- [ ] Không có lệnh console.log
+- [ ] Xử lý lỗi bao gồm message hiển thị cho người dùng
+- [ ] Thay đổi API tương thích ngược
+- [ ] Database migration có thể rollback
 ```
 
 ---
 
-### Release Notes Generator
+### Tạo Release Note
 
-Generate release notes from git history:
+Tạo release note từ lịch sử git:
 
 **SKILL.md:**
 ```yaml
 ---
 name: release-notes
-description: Generate release notes from commits since last tag
+description: Tạo release note từ các commit kể từ tag gần nhất
 disable-model-invocation: true
 ---
 
-## Recent Changes
-- Commits since last tag: !`git log $(git describe --tags --abbrev=0)..HEAD --oneline`
-- Last tag: !`git describe --tags --abbrev=0`
+## Thay Đổi Gần Đây
+- Commit kể từ tag gần nhất: !`git log $(git describe --tags --abbrev=0)..HEAD --oneline`
+- Tag gần nhất: !`git describe --tags --abbrev=0`
 
-Generate release notes:
-1. Group commits by type (feat, fix, docs, etc.)
-2. Write user-friendly descriptions
-3. Highlight breaking changes
-4. Format as markdown
+Tạo release note:
+1. Nhóm commit theo loại (feat, fix, docs, v.v.)
+2. Viết mô tả thân thiện với người dùng
+3. Làm nổi bật breaking change
+4. Format dưới dạng markdown
 ```
 
 ---
 
-### Project Conventions (Claude-only)
+### Convention Project (Chỉ Claude Gọi)
 
-Background knowledge Claude applies automatically:
+Kiến thức nền Claude tự động áp dụng:
 
 **SKILL.md:**
 ```yaml
 ---
 name: project-conventions
-description: Code style and patterns for this project. Apply when writing or reviewing code.
+description: Quy tắc code style và pattern cho project này. Áp dụng khi viết hoặc review code.
 user-invocable: false
 ---
 
-## Naming Conventions
-- React components: PascalCase
-- Utilities: camelCase
-- Constants: UPPER_SNAKE_CASE
-- Files: kebab-case
+## Convention Đặt Tên
+- React component: PascalCase
+- Utility: camelCase
+- Hằng số: UPPER_SNAKE_CASE
+- File: kebab-case
 
-## Patterns
-- Use `Result<T, E>` for fallible operations, not exceptions
-- Prefer composition over inheritance
-- All API responses use `{ data, error, meta }` shape
+## Pattern
+- Dùng `Result<T, E>` cho các thao tác có thể thất bại, không dùng exception
+- Ưu tiên composition hơn inheritance
+- Mọi API response dùng shape `{ data, error, meta }`
 
-## Forbidden
-- No `any` types
-- No `console.log` in production code
-- No synchronous file I/O
+## Cấm
+- Không dùng kiểu `any`
+- Không dùng `console.log` trong code production
+- Không dùng file I/O đồng bộ
 ```
 
 ---
 
-### Environment Setup
+### Cài Đặt Môi Trường
 
-Onboard new developers with setup script:
+Hướng dẫn developer mới với script cài đặt:
 
 ```
 .claude/skills/setup-dev/
@@ -370,39 +370,39 @@ Onboard new developers with setup script:
 ```yaml
 ---
 name: setup-dev
-description: Set up development environment for new contributors
+description: Cài đặt môi trường phát triển cho contributor mới
 disable-model-invocation: true
 ---
 
-Set up development environment:
+Cài đặt môi trường phát triển:
 
-1. Check prerequisites: `bash scripts/check-prerequisites.sh`
-2. Install dependencies: `npm install`
-3. Copy environment template: `cp .env.example .env`
-4. Set up database: `npm run db:setup`
-5. Verify setup: `npm test`
+1. Kiểm tra prerequisites: `bash scripts/check-prerequisites.sh`
+2. Cài đặt dependencies: `npm install`
+3. Copy template environment: `cp .env.example .env`
+4. Cài đặt database: `npm run db:setup`
+5. Kiểm tra cài đặt: `npm test`
 
-Report any issues encountered.
+Báo cáo bất kỳ vấn đề nào gặp phải.
 ```
 
 ---
 
-## Argument Patterns
+## Pattern Argument
 
-| Pattern | Meaning | Example |
+| Pattern | Ý nghĩa | Ví dụ |
 |---------|---------|---------|
-| `$ARGUMENTS` | All args as string | `/deploy staging` → "staging" |
+| `$ARGUMENTS` | Toàn bộ argument dưới dạng chuỗi | `/deploy staging` → "staging" |
 
-Arguments are appended as `ARGUMENTS: <value>` if `$ARGUMENTS` isn't in the skill.
+Argument được nối thêm dưới dạng `ARGUMENTS: <value>` nếu `$ARGUMENTS` không có trong skill.
 
-## Dynamic Context Injection
+## Inject Context Động
 
-Use `!`command`` to inject live data before the skill runs:
+Dùng `` !`command` `` để inject dữ liệu trực tiếp trước khi skill chạy:
 
 ```yaml
-## Current State
+## Trạng Thái Hiện Tại
 - Branch: !`git branch --show-current`
 - Status: !`git status --short`
 ```
 
-The command output replaces the placeholder before Claude sees the skill content.
+Output của command thay thế placeholder trước khi Claude nhận nội dung skill.

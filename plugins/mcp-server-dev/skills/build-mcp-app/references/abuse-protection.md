@@ -1,29 +1,28 @@
-# Abuse protection for authless hosted servers
+# Bảo vệ khỏi lạm dụng cho server không có xác thực
 
-An authless StreamableHTTP server is reachable by anything on the internet.
-There are three resources to protect: your compute, any upstream API quota
-your tools consume, and egress bandwidth for large `callServerTool` payloads.
+Một StreamableHTTP server không có xác thực có thể bị truy cập bởi bất kỳ ai trên internet.
+Có ba tài nguyên cần bảo vệ: tài nguyên tính toán của bạn, hạn mức API upstream mà
+các tool của bạn sử dụng, và băng thông egress cho các payload `callServerTool` lớn.
 
-## You don't get a per-user identity
+## Bạn không có danh tính per-user
 
-In authless mode there is no token and stateless transport gives no session
-ID. Traffic from claude.ai is proxied through Anthropic's egress — every web
-user arrives from the same small set of IPs:
+Trong chế độ không xác thực, không có token và transport không trạng thái nên không có
+session ID. Traffic từ claude.ai được proxy qua egress của Anthropic — mọi người dùng web
+đều đến từ cùng một tập IP nhỏ:
 
 ```
 160.79.104.0/21
 2607:6bc0::/48
 ```
 
-(See https://platform.claude.com/docs/en/api/ip-addresses.)
+(Xem https://platform.claude.com/docs/en/api/ip-addresses.)
 
-Claude Desktop, Claude Code, and other hosts connect **directly from the
-user's machine**, so those *do* have distinct per-user IPs. Per-IP limiting
-therefore works for direct-connect clients; for claude.ai you can only limit
-the aggregate Anthropic pool. If true per-user limits matter, that's the
-trigger to add OAuth.
+Claude Desktop, Claude Code, và các host khác kết nối **trực tiếp từ máy của
+người dùng**, nên những client đó *có* IP riêng biệt per-user. Do đó, giới hạn per-IP
+hoạt động với direct-connect clients; với claude.ai bạn chỉ có thể giới hạn
+pool Anthropic chung. Nếu cần giới hạn thực sự per-user, đó là lý do để thêm OAuth.
 
-## Tiered token-bucket (per-replica backstop)
+## Token-bucket theo tầng (backstop per-replica)
 
 ```ts
 const ANTHROPIC_CIDRS = ["160.79.104.0/21", "2607:6bc0::/48"];
@@ -33,28 +32,26 @@ const TIERS = {
 };
 ```
 
-Match `req.ip` against the CIDRs, pick a bucket (`"anthropic"` or
-`"ip:<addr>"`), 429 + `Retry-After` on exhaust. This is a per-replica
-backstop — cross-replica enforcement belongs at the edge (Cloudflare, Cloud
-Armor), which keeps the containers stateless.
+So khớp `req.ip` với các CIDR, chọn bucket (`"anthropic"` hoặc
+`"ip:<addr>"`), trả 429 + `Retry-After` khi cạn kiệt. Đây là backstop per-replica —
+enforcement xuyên replica thuộc về edge (Cloudflare, Cloud
+Armor), giúp các container giữ trạng thái stateless.
 
-## `trust proxy` must match your topology
+## `trust proxy` phải khớp với topology của bạn
 
-`req.ip` only honours `X-Forwarded-For` if `app.set('trust proxy', N)` is
-set. `true` trusts every hop, which lets a direct client send
-`X-Forwarded-For: 160.79.108.42` and claim the Anthropic tier. Set it to the
-exact number of trusted hops (e.g. `1` behind a single LB, `2` behind
-Cloudflare → origin LB) and **never `true` in production**.
+`req.ip` chỉ tuân theo `X-Forwarded-For` nếu `app.set('trust proxy', N)` được
+thiết lập. `true` tin tưởng mọi hop, điều này cho phép client trực tiếp gửi
+`X-Forwarded-For: 160.79.108.42` và giả mạo tầng Anthropic. Đặt giá trị chính xác bằng số hop
+đáng tin cậy (ví dụ: `1` sau một LB duy nhất, `2` sau Cloudflare → origin LB) và **không bao giờ dùng `true` trong production**.
 
-## Hard-allowlisting Anthropic IPs is a product decision
+## Hard-allowlist IP Anthropic là quyết định sản phẩm
 
-Blocking everything outside `160.79.104.0/21` locks out Desktop, Claude Code,
-and every other MCP host. Use the CIDRs to **tier** rate limits, not to gate
-access, unless claude.ai-only is an explicit goal.
+Chặn tất cả ngoài `160.79.104.0/21` sẽ loại Desktop, Claude Code,
+và mọi MCP host khác. Dùng các CIDR để **phân tầng** rate limit, không phải để chặn
+truy cập, trừ khi chỉ phục vụ claude.ai là mục tiêu rõ ràng.
 
-## Cache upstream responses
+## Cache response upstream
 
-For tools that wrap a third-party API, an in-process LRU keyed on the
-normalized query (TTL hours, no secrets in the key) is the primary cost
-control — repeat queries become free and absorb thundering-herd. Rate limits
-are the safety net, not the first line.
+Với các tool bọc API bên thứ ba, một LRU in-process keyed trên query đã chuẩn hóa (TTL tính theo giờ,
+không có secret trong key) là biện pháp kiểm soát chi phí chính — các query lặp lại trở nên
+miễn phí và hấp thụ thundering-herd. Rate limit là lưới an toàn, không phải tuyến đầu.

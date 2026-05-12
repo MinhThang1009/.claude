@@ -1,16 +1,16 @@
-# Advanced Workflow Patterns
+# Các Pattern Workflow Nâng Cao
 
-Multi-step command sequences and composition patterns for complex workflows.
+Chuỗi lệnh nhiều bước và các pattern kết hợp dành cho workflow phức tạp.
 
-## Overview
+## Tổng quan
 
-Advanced workflows combine multiple commands, coordinate state across invocations, and create sophisticated automation sequences. These patterns enable building complex functionality from simple command building blocks.
+Workflow nâng cao kết hợp nhiều command, điều phối trạng thái qua các lần gọi và tạo ra chuỗi tự động hóa tinh vi. Những pattern này cho phép xây dựng chức năng phức tạp từ các khối lệnh đơn giản.
 
-## Multi-Step Command Patterns
+## Các Pattern Command Nhiều Bước
 
-### Sequential Workflow Command
+### Command Workflow Tuần Tự
 
-Commands that guide users through multi-step processes:
+Command hướng dẫn người dùng qua quy trình nhiều bước:
 
 ```markdown
 ---
@@ -21,49 +21,49 @@ allowed-tools: Bash(gh:*), Read, Grep
 
 # PR Review Workflow for #$1
 
-## Step 1: Fetch PR Details
+## Bước 1: Lấy thông tin PR
 !`gh pr view $1 --json title,body,author,files`
 
-## Step 2: Review Files
-Files changed: !`gh pr diff $1 --name-only`
+## Bước 2: Review file
+Files đã thay đổi: !`gh pr diff $1 --name-only`
 
-For each file:
-- Check code quality
-- Verify tests exist
-- Review documentation
+Với mỗi file:
+- Kiểm tra chất lượng code
+- Xác nhận đã có test
+- Review tài liệu
 
-## Step 3: Run Checks
-Test status: !`gh pr checks $1`
+## Bước 3: Chạy kiểm tra
+Trạng thái test: !`gh pr checks $1`
 
-Verify:
-- All tests passing
-- No merge conflicts
-- CI/CD successful
+Xác nhận:
+- Tất cả test đều pass
+- Không có merge conflict
+- CI/CD thành công
 
-## Step 4: Provide Feedback
+## Bước 4: Đưa ra nhận xét
 
-Summarize:
-- Issues found (critical/minor)
-- Suggestions for improvement
-- Approval recommendation
+Tóm tắt:
+- Vấn đề tìm thấy (critical/minor)
+- Đề xuất cải thiện
+- Khuyến nghị approve
 
-Would you like to:
+Bạn muốn:
 1. Approve PR
 2. Request changes
-3. Leave comments only
+3. Chỉ để lại comments
 
-Reply with your choice and I'll help complete the action.
+Trả lời lựa chọn của bạn và tôi sẽ giúp hoàn tất thao tác.
 ```
 
-**Key features:**
-- Numbered steps for clarity
-- Bash execution for context
-- Decision points for user input
-- Next action suggestions
+**Tính năng chính:**
+- Đánh số bước để rõ ràng
+- Thực thi Bash để lấy context
+- Điểm quyết định để nhận input từ người dùng
+- Gợi ý hành động tiếp theo
 
-### State-Carrying Workflow
+### Workflow Lưu Trạng Thái
 
-Commands that maintain state between invocations:
+Command duy trì trạng thái giữa các lần gọi:
 
 ```markdown
 ---
@@ -73,12 +73,12 @@ allowed-tools: Write, Bash(git:*)
 
 # Initialize Deployment
 
-Creating deployment tracking file...
+Đang tạo file theo dõi deployment...
 
-Current branch: !`git branch --show-current`
-Latest commit: !`git log -1 --format=%H`
+Branch hiện tại: !`git branch --show-current`
+Commit mới nhất: !`git log -1 --format=%H`
 
-Deployment state saved to `.claude/deployment-state.local.md`:
+Trạng thái deployment đã lưu vào `.claude/deployment-state.local.md`:
 
 \`\`\`markdown
 ---
@@ -92,42 +92,42 @@ status: initialized
 # Deployment Tracking
 
 Branch: $(git branch --show-current)
-Started: $(date)
+Bắt đầu: $(date)
 
-Next steps:
-1. Run tests: /deploy-test
+Các bước tiếp theo:
+1. Chạy test: /deploy-test
 2. Build: /deploy-build
 3. Deploy: /deploy-execute
 \`\`\`
 
-State saved. Run `/deploy-test` to continue.
+Trạng thái đã lưu. Chạy `/deploy-test` để tiếp tục.
 ```
 
-**Next command** (`/deploy-test`):
+**Command tiếp theo** (`/deploy-test`):
 ```markdown
 ---
 description: Run deployment tests
 allowed-tools: Read, Bash(npm:*)
 ---
 
-Reading deployment state from `.claude/deployment-state.local.md`...
+Đang đọc trạng thái deployment từ `.claude/deployment-state.local.md`...
 
-Running tests: !`npm test`
+Chạy test: !`npm test`
 
-Updating state to 'tested'...
+Cập nhật trạng thái thành 'tested'...
 
-Tests complete. Run `/deploy-build` to continue.
+Test hoàn tất. Chạy `/deploy-build` để tiếp tục.
 ```
 
-**Pattern benefits:**
-- Persistent state across commands
-- Clear workflow progression
-- Safety checkpoints
-- Resume capability
+**Lợi ích của pattern:**
+- Trạng thái bền vững qua các command
+- Tiến trình workflow rõ ràng
+- Các checkpoint an toàn
+- Khả năng tiếp tục từ giữa chừng
 
-### Conditional Workflow Branching
+### Phân Nhánh Workflow Có Điều Kiện
 
-Commands that adapt based on conditions:
+Command thích ứng dựa trên điều kiện:
 
 ```markdown
 ---
@@ -138,41 +138,41 @@ allowed-tools: Bash(git:*), Bash(npm:*), Read
 
 # Deploy to $1
 
-## Pre-flight Checks
+## Kiểm tra trước khi bay
 
 Branch: !`git branch --show-current`
-Status: !`git status --short`
+Trạng thái: !`git status --short`
 
-**Checking conditions:**
+**Kiểm tra điều kiện:**
 
-1. Branch status:
-   - If main/master: Require approval
-   - If feature branch: Warning about target
-   - If hotfix: Fast-track process
+1. Trạng thái branch:
+   - Nếu là main/master: Yêu cầu approval
+   - Nếu là feature branch: Cảnh báo về target
+   - Nếu là hotfix: Quy trình nhanh
 
-2. Tests:
+2. Test:
    !`npm test`
-   - If tests fail: STOP - fix tests first
-   - If tests pass: Continue
+   - Nếu test thất bại: DỪNG — sửa test trước
+   - Nếu test pass: Tiếp tục
 
-3. Environment:
-   - If $1 = 'production': Extra validation
-   - If $1 = 'staging': Standard process
-   - If $1 = 'dev': Minimal checks
+3. Môi trường:
+   - Nếu $1 = 'production': Xác nhận thêm
+   - Nếu $1 = 'staging': Quy trình tiêu chuẩn
+   - Nếu $1 = 'dev': Kiểm tra tối thiểu
 
-**Workflow decision:**
-Based on above, proceeding with: [determined workflow]
+**Quyết định workflow:**
+Dựa trên các điều kiện trên, tiếp tục với: [workflow đã xác định]
 
-[Conditional steps based on environment and status]
+[Các bước có điều kiện dựa trên môi trường và trạng thái]
 
-Ready to deploy? (yes/no)
+Sẵn sàng deploy? (yes/no)
 ```
 
-## Command Composition Patterns
+## Các Pattern Kết Hợp Command
 
-### Command Chaining
+### Chuỗi Command
 
-Commands designed to work together:
+Command được thiết kế để hoạt động cùng nhau:
 
 ```markdown
 ---
@@ -181,30 +181,30 @@ description: Prepare for code review
 
 # Prepare Code Review
 
-Running preparation sequence:
+Đang chạy chuỗi chuẩn bị:
 
 1. Format code: /format-code
-2. Run linter: /lint-code
-3. Run tests: /test-all
-4. Generate coverage: /coverage-report
-5. Create review summary: /review-summary
+2. Chạy linter: /lint-code
+3. Chạy test: /test-all
+4. Tạo coverage: /coverage-report
+5. Tạo review summary: /review-summary
 
-This is a meta-command. After completing each step above,
-I'll compile results and prepare comprehensive review materials.
+Đây là meta-command. Sau khi hoàn thành từng bước trên,
+tôi sẽ tổng hợp kết quả và chuẩn bị tài liệu review toàn diện.
 
-Starting sequence...
+Đang bắt đầu chuỗi...
 ```
 
-**Individual commands** are simple:
-- `/format-code` - Just formats
-- `/lint-code` - Just lints
-- `/test-all` - Just tests
+**Các command riêng lẻ** đơn giản:
+- `/format-code` — Chỉ format
+- `/lint-code` — Chỉ lint
+- `/test-all` — Chỉ test
 
-**Composition command** orchestrates them.
+**Composition command** điều phối chúng.
 
-### Pipeline Pattern
+### Pattern Pipeline
 
-Commands that process output from previous commands:
+Command xử lý output từ các command trước:
 
 ```markdown
 ---
@@ -213,37 +213,37 @@ description: Analyze test failures
 
 # Analyze Test Failures
 
-## Step 1: Get test results
-(Run /test-all first if not done)
+## Bước 1: Lấy kết quả test
+(Chạy /test-all trước nếu chưa làm)
 
-Reading test output...
+Đang đọc output test...
 
-## Step 2: Categorize failures
-- Flaky tests (random failures)
-- Consistent failures
-- New failures vs existing
+## Bước 2: Phân loại lỗi
+- Flaky test (lỗi ngẫu nhiên)
+- Lỗi nhất quán
+- Lỗi mới so với lỗi cũ
 
-## Step 3: Prioritize
-Rank by:
+## Bước 3: Ưu tiên
+Xếp hạng theo:
 - Impact (critical path vs edge case)
-- Frequency (always fails vs sometimes)
-- Effort (quick fix vs major work)
+- Tần suất (luôn fail vs đôi khi fail)
+- Công sức (sửa nhanh vs việc lớn)
 
-## Step 4: Generate fix plan
-For each failure:
-- Root cause hypothesis
-- Suggested fix approach
-- Estimated effort
+## Bước 4: Tạo kế hoạch sửa
+Với mỗi lỗi:
+- Giả thuyết về nguyên nhân gốc rễ
+- Hướng tiếp cận đề xuất
+- Ước tính công sức
 
-Would you like me to:
-1. Fix highest priority failure
-2. Generate detailed fix plans for all
-3. Create GitHub issues for each
+Bạn muốn tôi:
+1. Sửa lỗi ưu tiên cao nhất
+2. Tạo kế hoạch sửa chi tiết cho tất cả
+3. Tạo GitHub issue cho từng lỗi
 ```
 
-### Parallel Execution Pattern
+### Pattern Thực Thi Song Song
 
-Commands that coordinate multiple simultaneous operations:
+Command điều phối nhiều thao tác đồng thời:
 
 ```markdown
 ---
@@ -253,34 +253,34 @@ allowed-tools: Bash(*), Read
 
 # Comprehensive Validation
 
-Running validations in parallel...
+Đang chạy validation song song...
 
-Starting:
-- Code quality checks
-- Security scanning
-- Dependency audit
-- Performance profiling
+Đang bắt đầu:
+- Kiểm tra chất lượng code
+- Quét bảo mật
+- Kiểm tra dependency
+- Profiling hiệu năng
 
-This will take 2-3 minutes. I'll monitor all processes
-and report when complete.
+Sẽ mất 2–3 phút. Tôi sẽ theo dõi tất cả tiến trình
+và báo cáo khi hoàn tất.
 
-[Poll each process and report progress]
+[Poll từng tiến trình và báo cáo tiến độ]
 
-All validations complete. Summary:
-- Quality: PASS (0 issues)
-- Security: WARN (2 minor issues)
+Tất cả validation hoàn tất. Tóm tắt:
+- Quality: PASS (0 vấn đề)
+- Security: WARN (2 vấn đề nhỏ)
 - Dependencies: PASS
-- Performance: PASS (baseline met)
+- Performance: PASS (đạt baseline)
 
-Details:
-[Collated results from all checks]
+Chi tiết:
+[Kết quả tổng hợp từ tất cả kiểm tra]
 ```
 
-## Workflow State Management
+## Quản Lý Trạng Thái Workflow
 
-### Using .local.md Files
+### Dùng File .local.md
 
-Store workflow state in plugin-specific files:
+Lưu trạng thái workflow trong file riêng của plugin:
 
 ```markdown
 .claude/plugin-name-workflow.local.md:
@@ -298,21 +298,21 @@ build_complete: false
 
 # Deployment Workflow State
 
-Current stage: Testing
-Started: 2025-01-15 10:30 UTC
+Stage hiện tại: Testing
+Bắt đầu: 2025-01-15 10:30 UTC
 
-Completed steps:
+Các bước đã hoàn thành:
 - ✅ Validation
-- ✅ Branch check
-- ⏳ Testing (in progress)
+- ✅ Kiểm tra branch
+- ⏳ Testing (đang thực hiện)
 
-Pending steps:
+Các bước còn lại:
 - Build
 - Deploy
-- Smoke tests
+- Smoke test
 ```
 
-**Reading state in commands:**
+**Đọc trạng thái trong command:**
 
 ```markdown
 ---
@@ -320,18 +320,18 @@ description: Continue deployment workflow
 allowed-tools: Read, Write
 ---
 
-Reading workflow state from .claude/plugin-name-workflow.local.md...
+Đang đọc trạng thái workflow từ .claude/plugin-name-workflow.local.md...
 
-Current stage: @.claude/plugin-name-workflow.local.md
+Stage hiện tại: @.claude/plugin-name-workflow.local.md
 
-[Parse YAML frontmatter to determine next step]
+[Parse YAML frontmatter để xác định bước tiếp theo]
 
-Next action based on state: [determined action]
+Hành động tiếp theo dựa trên trạng thái: [hành động đã xác định]
 ```
 
-### Workflow Recovery
+### Phục Hồi Workflow
 
-Handle interrupted workflows:
+Xử lý workflow bị gián đoạn:
 
 ```markdown
 ---
@@ -341,28 +341,28 @@ allowed-tools: Read
 
 # Resume Deployment
 
-Checking for interrupted workflow...
+Đang kiểm tra workflow bị gián đoạn...
 
 State file: @.claude/plugin-name-workflow.local.md
 
-**Workflow found:**
-- Started: [timestamp]
-- Environment: [env]
-- Last completed: [step]
+**Workflow tìm thấy:**
+- Bắt đầu: [timestamp]
+- Môi trường: [env]
+- Hoàn thành gần nhất: [step]
 
-**Recovery options:**
-1. Resume from last step
-2. Restart from beginning
-3. Abort and clean up
+**Tùy chọn phục hồi:**
+1. Tiếp tục từ bước cuối cùng
+2. Khởi động lại từ đầu
+3. Hủy bỏ và dọn dẹp
 
-Which would you like? (1/2/3)
+Bạn chọn tùy chọn nào? (1/2/3)
 ```
 
-## Workflow Coordination Patterns
+## Các Pattern Điều Phối Workflow
 
-### Cross-Command Communication
+### Giao Tiếp Giữa Các Command
 
-Commands that signal each other:
+Command phát tín hiệu cho nhau:
 
 ```markdown
 ---
@@ -372,19 +372,19 @@ allowed-tools: Write
 
 # Mark Feature Complete
 
-Writing completion marker...
+Đang ghi marker hoàn thành...
 
-Creating: .claude/feature-complete.flag
+Tạo: .claude/feature-complete.flag
 
-This signals other commands that feature is ready for:
-- Integration testing (/integration-test will auto-detect)
-- Documentation generation (/docs-generate will include)
-- Release notes (/release-notes will add)
+Điều này báo hiệu cho các command khác rằng feature đã sẵn sàng:
+- Integration testing (/integration-test sẽ tự phát hiện)
+- Tạo tài liệu (/docs-generate sẽ bao gồm)
+- Release notes (/release-notes sẽ thêm vào)
 
-Feature marked complete.
+Feature đã được đánh dấu hoàn thành.
 ```
 
-**Other commands check for flag:**
+**Các command khác kiểm tra flag:**
 
 ```markdown
 ---
@@ -392,18 +392,18 @@ description: Generate release notes
 allowed-tools: Read, Bash(git:*)
 ---
 
-Checking for completed features...
+Đang kiểm tra feature đã hoàn thành...
 
 if [ -f .claude/feature-complete.flag ]; then
-  Feature ready for release notes
+  Feature sẵn sàng cho release notes
 fi
 
-[Include in release notes]
+[Bao gồm vào release notes]
 ```
 
-### Workflow Locking
+### Khóa Workflow
 
-Prevent concurrent workflow execution:
+Ngăn chạy workflow đồng thời:
 
 ```markdown
 ---
@@ -413,25 +413,25 @@ allowed-tools: Read, Write, Bash
 
 # Start Deployment
 
-Checking for active deployments...
+Đang kiểm tra deployment đang hoạt động...
 
 if [ -f .claude/deployment.lock ]; then
-  ERROR: Deployment already in progress
-  Started: [timestamp from lock file]
+  LỖI: Đang có deployment đang chạy
+  Bắt đầu: [timestamp từ lock file]
 
-  Cannot start concurrent deployment.
-  Wait for completion or run /deployment-abort
+  Không thể bắt đầu deployment đồng thời.
+  Chờ hoàn tất hoặc chạy /deployment-abort
 
-  Exit.
+  Thoát.
 fi
 
-Creating deployment lock...
+Đang tạo deployment lock...
 
-Deployment started. Lock created.
-[Proceed with deployment]
+Deployment đã bắt đầu. Lock đã tạo.
+[Tiếp tục với deployment]
 ```
 
-**Lock cleanup:**
+**Dọn dẹp lock:**
 
 ```markdown
 ---
@@ -439,17 +439,17 @@ description: Complete deployment
 allowed-tools: Write, Bash
 ---
 
-Deployment complete.
+Deployment hoàn tất.
 
-Removing deployment lock...
+Đang xóa deployment lock...
 rm .claude/deployment.lock
 
-Ready for next deployment.
+Sẵn sàng cho deployment tiếp theo.
 ```
 
-## Advanced Argument Handling
+## Xử Lý Argument Nâng Cao
 
-### Optional Arguments with Defaults
+### Argument Tùy Chọn với Giá Trị Mặc Định
 
 ```markdown
 ---
@@ -460,14 +460,14 @@ argument-hint: [environment] [version]
 Environment: ${1:-staging}
 Version: ${2:-latest}
 
-Deploying ${2:-latest} to ${1:-staging}...
+Đang deploy ${2:-latest} lên ${1:-staging}...
 
-Note: Using defaults for missing arguments:
-- Environment defaults to 'staging'
-- Version defaults to 'latest'
+Lưu ý: Dùng giá trị mặc định cho argument thiếu:
+- Environment mặc định là 'staging'
+- Version mặc định là 'latest'
 ```
 
-### Argument Validation
+### Validation Argument
 
 ```markdown
 ---
@@ -477,19 +477,19 @@ argument-hint: [environment]
 
 Environment: $1
 
-Validating environment...
+Đang validate environment...
 
 valid_envs="dev staging production"
 if ! echo "$valid_envs" | grep -w "$1" > /dev/null; then
-  ERROR: Invalid environment '$1'
-  Valid options: dev, staging, production
-  Exit.
+  LỖI: Environment không hợp lệ '$1'
+  Các tùy chọn hợp lệ: dev, staging, production
+  Thoát.
 fi
 
-Environment validated. Proceeding...
+Environment hợp lệ. Đang tiếp tục...
 ```
 
-### Argument Transformation
+### Biến Đổi Argument
 
 ```markdown
 ---
@@ -499,7 +499,7 @@ argument-hint: [env-shorthand]
 
 Input: $1
 
-Expanding shorthand:
+Mở rộng shorthand:
 - d/dev → development
 - s/stg → staging
 - p/prod → production
@@ -511,12 +511,12 @@ case "$1" in
   *) ENV="$1";;
 esac
 
-Deploying to: $ENV
+Đang deploy lên: $ENV
 ```
 
-## Error Handling in Workflows
+## Xử Lý Lỗi trong Workflow
 
-### Graceful Failure
+### Thất Bại Khéo Léo
 
 ```markdown
 ---
@@ -525,29 +525,29 @@ description: Resilient deployment workflow
 
 # Deployment Workflow
 
-Running steps with error handling...
+Đang chạy các bước với xử lý lỗi...
 
-## Step 1: Tests
+## Bước 1: Test
 !`npm test`
 
 if [ $? -ne 0 ]; then
-  ERROR: Tests failed
+  LỖI: Test thất bại
 
-  Options:
-  1. Fix tests and retry
-  2. Skip tests (NOT recommended)
-  3. Abort deployment
+  Tùy chọn:
+  1. Sửa test và thử lại
+  2. Bỏ qua test (KHÔNG khuyến nghị)
+  3. Hủy deployment
 
-  What would you like to do?
+  Bạn muốn làm gì?
 
-  [Wait for user input before continuing]
+  [Chờ input từ người dùng trước khi tiếp tục]
 fi
 
-## Step 2: Build
-[Continue only if Step 1 succeeded]
+## Bước 2: Build
+[Chỉ tiếp tục nếu Bước 1 thành công]
 ```
 
-### Rollback on Failure
+### Rollback Khi Thất Bại
 
 ```markdown
 ---
@@ -556,27 +556,27 @@ description: Deployment with rollback
 
 # Deploy with Rollback
 
-Saving current state for rollback...
-Previous version: !`current-version.sh`
+Đang lưu trạng thái hiện tại để rollback...
+Phiên bản trước: !`current-version.sh`
 
-Deploying new version...
+Đang deploy phiên bản mới...
 
 !`deploy.sh`
 
 if [ $? -ne 0 ]; then
-  DEPLOYMENT FAILED
+  DEPLOYMENT THẤT BẠI
 
-  Initiating automatic rollback...
+  Đang bắt đầu rollback tự động...
   !`rollback.sh`
 
-  Rolled back to previous version.
-  Check logs for failure details.
+  Đã rollback về phiên bản trước.
+  Kiểm tra log để biết chi tiết lỗi.
 fi
 
-Deployment complete.
+Deployment hoàn tất.
 ```
 
-### Checkpoint Recovery
+### Phục Hồi từ Checkpoint
 
 ```markdown
 ---
@@ -597,46 +597,46 @@ echo "checkpoint:build" >> .claude/deployment-checkpoints.log
 !`deploy.sh`
 echo "checkpoint:deploy" >> .claude/deployment-checkpoints.log
 
-If any step fails, resume with:
+Nếu bất kỳ bước nào thất bại, tiếp tục với:
 /deployment-resume [last-successful-checkpoint]
 ```
 
-## Best Practices
+## Các Nguyên Tắc Tốt Nhất
 
-### Workflow Design
+### Thiết Kế Workflow
 
-1. **Clear progression**: Number steps, show current position
-2. **Explicit state**: Don't rely on implicit state
-3. **User control**: Provide decision points
-4. **Error recovery**: Handle failures gracefully
-5. **Progress indication**: Show what's done, what's pending
+1. **Tiến trình rõ ràng**: Đánh số bước, hiển thị vị trí hiện tại
+2. **Trạng thái tường minh**: Không dựa vào trạng thái ngầm định
+3. **Kiểm soát của người dùng**: Cung cấp điểm quyết định
+4. **Phục hồi lỗi**: Xử lý thất bại khéo léo
+5. **Chỉ báo tiến độ**: Hiển thị những gì đã xong, những gì còn lại
 
-### Command Composition
+### Kết Hợp Command
 
-1. **Single responsibility**: Each command does one thing well
-2. **Composable design**: Commands work together easily
-3. **Standard interfaces**: Consistent input/output formats
-4. **Loose coupling**: Commands don't depend on each other's internals
+1. **Single responsibility**: Mỗi command làm tốt một việc
+2. **Thiết kế có thể kết hợp**: Các command dễ làm việc cùng nhau
+3. **Interface tiêu chuẩn**: Format input/output nhất quán
+4. **Loose coupling**: Các command không phụ thuộc vào internal của nhau
 
-### State Management
+### Quản Lý Trạng Thái
 
-1. **Persistent state**: Use .local.md files
-2. **Atomic updates**: Write complete state files atomically
-3. **State validation**: Check state file format/completeness
-4. **Cleanup**: Remove stale state files
-5. **Documentation**: Document state file formats
+1. **Trạng thái bền vững**: Dùng file .local.md
+2. **Cập nhật atomic**: Ghi file trạng thái hoàn chỉnh theo kiểu atomic
+3. **Validation trạng thái**: Kiểm tra format/tính đầy đủ của state file
+4. **Dọn dẹp**: Xóa state file cũ
+5. **Tài liệu**: Ghi lại format của state file
 
-### Error Handling
+### Xử Lý Lỗi
 
-1. **Fail fast**: Detect errors early
-2. **Clear messages**: Explain what went wrong
-3. **Recovery options**: Provide clear next steps
-4. **State preservation**: Keep state for recovery
-5. **Rollback capability**: Support undoing changes
+1. **Fail fast**: Phát hiện lỗi sớm
+2. **Thông báo rõ ràng**: Giải thích điều gì đã sai
+3. **Tùy chọn phục hồi**: Cung cấp bước tiếp theo rõ ràng
+4. **Bảo toàn trạng thái**: Giữ trạng thái để phục hồi
+5. **Khả năng rollback**: Hỗ trợ hoàn tác thay đổi
 
-## Example: Complete Deployment Workflow
+## Ví dụ: Workflow Deployment Hoàn Chỉnh
 
-### Initialize Command
+### Command Initialize
 
 ```markdown
 ---
@@ -647,7 +647,7 @@ allowed-tools: Write, Bash(git:*)
 
 # Initialize Deployment to $1
 
-Creating workflow state...
+Đang tạo trạng thái workflow...
 
 \`\`\`yaml
 ---
@@ -660,12 +660,12 @@ timestamp: !`date -u +%Y-%m-%dT%H:%M:%SZ`
 ---
 \`\`\`
 
-Written to .claude/deployment-state.local.md
+Đã ghi vào .claude/deployment-state.local.md
 
-Next: Run /deployment-validate
+Tiếp theo: Chạy /deployment-validate
 ```
 
-### Validation Command
+### Command Validation
 
 ```markdown
 ---
@@ -673,19 +673,19 @@ description: Validate deployment
 allowed-tools: Read, Bash
 ---
 
-Reading state: @.claude/deployment-state.local.md
+Đang đọc trạng thái: @.claude/deployment-state.local.md
 
-Running validation...
-- Branch check: PASS
-- Tests: PASS
+Đang chạy validation...
+- Kiểm tra branch: PASS
+- Test: PASS
 - Build: PASS
 
-Updating state to 'validated'...
+Đang cập nhật trạng thái thành 'validated'...
 
-Next: Run /deployment-execute
+Tiếp theo: Chạy /deployment-execute
 ```
 
-### Execution Command
+### Command Thực Thi
 
 ```markdown
 ---
@@ -693,19 +693,19 @@ description: Execute deployment
 allowed-tools: Read, Bash, Write
 ---
 
-Reading state: @.claude/deployment-state.local.md
+Đang đọc trạng thái: @.claude/deployment-state.local.md
 
-Executing deployment to [environment]...
+Đang thực thi deployment lên [environment]...
 
 !`deploy.sh [environment]`
 
-Deployment complete.
-Updating state to 'completed'...
+Deployment hoàn tất.
+Đang cập nhật trạng thái thành 'completed'...
 
-Cleanup: /deployment-cleanup
+Dọn dẹp: /deployment-cleanup
 ```
 
-### Cleanup Command
+### Command Dọn Dẹp
 
 ```markdown
 ---
@@ -713,10 +713,10 @@ description: Clean up deployment
 allowed-tools: Bash
 ---
 
-Removing deployment state...
+Đang xóa trạng thái deployment...
 rm .claude/deployment-state.local.md
 
-Deployment workflow complete.
+Workflow deployment hoàn tất.
 ```
 
-This complete workflow demonstrates state management, sequential execution, error handling, and clean separation of concerns across multiple commands.
+Workflow hoàn chỉnh này minh họa quản lý trạng thái, thực thi tuần tự, xử lý lỗi và phân tách rõ ràng các mối quan tâm trên nhiều command.

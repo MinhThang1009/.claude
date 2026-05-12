@@ -6,204 +6,204 @@ license: Complete terms in LICENSE.txt
 
 # Skill Creator
 
-This skill provides guidance for creating effective skills.
+Skill này cung cấp hướng dẫn để tạo các skill hiệu quả.
 
-## About Skills
+## Về Skill
 
-Skills are modular, self-contained packages that extend Claude's capabilities by providing
-specialized knowledge, workflows, and tools. Think of them as "onboarding guides" for specific
-domains or tasks—they transform Claude from a general-purpose agent into a specialized agent
-equipped with procedural knowledge that no model can fully possess.
+Skill là các gói modular, tự chứa giúp mở rộng khả năng của Claude bằng cách cung cấp
+kiến thức chuyên sâu, workflow và tool. Hãy nghĩ về chúng như "hướng dẫn onboarding" cho các
+domain hoặc tác vụ cụ thể — chúng biến Claude từ một agent đa năng thành một agent chuyên biệt
+được trang bị kiến thức thủ tục mà không một model nào có thể nắm giữ đầy đủ.
 
-### What Skills Provide
+### Skill Cung Cấp Gì
 
-1. Specialized workflows - Multi-step procedures for specific domains
-2. Tool integrations - Instructions for working with specific file formats or APIs
-3. Domain expertise - Company-specific knowledge, schemas, business logic
-4. Bundled resources - Scripts, references, and assets for complex and repetitive tasks
+1. Workflow chuyên biệt — Quy trình nhiều bước cho các domain cụ thể
+2. Tích hợp tool — Hướng dẫn làm việc với định dạng file hoặc API cụ thể
+3. Domain expertise — Kiến thức đặc thù công ty, schema, logic nghiệp vụ
+4. Tài nguyên đóng gói — Script, tài liệu tham chiếu và asset cho tác vụ phức tạp và lặp đi lặp lại
 
-### Anatomy of a Skill
+### Cấu Trúc Của Một Skill
 
-Every skill consists of a required SKILL.md file and optional bundled resources:
+Mỗi skill bao gồm một file SKILL.md bắt buộc và các tài nguyên đóng gói tùy chọn:
 
 ```
 skill-name/
-├── SKILL.md (required)
-│   ├── YAML frontmatter metadata (required)
-│   │   ├── name: (required)
-│   │   └── description: (required)
-│   └── Markdown instructions (required)
-└── Bundled Resources (optional)
-    ├── scripts/          - Executable code (Python/Bash/etc.)
-    ├── references/       - Documentation intended to be loaded into context as needed
-    └── assets/           - Files used in output (templates, icons, fonts, etc.)
+├── SKILL.md (bắt buộc)
+│   ├── Metadata YAML frontmatter (bắt buộc)
+│   │   ├── name: (bắt buộc)
+│   │   └── description: (bắt buộc)
+│   └── Hướng dẫn Markdown (bắt buộc)
+└── Bundled Resources (tùy chọn)
+    ├── scripts/          - Code có thể thực thi (Python/Bash/v.v.)
+    ├── references/       - Tài liệu được thiết kế để tải vào context khi cần
+    └── assets/           - File dùng trong output (template, icon, font, v.v.)
 ```
 
-#### SKILL.md (required)
+#### SKILL.md (bắt buộc)
 
-**Metadata Quality:** The `name` and `description` in YAML frontmatter determine when Claude will use the skill. Be specific about what the skill does and when to use it. Use the third-person (e.g. "This skill should be used when..." instead of "Use this skill when...").
+**Chất lượng Metadata:** `name` và `description` trong YAML frontmatter quyết định khi nào Claude sẽ sử dụng skill. Hãy cụ thể về skill làm gì và khi nào dùng nó. Dùng ngôi thứ ba (ví dụ: "This skill should be used when..." thay vì "Use this skill when...").
 
-#### Bundled Resources (optional)
+#### Bundled Resources (tùy chọn)
 
 ##### Scripts (`scripts/`)
 
-Executable code (Python/Bash/etc.) for tasks that require deterministic reliability or are repeatedly rewritten.
+Code có thể thực thi (Python/Bash/v.v.) cho các tác vụ đòi hỏi độ tin cậy xác định hoặc được viết đi viết lại nhiều lần.
 
-- **When to include**: When the same code is being rewritten repeatedly or deterministic reliability is needed
-- **Example**: `scripts/rotate_pdf.py` for PDF rotation tasks
-- **Benefits**: Token efficient, deterministic, may be executed without loading into context
-- **Note**: Scripts may still need to be read by Claude for patching or environment-specific adjustments
+- **Khi nào nên có**: Khi cùng một đoạn code được viết lại nhiều lần hoặc cần độ tin cậy xác định
+- **Ví dụ**: `scripts/rotate_pdf.py` cho tác vụ xoay PDF
+- **Lợi ích**: Tiết kiệm token, xác định, có thể thực thi mà không cần tải vào context
+- **Lưu ý**: Script vẫn có thể cần được Claude đọc để vá lỗi hoặc điều chỉnh theo môi trường cụ thể
 
 ##### References (`references/`)
 
-Documentation and reference material intended to be loaded as needed into context to inform Claude's process and thinking.
+Tài liệu và tài liệu tham chiếu được thiết kế để tải vào context khi cần, giúp thông tin và tư duy của Claude.
 
-- **When to include**: For documentation that Claude should reference while working
-- **Examples**: `references/finance.md` for financial schemas, `references/mnda.md` for company NDA template, `references/policies.md` for company policies, `references/api_docs.md` for API specifications
-- **Use cases**: Database schemas, API documentation, domain knowledge, company policies, detailed workflow guides
-- **Benefits**: Keeps SKILL.md lean, loaded only when Claude determines it's needed
-- **Best practice**: If files are large (>10k words), include grep search patterns in SKILL.md
-- **Avoid duplication**: Information should live in either SKILL.md or references files, not both. Prefer references files for detailed information unless it's truly core to the skill—this keeps SKILL.md lean while making information discoverable without hogging the context window. Keep only essential procedural instructions and workflow guidance in SKILL.md; move detailed reference material, schemas, and examples to references files.
+- **Khi nào nên có**: Cho tài liệu mà Claude nên tham chiếu trong khi làm việc
+- **Ví dụ**: `references/finance.md` cho schema tài chính, `references/mnda.md` cho template NDA của công ty, `references/policies.md` cho chính sách công ty, `references/api_docs.md` cho đặc tả API
+- **Trường hợp dùng**: Schema database, tài liệu API, kiến thức domain, chính sách công ty, hướng dẫn workflow chi tiết
+- **Lợi ích**: Giữ SKILL.md gọn nhẹ, chỉ tải khi Claude xác định cần thiết
+- **Nguyên tắc tốt nhất**: Nếu file lớn (>10k từ), hãy đưa vào SKILL.md các pattern grep để tìm kiếm
+- **Tránh trùng lặp**: Thông tin chỉ nên tồn tại ở SKILL.md hoặc file references, không cả hai. Ưu tiên file references cho thông tin chi tiết trừ khi nó thực sự là cốt lõi của skill — điều này giữ SKILL.md gọn nhẹ trong khi vẫn có thể khám phá thông tin mà không chiếm dụng context window. Chỉ giữ trong SKILL.md các hướng dẫn thủ tục thiết yếu và guidance workflow; chuyển tài liệu tham chiếu chi tiết, schema và ví dụ sang file references.
 
 ##### Assets (`assets/`)
 
-Files not intended to be loaded into context, but rather used within the output Claude produces.
+File không được thiết kế để tải vào context, mà được dùng trong output Claude tạo ra.
 
-- **When to include**: When the skill needs files that will be used in the final output
-- **Examples**: `assets/logo.png` for brand assets, `assets/slides.pptx` for PowerPoint templates, `assets/frontend-template/` for HTML/React boilerplate, `assets/font.ttf` for typography
-- **Use cases**: Templates, images, icons, boilerplate code, fonts, sample documents that get copied or modified
-- **Benefits**: Separates output resources from documentation, enables Claude to use files without loading them into context
+- **Khi nào nên có**: Khi skill cần file sẽ được dùng trong output cuối cùng
+- **Ví dụ**: `assets/logo.png` cho brand asset, `assets/slides.pptx` cho template PowerPoint, `assets/frontend-template/` cho boilerplate HTML/React, `assets/font.ttf` cho typography
+- **Trường hợp dùng**: Template, hình ảnh, icon, boilerplate code, font, tài liệu mẫu được sao chép hoặc chỉnh sửa
+- **Lợi ích**: Tách biệt tài nguyên output khỏi tài liệu, cho phép Claude dùng file mà không tải vào context
 
-### Progressive Disclosure Design Principle
+### Nguyên Tắc Thiết Kế Progressive Disclosure
 
-Skills use a three-level loading system to manage context efficiently:
+Skill dùng hệ thống tải ba cấp để quản lý context hiệu quả:
 
-1. **Metadata (name + description)** - Always in context (~100 words)
-2. **SKILL.md body** - When skill triggers (<5k words)
-3. **Bundled resources** - As needed by Claude (Unlimited*)
+1. **Metadata (name + description)** — Luôn trong context (~100 từ)
+2. **Body SKILL.md** — Khi skill kích hoạt (<5k từ)
+3. **Bundled resources** — Khi Claude cần (Không giới hạn*)
 
-*Unlimited because scripts can be executed without reading into context window.
+*Không giới hạn vì script có thể thực thi mà không cần đọc vào context window.
 
-## Skill Creation Process
+## Quy Trình Tạo Skill
 
-To create a skill, follow the "Skill Creation Process" in order, skipping steps only if there is a clear reason why they are not applicable.
+Để tạo một skill, hãy thực hiện theo "Quy Trình Tạo Skill" theo thứ tự, bỏ qua bước chỉ khi có lý do rõ ràng chúng không áp dụng được.
 
-### Step 1: Understanding the Skill with Concrete Examples
+### Bước 1: Hiểu Skill Qua Ví Dụ Cụ Thể
 
-Skip this step only when the skill's usage patterns are already clearly understood. It remains valuable even when working with an existing skill.
+Bỏ qua bước này chỉ khi các pattern sử dụng của skill đã được hiểu rõ. Bước này vẫn có giá trị ngay cả khi làm việc với skill đã tồn tại.
 
-To create an effective skill, clearly understand concrete examples of how the skill will be used. This understanding can come from either direct user examples or generated examples that are validated with user feedback.
+Để tạo một skill hiệu quả, hãy hiểu rõ các ví dụ cụ thể về cách skill sẽ được sử dụng. Sự hiểu biết này có thể đến từ ví dụ trực tiếp của người dùng hoặc ví dụ được tạo ra và được validate bởi phản hồi của người dùng.
 
-For example, when building an image-editor skill, relevant questions include:
+Ví dụ, khi xây dựng skill image-editor, các câu hỏi liên quan bao gồm:
 
-- "What functionality should the image-editor skill support? Editing, rotating, anything else?"
-- "Can you give some examples of how this skill would be used?"
-- "I can imagine users asking for things like 'Remove the red-eye from this image' or 'Rotate this image'. Are there other ways you imagine this skill being used?"
-- "What would a user say that should trigger this skill?"
+- "Skill image-editor nên hỗ trợ chức năng gì? Chỉnh sửa, xoay, hay gì khác không?"
+- "Bạn có thể cho vài ví dụ về cách skill này sẽ được sử dụng không?"
+- "Tôi có thể hình dung người dùng sẽ yêu cầu như 'Xóa mắt đỏ trong ảnh này' hay 'Xoay ảnh này'. Bạn có nghĩ đến cách dùng nào khác không?"
+- "Người dùng sẽ nói gì để kích hoạt skill này?"
 
-To avoid overwhelming users, avoid asking too many questions in a single message. Start with the most important questions and follow up as needed for better effectiveness.
+Để tránh làm người dùng choáng ngợp, không hỏi quá nhiều câu hỏi trong một tin nhắn. Bắt đầu với câu hỏi quan trọng nhất và hỏi thêm khi cần để hiệu quả hơn.
 
-Conclude this step when there is a clear sense of the functionality the skill should support.
+Kết thúc bước này khi đã có cảm nhận rõ ràng về chức năng mà skill cần hỗ trợ.
 
-### Step 2: Planning the Reusable Skill Contents
+### Bước 2: Lên Kế Hoạch Nội Dung Skill Có Thể Tái Sử Dụng
 
-To turn concrete examples into an effective skill, analyze each example by:
+Để biến ví dụ cụ thể thành một skill hiệu quả, hãy phân tích từng ví dụ bằng cách:
 
-1. Considering how to execute on the example from scratch
-2. Identifying what scripts, references, and assets would be helpful when executing these workflows repeatedly
+1. Cân nhắc cách thực hiện ví dụ từ đầu
+2. Xác định script, references và asset nào sẽ hữu ích khi thực hiện các workflow này lặp đi lặp lại
 
-Example: When building a `pdf-editor` skill to handle queries like "Help me rotate this PDF," the analysis shows:
+Ví dụ: Khi xây dựng skill `pdf-editor` để xử lý query như "Giúp tôi xoay PDF này," việc phân tích cho thấy:
 
-1. Rotating a PDF requires re-writing the same code each time
-2. A `scripts/rotate_pdf.py` script would be helpful to store in the skill
+1. Xoay PDF yêu cầu viết lại cùng đoạn code mỗi lần
+2. Script `scripts/rotate_pdf.py` sẽ hữu ích để lưu trong skill
 
-Example: When designing a `frontend-webapp-builder` skill for queries like "Build me a todo app" or "Build me a dashboard to track my steps," the analysis shows:
+Ví dụ: Khi thiết kế skill `frontend-webapp-builder` cho query như "Xây cho tôi một todo app" hoặc "Xây cho tôi một dashboard theo dõi bước chân," việc phân tích cho thấy:
 
-1. Writing a frontend webapp requires the same boilerplate HTML/React each time
-2. An `assets/hello-world/` template containing the boilerplate HTML/React project files would be helpful to store in the skill
+1. Viết frontend webapp yêu cầu cùng boilerplate HTML/React mỗi lần
+2. Template `assets/hello-world/` chứa boilerplate HTML/React sẽ hữu ích để lưu trong skill
 
-Example: When building a `big-query` skill to handle queries like "How many users have logged in today?" the analysis shows:
+Ví dụ: Khi xây dựng skill `big-query` để xử lý query như "Hôm nay có bao nhiêu user đã đăng nhập?" việc phân tích cho thấy:
 
-1. Querying BigQuery requires re-discovering the table schemas and relationships each time
-2. A `references/schema.md` file documenting the table schemas would be helpful to store in the skill
+1. Truy vấn BigQuery yêu cầu khám phá lại schema và mối quan hệ bảng mỗi lần
+2. File `references/schema.md` ghi lại schema bảng sẽ hữu ích để lưu trong skill
 
-To establish the skill's contents, analyze each concrete example to create a list of the reusable resources to include: scripts, references, and assets.
+Để xây dựng nội dung skill, hãy phân tích từng ví dụ cụ thể để tạo danh sách tài nguyên tái sử dụng cần có: script, references và assets.
 
-### Step 3: Initializing the Skill
+### Bước 3: Khởi Tạo Skill
 
-At this point, it is time to actually create the skill.
+Đến bước này, đã đến lúc thực sự tạo skill.
 
-Skip this step only if the skill being developed already exists, and iteration or packaging is needed. In this case, continue to the next step.
+Bỏ qua bước này chỉ khi skill đang được phát triển đã tồn tại và cần lặp lại hoặc đóng gói. Trong trường hợp đó, hãy chuyển sang bước tiếp theo.
 
-When creating a new skill from scratch, always run the `init_skill.py` script. The script conveniently generates a new template skill directory that automatically includes everything a skill requires, making the skill creation process much more efficient and reliable.
+Khi tạo skill mới từ đầu, luôn chạy script `init_skill.py`. Script này tiện lợi tạo ra thư mục template skill mới tự động bao gồm mọi thứ skill cần, giúp quá trình tạo skill hiệu quả và đáng tin cậy hơn nhiều.
 
-Usage:
+Cách dùng:
 
 ```bash
 scripts/init_skill.py <skill-name> --path <output-directory>
 ```
 
-The script:
+Script sẽ:
 
-- Creates the skill directory at the specified path
-- Generates a SKILL.md template with proper frontmatter and TODO placeholders
-- Creates example resource directories: `scripts/`, `references/`, and `assets/`
-- Adds example files in each directory that can be customized or deleted
+- Tạo thư mục skill tại đường dẫn được chỉ định
+- Tạo template SKILL.md với frontmatter đúng và placeholder TODO
+- Tạo thư mục tài nguyên mẫu: `scripts/`, `references/`, và `assets/`
+- Thêm file mẫu trong mỗi thư mục có thể tùy chỉnh hoặc xóa
 
-After initialization, customize or remove the generated SKILL.md and example files as needed.
+Sau khi khởi tạo, hãy tùy chỉnh hoặc xóa SKILL.md đã tạo và các file mẫu khi cần.
 
-### Step 4: Edit the Skill
+### Bước 4: Chỉnh Sửa Skill
 
-When editing the (newly-generated or existing) skill, remember that the skill is being created for another instance of Claude to use. Focus on including information that would be beneficial and non-obvious to Claude. Consider what procedural knowledge, domain-specific details, or reusable assets would help another Claude instance execute these tasks more effectively.
+Khi chỉnh sửa skill (mới tạo hoặc đã tồn tại), hãy nhớ rằng skill đang được tạo cho một instance Claude khác sử dụng. Tập trung vào việc đưa vào thông tin sẽ hữu ích và không hiển nhiên với Claude. Hãy cân nhắc kiến thức thủ tục, chi tiết đặc thù domain hoặc asset tái sử dụng nào sẽ giúp instance Claude khác thực thi các tác vụ này hiệu quả hơn.
 
-#### Start with Reusable Skill Contents
+#### Bắt Đầu với Nội Dung Skill Tái Sử Dụng
 
-To begin implementation, start with the reusable resources identified above: `scripts/`, `references/`, and `assets/` files. Note that this step may require user input. For example, when implementing a `brand-guidelines` skill, the user may need to provide brand assets or templates to store in `assets/`, or documentation to store in `references/`.
+Để bắt đầu triển khai, hãy bắt đầu với các tài nguyên tái sử dụng đã xác định ở trên: file `scripts/`, `references/` và `assets/`. Lưu ý bước này có thể cần input từ người dùng. Ví dụ, khi triển khai skill `brand-guidelines`, người dùng có thể cần cung cấp brand asset hoặc template để lưu trong `assets/`, hoặc tài liệu để lưu trong `references/`.
 
-Also, delete any example files and directories not needed for the skill. The initialization script creates example files in `scripts/`, `references/`, and `assets/` to demonstrate structure, but most skills won't need all of them.
+Ngoài ra, hãy xóa các file mẫu và thư mục không cần thiết cho skill. Script khởi tạo tạo file mẫu trong `scripts/`, `references/` và `assets/` để minh họa cấu trúc, nhưng hầu hết skill sẽ không cần tất cả.
 
-#### Update SKILL.md
+#### Cập Nhật SKILL.md
 
-**Writing Style:** Write the entire skill using **imperative/infinitive form** (verb-first instructions), not second person. Use objective, instructional language (e.g., "To accomplish X, do Y" rather than "You should do X" or "If you need to do X"). This maintains consistency and clarity for AI consumption.
+**Phong cách viết:** Viết toàn bộ skill theo **dạng imperative/infinitive (hướng dẫn bắt đầu bằng động từ)**, không dùng ngôi thứ hai. Dùng ngôn ngữ khách quan, mang tính hướng dẫn (ví dụ: "To accomplish X, do Y" thay vì "You should do X" hay "If you need to do X"). Điều này duy trì sự nhất quán và rõ ràng cho AI sử dụng.
 
-To complete SKILL.md, answer the following questions:
+Để hoàn thành SKILL.md, hãy trả lời các câu hỏi sau:
 
-1. What is the purpose of the skill, in a few sentences?
-2. When should the skill be used?
-3. In practice, how should Claude use the skill? All reusable skill contents developed above should be referenced so that Claude knows how to use them.
+1. Mục đích của skill là gì, trong vài câu?
+2. Khi nào skill nên được sử dụng?
+3. Trên thực tế, Claude nên sử dụng skill như thế nào? Tất cả nội dung skill tái sử dụng đã phát triển ở trên đều phải được tham chiếu để Claude biết cách dùng chúng.
 
-### Step 5: Packaging a Skill
+### Bước 5: Đóng Gói Skill
 
-Once the skill is ready, it should be packaged into a distributable zip file that gets shared with the user. The packaging process automatically validates the skill first to ensure it meets all requirements:
+Khi skill đã sẵn sàng, nó nên được đóng gói thành file zip có thể phân phối để chia sẻ với người dùng. Quá trình đóng gói tự động validate skill trước để đảm bảo đáp ứng mọi yêu cầu:
 
 ```bash
 scripts/package_skill.py <path/to/skill-folder>
 ```
 
-Optional output directory specification:
+Chỉ định thư mục output tùy chọn:
 
 ```bash
 scripts/package_skill.py <path/to/skill-folder> ./dist
 ```
 
-The packaging script will:
+Script đóng gói sẽ:
 
-1. **Validate** the skill automatically, checking:
-   - YAML frontmatter format and required fields
-   - Skill naming conventions and directory structure
-   - Description completeness and quality
-   - File organization and resource references
+1. **Validate** skill tự động, kiểm tra:
+   - Định dạng YAML frontmatter và các trường bắt buộc
+   - Quy ước đặt tên skill và cấu trúc thư mục
+   - Tính đầy đủ và chất lượng của description
+   - Tổ chức file và tham chiếu tài nguyên
 
-2. **Package** the skill if validation passes, creating a zip file named after the skill (e.g., `my-skill.zip`) that includes all files and maintains the proper directory structure for distribution.
+2. **Đóng gói** skill nếu validation pass, tạo file zip được đặt tên theo skill (ví dụ: `my-skill.zip`) bao gồm tất cả file và duy trì cấu trúc thư mục đúng để phân phối.
 
-If validation fails, the script will report the errors and exit without creating a package. Fix any validation errors and run the packaging command again.
+Nếu validation thất bại, script sẽ báo lỗi và thoát mà không tạo gói. Sửa các lỗi validation và chạy lại lệnh đóng gói.
 
-### Step 6: Iterate
+### Bước 6: Lặp Lại
 
-After testing the skill, users may request improvements. Often this happens right after using the skill, with fresh context of how the skill performed.
+Sau khi kiểm thử skill, người dùng có thể yêu cầu cải thiện. Điều này thường xảy ra ngay sau khi dùng skill, với context còn tươi về cách skill đã hoạt động.
 
-**Iteration workflow:**
-1. Use the skill on real tasks
-2. Notice struggles or inefficiencies
-3. Identify how SKILL.md or bundled resources should be updated
-4. Implement changes and test again
+**Workflow lặp lại:**
+1. Dùng skill trên tác vụ thực tế
+2. Nhận thấy những khó khăn hoặc kém hiệu quả
+3. Xác định SKILL.md hoặc bundled resources cần cập nhật như thế nào
+4. Triển khai thay đổi và kiểm thử lại

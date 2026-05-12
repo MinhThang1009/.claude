@@ -1,6 +1,6 @@
 # Remote Streamable-HTTP MCP Server — Scaffold
 
-Minimal working servers in both recommended frameworks. Start here, then add tools.
+Các server hoạt động tối giản trong cả hai framework được khuyến nghị. Bắt đầu từ đây, sau đó thêm tool.
 
 ---
 
@@ -25,7 +25,7 @@ const server = new McpServer(
   { instructions: "Prefer search_items before calling get_item directly — IDs aren't guessable." },
 );
 
-// Pattern A: one tool per action
+// Pattern A: một tool cho một action
 server.registerTool(
   "search_items",
   {
@@ -37,7 +37,7 @@ server.registerTool(
     annotations: { readOnlyHint: true },
   },
   async ({ query, limit }, extra) => {
-    // extra.signal is an AbortSignal — check it in long loops for cancellation
+    // extra.signal là AbortSignal — kiểm tra nó trong vòng lặp dài để xử lý cancellation
     const results = await upstreamApi.search(query, limit);
     return {
       content: [{ type: "text", text: JSON.stringify(results, null, 2) }],
@@ -58,7 +58,7 @@ server.registerTool(
   },
 );
 
-// Streamable HTTP transport (stateless mode — simplest)
+// Streamable HTTP transport (chế độ stateless — đơn giản nhất)
 const app = express();
 app.use(express.json());
 
@@ -74,7 +74,7 @@ app.post("/mcp", async (req, res) => {
 app.listen(process.env.PORT ?? 3000);
 ```
 
-**Stateless vs stateful:** The snippet above creates a fresh transport per request (stateless). Fine for most API-wrapping servers. If tools need to share state across calls in a session (rare), use a session-keyed transport map — see the SDK's `examples/server/simpleStreamableHttp.ts`.
+**Stateless vs stateful:** Đoạn code trên tạo transport mới cho mỗi request (stateless). Ổn cho hầu hết server bọc API. Nếu các tool cần chia sẻ state qua nhiều call trong một session (hiếm gặp), dùng session-keyed transport map — xem `examples/server/simpleStreamableHttp.ts` trong SDK.
 
 ---
 
@@ -108,13 +108,13 @@ if __name__ == "__main__":
     mcp.run(transport="http", host="0.0.0.0", port=3000)
 ```
 
-FastMCP derives the JSON schema from type hints and the docstring becomes the tool description. Keep docstrings terse and action-oriented — they land in Claude's context window verbatim.
+FastMCP tự suy ra JSON schema từ type hint và docstring trở thành mô tả tool. Giữ docstring ngắn gọn và hướng đến hành động — chúng được đưa vào context window của Claude nguyên văn.
 
 ---
 
-## Search + execute pattern (large API surface)
+## Pattern search + execute (API surface lớn)
 
-When wrapping 50+ endpoints, don't register them all. Two tools:
+Khi bọc 50+ endpoint, đừng đăng ký tất cả. Dùng hai tool:
 
 ```typescript
 const CATALOG = loadActionCatalog(); // { id, description, paramSchema }[]
@@ -151,21 +151,21 @@ server.registerTool(
 );
 ```
 
-`rankActions` can be simple keyword matching to start. Upgrade to embeddings if precision matters.
+`rankActions` có thể bắt đầu đơn giản bằng keyword matching. Nâng cấp lên embedding nếu độ chính xác quan trọng.
 
 ---
 
-## Test it
+## Kiểm thử
 
-The MCP Inspector connects to any transport and lets you poke tools interactively.
+MCP Inspector kết nối tới bất kỳ transport nào và cho phép bạn thao tác với tool theo cách tương tác.
 
 ```bash
-# Interactive — opens a UI on localhost:6274
+# Tương tác — mở UI tại localhost:6274
 npx @modelcontextprotocol/inspector
-# → select "Streamable HTTP", paste http://localhost:3000/mcp, Connect
+# → chọn "Streamable HTTP", dán http://localhost:3000/mcp, Connect
 ```
 
-For scripted checks (CI, smoke tests):
+Để kiểm tra tự động (CI, smoke test):
 
 ```bash
 npx @modelcontextprotocol/inspector --cli http://localhost:3000/mcp \
@@ -177,35 +177,35 @@ npx @modelcontextprotocol/inspector --cli http://localhost:3000/mcp \
 
 ---
 
-## Connect users
+## Kết nối user
 
-Once deployed, users add the URL directly — no install step.
+Sau khi deploy, user thêm URL trực tiếp — không cần bước install.
 
-| Surface | How |
+| Bề mặt | Cách làm |
 |---|---|
-| **Claude Code** | `claude mcp add --transport http <name> <url>` (add `--scope user` for global, `--header "Authorization: Bearer ..."` for auth) |
-| **Claude Desktop / Claude.ai** | Settings → Connectors → Add custom connector. **Not** `claude_desktop_config.json` — remote servers configured there are ignored. |
-| **Connector directory** | Anthropic maintains a submission guide for listing in the public connector directory. |
+| **Claude Code** | `claude mcp add --transport http <name> <url>` (thêm `--scope user` để global, `--header "Authorization: Bearer ..."` để auth) |
+| **Claude Desktop / Claude.ai** | Settings → Connectors → Add custom connector. **Không** dùng `claude_desktop_config.json` — remote server được cấu hình ở đó sẽ bị bỏ qua. |
+| **Connector directory** | Anthropic có hướng dẫn nộp để được liệt kê trong public connector directory. |
 
 ---
 
 ## Deploy
 
-**Fastest path:** Cloudflare Workers — two commands from zero to a live `https://` URL on the free tier. Uses a Workers-native scaffold (not Express). → `deploy-cloudflare-workers.md`
+**Con đường nhanh nhất:** Cloudflare Workers — hai lệnh từ zero đến URL `https://` live trên free tier. Dùng scaffold native của Workers (không phải Express). → `deploy-cloudflare-workers.md`
 
-**This Express scaffold** runs on any Node host — Render, Railway, Fly.io, a VPS. Containerize it (`node:20-slim`, copy, `npm ci`, `node dist/server.js`) and ship. FastMCP is the same story with a Python base image.
+**Express scaffold này** chạy trên bất kỳ Node host nào — Render, Railway, Fly.io, VPS. Container hóa nó (`node:20-slim`, copy, `npm ci`, `node dist/server.js`) và ship. FastMCP là câu chuyện tương tự với Python base image.
 
 ---
 
-## Deployment checklist
+## Checklist trước khi deploy
 
-- [ ] `POST /mcp` responds to `initialize` with server capabilities
-- [ ] `tools/list` returns your tools with complete schemas
-- [ ] Errors return structured MCP errors, not HTTP 500s with HTML bodies
-- [ ] CORS headers set if browser clients will connect
-- [ ] `Origin` header validated on `/mcp` (spec MUST — DNS rebinding prevention)
-- [ ] `MCP-Protocol-Version` header honored (return 400 for unsupported versions)
-- [ ] `instructions` field set if tool-use needs hints
-- [ ] Health check endpoint separate from `/mcp` (hosts poll it)
-- [ ] Secrets from env vars, never hardcoded
-- [ ] If OAuth: CIMD or DCR endpoint implemented — see `auth.md`
+- [ ] `POST /mcp` phản hồi `initialize` với server capabilities
+- [ ] `tools/list` trả về tool của bạn với schema đầy đủ
+- [ ] Lỗi trả về MCP error có cấu trúc, không phải HTTP 500 với body HTML
+- [ ] CORS header được set nếu browser client sẽ kết nối
+- [ ] Header `Origin` được validate trên `/mcp` (MUST theo spec — ngăn DNS rebinding)
+- [ ] Header `MCP-Protocol-Version` được tôn trọng (trả về 400 với version không hỗ trợ)
+- [ ] Field `instructions` được set nếu việc dùng tool cần gợi ý
+- [ ] Health check endpoint tách biệt với `/mcp` (host poll endpoint này)
+- [ ] Secret lấy từ env var, không bao giờ hardcode
+- [ ] Nếu dùng OAuth: CIMD hoặc DCR endpoint đã được implement — xem `auth.md`

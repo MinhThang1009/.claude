@@ -1,47 +1,47 @@
-# Plugin Recommendations
+# Gợi Ý Plugin
 
-Plugins are installable collections of skills, commands, agents, and hooks. Install via `/plugin install`.
+Plugin là các bộ sưu tập có thể cài đặt, bao gồm skill, command, agent và hook. Cài đặt qua `/plugin install`.
 
-**Note**: These are plugins from the official repository. Use web search to discover additional community plugins.
+**Lưu ý**: Đây là các plugin từ repository chính thức. Dùng web search để khám phá thêm plugin từ cộng đồng.
 
 ---
 
-## Official Plugins
+## Plugin Chính Thức
 
-### Development & Code Quality
+### Phát Triển & Chất Lượng Code
 
-| Plugin | Best For | Key Features |
+| Plugin | Phù hợp nhất cho | Tính năng chính |
 |--------|----------|--------------|
-| **plugin-dev** | Building Claude Code plugins | Skills for creating skills, hooks, commands, agents |
-| **pr-review-toolkit** | PR review workflows | Specialized review agents (code, tests, types) |
-| **code-review** | Automated code review | Multi-agent review with confidence scoring |
-| **code-simplifier** | Code refactoring | Simplify code while preserving functionality |
-| **feature-dev** | Feature development | End-to-end feature workflow with agents |
+| **plugin-dev** | Xây dựng plugin Claude Code | Skill để tạo skill, hook, command, agent |
+| **pr-review-toolkit** | Workflow review PR | Các agent review chuyên biệt (code, test, kiểu) |
+| **code-review** | Review code tự động | Multi-agent review với điểm độ tin cậy |
+| **code-simplifier** | Refactoring code | Đơn giản hóa code trong khi giữ nguyên chức năng |
+| **feature-dev** | Phát triển tính năng | Workflow tính năng end-to-end với agent |
 
 ### Git & Workflow
 
-| Plugin | Best For | Key Features |
+| Plugin | Phù hợp nhất cho | Tính năng chính |
 |--------|----------|--------------|
-| **commit-commands** | Git workflows | /commit, /commit-push-pr commands |
-| **hookify** | Automation rules | Create hooks from conversation patterns |
+| **commit-commands** | Workflow Git | Các command /commit, /commit-push-pr |
+| **hookify** | Quy tắc tự động hóa | Tạo hook từ pattern hội thoại |
 
 ### Frontend
 
-| Plugin | Best For | Key Features |
+| Plugin | Phù hợp nhất cho | Tính năng chính |
 |--------|----------|--------------|
-| **frontend-design** | UI development | Production-grade UI, avoids generic aesthetics |
+| **frontend-design** | Phát triển UI | UI chất lượng production, tránh thiết kế chung chung |
 
-### Learning & Guidance
+### Học Tập & Hướng Dẫn
 
-| Plugin | Best For | Key Features |
+| Plugin | Phù hợp nhất cho | Tính năng chính |
 |--------|----------|--------------|
-| **explanatory-output-style** | Learning | Educational insights about code choices |
-| **learning-output-style** | Interactive learning | Requests contributions at decision points |
-| **security-guidance** | Security awareness | Warns about security issues when editing |
+| **explanatory-output-style** | Học tập | Giải thích có tính giáo dục về các lựa chọn code |
+| **learning-output-style** | Học tương tác | Yêu cầu đóng góp tại các điểm quyết định |
+| **security-guidance** | Nhận thức bảo mật | Cảnh báo về vấn đề bảo mật khi chỉnh sửa |
 
-### Language Servers (LSP)
+### Language Server (LSP)
 
-| Plugin | Language |
+| Plugin | Ngôn ngữ |
 |--------|----------|
 | **typescript-lsp** | TypeScript/JavaScript |
 | **pyright-lsp** | Python |
@@ -57,42 +57,42 @@ Plugins are installable collections of skills, commands, agents, and hooks. Inst
 
 ---
 
-## Quick Reference: Codebase → Plugin
+## Tham Khảo Nhanh: Codebase → Plugin
 
-| Codebase Signal | Recommended Plugin |
+| Dấu hiệu Codebase | Plugin Khuyến Nghị |
 |-----------------|-------------------|
-| Building plugins | plugin-dev |
-| PR-based workflow | pr-review-toolkit |
-| Git commits | commit-commands |
+| Đang xây dựng plugin | plugin-dev |
+| Workflow theo PR | pr-review-toolkit |
+| Commit git | commit-commands |
 | React/Vue/Angular | frontend-design |
-| Want automation rules | hookify |
-| TypeScript project | typescript-lsp |
-| Python project | pyright-lsp |
-| Go project | gopls-lsp |
-| Security-sensitive code | security-guidance |
-| Learning/onboarding | explanatory-output-style |
+| Muốn quy tắc tự động hóa | hookify |
+| Project TypeScript | typescript-lsp |
+| Project Python | pyright-lsp |
+| Project Go | gopls-lsp |
+| Code nhạy cảm về bảo mật | security-guidance |
+| Học tập/onboarding | explanatory-output-style |
 
 ---
 
-## Plugin Management
+## Quản Lý Plugin
 
 ```bash
-# Install a plugin
+# Cài đặt plugin
 /plugin install <plugin-name>
 
-# List installed plugins
+# Liệt kê plugin đã cài
 /plugin list
 
-# View plugin details
+# Xem chi tiết plugin
 /plugin info <plugin-name>
 ```
 
 ---
 
-## When to Recommend Plugins
+## Khi Nào Nên Khuyến Nghị Plugin
 
-**Recommend plugin installation when:**
-- User wants to install Claude Code automations from Anthropic's official repository or another shared marketplace
-- User needs multiple related capabilities
-- Team wants standardized workflows
-- First-time Claude Code setup
+**Khuyến nghị cài đặt plugin khi:**
+- Người dùng muốn cài automation cho Claude Code từ repository chính thức của Anthropic hoặc marketplace chia sẻ khác
+- Người dùng cần nhiều tính năng liên quan với nhau
+- Team muốn workflow chuẩn hóa
+- Lần đầu cài đặt Claude Code

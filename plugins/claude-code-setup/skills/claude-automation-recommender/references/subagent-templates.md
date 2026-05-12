@@ -1,156 +1,156 @@
-# Subagent Recommendations
+# Gợi Ý Subagent
 
-Subagents are specialized Claude instances that run in parallel, each with their own context window and tool access. They're ideal for focused reviews, analysis, or generation tasks.
+Subagent là các phiên bản Claude chuyên biệt chạy song song, mỗi cái có context window và quyền truy cập tool riêng. Chúng lý tưởng cho các tác vụ review, phân tích, hoặc tạo nội dung tập trung.
 
-**Note**: These are common patterns. Design custom subagents based on the codebase's specific review and analysis needs.
+**Lưu ý**: Đây là các pattern phổ biến. Thiết kế subagent tùy chỉnh dựa trên nhu cầu review và phân tích cụ thể của codebase.
 
-## Code Review Agents
+## Agent Review Code
 
 ### code-reviewer
-**Best for**: Automated code quality checks on large codebases
+**Phù hợp nhất cho**: Kiểm tra chất lượng code tự động trên codebase lớn
 
-| Recommend When | Detection |
+| Khuyến nghị khi | Phát hiện |
 |----------------|-----------|
-| Large codebase (>500 files) | File count |
-| Frequent code changes | Active development |
-| Team wants consistent review | Quality focus |
+| Codebase lớn (>500 file) | Số lượng file |
+| Thay đổi code thường xuyên | Đang phát triển tích cực |
+| Team muốn review nhất quán | Tập trung vào chất lượng |
 
-**Value**: Runs code review in parallel while you continue working
-**Model**: sonnet (balanced quality/speed)
+**Giá trị**: Chạy review code song song trong khi bạn tiếp tục làm việc
+**Model**: sonnet (cân bằng chất lượng/tốc độ)
 **Tools**: Read, Grep, Glob, Bash
 
 ---
 
 ### security-reviewer
-**Best for**: Security-focused code review
+**Phù hợp nhất cho**: Review code tập trung vào bảo mật
 
-| Recommend When | Detection |
+| Khuyến nghị khi | Phát hiện |
 |----------------|-----------|
-| Auth code present | `auth/`, `login`, `session` patterns |
-| Payment processing | `stripe`, `payment`, `billing` patterns |
-| User data handling | `user`, `profile`, `pii` patterns |
-| API keys in code | Environment variable patterns |
+| Có code auth | Pattern `auth/`, `login`, `session` |
+| Xử lý thanh toán | Pattern `stripe`, `payment`, `billing` |
+| Xử lý dữ liệu người dùng | Pattern `user`, `profile`, `pii` |
+| API key trong code | Pattern biến môi trường |
 
-**Value**: Catches OWASP vulnerabilities, auth issues, data exposure
+**Giá trị**: Phát hiện lỗ hổng OWASP, vấn đề auth, lộ dữ liệu
 **Model**: sonnet
-**Tools**: Read, Grep, Glob (read-only for safety)
+**Tools**: Read, Grep, Glob (chỉ đọc để đảm bảo an toàn)
 
 ---
 
 ### test-writer
-**Best for**: Generating comprehensive test coverage
+**Phù hợp nhất cho**: Tạo test coverage toàn diện
 
-| Recommend When | Detection |
+| Khuyến nghị khi | Phát hiện |
 |----------------|-----------|
-| Low test coverage | Few test files vs source files |
-| Test suite exists | `tests/`, `__tests__/` present |
-| Testing framework configured | jest, pytest, vitest in deps |
+| Coverage test thấp | Ít file test so với file source |
+| Có test suite | Thư mục `tests/`, `__tests__/` tồn tại |
+| Đã cấu hình testing framework | jest, pytest, vitest trong deps |
 
-**Value**: Generates tests matching project conventions
+**Giá trị**: Tạo test theo convention của project
 **Model**: sonnet
 **Tools**: Read, Write, Grep, Glob
 
 ---
 
-## Specialized Agents
+## Agent Chuyên Biệt
 
 ### api-documenter
-**Best for**: API documentation generation
+**Phù hợp nhất cho**: Tạo API documentation
 
-| Recommend When | Detection |
+| Khuyến nghị khi | Phát hiện |
 |----------------|-----------|
-| REST endpoints | Express routes, FastAPI paths |
-| GraphQL schema | `.graphql` files |
-| OpenAPI exists | `openapi.yaml`, `swagger.json` |
-| Undocumented APIs | Routes without docs |
+| Có REST endpoint | Express route, FastAPI path |
+| GraphQL schema | File `.graphql` |
+| OpenAPI đã có | `openapi.yaml`, `swagger.json` |
+| API chưa có tài liệu | Route không có docs |
 
-**Value**: Generates OpenAPI specs, endpoint documentation
+**Giá trị**: Tạo OpenAPI spec, tài liệu endpoint
 **Model**: sonnet
 **Tools**: Read, Write, Grep, Glob
 
 ---
 
 ### performance-analyzer
-**Best for**: Finding performance bottlenecks
+**Phù hợp nhất cho**: Tìm bottleneck hiệu năng
 
-| Recommend When | Detection |
+| Khuyến nghị khi | Phát hiện |
 |----------------|-----------|
-| Database queries | ORM usage, raw SQL |
-| High-traffic code | API endpoints, hot paths |
-| Performance complaints | User reports slowness |
-| Complex algorithms | Nested loops, recursion |
+| Có database query | ORM, raw SQL |
+| Code có lưu lượng cao | API endpoint, hot path |
+| Phàn nàn về hiệu năng | Người dùng báo chậm |
+| Thuật toán phức tạp | Nested loop, đệ quy |
 
-**Value**: Finds N+1 queries, O(n²) algorithms, memory leaks
+**Giá trị**: Tìm N+1 query, thuật toán O(n²), memory leak
 **Model**: sonnet
 **Tools**: Read, Grep, Glob, Bash
 
 ---
 
 ### ui-reviewer
-**Best for**: Frontend accessibility and UX review
+**Phù hợp nhất cho**: Review accessibility và UX frontend
 
-| Recommend When | Detection |
+| Khuyến nghị khi | Phát hiện |
 |----------------|-----------|
-| React/Vue/Angular | Frontend framework detected |
-| Component library | `components/` directory |
-| User-facing UI | Not just API project |
+| React/Vue/Angular | Phát hiện frontend framework |
+| Thư viện component | Thư mục `components/` |
+| UI hướng người dùng | Không chỉ là project API |
 
-**Value**: Catches accessibility issues, UX problems, responsive design gaps
+**Giá trị**: Phát hiện vấn đề accessibility, UX, thiếu responsive design
 **Model**: sonnet
 **Tools**: Read, Grep, Glob
 
 ---
 
-## Utility Agents
+## Agent Tiện Ích
 
 ### dependency-updater
-**Best for**: Safe dependency updates
+**Phù hợp nhất cho**: Cập nhật dependency an toàn
 
-| Recommend When | Detection |
+| Khuyến nghị khi | Phát hiện |
 |----------------|-----------|
-| Outdated deps | `npm outdated` has results |
-| Security advisories | `npm audit` warnings |
-| Major version behind | Significant version gaps |
+| Dep lỗi thời | `npm outdated` có kết quả |
+| Cảnh báo bảo mật | `npm audit` có cảnh báo |
+| Chênh lệch major version lớn | Khoảng cách version đáng kể |
 
-**Value**: Updates dependencies incrementally with testing
+**Giá trị**: Cập nhật dependency từng bước kèm kiểm thử
 **Model**: sonnet
 **Tools**: Read, Write, Bash, Grep
 
 ---
 
 ### migration-helper
-**Best for**: Framework/version migrations
+**Phù hợp nhất cho**: Migration framework/version
 
-| Recommend When | Detection |
+| Khuyến nghị khi | Phát hiện |
 |----------------|-----------|
-| Major upgrade needed | Framework version very old |
-| Breaking changes coming | Deprecation warnings |
-| Refactoring planned | Architectural changes |
+| Cần nâng cấp major | Version framework quá cũ |
+| Sắp có breaking change | Cảnh báo deprecation |
+| Lên kế hoạch refactoring | Thay đổi kiến trúc |
 
-**Value**: Plans and executes migrations incrementally
-**Model**: opus (complex reasoning needed)
+**Giá trị**: Lên kế hoạch và thực hiện migration từng bước
+**Model**: opus (cần suy luận phức tạp)
 **Tools**: Read, Write, Grep, Glob, Bash
 
 ---
 
-## Quick Reference: Detection → Recommendation
+## Tham Khảo Nhanh: Phát Hiện → Gợi Ý
 
-| If You See | Recommend Subagent |
+| Nếu thấy | Khuyến nghị Subagent |
 |------------|-------------------|
-| Large codebase | code-reviewer |
-| Auth/payment code | security-reviewer |
-| Few tests | test-writer |
-| API routes | api-documenter |
-| Database heavy | performance-analyzer |
-| Frontend components | ui-reviewer |
-| Outdated packages | dependency-updater |
-| Old framework version | migration-helper |
+| Codebase lớn | code-reviewer |
+| Code auth/thanh toán | security-reviewer |
+| Ít test | test-writer |
+| API route | api-documenter |
+| Nhiều database | performance-analyzer |
+| Component frontend | ui-reviewer |
+| Package lỗi thời | dependency-updater |
+| Framework cũ | migration-helper |
 
 ---
 
-## Subagent Placement
+## Vị Trí Đặt Subagent
 
-Subagents go in `.claude/agents/`:
+Subagent đặt trong `.claude/agents/`:
 
 ```
 .claude/
@@ -162,20 +162,20 @@ Subagents go in `.claude/agents/`:
 
 ---
 
-## Model Selection Guide
+## Hướng Dẫn Chọn Model
 
-| Model | Best For | Trade-off |
+| Model | Phù hợp nhất cho | Đánh đổi |
 |-------|----------|-----------|
-| **haiku** | Simple, repetitive checks | Fast, cheap, less thorough |
-| **sonnet** | Most review/analysis tasks | Balanced (recommended default) |
-| **opus** | Complex migrations, architecture | Thorough, slower, more expensive |
+| **haiku** | Kiểm tra đơn giản, lặp đi lặp lại | Nhanh, rẻ, kém kỹ lưỡng |
+| **sonnet** | Hầu hết tác vụ review/phân tích | Cân bằng (mặc định khuyến nghị) |
+| **opus** | Migration phức tạp, kiến trúc | Kỹ lưỡng, chậm hơn, tốn kém hơn |
 
 ---
 
-## Tool Access Guide
+## Hướng Dẫn Quyền Truy Cập Tool
 
-| Access Level | Tools | Use Case |
+| Mức độ truy cập | Tools | Trường hợp dùng |
 |--------------|-------|----------|
-| Read-only | Read, Grep, Glob | Reviews, analysis |
-| Writing | + Write | Code generation, docs |
-| Full | + Bash | Migrations, testing |
+| Chỉ đọc | Read, Grep, Glob | Review, phân tích |
+| Có ghi | + Write | Tạo code, docs |
+| Đầy đủ | + Bash | Migration, kiểm thử |

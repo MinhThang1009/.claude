@@ -1,14 +1,14 @@
 # Widget Templates
 
-Minimal HTML scaffolds for the common widget shapes. Copy, fill in, ship.
+Các scaffold HTML tối giản cho các dạng widget phổ biến. Copy, điền vào, ship.
 
-All templates inline the `App` class from `@modelcontextprotocol/ext-apps` at build time — the iframe's CSP blocks CDN script imports. They're intentionally framework-free; widgets are small enough that React/Vue hydration cost usually isn't worth it.
+Tất cả template đều inline class `App` từ `@modelcontextprotocol/ext-apps` lúc build time — CSP của iframe chặn import script từ CDN. Chúng cố ý không dùng framework; widget đủ nhỏ để chi phí hydration của React/Vue thường không đáng.
 
 ---
 
-## Serving widget HTML
+## Phục vụ widget HTML
 
-Widgets are static HTML with one placeholder: `/*__EXT_APPS_BUNDLE__*/` gets replaced at server startup with the `ext-apps/app-with-deps` bundle (rewritten to expose `globalThis.ExtApps`).
+Widget là HTML tĩnh với một placeholder: `/*__EXT_APPS_BUNDLE__*/` được thay thế lúc server khởi động bằng bundle `ext-apps/app-with-deps` (được viết lại để expose `globalThis.ExtApps`).
 
 ```typescript
 import { readFileSync } from "node:fs";
@@ -37,11 +37,11 @@ registerAppResource(server, "Picker", "ui://widgets/picker.html", {},
 );
 ```
 
-Bundle once per server startup (or at build time); reuse the `bundle` string across all widget templates.
+Bundle một lần mỗi lần server khởi động (hoặc lúc build time); tái sử dụng chuỗi `bundle` qua tất cả widget template.
 
 ---
 
-## Picker (single-select list)
+## Picker (danh sách chọn một)
 
 ```html
 <!doctype html>
@@ -70,7 +70,7 @@ const { App } = globalThis.ExtApps;
       li.addEventListener("click", () => {
         app.sendMessage({
           role: "user",
-          content: [{ type: "text", text: `Selected: ${it.id}` }],
+          content: [{ type: "text", text: `Đã chọn: ${it.id}` }],
         });
       });
       ul.append(li);
@@ -82,7 +82,7 @@ const { App } = globalThis.ExtApps;
 </script>
 ```
 
-**Tool returns:** `{ content: [{ type: "text", text: JSON.stringify({ items: [{ id, label, sub? }] }) }] }`
+**Tool trả về:** `{ content: [{ type: "text", text: JSON.stringify({ items: [{ id, label, sub? }] }) }] }`
 
 ---
 
@@ -99,8 +99,8 @@ const { App } = globalThis.ExtApps;
 </style>
 <p id="msg"></p>
 <div class="actions">
-  <button id="cancel">Cancel</button>
-  <button id="confirm" class="danger">Confirm</button>
+  <button id="cancel">Hủy</button>
+  <button id="confirm" class="danger">Xác nhận</button>
 </div>
 <script type="module">
 /*__EXT_APPS_BUNDLE__*/
@@ -117,22 +117,22 @@ const { App } = globalThis.ExtApps;
   await app.connect();
 
   document.getElementById("confirm").addEventListener("click", () => {
-    app.sendMessage({ role: "user", content: [{ type: "text", text: "Confirmed." }] });
+    app.sendMessage({ role: "user", content: [{ type: "text", text: "Đã xác nhận." }] });
   });
   document.getElementById("cancel").addEventListener("click", () => {
-    app.sendMessage({ role: "user", content: [{ type: "text", text: "Cancelled." }] });
+    app.sendMessage({ role: "user", content: [{ type: "text", text: "Đã hủy." }] });
   });
 })();
 </script>
 ```
 
-**Tool returns:** `{ content: [{ type: "text", text: JSON.stringify({ message, confirmLabel? }) }] }`
+**Tool trả về:** `{ content: [{ type: "text", text: JSON.stringify({ message, confirmLabel? }) }] }`
 
-**Note:** For simple confirmation, prefer **elicitation** over a widget — see `../build-mcp-server/references/elicitation.md`. Use this widget when you need custom styling or context beyond what a native form offers.
+**Lưu ý:** Với xác nhận đơn giản, ưu tiên **elicitation** thay vì widget — xem `../build-mcp-server/references/elicitation.md`. Dùng widget này khi cần style tùy chỉnh hoặc context vượt quá những gì native form cung cấp.
 
 ---
 
-## Progress (long-running)
+## Progress (thao tác chạy lâu)
 
 ```html
 <!doctype html>
@@ -142,7 +142,7 @@ const { App } = globalThis.ExtApps;
   .bar { height: 8px; background: #eee; border-radius: 4px; overflow: hidden; }
   .fill { height: 100%; background: #2a7; transition: width 200ms; }
 </style>
-<p id="label">Starting…</p>
+<p id="label">Đang bắt đầu…</p>
 <div class="bar"><div id="fill" class="fill" style="width:0%"></div></div>
 <script type="module">
 /*__EXT_APPS_BUNDLE__*/
@@ -152,8 +152,8 @@ const { App } = globalThis.ExtApps;
   const label = document.getElementById("label");
   const fill = document.getElementById("fill");
 
-  // The tool result fires when the job completes — intermediate updates
-  // arrive via the same handler if the server streams them
+  // Kết quả tool bắn khi công việc hoàn thành — cập nhật trung gian
+  // đến qua cùng handler nếu server stream chúng
   app.ontoolresult = ({ content }) => {
     const state = JSON.parse(content[0].text);
     if (state.progress !== undefined) {
@@ -161,7 +161,7 @@ const { App } = globalThis.ExtApps;
       fill.style.width = `${(state.progress / state.total) * 100}%`;
     }
     if (state.done) {
-      label.textContent = "Complete";
+      label.textContent = "Hoàn thành";
       fill.style.width = "100%";
     }
   };
@@ -171,17 +171,17 @@ const { App } = globalThis.ExtApps;
 </script>
 ```
 
-Server side, emit progress via `extra.sendNotification({ method: "notifications/progress", ... })` — see `apps-sdk-messages.md`.
+Phía server, emit progress qua `extra.sendNotification({ method: "notifications/progress", ... })` — xem `apps-sdk-messages.md`.
 
 ---
 
 ## Display-only (chart / preview)
 
-Display widgets don't call `sendMessage` — they render and sit there. The tool should return a text summary **alongside** the widget so Claude can keep reasoning while the user sees the visual:
+Widget display không gọi `sendMessage` — chúng render và ở đó. Tool nên trả về một text summary **kèm** widget để Claude tiếp tục reasoning trong khi người dùng thấy phần visual:
 
 ```typescript
 registerAppTool(server, "show_chart", {
-  description: "Render a revenue chart",
+  description: "Render biểu đồ doanh thu",
   inputSchema: { range: z.enum(["week", "month", "year"]) },
   _meta: { ui: { resourceUri: "ui://widgets/chart.html" } },
 }, async ({ range }) => {
@@ -189,7 +189,7 @@ registerAppTool(server, "show_chart", {
   return {
     content: [{
       type: "text",
-      text: `Revenue is up ${data.change}% over the ${range}. Chart rendered.\n\n` +
+      text: `Doanh thu tăng ${data.change}% trong ${range}. Đã render biểu đồ.\n\n` +
             JSON.stringify(data.points),
     }],
   };
@@ -208,7 +208,7 @@ const { App } = globalThis.ExtApps;
   const app = new App({ name: "Chart", version: "1.0.0" }, {});
 
   app.ontoolresult = ({ content }) => {
-    // Parse the JSON points from the text content (after the summary line)
+    // Parse các điểm JSON từ text content (sau dòng summary)
     const text = content[0].text;
     const jsonStart = text.indexOf("\n\n") + 2;
     const points = JSON.parse(text.slice(jsonStart));
@@ -224,15 +224,15 @@ const { App } = globalThis.ExtApps;
 
 ---
 
-## Carousel (multi-item display with actions)
+## Carousel (hiển thị nhiều item với action)
 
-For presenting multiple items (product picks, search results) in a horizontal scroll rail. Patterns that tested well:
+Dùng để trình bày nhiều item (gợi ý sản phẩm, kết quả tìm kiếm) trong một horizontal scroll rail. Các pattern thử nghiệm tốt:
 
-- **Skip nav chevrons** — users know how to scroll. `scroll-snap-type` can cause a few-px-off-flush initial render; omit it and `scrollLeft = 0` after rendering.
-- **Layout-fork by item count** — `items.length === 1` → detail/PDP layout, `> 1` → carousel. Handle in widget JS, keep the tool schema flat.
-- **Put Claude's reasoning in each item** — a `note` field rendered as a small callout on the card gives users the "why" inline.
-- **Silent state via `updateModelContext`** — cart/selection changes should inform Claude without spamming the chat. Reserve `sendMessage` for terminal actions ("checkout", "done").
-- **Outbound links via `app.openLink`** — `window.open` and `<a target="_blank">` are blocked by the sandbox.
+- **Bỏ chevron điều hướng** — người dùng biết cách scroll. `scroll-snap-type` có thể gây render lệch vài px ban đầu; bỏ đi và `scrollLeft = 0` sau khi render.
+- **Fork layout theo số lượng item** — `items.length === 1` → layout detail/PDP, `> 1` → carousel. Xử lý trong widget JS, giữ tool schema phẳng.
+- **Đặt reasoning của Claude vào mỗi item** — một trường `note` render thành callout nhỏ trên card cho người dùng thấy "tại sao" ngay trong card.
+- **Trạng thái im lặng qua `updateModelContext`** — thay đổi cart/selection nên thông báo cho Claude mà không spam chat. Chỉ dùng `sendMessage` cho action kết thúc ("checkout", "done").
+- **Link ra ngoài qua `app.openLink`** — `window.open` và `<a target="_blank">` bị sandbox chặn.
 
 ```html
 <style>
@@ -246,4 +246,4 @@ For presenting multiple items (product picks, search results) in a horizontal sc
 <div class="rail" id="rail"></div>
 ```
 
-**Images:** the iframe CSP blocks remote `img-src`. Fetch thumbnails server-side in the tool handler, embed as `data:` URLs in the JSON payload, and render from those. Add `referrerpolicy="no-referrer"` as a fallback.
+**Ảnh:** CSP của iframe chặn remote `img-src`. Fetch thumbnail phía server trong tool handler, nhúng dưới dạng `data:` URL trong JSON payload, và render từ đó. Thêm `referrerpolicy="no-referrer"` như fallback.

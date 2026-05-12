@@ -1,10 +1,10 @@
-# Settings File Parsing Techniques
+# Kỹ Thuật Phân Tích File Settings
 
-Complete guide to parsing `.claude/plugin-name.local.md` files in bash scripts.
+Hướng dẫn đầy đủ về cách phân tích file `.claude/plugin-name.local.md` trong bash script.
 
-## File Structure
+## Cấu Trúc File
 
-Settings files use markdown with YAML frontmatter:
+File settings dùng markdown với YAML frontmatter:
 
 ```markdown
 ---
@@ -15,162 +15,162 @@ boolean_field: true
 list_field: ["item1", "item2", "item3"]
 ---
 
-# Markdown Content
+# Nội Dung Markdown
 
-This body content can be extracted separately.
-It's useful for prompts, documentation, or additional context.
+Nội dung body này có thể được trích xuất riêng.
+Hữu ích cho prompt, tài liệu, hoặc ngữ cảnh bổ sung.
 ```
 
-## Parsing Frontmatter
+## Phân Tích Frontmatter
 
-### Extract Frontmatter Block
+### Trích Xuất Khối Frontmatter
 
 ```bash
 #!/bin/bash
 FILE=".claude/my-plugin.local.md"
 
-# Extract everything between --- markers (excluding the markers themselves)
+# Trích xuất tất cả nội dung giữa các marker --- (không bao gồm marker)
 FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$FILE")
 ```
 
-**How it works:**
-- `sed -n` - Suppress automatic printing
-- `/^---$/,/^---$/` - Range from first `---` to second `---`
-- `{ /^---$/d; p; }` - Delete the `---` lines, print everything else
+**Cách hoạt động:**
+- `sed -n` — Tắt in tự động
+- `/^---$/,/^---$/` — Phạm vi từ `---` đầu đến `---` thứ hai
+- `{ /^---$/d; p; }` — Xóa dòng `---`, in tất cả còn lại
 
-### Extract Individual Fields
+### Trích Xuất Từng Trường
 
-**String fields:**
+**Trường kiểu string:**
 ```bash
-# Simple value
+# Giá trị đơn giản
 VALUE=$(echo "$FRONTMATTER" | grep '^field_name:' | sed 's/field_name: *//')
 
-# Quoted value (removes surrounding quotes)
+# Giá trị có dấu nháy (xóa dấu nháy bao quanh)
 VALUE=$(echo "$FRONTMATTER" | grep '^field_name:' | sed 's/field_name: *//' | sed 's/^"\(.*\)"$/\1/')
 ```
 
-**Boolean fields:**
+**Trường boolean:**
 ```bash
 ENABLED=$(echo "$FRONTMATTER" | grep '^enabled:' | sed 's/enabled: *//')
 
-# Use in condition
+# Dùng trong điều kiện
 if [[ "$ENABLED" == "true" ]]; then
-  # Enabled
+  # Đã bật
 fi
 ```
 
-**Numeric fields:**
+**Trường số:**
 ```bash
 MAX=$(echo "$FRONTMATTER" | grep '^max_value:' | sed 's/max_value: *//')
 
-# Validate it's a number
+# Validate là số
 if [[ "$MAX" =~ ^[0-9]+$ ]]; then
-  # Use in numeric comparison
+  # Dùng trong so sánh số
   if [[ $MAX -gt 100 ]]; then
-    # Too large
+    # Quá lớn
   fi
 fi
 ```
 
-**List fields (simple):**
+**Trường list (đơn giản):**
 ```bash
 # YAML: list: ["item1", "item2", "item3"]
 LIST=$(echo "$FRONTMATTER" | grep '^list:' | sed 's/list: *//')
-# Result: ["item1", "item2", "item3"]
+# Kết quả: ["item1", "item2", "item3"]
 
-# For simple checks:
+# Để kiểm tra đơn giản:
 if [[ "$LIST" == *"item1"* ]]; then
-  # List contains item1
+  # List chứa item1
 fi
 ```
 
-**List fields (proper parsing with jq):**
+**Trường list (phân tích đúng với jq):**
 ```bash
-# For proper list handling, use yq or convert to JSON
-# This requires yq to be installed (brew install yq)
+# Để xử lý list đúng, dùng yq hoặc chuyển sang JSON
+# Yêu cầu yq (brew install yq)
 
-# Extract list as JSON array
+# Trích xuất list dưới dạng JSON array
 LIST=$(echo "$FRONTMATTER" | yq -o json '.list' 2>/dev/null)
 
-# Iterate over items
+# Duyệt qua các item
 echo "$LIST" | jq -r '.[]' | while read -r item; do
-  echo "Processing: $item"
+  echo "Đang xử lý: $item"
 done
 ```
 
-## Parsing Markdown Body
+## Phân Tích Phần Body Markdown
 
-### Extract Body Content
+### Trích Xuất Nội Dung Body
 
 ```bash
 #!/bin/bash
 FILE=".claude/my-plugin.local.md"
 
-# Extract everything after the closing ---
-# Counts --- markers: first is opening, second is closing, everything after is body
+# Trích xuất tất cả sau dấu --- đóng
+# Đếm marker ---: đầu tiên là mở, thứ hai là đóng, tất cả sau là body
 BODY=$(awk '/^---$/{i++; next} i>=2' "$FILE")
 ```
 
-**How it works:**
-- `/^---$/` - Match `---` lines
-- `{i++; next}` - Increment counter and skip the `---` line
-- `i>=2` - Print all lines after second `---`
+**Cách hoạt động:**
+- `/^---$/` — Khớp dòng `---`
+- `{i++; next}` — Tăng counter và bỏ qua dòng `---`
+- `i>=2` — In tất cả dòng sau `---` thứ hai
 
-**Handles edge case:** If `---` appears in the markdown body, it still works because we only count the first two `---` at the start.
+**Xử lý trường hợp biên:** Nếu `---` xuất hiện trong body markdown, cách phân tích vẫn hoạt động vì chúng ta chỉ đếm hai `---` đầu tiên ở đầu file.
 
-### Use Body as Prompt
+### Dùng Body Làm Prompt
 
 ```bash
-# Extract body
+# Trích xuất body
 PROMPT=$(awk '/^---$/{i++; next} i>=2' "$RALPH_STATE_FILE")
 
-# Feed back to Claude
+# Đưa lại cho Claude
 echo '{"decision": "block", "reason": "'"$PROMPT"'"}' | jq .
 ```
 
-**Important:** Use `jq -n --arg` for safer JSON construction with user content:
+**Quan trọng:** Dùng `jq -n --arg` để xây dựng JSON an toàn hơn với nội dung của người dùng:
 
 ```bash
 PROMPT=$(awk '/^---$/{i++; next} i>=2' "$FILE")
 
-# Safe JSON construction
+# Xây dựng JSON an toàn
 jq -n --arg prompt "$PROMPT" '{
   "decision": "block",
   "reason": $prompt
 }'
 ```
 
-## Common Parsing Patterns
+## Các Pattern Phân Tích Phổ Biến
 
-### Pattern: Field with Default
+### Pattern: Trường với Giá Trị Mặc Định
 
 ```bash
 VALUE=$(echo "$FRONTMATTER" | grep '^field:' | sed 's/field: *//' | sed 's/^"\(.*\)"$/\1/')
 
-# Use default if empty
+# Dùng giá trị mặc định nếu trống
 if [[ -z "$VALUE" ]]; then
   VALUE="default_value"
 fi
 ```
 
-### Pattern: Optional Field
+### Pattern: Trường Tùy Chọn
 
 ```bash
 OPTIONAL=$(echo "$FRONTMATTER" | grep '^optional_field:' | sed 's/optional_field: *//' | sed 's/^"\(.*\)"$/\1/')
 
-# Only use if present
+# Chỉ dùng nếu có
 if [[ -n "$OPTIONAL" ]] && [[ "$OPTIONAL" != "null" ]]; then
-  # Field is set, use it
+  # Trường đã được đặt, dùng nó
   echo "Optional field: $OPTIONAL"
 fi
 ```
 
-### Pattern: Multiple Fields at Once
+### Pattern: Nhiều Trường Cùng Lúc
 
 ```bash
-# Parse all fields in one pass
+# Phân tích tất cả trường trong một lần duyệt
 while IFS=': ' read -r key value; do
-  # Remove quotes if present
+  # Xóa dấu nháy nếu có
   value=$(echo "$value" | sed 's/^"\(.*\)"$/\1/')
 
   case "$key" in
@@ -187,44 +187,44 @@ while IFS=': ' read -r key value; do
 done <<< "$FRONTMATTER"
 ```
 
-## Updating Settings Files
+## Cập Nhật File Settings
 
-### Atomic Updates
+### Cập Nhật Atomic
 
-Always use temp file + atomic move to prevent corruption:
+Luôn dùng temp file + atomic move để ngăn file bị hỏng:
 
 ```bash
 #!/bin/bash
 FILE=".claude/my-plugin.local.md"
 NEW_VALUE="updated_value"
 
-# Create temp file
+# Tạo temp file
 TEMP_FILE="${FILE}.tmp.$$"
 
-# Update field using sed
+# Cập nhật trường dùng sed
 sed "s/^field_name: .*/field_name: $NEW_VALUE/" "$FILE" > "$TEMP_FILE"
 
-# Atomic replace
+# Thay thế atomic
 mv "$TEMP_FILE" "$FILE"
 ```
 
-### Update Single Field
+### Cập Nhật Một Trường
 
 ```bash
-# Increment iteration counter
+# Tăng iteration counter
 CURRENT=$(echo "$FRONTMATTER" | grep '^iteration:' | sed 's/iteration: *//')
 NEXT=$((CURRENT + 1))
 
-# Update file
+# Cập nhật file
 TEMP_FILE="${FILE}.tmp.$$"
 sed "s/^iteration: .*/iteration: $NEXT/" "$FILE" > "$TEMP_FILE"
 mv "$TEMP_FILE" "$FILE"
 ```
 
-### Update Multiple Fields
+### Cập Nhật Nhiều Trường
 
 ```bash
-# Update several fields at once
+# Cập nhật nhiều trường cùng lúc
 TEMP_FILE="${FILE}.tmp.$$"
 
 sed -e "s/^iteration: .*/iteration: $NEXT_ITERATION/" \
@@ -235,90 +235,90 @@ sed -e "s/^iteration: .*/iteration: $NEXT_ITERATION/" \
 mv "$TEMP_FILE" "$FILE"
 ```
 
-## Validation Techniques
+## Kỹ Thuật Validation
 
-### Validate File Exists and Is Readable
+### Validate File Tồn Tại và Có Thể Đọc
 
 ```bash
 FILE=".claude/my-plugin.local.md"
 
 if [[ ! -f "$FILE" ]]; then
-  echo "Settings file not found" >&2
+  echo "Không tìm thấy file settings" >&2
   exit 1
 fi
 
 if [[ ! -r "$FILE" ]]; then
-  echo "Settings file not readable" >&2
+  echo "Không thể đọc file settings" >&2
   exit 1
 fi
 ```
 
-### Validate Frontmatter Structure
+### Validate Cấu Trúc Frontmatter
 
 ```bash
-# Count --- markers (should be exactly 2 at start)
+# Đếm marker --- (phải đúng 2 ở đầu)
 MARKER_COUNT=$(grep -c '^---$' "$FILE" 2>/dev/null || echo "0")
 
 if [[ $MARKER_COUNT -lt 2 ]]; then
-  echo "Invalid settings file: missing frontmatter markers" >&2
+  echo "File settings không hợp lệ: thiếu marker frontmatter" >&2
   exit 1
 fi
 ```
 
-### Validate Field Values
+### Validate Giá Trị Trường
 
 ```bash
 MODE=$(echo "$FRONTMATTER" | grep '^mode:' | sed 's/mode: *//')
 
 case "$MODE" in
   strict|standard|lenient)
-    # Valid mode
+    # Mode hợp lệ
     ;;
   *)
-    echo "Invalid mode: $MODE (must be strict, standard, or lenient)" >&2
+    echo "Mode không hợp lệ: $MODE (phải là strict, standard, hoặc lenient)" >&2
     exit 1
     ;;
 esac
 ```
 
-### Validate Numeric Ranges
+### Validate Phạm Vi Số
 
 ```bash
 MAX_SIZE=$(echo "$FRONTMATTER" | grep '^max_size:' | sed 's/max_size: *//')
 
 if ! [[ "$MAX_SIZE" =~ ^[0-9]+$ ]]; then
-  echo "max_size must be a number" >&2
+  echo "max_size phải là một số" >&2
   exit 1
 fi
 
 if [[ $MAX_SIZE -lt 1 ]] || [[ $MAX_SIZE -gt 10000000 ]]; then
-  echo "max_size out of range (1-10000000)" >&2
+  echo "max_size ngoài phạm vi (1–10000000)" >&2
   exit 1
 fi
 ```
 
-## Edge Cases and Gotchas
+## Trường Hợp Biên và Lưu Ý
 
-### Quotes in Values
+### Dấu Nháy trong Giá Trị
 
-YAML allows both quoted and unquoted strings:
+YAML cho phép cả chuỗi có dấu nháy và không có dấu nháy:
 
 ```yaml
-# These are equivalent:
+# Các giá trị này tương đương:
 field1: value
 field2: "value"
 field3: 'value'
 ```
 
-**Handle both:**
+**Xử lý cả hai:**
 ```bash
-# Remove surrounding quotes if present
+# Xóa dấu nháy bao quanh nếu có
 VALUE=$(echo "$FRONTMATTER" | grep '^field:' | sed 's/field: *//' | sed 's/^"\(.*\)"$/\1/' | sed "s/^'\\(.*\\)'$/\\1/")
 ```
 
-### --- in Markdown Body
+### --- trong Body Markdown
 
-If the markdown body contains `---`, the parsing still works because we only match the first two:
+Nếu body markdown chứa `---`, cách phân tích vẫn hoạt động vì chúng ta chỉ khớp hai dấu đầu tiên:
 
 ```markdown
 ---
@@ -327,17 +327,17 @@ field: value
 
 # Body
 
-Here's a separator:
+Đây là dấu phân cách:
 ---
 
-More content after the separator.
+Nội dung thêm sau dấu phân cách.
 ```
 
-The `awk '/^---$/{i++; next} i>=2'` pattern handles this correctly.
+Pattern `awk '/^---$/{i++; next} i>=2'` xử lý trường hợp này đúng.
 
-### Empty Values
+### Giá Trị Trống
 
-Handle missing or empty fields:
+Xử lý trường thiếu hoặc trống:
 
 ```yaml
 field1:
@@ -345,20 +345,20 @@ field2: ""
 field3: null
 ```
 
-**Parsing:**
+**Phân tích:**
 ```bash
 VALUE=$(echo "$FRONTMATTER" | grep '^field1:' | sed 's/field1: *//')
-# VALUE will be empty string
+# VALUE sẽ là chuỗi rỗng
 
-# Check for empty/null
+# Kiểm tra trống/null
 if [[ -z "$VALUE" ]] || [[ "$VALUE" == "null" ]]; then
   VALUE="default"
 fi
 ```
 
-### Special Characters
+### Ký Tự Đặc Biệt
 
-Values with special characters need careful handling:
+Giá trị với ký tự đặc biệt cần xử lý cẩn thận:
 
 ```yaml
 message: "Error: Something went wrong!"
@@ -366,65 +366,65 @@ path: "/path/with spaces/file.txt"
 regex: "^[a-zA-Z0-9_]+$"
 ```
 
-**Safe parsing:**
+**Phân tích an toàn:**
 ```bash
-# Always quote variables when using
+# Luôn đặt biến trong dấu nháy khi dùng
 MESSAGE=$(echo "$FRONTMATTER" | grep '^message:' | sed 's/message: *//' | sed 's/^"\(.*\)"$/\1/')
 
-echo "Message: $MESSAGE"  # Quoted!
+echo "Message: $MESSAGE"  # Đặt trong dấu nháy!
 ```
 
-## Performance Optimization
+## Tối Ưu Hiệu Năng
 
-### Cache Parsed Values
+### Cache Giá Trị Đã Phân Tích
 
-If reading settings multiple times:
+Nếu đọc settings nhiều lần:
 
 ```bash
-# Parse once
+# Phân tích một lần
 FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$FILE")
 
-# Extract multiple fields from cached frontmatter
+# Trích xuất nhiều trường từ frontmatter đã cache
 FIELD1=$(echo "$FRONTMATTER" | grep '^field1:' | sed 's/field1: *//')
 FIELD2=$(echo "$FRONTMATTER" | grep '^field2:' | sed 's/field2: *//')
 FIELD3=$(echo "$FRONTMATTER" | grep '^field3:' | sed 's/field3: *//')
 ```
 
-**Don't:** Re-parse file for each field.
+**Không nên:** Phân tích lại file cho mỗi trường.
 
 ### Lazy Loading
 
-Only parse settings when needed:
+Chỉ phân tích settings khi cần:
 
 ```bash
 #!/bin/bash
 input=$(cat)
 
-# Quick checks first (no file I/O)
+# Kiểm tra nhanh trước (không có I/O file)
 tool_name=$(echo "$input" | jq -r '.tool_name')
 if [[ "$tool_name" != "Write" ]]; then
-  exit 0  # Not a write operation, skip
+  exit 0  # Không phải thao tác ghi, bỏ qua
 fi
 
-# Only now check settings file
+# Chỉ lúc này mới kiểm tra file settings
 if [[ -f ".claude/my-plugin.local.md" ]]; then
-  # Parse settings
+  # Phân tích settings
   # ...
 fi
 ```
 
-## Debugging
+## Debug
 
-### Print Parsed Values
+### In Giá Trị Đã Phân Tích
 
 ```bash
 #!/bin/bash
-set -x  # Enable debug tracing
+set -x  # Bật debug tracing
 
 FILE=".claude/my-plugin.local.md"
 
 if [[ -f "$FILE" ]]; then
-  echo "Settings file found" >&2
+  echo "Tìm thấy file settings" >&2
 
   FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$FILE")
   echo "Frontmatter:" >&2
@@ -435,74 +435,74 @@ if [[ -f "$FILE" ]]; then
 fi
 ```
 
-### Validate Parsing
+### Validate Kết Quả Phân Tích
 
 ```bash
-# Show what was parsed
-echo "Parsed values:" >&2
+# Hiển thị những gì đã được phân tích
+echo "Các giá trị đã phân tích:" >&2
 echo "  enabled: $ENABLED" >&2
 echo "  mode: $MODE" >&2
 echo "  max_size: $MAX_SIZE" >&2
 
-# Verify expected values
+# Xác minh giá trị mong đợi
 if [[ "$ENABLED" != "true" ]] && [[ "$ENABLED" != "false" ]]; then
-  echo "⚠️  Unexpected enabled value: $ENABLED" >&2
+  echo "⚠️  Giá trị enabled bất thường: $ENABLED" >&2
 fi
 ```
 
-## Alternative: Using yq
+## Thay Thế: Dùng yq
 
-For complex YAML, consider using `yq`:
+Đối với YAML phức tạp, cân nhắc dùng `yq`:
 
 ```bash
-# Install: brew install yq
+# Cài đặt: brew install yq
 
-# Parse YAML properly
+# Phân tích YAML đúng chuẩn
 FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$FILE")
 
-# Extract fields with yq
+# Trích xuất trường với yq
 ENABLED=$(echo "$FRONTMATTER" | yq '.enabled')
 MODE=$(echo "$FRONTMATTER" | yq '.mode')
 LIST=$(echo "$FRONTMATTER" | yq -o json '.list_field')
 
-# Iterate list properly
+# Duyệt list đúng chuẩn
 echo "$LIST" | jq -r '.[]' | while read -r item; do
   echo "Item: $item"
 done
 ```
 
-**Pros:**
-- Proper YAML parsing
-- Handles complex structures
-- Better list/object support
+**Ưu điểm:**
+- Phân tích YAML đúng chuẩn
+- Xử lý cấu trúc phức tạp
+- Hỗ trợ list/object tốt hơn
 
-**Cons:**
-- Requires yq installation
-- Additional dependency
-- May not be available on all systems
+**Nhược điểm:**
+- Yêu cầu cài đặt yq
+- Dependency bổ sung
+- Có thể không có sẵn trên mọi hệ thống
 
-**Recommendation:** Use sed/grep for simple fields, yq for complex structures.
+**Khuyến nghị:** Dùng sed/grep cho trường đơn giản, yq cho cấu trúc phức tạp.
 
-## Complete Example
+## Ví Dụ Hoàn Chỉnh
 
 ```bash
 #!/bin/bash
 set -euo pipefail
 
-# Configuration
+# Cấu hình
 SETTINGS_FILE=".claude/my-plugin.local.md"
 
-# Quick exit if not configured
+# Thoát nhanh nếu chưa cấu hình
 if [[ ! -f "$SETTINGS_FILE" ]]; then
-  # Use defaults
+  # Dùng giá trị mặc định
   ENABLED=true
   MODE=standard
   MAX_SIZE=1000000
 else
-  # Parse frontmatter
+  # Phân tích frontmatter
   FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$SETTINGS_FILE")
 
-  # Extract fields with defaults
+  # Trích xuất trường với giá trị mặc định
   ENABLED=$(echo "$FRONTMATTER" | grep '^enabled:' | sed 's/enabled: *//')
   ENABLED=${ENABLED:-true}
 
@@ -512,38 +512,38 @@ else
   MAX_SIZE=$(echo "$FRONTMATTER" | grep '^max_size:' | sed 's/max_size: *//')
   MAX_SIZE=${MAX_SIZE:-1000000}
 
-  # Validate values
+  # Validate giá trị
   if [[ "$ENABLED" != "true" ]] && [[ "$ENABLED" != "false" ]]; then
-    echo "⚠️  Invalid enabled value, using default" >&2
+    echo "⚠️  Giá trị enabled không hợp lệ, dùng mặc định" >&2
     ENABLED=true
   fi
 
   if ! [[ "$MAX_SIZE" =~ ^[0-9]+$ ]]; then
-    echo "⚠️  Invalid max_size, using default" >&2
+    echo "⚠️  max_size không hợp lệ, dùng mặc định" >&2
     MAX_SIZE=1000000
   fi
 fi
 
-# Quick exit if disabled
+# Thoát nhanh nếu bị tắt
 if [[ "$ENABLED" != "true" ]]; then
   exit 0
 fi
 
-# Use configuration
-echo "Configuration loaded: mode=$MODE, max_size=$MAX_SIZE" >&2
+# Dùng cấu hình
+echo "Cấu hình đã tải: mode=$MODE, max_size=$MAX_SIZE" >&2
 
-# Apply logic based on settings
+# Áp dụng logic dựa trên settings
 case "$MODE" in
   strict)
-    # Strict validation
+    # Validation chặt
     ;;
   standard)
-    # Standard validation
+    # Validation tiêu chuẩn
     ;;
   lenient)
-    # Lenient validation
+    # Validation lỏng
     ;;
 esac
 ```
 
-This provides robust settings handling with defaults, validation, and error recovery.
+Ví dụ này cung cấp xử lý settings mạnh mẽ với giá trị mặc định, validation và phục hồi lỗi.

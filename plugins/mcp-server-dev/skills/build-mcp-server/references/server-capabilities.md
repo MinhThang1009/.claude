@@ -1,12 +1,12 @@
-# Server capabilities — the rest of the spec
+# Server capabilities — phần còn lại của spec
 
-Features beyond the three core primitives. Most are optional, a few are near-free wins.
+Các tính năng ngoài ba primitive cốt lõi. Hầu hết là tùy chọn, một số gần như miễn phí nhưng mang lại nhiều giá trị.
 
 ---
 
-## `instructions` — system prompt injection
+## `instructions` — injection vào system prompt
 
-One line of config, lands directly in Claude's system prompt. Use it for tool-use hints that don't fit in individual tool descriptions.
+Một dòng config, được đưa thẳng vào system prompt của Claude. Dùng cho gợi ý sử dụng tool không vừa vào mô tả từng tool riêng lẻ.
 
 ```typescript
 const server = new McpServer(
@@ -19,16 +19,16 @@ const server = new McpServer(
 mcp = FastMCP("my-server", instructions="Always call search_items before get_item — IDs aren't guessable.")
 ```
 
-This is the highest-leverage one-liner in the spec. If Claude keeps misusing your tools, put the fix here.
+Đây là one-liner có đòn bẩy cao nhất trong spec. Nếu Claude liên tục dùng tool sai, hãy đặt cách sửa vào đây.
 
 ---
 
-## Sampling — delegate LLM calls to the host
+## Sampling — ủy thác LLM call cho host
 
-If your tool logic needs LLM inference (summarize, classify, generate), don't ship your own model client. Ask the host to do it.
+Nếu logic tool của bạn cần LLM inference (tóm tắt, phân loại, sinh nội dung), đừng ship model client riêng. Hãy nhờ host làm.
 
 ```typescript
-// Inside a tool handler
+// Bên trong một tool handler
 const result = await extra.sendRequest({
   method: "sampling/createMessage",
   params: {
@@ -43,13 +43,13 @@ const result = await extra.sendRequest({
 response = await ctx.sample("Summarize this document", context=doc)
 ```
 
-**Requires client support** — check `clientCapabilities.sampling` first. Model preference hints are substring-matched (`"claude-3-5"` matches any Claude 3.5 variant).
+**Yêu cầu client hỗ trợ** — kiểm tra `clientCapabilities.sampling` trước. Gợi ý về model preference được match bằng substring (`"claude-3-5"` khớp với mọi variant Claude 3.5).
 
 ---
 
-## Roots — query workspace boundaries
+## Roots — truy vấn ranh giới workspace
 
-Instead of hardcoding a root directory, ask the host which directories the user approved.
+Thay vì hardcode thư mục root, hãy hỏi host thư mục nào user đã phê duyệt.
 
 ```typescript
 const caps = server.getClientCapabilities();
@@ -63,16 +63,16 @@ if (caps?.roots) {
 roots = await ctx.list_roots()
 ```
 
-Particularly relevant for MCPB local servers — see `build-mcpb/references/local-security.md`.
+Đặc biệt liên quan đến MCPB local server — xem `build-mcpb/references/local-security.md`.
 
 ---
 
-## Logging — structured, level-aware
+## Logging — có cấu trúc, theo level
 
-Better than stderr for remote servers. Client can filter by level.
+Tốt hơn stderr cho remote server. Client có thể lọc theo level.
 
 ```typescript
-// In a tool handler
+// Trong một tool handler
 await extra.sendNotification({
   method: "notifications/message",
   params: { level: "info", logger: "my-tool", data: { msg: "Processing", count: 42 } },
@@ -80,16 +80,16 @@ await extra.sendNotification({
 ```
 
 ```python
-await ctx.info("Processing", count=42)   # also: ctx.debug, ctx.warning, ctx.error
+await ctx.info("Processing", count=42)   # cũng có: ctx.debug, ctx.warning, ctx.error
 ```
 
-Levels follow syslog: `debug`, `info`, `notice`, `warning`, `error`, `critical`, `alert`, `emergency`. Client sets minimum via `logging/setLevel`.
+Level theo syslog: `debug`, `info`, `notice`, `warning`, `error`, `critical`, `alert`, `emergency`. Client đặt mức tối thiểu qua `logging/setLevel`.
 
 ---
 
-## Progress — for long-running tools
+## Progress — cho tool chạy lâu
 
-Client sends a `progressToken` in request `_meta`. Server emits progress notifications against it.
+Client gửi `progressToken` trong request `_meta`. Server emit progress notification theo token đó.
 
 ```typescript
 async (args, extra) => {
@@ -117,9 +117,9 @@ async def long_task(ctx: Context) -> str:
 
 ---
 
-## Cancellation — honor the abort signal
+## Cancellation — tôn trọng abort signal
 
-Long tools should check the SDK-provided `AbortSignal`:
+Tool chạy lâu nên kiểm tra `AbortSignal` do SDK cung cấp:
 
 ```typescript
 async (args, extra) => {
@@ -130,13 +130,13 @@ async (args, extra) => {
 }
 ```
 
-fastmcp handles this via asyncio cancellation — no explicit check needed if your handler is properly async.
+fastmcp xử lý việc này qua asyncio cancellation — không cần kiểm tra tường minh nếu handler của bạn properly async.
 
 ---
 
-## Completion — autocomplete for prompt args
+## Completion — autocomplete cho prompt arg
 
-If you've registered prompts or resource templates with arguments, you can offer autocomplete:
+Nếu bạn đã đăng ký prompt hoặc resource template có argument, bạn có thể cung cấp autocomplete:
 
 ```typescript
 server.registerPrompt("query", {
@@ -146,19 +146,19 @@ server.registerPrompt("query", {
 }, ...);
 ```
 
-Low priority unless your prompts have many valid values.
+Ưu tiên thấp trừ khi prompt của bạn có nhiều giá trị hợp lệ.
 
 ---
 
-## Which capabilities need client support?
+## Capability nào cần client hỗ trợ?
 
-| Feature | Server declares | Client must support | Fallback if not |
+| Tính năng | Server khai báo | Client phải hỗ trợ | Fallback nếu không |
 |---|---|---|---|
-| `instructions` | implicit | — | — (always works) |
+| `instructions` | ngầm định | — | — (luôn hoạt động) |
 | Logging | `logging: {}` | — | stderr |
-| Progress | — | sends `progressToken` | silently skip |
-| Sampling | — | `sampling: {}` | bring your own LLM |
-| Elicitation | — | `elicitation: {}` | return text, ask Claude to relay |
+| Progress | — | gửi `progressToken` | bỏ qua silently |
+| Sampling | — | `sampling: {}` | tự mang LLM |
+| Elicitation | — | `elicitation: {}` | trả text, nhờ Claude chuyển tiếp |
 | Roots | — | `roots: {}` | config env var |
 
-Check client caps via `server.getClientCapabilities()` (TS) or `ctx.session.client_params.capabilities` (fastmcp) before using the bottom three.
+Kiểm tra client caps qua `server.getClientCapabilities()` (TS) hoặc `ctx.session.client_params.capabilities` (fastmcp) trước khi dùng ba cái cuối.

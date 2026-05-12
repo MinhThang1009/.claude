@@ -1,57 +1,57 @@
-# Interactive Command Patterns
+# Các Pattern Command Tương Tác
 
-Comprehensive guide to creating commands that gather user feedback and make decisions through the AskUserQuestion tool.
+Hướng dẫn toàn diện về cách tạo command thu thập phản hồi từ người dùng và đưa ra quyết định thông qua tool AskUserQuestion.
 
-## Overview
+## Tổng Quan
 
-Some commands need user input that doesn't work well with simple arguments. For example:
-- Choosing between multiple complex options with trade-offs
-- Selecting multiple items from a list
-- Making decisions that require explanation
-- Gathering preferences or configuration interactively
+Một số command cần input từ người dùng không phù hợp với argument đơn giản. Ví dụ:
+- Chọn giữa nhiều tùy chọn phức tạp có đánh đổi
+- Chọn nhiều item từ danh sách
+- Đưa ra quyết định cần giải thích
+- Thu thập preferences hoặc cấu hình một cách tương tác
 
-For these cases, use the **AskUserQuestion tool** within command execution rather than relying on command arguments.
+Cho những trường hợp này, hãy dùng **tool AskUserQuestion** trong quá trình thực thi command thay vì dựa vào argument.
 
-## When to Use AskUserQuestion
+## Khi Nào Dùng AskUserQuestion
 
-### Use AskUserQuestion When:
+### Dùng AskUserQuestion Khi:
 
-1. **Multiple choice decisions** with explanations needed
-2. **Complex options** that require context to choose
-3. **Multi-select scenarios** (choosing multiple items)
-4. **Preference gathering** for configuration
-5. **Interactive workflows** that adapt based on answers
+1. **Quyết định multiple choice** cần giải thích
+2. **Tùy chọn phức tạp** cần context để lựa chọn
+3. **Tình huống multi-select** (chọn nhiều item)
+4. **Thu thập preferences** cho cấu hình
+5. **Workflow tương tác** thích ứng dựa trên câu trả lời
 
-### Use Command Arguments When:
+### Dùng Argument Command Khi:
 
-1. **Simple values** (file paths, numbers, names)
-2. **Known inputs** user already has
-3. **Scriptable workflows** that should be automatable
-4. **Fast invocations** where prompting would slow down
+1. **Giá trị đơn giản** (đường dẫn file, số, tên)
+2. **Input đã biết** mà người dùng đã có sẵn
+3. **Workflow có thể script hóa** nên tự động hóa được
+4. **Gọi nhanh** mà việc hỏi sẽ làm chậm
 
-## AskUserQuestion Basics
+## Cơ Bản về AskUserQuestion
 
-### Tool Parameters
+### Các Tham Số của Tool
 
 ```typescript
 {
   questions: [
     {
       question: "Which authentication method should we use?",
-      header: "Auth method",  // Short label (max 12 chars)
-      multiSelect: false,     // true for multiple selection
+      header: "Auth method",  // Nhãn ngắn (tối đa 12 ký tự)
+      multiSelect: false,     // true để chọn nhiều
       options: [
         {
           label: "OAuth 2.0",
-          description: "Industry standard, supports multiple providers"
+          description: "Tiêu chuẩn ngành, hỗ trợ nhiều provider"
         },
         {
           label: "JWT",
-          description: "Stateless, good for APIs"
+          description: "Stateless, phù hợp cho API"
         },
         {
           label: "Session",
-          description: "Traditional, server-side state"
+          description: "Truyền thống, state phía server"
         }
       ]
     }
@@ -59,15 +59,15 @@ For these cases, use the **AskUserQuestion tool** within command execution rathe
 }
 ```
 
-**Key points:**
-- Users can always choose "Other" to provide custom input (automatic)
-- `multiSelect: true` allows selecting multiple options
-- Options should be 2-4 choices (not more)
-- Can ask 1-4 questions per tool call
+**Các điểm quan trọng:**
+- Người dùng luôn có thể chọn "Other" để cung cấp input tùy chỉnh (tự động)
+- `multiSelect: true` cho phép chọn nhiều tùy chọn
+- Tùy chọn nên là 2–4 lựa chọn (không nhiều hơn)
+- Có thể hỏi 1–4 câu hỏi mỗi lần gọi tool
 
-## Command Pattern for User Interaction
+## Pattern Command cho Tương Tác Người Dùng
 
-### Basic Interactive Command
+### Command Tương Tác Cơ Bản
 
 ```markdown
 ---
@@ -77,76 +77,76 @@ allowed-tools: AskUserQuestion, Write
 
 # Interactive Plugin Setup
 
-This command will guide you through configuring the plugin with a series of questions.
+Command này sẽ hướng dẫn bạn cấu hình plugin qua một loạt câu hỏi.
 
-## Step 1: Gather Configuration
+## Bước 1: Thu Thập Cấu Hình
 
-Use the AskUserQuestion tool to ask:
+Dùng tool AskUserQuestion để hỏi:
 
-**Question 1 - Deployment target:**
+**Câu hỏi 1 — Đích deploy:**
 - header: "Deploy to"
 - question: "Which deployment platform will you use?"
 - options:
-  - AWS (Amazon Web Services with ECS/EKS)
-  - GCP (Google Cloud with GKE)
-  - Azure (Microsoft Azure with AKS)
-  - Local (Docker on local machine)
+  - AWS (Amazon Web Services với ECS/EKS)
+  - GCP (Google Cloud với GKE)
+  - Azure (Microsoft Azure với AKS)
+  - Local (Docker trên máy local)
 
-**Question 2 - Environment strategy:**
+**Câu hỏi 2 — Chiến lược môi trường:**
 - header: "Environments"
 - question: "How many environments do you need?"
 - options:
-  - Single (Just production)
+  - Single (Chỉ production)
   - Standard (Dev, Staging, Production)
   - Complete (Dev, QA, Staging, Production)
 
-**Question 3 - Features to enable:**
+**Câu hỏi 3 — Tính năng cần bật:**
 - header: "Features"
 - question: "Which features do you want to enable?"
 - multiSelect: true
 - options:
-  - Auto-scaling (Automatic resource scaling)
-  - Monitoring (Health checks and metrics)
-  - CI/CD (Automated deployment pipeline)
-  - Backups (Automated database backups)
+  - Auto-scaling (Tự động mở rộng tài nguyên)
+  - Monitoring (Health check và metrics)
+  - CI/CD (Pipeline deployment tự động)
+  - Backups (Sao lưu database tự động)
 
-## Step 2: Process Answers
+## Bước 2: Xử Lý Câu Trả Lời
 
-Based on the answers received from AskUserQuestion:
+Dựa trên câu trả lời nhận được từ AskUserQuestion:
 
-1. Parse the deployment target choice
-2. Set up environment-specific configuration
-3. Enable selected features
-4. Generate configuration files
+1. Phân tích lựa chọn deployment target
+2. Thiết lập cấu hình theo môi trường
+3. Bật các tính năng đã chọn
+4. Tạo file cấu hình
 
-## Step 3: Generate Configuration
+## Bước 3: Tạo Cấu Hình
 
-Create `.claude/plugin-name.local.md` with:
+Tạo `.claude/plugin-name.local.md` với:
 
 \`\`\`yaml
 ---
-deployment_target: [answer from Q1]
-environments: [answer from Q2]
+deployment_target: [câu trả lời từ Q1]
+environments: [câu trả lời từ Q2]
 features:
-  auto_scaling: [true if selected in Q3]
-  monitoring: [true if selected in Q3]
-  ci_cd: [true if selected in Q3]
-  backups: [true if selected in Q3]
+  auto_scaling: [true nếu được chọn trong Q3]
+  monitoring: [true nếu được chọn trong Q3]
+  ci_cd: [true nếu được chọn trong Q3]
+  backups: [true nếu được chọn trong Q3]
 ---
 
 # Plugin Configuration
 
-Generated: [timestamp]
+Tạo lúc: [timestamp]
 Target: [deployment_target]
-Environments: [environments]
+Môi trường: [environments]
 \`\`\`
 
-## Step 4: Confirm and Next Steps
+## Bước 4: Xác Nhận và Bước Tiếp Theo
 
-Confirm configuration created and guide user on next steps.
+Xác nhận cấu hình đã tạo và hướng dẫn người dùng về bước tiếp theo.
 ```
 
-### Multi-Stage Interactive Workflow
+### Workflow Tương Tác Nhiều Giai Đoạn
 
 ```markdown
 ---
@@ -156,119 +156,119 @@ allowed-tools: AskUserQuestion, Read, Write, Bash
 
 # Multi-Stage Deployment Setup
 
-This command walks through deployment setup in stages, adapting based on your answers.
+Command này hướng dẫn thiết lập deployment theo từng giai đoạn, thích ứng dựa trên câu trả lời của bạn.
 
-## Stage 1: Basic Configuration
+## Giai Đoạn 1: Cấu Hình Cơ Bản
 
-Use AskUserQuestion to ask about deployment basics.
+Dùng AskUserQuestion để hỏi về các cài đặt deployment cơ bản.
 
-Based on answers, determine which additional questions to ask.
+Dựa trên câu trả lời, xác định câu hỏi bổ sung cần hỏi.
 
-## Stage 2: Advanced Options (Conditional)
+## Giai Đoạn 2: Tùy Chọn Nâng Cao (Có Điều Kiện)
 
-If user selected "Advanced" deployment in Stage 1:
+Nếu người dùng chọn deployment "Advanced" ở Giai đoạn 1:
 
-Use AskUserQuestion to ask about:
-- Load balancing strategy
-- Caching configuration
-- Security hardening options
+Dùng AskUserQuestion để hỏi về:
+- Chiến lược load balancing
+- Cấu hình caching
+- Các tùy chọn tăng cường bảo mật
 
-If user selected "Simple" deployment:
-- Skip advanced questions
-- Use sensible defaults
+Nếu người dùng chọn deployment "Simple":
+- Bỏ qua câu hỏi nâng cao
+- Dùng các giá trị mặc định hợp lý
 
-## Stage 3: Confirmation
+## Giai Đoạn 3: Xác Nhận
 
-Show summary of all selections.
+Hiển thị tóm tắt tất cả lựa chọn.
 
-Use AskUserQuestion for final confirmation:
+Dùng AskUserQuestion để xác nhận cuối:
 - header: "Confirm"
 - question: "Does this configuration look correct?"
 - options:
-  - Yes (Proceed with setup)
-  - No (Start over)
-  - Modify (Let me adjust specific settings)
+  - Yes (Tiến hành thiết lập)
+  - No (Bắt đầu lại)
+  - Modify (Để tôi điều chỉnh cài đặt cụ thể)
 
-If "Modify", ask which specific setting to change.
+Nếu "Modify", hỏi cài đặt cụ thể nào cần thay đổi.
 
-## Stage 4: Execute Setup
+## Giai Đoạn 4: Thực Thi Thiết Lập
 
-Based on confirmed configuration, execute setup steps.
+Dựa trên cấu hình đã xác nhận, thực thi các bước thiết lập.
 ```
 
-## Interactive Question Design
+## Thiết Kế Câu Hỏi Tương Tác
 
-### Question Structure
+### Cấu Trúc Câu Hỏi
 
-**Good questions:**
+**Câu hỏi tốt:**
 ```markdown
 Question: "Which database should we use for this project?"
 Header: "Database"
 Options:
-  - PostgreSQL (Relational, ACID compliant, best for complex queries)
-  - MongoDB (Document store, flexible schema, best for rapid iteration)
-  - Redis (In-memory, fast, best for caching and sessions)
+  - PostgreSQL (Relational, tuân thủ ACID, tốt nhất cho query phức tạp)
+  - MongoDB (Document store, schema linh hoạt, tốt nhất cho phát triển nhanh)
+  - Redis (In-memory, nhanh, tốt nhất cho caching và session)
 ```
 
-**Poor questions:**
+**Câu hỏi kém:**
 ```markdown
-Question: "Database?"  // Too vague
-Header: "DB"  // Unclear abbreviation
+Question: "Database?"  // Quá mơ hồ
+Header: "DB"  // Viết tắt không rõ
 Options:
-  - Option 1  // Not descriptive
+  - Option 1  // Không mô tả
   - Option 2
 ```
 
-### Option Design Best Practices
+### Nguyên Tắc Thiết Kế Tùy Chọn Tốt Nhất
 
-**Clear labels:**
-- Use 1-5 words
-- Specific and descriptive
-- No jargon without context
+**Nhãn rõ ràng:**
+- Dùng 1–5 từ
+- Cụ thể và mô tả
+- Không dùng jargon không có ngữ cảnh
 
-**Helpful descriptions:**
-- Explain what the option means
-- Mention key benefits or trade-offs
-- Help user make informed decision
-- Keep to 1-2 sentences
+**Mô tả hữu ích:**
+- Giải thích tùy chọn có nghĩa gì
+- Đề cập lợi ích hoặc đánh đổi chính
+- Giúp người dùng đưa ra quyết định có thông tin
+- Giữ trong 1–2 câu
 
-**Appropriate number:**
-- 2-4 options per question
-- Don't overwhelm with too many choices
-- Group related options
-- "Other" automatically provided
+**Số lượng phù hợp:**
+- 2–4 tùy chọn mỗi câu hỏi
+- Không làm người dùng choáng ngợp với quá nhiều lựa chọn
+- Nhóm các tùy chọn liên quan
+- "Other" được cung cấp tự động
 
-### Multi-Select Questions
+### Câu Hỏi Multi-Select
 
-**When to use multiSelect:**
+**Khi nào dùng multiSelect:**
 
 ```markdown
-Use AskUserQuestion for enabling features:
+Dùng AskUserQuestion để bật tính năng:
 
 Question: "Which features do you want to enable?"
 Header: "Features"
-multiSelect: true  // Allow selecting multiple
+multiSelect: true  // Cho phép chọn nhiều
 Options:
-  - Logging (Detailed operation logs)
-  - Metrics (Performance monitoring)
-  - Alerts (Error notifications)
-  - Backups (Automatic backups)
+  - Logging (Log thao tác chi tiết)
+  - Metrics (Theo dõi hiệu năng)
+  - Alerts (Thông báo lỗi)
+  - Backups (Sao lưu tự động)
 ```
 
-User can select any combination: none, some, or all.
+Người dùng có thể chọn bất kỳ kết hợp nào: không có, một số, hoặc tất cả.
 
-**When NOT to use multiSelect:**
+**Khi KHÔNG dùng multiSelect:**
 
 ```markdown
 Question: "Which authentication method?"
-multiSelect: false  // Only one auth method makes sense
+multiSelect: false  // Chỉ một phương thức auth có ý nghĩa
 ```
 
-Mutually exclusive choices should not use multiSelect.
+Các lựa chọn loại trừ lẫn nhau không nên dùng multiSelect.
 
-## Command Patterns with AskUserQuestion
+## Các Pattern Command với AskUserQuestion
 
-### Pattern 1: Simple Yes/No Decision
+### Pattern 1: Quyết Định Yes/No Đơn Giản
 
 ```markdown
 ---
@@ -278,26 +278,26 @@ allowed-tools: AskUserQuestion, Bash
 
 # Destructive Operation
 
-This operation will delete all cached data.
+Thao tác này sẽ xóa tất cả dữ liệu đã cache.
 
-Use AskUserQuestion to confirm:
+Dùng AskUserQuestion để xác nhận:
 
 Question: "This will delete all cached data. Are you sure?"
 Header: "Confirm"
 Options:
-  - Yes (Proceed with deletion)
-  - No (Cancel operation)
+  - Yes (Tiến hành xóa)
+  - No (Hủy thao tác)
 
-If user selects "Yes":
-  Execute deletion
-  Report completion
+Nếu người dùng chọn "Yes":
+  Thực thi xóa
+  Báo cáo kết quả
 
-If user selects "No":
-  Cancel operation
-  Exit without changes
+Nếu người dùng chọn "No":
+  Hủy thao tác
+  Thoát không có thay đổi
 ```
 
-### Pattern 2: Multiple Configuration Questions
+### Pattern 2: Nhiều Câu Hỏi Cấu Hình
 
 ```markdown
 ---
@@ -307,36 +307,36 @@ allowed-tools: AskUserQuestion, Write
 
 # Project Configuration Setup
 
-Gather configuration through multiple questions.
+Thu thập cấu hình qua nhiều câu hỏi.
 
-Use AskUserQuestion with multiple questions in one call:
+Dùng AskUserQuestion với nhiều câu hỏi trong một lần gọi:
 
-**Question 1:**
+**Câu hỏi 1:**
 - question: "Which programming language?"
 - header: "Language"
 - options: Python, TypeScript, Go, Rust
 
-**Question 2:**
+**Câu hỏi 2:**
 - question: "Which test framework?"
 - header: "Testing"
 - options: Jest, PyTest, Go Test, Cargo Test
-  (Adapt based on language from Q1)
+  (Thích nghi dựa trên ngôn ngữ từ Q1)
 
-**Question 3:**
+**Câu hỏi 3:**
 - question: "Which CI/CD platform?"
 - header: "CI/CD"
 - options: GitHub Actions, GitLab CI, CircleCI
 
-**Question 4:**
+**Câu hỏi 4:**
 - question: "Which features do you need?"
 - header: "Features"
 - multiSelect: true
 - options: Linting, Type checking, Code coverage, Security scanning
 
-Process all answers together to generate cohesive configuration.
+Xử lý tất cả câu trả lời cùng nhau để tạo cấu hình thống nhất.
 ```
 
-### Pattern 3: Conditional Question Flow
+### Pattern 3: Luồng Câu Hỏi Có Điều Kiện
 
 ```markdown
 ---
@@ -346,39 +346,39 @@ allowed-tools: AskUserQuestion, Read, Write
 
 # Adaptive Configuration
 
-## Question 1: Deployment Complexity
+## Câu Hỏi 1: Độ Phức Tạp Deployment
 
-Use AskUserQuestion:
+Dùng AskUserQuestion:
 
 Question: "How complex is your deployment?"
 Header: "Complexity"
 Options:
-  - Simple (Single server, straightforward)
-  - Standard (Multiple servers, load balancing)
-  - Complex (Microservices, orchestration)
+  - Simple (Một server, đơn giản)
+  - Standard (Nhiều server, load balancing)
+  - Complex (Microservice, orchestration)
 
-## Conditional Questions Based on Answer
+## Câu Hỏi Có Điều Kiện Dựa Trên Câu Trả Lời
 
-If answer is "Simple":
-  - No additional questions
-  - Use minimal configuration
+Nếu câu trả lời là "Simple":
+  - Không có câu hỏi thêm
+  - Dùng cấu hình tối thiểu
 
-If answer is "Standard":
-  - Ask about load balancing strategy
-  - Ask about scaling policy
+Nếu câu trả lời là "Standard":
+  - Hỏi về chiến lược load balancing
+  - Hỏi về chính sách scaling
 
-If answer is "Complex":
-  - Ask about orchestration platform (Kubernetes, Docker Swarm)
-  - Ask about service mesh (Istio, Linkerd, None)
-  - Ask about monitoring (Prometheus, Datadog, CloudWatch)
-  - Ask about logging aggregation
+Nếu câu trả lời là "Complex":
+  - Hỏi về nền tảng orchestration (Kubernetes, Docker Swarm)
+  - Hỏi về service mesh (Istio, Linkerd, None)
+  - Hỏi về monitoring (Prometheus, Datadog, CloudWatch)
+  - Hỏi về log aggregation
 
-## Process Conditional Answers
+## Xử Lý Câu Trả Lời Có Điều Kiện
 
-Generate configuration appropriate for selected complexity level.
+Tạo cấu hình phù hợp với mức độ phức tạp đã chọn.
 ```
 
-### Pattern 4: Iterative Collection
+### Pattern 4: Thu Thập Lặp Đi Lặp Lại
 
 ```markdown
 ---
@@ -388,25 +388,25 @@ allowed-tools: AskUserQuestion, Write
 
 # Collect Team Members
 
-We'll collect team member information for the project.
+Chúng ta sẽ thu thập thông tin thành viên nhóm cho project.
 
-## Question: How many team members?
+## Câu Hỏi: Bao Nhiêu Thành Viên?
 
-Use AskUserQuestion:
+Dùng AskUserQuestion:
 
 Question: "How many team members should we set up?"
 Header: "Team size"
 Options:
-  - 2 people
-  - 3 people
-  - 4 people
-  - 6 people
+  - 2 người
+  - 3 người
+  - 4 người
+  - 6 người
 
-## Iterate Through Team Members
+## Lặp Qua Từng Thành Viên
 
-For each team member (1 to N based on answer):
+Với mỗi thành viên (1 đến N dựa trên câu trả lời):
 
-Use AskUserQuestion for member details:
+Dùng AskUserQuestion để hỏi chi tiết thành viên:
 
 Question: "What role for team member [number]?"
 Header: "Role"
@@ -417,14 +417,14 @@ Options:
   - QA Engineer
   - Designer
 
-Store each member's information.
+Lưu thông tin từng thành viên.
 
-## Generate Team Configuration
+## Tạo Cấu Hình Nhóm
 
-After collecting all N members, create team configuration file with all members and their roles.
+Sau khi thu thập đủ N thành viên, tạo file cấu hình nhóm với tất cả thành viên và vai trò của họ.
 ```
 
-### Pattern 5: Dependency Selection
+### Pattern 5: Chọn Dependency
 
 ```markdown
 ---
@@ -434,9 +434,9 @@ allowed-tools: AskUserQuestion
 
 # Configure Project Dependencies
 
-## Question: Required Libraries
+## Câu Hỏi: Thư Viện Cần Thiết
 
-Use AskUserQuestion with multiSelect:
+Dùng AskUserQuestion với multiSelect:
 
 Question: "Which libraries does your project need?"
 Header: "Dependencies"
@@ -448,76 +448,76 @@ Options:
   - Jest (Testing framework)
   - Axios (HTTP client)
 
-User can select any combination.
+Người dùng có thể chọn bất kỳ kết hợp nào.
 
-## Process Selections
+## Xử Lý Lựa Chọn
 
-For each selected library:
-- Add to package.json dependencies
-- Generate sample configuration
-- Create usage examples
-- Update documentation
+Với mỗi thư viện được chọn:
+- Thêm vào package.json dependencies
+- Tạo cấu hình mẫu
+- Tạo ví dụ sử dụng
+- Cập nhật tài liệu
 ```
 
-## Best Practices for Interactive Commands
+## Nguyên Tắc Tốt Nhất cho Command Tương Tác
 
-### Question Design
+### Thiết Kế Câu Hỏi
 
-1. **Clear and specific**: Question should be unambiguous
-2. **Concise header**: Max 12 characters for clean display
-3. **Helpful options**: Labels are clear, descriptions explain trade-offs
-4. **Appropriate count**: 2-4 options per question, 1-4 questions per call
-5. **Logical order**: Questions flow naturally
+1. **Rõ ràng và cụ thể**: Câu hỏi phải không mơ hồ
+2. **Header ngắn gọn**: Tối đa 12 ký tự để hiển thị gọn
+3. **Tùy chọn hữu ích**: Nhãn rõ ràng, mô tả giải thích đánh đổi
+4. **Số lượng phù hợp**: 2–4 tùy chọn mỗi câu hỏi, 1–4 câu hỏi mỗi lần gọi
+5. **Thứ tự logic**: Câu hỏi chảy tự nhiên
 
-### Error Handling
+### Xử Lý Lỗi
 
 ```markdown
-# Handle AskUserQuestion Responses
+# Xử Lý Phản Hồi AskUserQuestion
 
-After calling AskUserQuestion, verify answers received:
+Sau khi gọi AskUserQuestion, xác minh câu trả lời nhận được:
 
-If answers are empty or invalid:
-  Something went wrong gathering responses.
+Nếu câu trả lời trống hoặc không hợp lệ:
+  Có gì đó đã sai khi thu thập phản hồi.
 
-  Please try again or provide configuration manually:
-  [Show alternative approach]
+  Hãy thử lại hoặc cung cấp cấu hình thủ công:
+  [Hiển thị cách tiếp cận thay thế]
 
-  Exit.
+  Thoát.
 
-If answers look correct:
-  Process as expected
+Nếu câu trả lời có vẻ đúng:
+  Xử lý như mong đợi
 ```
 
-### Progressive Disclosure
+### Tiết Lộ Dần Dần
 
 ```markdown
-# Start Simple, Get Detailed as Needed
+# Bắt Đầu Đơn Giản, Đi Sâu Khi Cần
 
-## Question 1: Setup Type
+## Câu Hỏi 1: Loại Thiết Lập
 
-Use AskUserQuestion:
+Dùng AskUserQuestion:
 
 Question: "How would you like to set up?"
 Header: "Setup type"
 Options:
-  - Quick (Use recommended defaults)
-  - Custom (Configure all options)
-  - Guided (Step-by-step with explanations)
+  - Quick (Dùng các giá trị mặc định được khuyến nghị)
+  - Custom (Cấu hình tất cả tùy chọn)
+  - Guided (Từng bước với giải thích)
 
-If "Quick":
-  Apply defaults, minimal questions
+Nếu "Quick":
+  Áp dụng mặc định, câu hỏi tối thiểu
 
-If "Custom":
-  Ask all available configuration questions
+Nếu "Custom":
+  Hỏi tất cả câu hỏi cấu hình có sẵn
 
-If "Guided":
-  Ask questions with extra explanation
-  Provide recommendations along the way
+Nếu "Guided":
+  Hỏi câu hỏi với giải thích thêm
+  Cung cấp khuyến nghị theo từng bước
 ```
 
-### Multi-Select Guidelines
+### Hướng Dẫn Multi-Select
 
-**Good multi-select use:**
+**Dùng multi-select đúng cách:**
 ```markdown
 Question: "Which features do you want to enable?"
 multiSelect: true
@@ -527,20 +527,20 @@ Options:
   - Alerts
   - Backups
 
-Reason: User might want any combination
+Lý do: Người dùng có thể muốn bất kỳ kết hợp nào
 ```
 
-**Bad multi-select use:**
+**Dùng multi-select sai cách:**
 ```markdown
 Question: "Which database engine?"
-multiSelect: true  // ❌ Should be single-select
+multiSelect: true  # ❌ Nên là single-select
 
-Reason: Can only use one database engine
+Lý do: Chỉ có thể dùng một database engine
 ```
 
-## Advanced Patterns
+## Các Pattern Nâng Cao
 
-### Validation Loop
+### Vòng Lặp Validation
 
 ```markdown
 ---
@@ -550,33 +550,33 @@ allowed-tools: AskUserQuestion, Bash
 
 # Setup with Validation
 
-## Gather Configuration
+## Thu Thập Cấu Hình
 
-Use AskUserQuestion to collect settings.
+Dùng AskUserQuestion để thu thập các cài đặt.
 
-## Validate Configuration
+## Validate Cấu Hình
 
-Check if configuration is valid:
-- Required dependencies available?
-- Settings compatible with each other?
-- No conflicts detected?
+Kiểm tra cấu hình có hợp lệ không:
+- Các dependency bắt buộc có sẵn không?
+- Các cài đặt có tương thích với nhau không?
+- Không phát hiện conflict?
 
-If validation fails:
-  Show validation errors
+Nếu validation thất bại:
+  Hiển thị lỗi validation
 
-  Use AskUserQuestion to ask:
+  Dùng AskUserQuestion để hỏi:
 
   Question: "Configuration has issues. What would you like to do?"
   Header: "Next step"
   Options:
-    - Fix (Adjust settings to resolve issues)
-    - Override (Proceed despite warnings)
-    - Cancel (Abort setup)
+    - Fix (Điều chỉnh cài đặt để giải quyết vấn đề)
+    - Override (Tiếp tục bất chấp cảnh báo)
+    - Cancel (Hủy bỏ thiết lập)
 
-  Based on answer, retry or proceed or exit.
+  Dựa trên câu trả lời, thử lại hoặc tiếp tục hoặc thoát.
 ```
 
-### Build Configuration Incrementally
+### Xây Dựng Cấu Hình Dần Dần
 
 ```markdown
 ---
@@ -586,42 +586,42 @@ allowed-tools: AskUserQuestion, Write, Read
 
 # Incremental Setup
 
-## Phase 1: Core Settings
+## Giai Đoạn 1: Cài Đặt Cốt Lõi
 
-Use AskUserQuestion for core settings.
+Dùng AskUserQuestion cho các cài đặt cốt lõi.
 
-Save to `.claude/config-partial.yml`
+Lưu vào `.claude/config-partial.yml`
 
-## Phase 2: Review Core Settings
+## Giai Đoạn 2: Xem Lại Cài Đặt Cốt Lõi
 
-Show user the core settings:
+Hiển thị cho người dùng các cài đặt cốt lõi:
 
-Based on these core settings, you need to configure:
-- [Setting A] (because you chose [X])
-- [Setting B] (because you chose [Y])
+Dựa trên các cài đặt cốt lõi này, bạn cần cấu hình:
+- [Cài đặt A] (vì bạn đã chọn [X])
+- [Cài đặt B] (vì bạn đã chọn [Y])
 
-Ready to continue?
+Sẵn sàng tiếp tục?
 
-## Phase 3: Detailed Settings
+## Giai Đoạn 3: Cài Đặt Chi Tiết
 
-Use AskUserQuestion for settings based on Phase 1 answers.
+Dùng AskUserQuestion cho cài đặt dựa trên câu trả lời Giai đoạn 1.
 
-Merge with core settings.
+Hợp nhất với cài đặt cốt lõi.
 
-## Phase 4: Final Review
+## Giai Đoạn 4: Xem Lại Cuối Cùng
 
-Present complete configuration.
+Trình bày cấu hình hoàn chỉnh.
 
-Use AskUserQuestion for confirmation:
+Dùng AskUserQuestion để xác nhận:
 
 Question: "Is this configuration correct?"
 Options:
-  - Yes (Save and apply)
-  - No (Start over)
-  - Modify (Edit specific settings)
+  - Yes (Lưu và áp dụng)
+  - No (Bắt đầu lại)
+  - Modify (Chỉnh sửa cài đặt cụ thể)
 ```
 
-### Dynamic Options Based on Context
+### Tùy Chọn Động Dựa Trên Ngữ Cảnh
 
 ```markdown
 ---
@@ -631,43 +631,43 @@ allowed-tools: AskUserQuestion, Bash, Read
 
 # Context-Aware Setup
 
-## Detect Current State
+## Phát Hiện Trạng Thái Hiện Tại
 
-Check existing configuration:
-- Current language: !`detect-language.sh`
-- Existing frameworks: !`detect-frameworks.sh`
-- Available tools: !`check-tools.sh`
+Kiểm tra cấu hình hiện có:
+- Ngôn ngữ hiện tại: !`detect-language.sh`
+- Framework hiện có: !`detect-frameworks.sh`
+- Tool có sẵn: !`check-tools.sh`
 
-## Ask Context-Appropriate Questions
+## Hỏi Câu Hỏi Phù Hợp Với Ngữ Cảnh
 
-Based on detected language, ask relevant questions.
+Dựa trên ngôn ngữ được phát hiện, hỏi câu hỏi liên quan.
 
-If language is TypeScript:
+Nếu ngôn ngữ là TypeScript:
 
-  Use AskUserQuestion:
+  Dùng AskUserQuestion:
 
   Question: "Which TypeScript features should we enable?"
   Options:
-    - Strict Mode (Maximum type safety)
-    - Decorators (Experimental decorator support)
-    - Path Mapping (Module path aliases)
+    - Strict Mode (Type safety tối đa)
+    - Decorators (Hỗ trợ decorator thực nghiệm)
+    - Path Mapping (Alias đường dẫn module)
 
-If language is Python:
+Nếu ngôn ngữ là Python:
 
-  Use AskUserQuestion:
+  Dùng AskUserQuestion:
 
   Question: "Which Python tools should we configure?"
   Options:
-    - Type Hints (mypy for type checking)
-    - Black (Code formatting)
-    - Pylint (Linting and style)
+    - Type Hints (mypy để kiểm tra kiểu)
+    - Black (Định dạng code)
+    - Pylint (Lint và style)
 
-Questions adapt to project context.
+Câu hỏi thích nghi với ngữ cảnh project.
 ```
 
-## Real-World Example: Multi-Agent Swarm Launch
+## Ví Dụ Thực Tế: Khởi Chạy Multi-Agent Swarm
 
-**From multi-agent-swarm plugin:**
+**Từ plugin multi-agent-swarm:**
 
 ```markdown
 ---
@@ -677,57 +677,57 @@ allowed-tools: AskUserQuestion, Read, Write, Bash
 
 # Launch Multi-Agent Swarm
 
-## Interactive Mode (No Task List Provided)
+## Chế Độ Tương Tác (Chưa Cung Cấp Task List)
 
-If user didn't provide task list file, help create one interactively.
+Nếu người dùng chưa cung cấp file task list, giúp tạo một cách tương tác.
 
-### Question 1: Agent Count
+### Câu Hỏi 1: Số Lượng Agent
 
-Use AskUserQuestion:
+Dùng AskUserQuestion:
 
 Question: "How many agents should we launch?"
 Header: "Agent count"
 Options:
-  - 2 agents (Best for simple projects)
-  - 3 agents (Good for medium projects)
-  - 4 agents (Standard team size)
-  - 6 agents (Large projects)
-  - 8 agents (Complex multi-component projects)
+  - 2 agents (Tốt nhất cho project đơn giản)
+  - 3 agents (Phù hợp cho project vừa)
+  - 4 agents (Quy mô nhóm tiêu chuẩn)
+  - 6 agents (Project lớn)
+  - 8 agents (Project phức tạp nhiều thành phần)
 
-### Question 2: Task Definition Approach
+### Câu Hỏi 2: Cách Định Nghĩa Task
 
-Use AskUserQuestion:
+Dùng AskUserQuestion:
 
 Question: "How would you like to define tasks?"
 Header: "Task setup"
 Options:
-  - File (I have a task list file ready)
-  - Guided (Help me create tasks interactively)
-  - Custom (Other approach)
+  - File (Tôi đã có file task list sẵn)
+  - Guided (Giúp tôi tạo task tương tác)
+  - Custom (Cách tiếp cận khác)
 
-If "File":
-  Ask for file path
-  Validate file exists and has correct format
+Nếu "File":
+  Hỏi đường dẫn file
+  Validate file tồn tại và đúng định dạng
 
-If "Guided":
-  Enter iterative task creation mode (see below)
+Nếu "Guided":
+  Vào chế độ tạo task lặp đi lặp lại (xem bên dưới)
 
-### Question 3: Coordination Mode
+### Câu Hỏi 3: Chế Độ Điều Phối
 
-Use AskUserQuestion:
+Dùng AskUserQuestion:
 
 Question: "How should agents coordinate?"
 Header: "Coordination"
 Options:
-  - Team Leader (One agent coordinates others)
-  - Collaborative (Agents coordinate as peers)
-  - Autonomous (Independent work, minimal coordination)
+  - Team Leader (Một agent điều phối các agent khác)
+  - Collaborative (Các agent điều phối như đồng nghiệp)
+  - Autonomous (Làm việc độc lập, điều phối tối thiểu)
 
-### Iterative Task Creation (If "Guided" Selected)
+### Tạo Task Lặp Đi Lặp Lại (Nếu Chọn "Guided")
 
-For each agent (1 to N from Question 1):
+Với mỗi agent (1 đến N từ Câu hỏi 1):
 
-**Question A: Agent Name**
+**Câu hỏi A: Tên Agent**
 Question: "What should we call agent [number]?"
 Header: "Agent name"
 Options:
@@ -735,28 +735,28 @@ Options:
   - api-agent
   - ui-agent
   - db-agent
-  (Provide relevant suggestions based on common patterns)
+  (Cung cấp gợi ý liên quan dựa trên các pattern phổ biến)
 
-**Question B: Task Type**
+**Câu hỏi B: Loại Task**
 Question: "What task for [agent-name]?"
 Header: "Task type"
 Options:
-  - Authentication (User auth, JWT, OAuth)
-  - API Endpoints (REST/GraphQL APIs)
-  - UI Components (Frontend components)
-  - Database (Schema, migrations, queries)
-  - Testing (Test suites and coverage)
-  - Documentation (Docs, README, guides)
+  - Authentication (Auth người dùng, JWT, OAuth)
+  - API Endpoints (REST/GraphQL API)
+  - UI Components (Component frontend)
+  - Database (Schema, migration, query)
+  - Testing (Bộ test và coverage)
+  - Documentation (Docs, README, guide)
 
-**Question C: Dependencies**
+**Câu hỏi C: Dependency**
 Question: "What does [agent-name] depend on?"
 Header: "Dependencies"
 multiSelect: true
 Options:
-  - [List of previously defined agents]
+  - [Danh sách các agent đã định nghĩa trước đó]
   - No dependencies
 
-**Question D: Base Branch**
+**Câu hỏi D: Branch Cơ Sở**
 Question: "Which base branch for PR?"
 Header: "PR base"
 Options:
@@ -764,59 +764,59 @@ Options:
   - staging
   - develop
 
-Store all task information for each agent.
+Lưu tất cả thông tin task cho mỗi agent.
 
-### Generate Task List File
+### Tạo File Task List
 
-After collecting all agent task details:
+Sau khi thu thập đủ chi tiết task cho mọi agent:
 
-1. Ask for project name
-2. Generate task list in proper format
-3. Save to `.daisy/swarm/tasks.md`
-4. Show user the file path
-5. Proceed with launch using generated task list
+1. Hỏi tên project
+2. Tạo task list theo đúng định dạng
+3. Lưu vào `.daisy/swarm/tasks.md`
+4. Hiển thị đường dẫn file cho người dùng
+5. Tiến hành khởi chạy dùng task list đã tạo
 ```
 
-## Best Practices
+## Nguyên Tắc Tốt Nhất
 
-### Question Writing
+### Viết Câu Hỏi
 
-1. **Be specific**: "Which database?" not "Choose option?"
-2. **Explain trade-offs**: Describe pros/cons in option descriptions
-3. **Provide context**: Question text should stand alone
-4. **Guide decisions**: Help user make informed choice
-5. **Keep concise**: Header max 12 chars, descriptions 1-2 sentences
+1. **Cụ thể**: "Which database?" thay vì "Choose option?"
+2. **Giải thích đánh đổi**: Mô tả ưu/nhược của từng tùy chọn
+3. **Cung cấp ngữ cảnh**: Câu hỏi phải đứng được một mình
+4. **Hướng dẫn quyết định**: Giúp người dùng đưa ra lựa chọn có thông tin
+5. **Giữ ngắn gọn**: Header tối đa 12 ký tự, mô tả 1–2 câu
 
-### Option Design
+### Thiết Kế Tùy Chọn
 
-1. **Meaningful labels**: Specific, clear names
-2. **Informative descriptions**: Explain what each option does
-3. **Show trade-offs**: Help user understand implications
-4. **Consistent detail**: All options equally explained
-5. **2-4 options**: Not too few, not too many
+1. **Nhãn có ý nghĩa**: Tên cụ thể, rõ ràng
+2. **Mô tả nhiều thông tin**: Giải thích từng tùy chọn làm gì
+3. **Hiển thị đánh đổi**: Giúp người dùng hiểu hệ quả
+4. **Chi tiết nhất quán**: Tất cả tùy chọn được giải thích đều nhau
+5. **2–4 tùy chọn**: Không quá ít, không quá nhiều
 
-### Flow Design
+### Thiết Kế Luồng
 
-1. **Logical order**: Questions flow naturally
-2. **Build on previous**: Later questions use earlier answers
-3. **Minimize questions**: Ask only what's needed
-4. **Group related**: Ask related questions together
-5. **Show progress**: Indicate where in flow
+1. **Thứ tự logic**: Câu hỏi chảy tự nhiên
+2. **Xây dựng từ trước**: Câu hỏi sau dùng câu trả lời trước
+3. **Tối thiểu hóa câu hỏi**: Chỉ hỏi những gì cần thiết
+4. **Nhóm câu hỏi liên quan**: Hỏi câu hỏi liên quan cùng nhau
+5. **Hiển thị tiến độ**: Chỉ rõ đang ở đâu trong luồng
 
-### User Experience
+### Trải Nghiệm Người Dùng
 
-1. **Set expectations**: Tell user what to expect
-2. **Explain why**: Help user understand purpose
-3. **Provide defaults**: Suggest recommended options
-4. **Allow escape**: Let user cancel or restart
-5. **Confirm actions**: Summarize before executing
+1. **Đặt kỳ vọng**: Cho người dùng biết điều gì sẽ xảy ra
+2. **Giải thích lý do**: Giúp người dùng hiểu mục đích
+3. **Cung cấp mặc định**: Gợi ý tùy chọn được khuyến nghị
+4. **Cho phép thoát**: Để người dùng hủy hoặc bắt đầu lại
+5. **Xác nhận hành động**: Tóm tắt trước khi thực thi
 
-## Common Patterns
+## Các Pattern Phổ Biến
 
-### Pattern: Feature Selection
+### Pattern: Chọn Tính Năng
 
 ```markdown
-Use AskUserQuestion:
+Dùng AskUserQuestion:
 
 Question: "Which features do you need?"
 Header: "Features"
@@ -828,93 +828,93 @@ Options:
   - Caching
 ```
 
-### Pattern: Environment Configuration
+### Pattern: Cấu Hình Môi Trường
 
 ```markdown
-Use AskUserQuestion:
+Dùng AskUserQuestion:
 
 Question: "Which environment is this?"
 Header: "Environment"
 Options:
-  - Development (Local development)
-  - Staging (Pre-production testing)
-  - Production (Live environment)
+  - Development (Phát triển local)
+  - Staging (Kiểm thử trước production)
+  - Production (Môi trường live)
 ```
 
-### Pattern: Priority Selection
+### Pattern: Chọn Độ Ưu Tiên
 
 ```markdown
-Use AskUserQuestion:
+Dùng AskUserQuestion:
 
 Question: "What's the priority for this task?"
 Header: "Priority"
 Options:
-  - Critical (Must be done immediately)
-  - High (Important, do soon)
-  - Medium (Standard priority)
-  - Low (Nice to have)
+  - Critical (Phải làm ngay)
+  - High (Quan trọng, làm sớm)
+  - Medium (Ưu tiên bình thường)
+  - Low (Tốt nếu có)
 ```
 
-### Pattern: Scope Selection
+### Pattern: Chọn Phạm Vi
 
 ```markdown
-Use AskUserQuestion:
+Dùng AskUserQuestion:
 
 Question: "What scope should we analyze?"
 Header: "Scope"
 Options:
-  - Current file (Just this file)
-  - Current directory (All files in directory)
-  - Entire project (Full codebase scan)
+  - Current file (Chỉ file này)
+  - Current directory (Tất cả file trong thư mục)
+  - Entire project (Quét toàn bộ codebase)
 ```
 
-## Combining Arguments and Questions
+## Kết Hợp Argument và Câu Hỏi
 
-### Use Both Appropriately
+### Dùng Cả Hai Phù Hợp
 
-**Arguments for known values:**
+**Argument cho giá trị đã biết:**
 ```markdown
 ---
 argument-hint: [project-name]
 allowed-tools: AskUserQuestion, Write
 ---
 
-Setup for project: $1
+Thiết lập cho project: $1
 
-Now gather additional configuration...
+Bây giờ thu thập cấu hình bổ sung...
 
-Use AskUserQuestion for options that require explanation.
+Dùng AskUserQuestion cho các tùy chọn cần giải thích.
 ```
 
-**Questions for complex choices:**
+**Câu hỏi cho lựa chọn phức tạp:**
 ```markdown
-Project name from argument: $1
+Tên project từ argument: $1
 
-Now use AskUserQuestion to choose:
-- Architecture pattern
+Bây giờ dùng AskUserQuestion để chọn:
+- Pattern kiến trúc
 - Technology stack
-- Deployment strategy
+- Chiến lược deployment
 
-These require explanation, so questions work better than arguments.
+Những thứ này cần giải thích, nên câu hỏi phù hợp hơn argument.
 ```
 
 ## Troubleshooting
 
-**Questions not appearing:**
-- Verify AskUserQuestion in allowed-tools
-- Check question format is correct
-- Ensure options array has 2-4 items
+**Câu hỏi không hiển thị:**
+- Xác minh AskUserQuestion có trong allowed-tools
+- Kiểm tra định dạng câu hỏi đúng
+- Đảm bảo mảng options có 2–4 item
 
-**User can't make selection:**
-- Check option labels are clear
-- Verify descriptions are helpful
-- Consider if too many options
-- Ensure multiSelect setting is correct
+**Người dùng không thể chọn:**
+- Kiểm tra nhãn tùy chọn rõ ràng
+- Xác minh mô tả hữu ích
+- Cân nhắc xem có quá nhiều tùy chọn không
+- Đảm bảo cài đặt multiSelect đúng
 
-**Flow feels confusing:**
-- Reduce number of questions
-- Group related questions
-- Add explanation between stages
-- Show progress through workflow
+**Luồng gây nhầm lẫn:**
+- Giảm số câu hỏi
+- Nhóm câu hỏi liên quan
+- Thêm giải thích giữa các giai đoạn
+- Hiển thị tiến độ qua workflow
 
-With AskUserQuestion, commands become interactive wizards that guide users through complex decisions while maintaining the clarity that simple arguments provide for straightforward inputs.
+Với AskUserQuestion, command trở thành các wizard tương tác hướng dẫn người dùng qua các quyết định phức tạp trong khi vẫn giữ sự rõ ràng mà argument đơn giản mang lại cho các input thẳng thắn.
