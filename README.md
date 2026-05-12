@@ -32,10 +32,9 @@
 ├── rules/
 │   ├── communication.md            # ✅ Auto-import (essential mỗi turn)
 │   ├── security.md                 # ✅ Auto-import (essential mọi task)
-│   └── verification.md             # ✅ Auto-import (verify & avoid past mistakes)
-├── references/
-│   ├── coding-standards.md         # ⏸️ @-reference khi cần
-│   └── git-workflow.md             # ⏸️ @-reference khi cần
+│   ├── verification.md             # ✅ Auto-import (verify & avoid past mistakes)
+│   ├── coding-standards.md         # ✅ Auto-import (coding conventions)
+│   └── git-workflow.md             # ✅ Auto-import (git workflow)
 ├── skills/                         # Workflow tái sử dụng (gọi /tên)
 │   ├── commit/SKILL.md             # Conventional Commit, subject TV
 │   ├── code-review/SKILL.md        # Review 6 góc nhìn
@@ -60,7 +59,7 @@
 │   ├── type-design-analyzer.md     # Phân tích type design (sonnet)
 │   ├── comment-analyzer.md         # Phân tích comment quality (sonnet)
 │   ├── silent-failure-hunter.md    # Tìm silent failures (sonnet)
-│   ├── architecture-critic.md     # Adversarial architecture review (sonnet)
+│   ├── architecture-critic.md      # Adversarial architecture review (sonnet)
 │   ├── debugger.md                 # Root cause analysis + fix (sonnet)
 │   ├── documentation-engineer.md   # Viết/maintain docs (sonnet)
 │   ├── performance-engineer.md     # Profiling + optimization (sonnet)
@@ -124,7 +123,7 @@
 **Ghi chú**:
 - Vietnamese tokenize ~2.3 chars/token cho prose (ước lượng empirical, đo bằng `/context` trên tokenizer Claude — Anthropic không publish ratio chính thức cho từng ngôn ngữ); kém hiệu quả hơn English ~4 chars/token; baseline ~46k cao hơn config English (~10-15k) là expected.
 - 16 agents (6,800 tokens tổng descriptions) — chỉ load descriptions tại session start, body load khi spawn agent.
-- 2 references còn lại ([`coding-standards.md`](references/coding-standards.md), [`git-workflow.md`](references/git-workflow.md)) chỉ load khi `@`-reference → KHÔNG ăn baseline.
+- 5 rules auto-load mọi session (communication, security, verification, coding-standards, git-workflow).
 - Autocompact buffer 33k reserved (không tính vào used) — Claude Code dành chỗ cho compact summary khi context đầy.
 
 ## 2. Cài đặt
@@ -171,7 +170,7 @@ git clone https://github.com/MinhThang1009/dotclaude.git
 
 ```bash
 mkdir -p ~/.claude
-for item in CLAUDE.md settings.json agents hooks output-styles references rules skills templates; do
+for item in CLAUDE.md settings.json agents hooks output-styles rules skills templates; do
   cp -r "dotclaude/$item" ~/.claude/
 done
 ```
@@ -180,7 +179,7 @@ done
 
 ```powershell
 New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude" | Out-Null
-$items = @('CLAUDE.md', 'settings.json', 'agents', 'hooks', 'output-styles', 'references', 'rules', 'skills', 'templates')
+$items = @('CLAUDE.md', 'settings.json', 'agents', 'hooks', 'output-styles', 'rules', 'skills', 'templates')
 foreach ($item in $items) {
   Copy-Item -Recurse -Force "dotclaude\$item" "$env:USERPROFILE\.claude\"
 }
@@ -192,7 +191,7 @@ foreach ($item in $items) {
 if not exist "%USERPROFILE%\.claude" mkdir "%USERPROFILE%\.claude"
 copy /Y "dotclaude\CLAUDE.md" "%USERPROFILE%\.claude\"
 copy /Y "dotclaude\settings.json" "%USERPROFILE%\.claude\"
-for %i in (agents hooks output-styles references rules skills templates) do xcopy /E /I /Y /H "dotclaude\%i" "%USERPROFILE%\.claude\%i\"
+for %i in (agents hooks output-styles rules skills templates) do xcopy /E /I /Y /H "dotclaude\%i" "%USERPROFILE%\.claude\%i\"
 ```
 
 > CMD `for` loop syntax là `%i` interactive, `%%i` trong batch file (`.bat`/`.cmd`).
@@ -329,8 +328,7 @@ Cao → thấp khi xung đột:
 | Cơ chế                 | Mục đích                                                                      |
 | ---------------------- | ----------------------------------------------------------------------------- |
 | **CLAUDE.md**          | Hướng dẫn cần load **MỌI session** — giữ ngắn (<100 dòng)                     |
-| **rules/** auto-import | Rule áp dụng MỌI session — chỉ 1-2 file thật cần                              |
-| **references/**        | Rule theo chủ đề — `@`-reference khi cần (tiết kiệm context)                  |
+| **rules/** auto-import | Rule áp dụng MỌI session                                                       |
 | **skills/**            | Workflow tái sử dụng — load **ON-DEMAND** khi gọi                             |
 | **agents/**            | Task chuyên biệt cần **context window riêng**                                 |
 | **hooks**              | Hành động **BẮT BUỘC** chạy mỗi lần (CLAUDE.md là gợi ý, hooks deterministic) |
@@ -496,9 +494,9 @@ Sau khi dùng skills 1 thời gian, có thể measure xem description trigger c�
 
 Câu hỏi thường gặp:
 
-### 9.1 Tại sao tách rules và references?
+### 9.1 Tại sao tất cả rules đều auto-load?
 
-3 rules (`communication`, `security`, `verification`) auto-load mọi session (~7,700 tokens). 2 references (`coding-standards`, `git-workflow`) KHÔNG auto-load để tiết kiệm context — Claude tự đọc khi gặp task liên quan, hoặc user `@`-reference khi cần.
+5 rules (`communication`, `security`, `verification`, `coding-standards`, `git-workflow`) auto-load mọi session. Coding conventions và git workflow áp dụng cho hầu hết mọi task nên đưa vào rules/ thay vì để user `@`-reference thủ công.
 
 ### 9.2 Tại sao [REFERENCE.md](docs/REFERENCE.md) không auto-load vào [CLAUDE.md](CLAUDE.md)?
 
