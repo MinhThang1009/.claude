@@ -118,17 +118,17 @@ agent: Explore                  # Loại agent khi fork
 ```yaml
 ---
 name: api-doc
-description: Tạo OpenAPI documentation cho một endpoint. Dùng khi viết tài liệu cho API route.
+description: Generate OpenAPI documentation for an endpoint. Use when documenting API routes.
 ---
 
-Tạo OpenAPI documentation cho endpoint tại $ARGUMENTS.
+Generate OpenAPI documentation for the endpoint at $ARGUMENTS.
 
-Dùng template trong [openapi-template.yaml](openapi-template.yaml) làm cấu trúc.
+Use the template in [openapi-template.yaml](openapi-template.yaml) as the structure.
 
-1. Đọc code endpoint
-2. Trích xuất path, method, parameter, schema request/response
-3. Điền template với các giá trị thực tế
-4. Xuất ra YAML hoàn chỉnh
+1. Read the endpoint code
+2. Extract path, method, parameters, request/response schemas
+3. Fill in the template with actual values
+4. Output the completed YAML
 ```
 
 **openapi-template.yaml:**
@@ -168,23 +168,23 @@ Tạo và kiểm tra migration dùng script đi kèm:
 ```yaml
 ---
 name: create-migration
-description: Tạo file database migration
+description: Create a database migration file
 disable-model-invocation: true
 allowed-tools: Read, Write, Bash
 ---
 
-Tạo migration cho: $ARGUMENTS
+Create a migration for: $ARGUMENTS
 
-1. Tạo file migration trong `migrations/` với tiền tố timestamp
-2. Bao gồm hàm up và down
-3. Chạy kiểm tra: `bash ~/.claude/skills/create-migration/scripts/validate-migration.sh`
-4. Báo cáo bất kỳ vấn đề nào tìm thấy
+1. Generate migration file in `migrations/` with timestamp prefix
+2. Include up and down functions
+3. Run validation: `bash ~/.claude/skills/create-migration/scripts/validate-migration.sh`
+4. Report any issues found
 ```
 
 **scripts/validate-migration.sh:**
 ```bash
 #!/bin/bash
-# Kiểm tra cú pháp migration
+# Validate migration syntax
 npx prisma validate 2>&1 || echo "Validation failed"
 ```
 
@@ -206,20 +206,20 @@ Tạo test theo pattern của project:
 ```yaml
 ---
 name: gen-test
-description: Tạo test cho một file theo convention của project
+description: Generate tests for a file following project conventions
 disable-model-invocation: true
 ---
 
-Tạo test cho: $ARGUMENTS
+Generate tests for: $ARGUMENTS
 
-Tham khảo các ví dụ sau để biết pattern mong đợi:
-- Unit test: [examples/unit-test.ts](examples/unit-test.ts)
-- Integration test: [examples/integration-test.ts](examples/integration-test.ts)
+Reference these examples for the expected patterns:
+- Unit tests: [examples/unit-test.ts](examples/unit-test.ts)
+- Integration tests: [examples/integration-test.ts](examples/integration-test.ts)
 
-1. Phân tích file source
-2. Xác định các hàm/method cần test
-3. Tạo test khớp với convention của project
-4. Đặt vào thư mục test phù hợp
+1. Analyze the source file
+2. Identify functions/methods to test
+3. Generate tests matching project conventions
+4. Place in appropriate test directory
 ```
 
 ---
@@ -241,19 +241,19 @@ Scaffold component mới từ template:
 ```yaml
 ---
 name: new-component
-description: Scaffold React component mới kèm test và story
+description: Scaffold a new React component with tests and stories
 disable-model-invocation: true
 ---
 
-Tạo component: $ARGUMENTS
+Create component: $ARGUMENTS
 
-Dùng template trong thư mục [templates/](templates/):
-1. Tạo component từ component.tsx.template
-2. Tạo test từ component.test.tsx.template
-3. Tạo Storybook story từ component.stories.tsx.template
+Use templates in [templates/](templates/) directory:
+1. Generate component from component.tsx.template
+2. Generate tests from component.test.tsx.template
+3. Generate Storybook story from component.stories.tsx.template
 
-Thay {{ComponentName}} bằng tên PascalCase.
-Thay {{component-name}} bằng tên kebab-case.
+Replace {{ComponentName}} with the PascalCase name.
+Replace {{component-name}} with the kebab-case name.
 ```
 
 ---
@@ -272,29 +272,29 @@ Review PR theo checklist riêng của project:
 ```yaml
 ---
 name: pr-check
-description: Review PR theo checklist của project
+description: Review PR against project checklist
 disable-model-invocation: true
 context: fork
 ---
 
-## Context PR
+## PR Context
 - Diff: !`gh pr diff`
-- Mô tả: !`gh pr view`
+- Description: !`gh pr view`
 
-Review theo [checklist.md](checklist.md).
+Review against [checklist.md](checklist.md).
 
-Với mỗi mục, đánh dấu ✅ hoặc ❌ kèm giải thích.
+For each item, mark ✅ or ❌ with explanation.
 ```
 
 **checklist.md:**
 ```markdown
-## Checklist PR
+## PR Checklist
 
-- [ ] Đã thêm test cho tính năng mới
-- [ ] Không có lệnh console.log
-- [ ] Xử lý lỗi bao gồm message hiển thị cho người dùng
-- [ ] Thay đổi API tương thích ngược
-- [ ] Database migration có thể rollback
+- [ ] Tests added for new functionality
+- [ ] No console.log statements
+- [ ] Error handling includes user-facing messages
+- [ ] API changes are backwards compatible
+- [ ] Database migrations are reversible
 ```
 
 ---
@@ -307,19 +307,19 @@ Tạo release note từ lịch sử git:
 ```yaml
 ---
 name: release-notes
-description: Tạo release note từ các commit kể từ tag gần nhất
+description: Generate release notes from commits since last tag
 disable-model-invocation: true
 ---
 
-## Thay Đổi Gần Đây
-- Commit kể từ tag gần nhất: !`git log $(git describe --tags --abbrev=0)..HEAD --oneline`
-- Tag gần nhất: !`git describe --tags --abbrev=0`
+## Recent Changes
+- Commits since last tag: !`git log $(git describe --tags --abbrev=0)..HEAD --oneline`
+- Last tag: !`git describe --tags --abbrev=0`
 
-Tạo release note:
-1. Nhóm commit theo loại (feat, fix, docs, v.v.)
-2. Viết mô tả thân thiện với người dùng
-3. Làm nổi bật breaking change
-4. Format dưới dạng markdown
+Generate release notes:
+1. Group commits by type (feat, fix, docs, etc.)
+2. Write user-friendly descriptions
+3. Highlight breaking changes
+4. Format as markdown
 ```
 
 ---
@@ -332,25 +332,25 @@ Kiến thức nền Claude tự động áp dụng:
 ```yaml
 ---
 name: project-conventions
-description: Quy tắc code style và pattern cho project này. Áp dụng khi viết hoặc review code.
+description: Code style and patterns for this project. Apply when writing or reviewing code.
 user-invocable: false
 ---
 
-## Convention Đặt Tên
-- React component: PascalCase
-- Utility: camelCase
-- Hằng số: UPPER_SNAKE_CASE
-- File: kebab-case
+## Naming Conventions
+- React components: PascalCase
+- Utilities: camelCase
+- Constants: UPPER_SNAKE_CASE
+- Files: kebab-case
 
-## Pattern
-- Dùng `Result<T, E>` cho các thao tác có thể thất bại, không dùng exception
-- Ưu tiên composition hơn inheritance
-- Mọi API response dùng shape `{ data, error, meta }`
+## Patterns
+- Use `Result<T, E>` for fallible operations, not exceptions
+- Prefer composition over inheritance
+- All API responses use `{ data, error, meta }` shape
 
-## Cấm
-- Không dùng kiểu `any`
-- Không dùng `console.log` trong code production
-- Không dùng file I/O đồng bộ
+## Forbidden
+- No `any` types
+- No `console.log` in production code
+- No synchronous file I/O
 ```
 
 ---
@@ -370,19 +370,19 @@ Hướng dẫn developer mới với script cài đặt:
 ```yaml
 ---
 name: setup-dev
-description: Cài đặt môi trường phát triển cho contributor mới
+description: Set up development environment for new contributors
 disable-model-invocation: true
 ---
 
-Cài đặt môi trường phát triển:
+Set up development environment:
 
-1. Kiểm tra prerequisites: `bash scripts/check-prerequisites.sh`
-2. Cài đặt dependencies: `npm install`
-3. Copy template environment: `cp .env.example .env`
-4. Cài đặt database: `npm run db:setup`
-5. Kiểm tra cài đặt: `npm test`
+1. Check prerequisites: `bash scripts/check-prerequisites.sh`
+2. Install dependencies: `npm install`
+3. Copy environment template: `cp .env.example .env`
+4. Set up database: `npm run db:setup`
+5. Verify setup: `npm test`
 
-Báo cáo bất kỳ vấn đề nào gặp phải.
+Report any issues encountered.
 ```
 
 ---

@@ -25,38 +25,38 @@ AUTHOR: Team Name
 LAST UPDATED: 2025-01-15
 
 PURPOSE:
-Giải thích chi tiết command này làm gì và tại sao nó tồn tại.
+Detailed explanation of what this command does and why it exists.
 
 USAGE:
   /command-name arg1 arg2
 
 ARGUMENTS:
-  arg1: Mô tả argument đầu tiên (bắt buộc)
-  arg2: Mô tả argument thứ hai (tùy chọn, mặc định là X)
+  arg1: Description of first argument (required)
+  arg2: Description of second argument (optional, defaults to X)
 
 EXAMPLES:
   /command-name feature-branch main
-    → So sánh feature-branch với main
+    → Compares feature-branch with main
 
   /command-name my-branch
-    → So sánh my-branch với branch hiện tại
+    → Compares my-branch with current branch
 
 REQUIREMENTS:
   - Git repository
-  - Branch phải tồn tại
-  - Quyền đọc repository
+  - Branch must exist
+  - Permissions to read repository
 
 RELATED COMMANDS:
-  /other-command - Chức năng liên quan
-  /another-command - Cách tiếp cận thay thế
+  /other-command - Related functionality
+  /another-command - Alternative approach
 
 TROUBLESHOOTING:
-  - Nếu không tìm thấy branch: Kiểm tra chính tả tên branch
-  - Nếu bị từ chối quyền truy cập: Kiểm tra quyền truy cập repository
+  - If branch not found: Check branch name spelling
+  - If permission denied: Check repository access
 
 CHANGELOG:
-  v1.0.0 (2025-01-15): Phát hành lần đầu
-  v0.9.0 (2025-01-10): Phiên bản beta
+  v1.0.0 (2025-01-15): Initial release
+  v0.9.0 (2025-01-10): Beta version
 -->
 
 # Triển Khai Command

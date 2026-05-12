@@ -25,7 +25,7 @@ Inject một message hiển thị vào cuộc hội thoại. Đây là cách hà
 ```js
 app.sendMessage({
   role: "user",
-  content: [{ type: "text", text: "Người dùng đã chọn đơn hàng #1234" }],
+  content: [{ type: "text", text: "User selected order #1234" }],
 });
 ```
 
@@ -37,7 +37,7 @@ Cập nhật context của Claude **không hiển thị** — không có chat bu
 
 ```js
 app.updateModelContext({
-  content: [{ type: "text", text: "Đang xem: đơn hàng trong 30 ngày qua" }],
+  content: [{ type: "text", text: "Currently viewing: orders from last 30 days" }],
 });
 ```
 
@@ -163,7 +163,7 @@ async ({ query }, extra) => {
     }
     await steps[i].run();
   }
-  return { content: [{ type: "text", text: "Hoàn thành" }] };
+  return { content: [{ type: "text", text: "Complete" }] };
 }
 ```
 

@@ -70,7 +70,7 @@ const { App } = globalThis.ExtApps;
       li.addEventListener("click", () => {
         app.sendMessage({
           role: "user",
-          content: [{ type: "text", text: `Đã chọn: ${it.id}` }],
+          content: [{ type: "text", text: `Selected: ${it.id}` }],
         });
       });
       ul.append(li);
@@ -99,8 +99,8 @@ const { App } = globalThis.ExtApps;
 </style>
 <p id="msg"></p>
 <div class="actions">
-  <button id="cancel">Hủy</button>
-  <button id="confirm" class="danger">Xác nhận</button>
+  <button id="cancel">Cancel</button>
+  <button id="confirm" class="danger">Confirm</button>
 </div>
 <script type="module">
 /*__EXT_APPS_BUNDLE__*/
@@ -117,10 +117,10 @@ const { App } = globalThis.ExtApps;
   await app.connect();
 
   document.getElementById("confirm").addEventListener("click", () => {
-    app.sendMessage({ role: "user", content: [{ type: "text", text: "Đã xác nhận." }] });
+    app.sendMessage({ role: "user", content: [{ type: "text", text: "Confirmed." }] });
   });
   document.getElementById("cancel").addEventListener("click", () => {
-    app.sendMessage({ role: "user", content: [{ type: "text", text: "Đã hủy." }] });
+    app.sendMessage({ role: "user", content: [{ type: "text", text: "Cancelled." }] });
   });
 })();
 </script>
@@ -142,7 +142,7 @@ const { App } = globalThis.ExtApps;
   .bar { height: 8px; background: #eee; border-radius: 4px; overflow: hidden; }
   .fill { height: 100%; background: #2a7; transition: width 200ms; }
 </style>
-<p id="label">Đang bắt đầu…</p>
+<p id="label">Starting…</p>
 <div class="bar"><div id="fill" class="fill" style="width:0%"></div></div>
 <script type="module">
 /*__EXT_APPS_BUNDLE__*/
@@ -152,8 +152,8 @@ const { App } = globalThis.ExtApps;
   const label = document.getElementById("label");
   const fill = document.getElementById("fill");
 
-  // Kết quả tool bắn khi công việc hoàn thành — cập nhật trung gian
-  // đến qua cùng handler nếu server stream chúng
+  // The tool result fires when the job completes — intermediate updates
+  // arrive via the same handler if the server streams them
   app.ontoolresult = ({ content }) => {
     const state = JSON.parse(content[0].text);
     if (state.progress !== undefined) {
@@ -161,7 +161,7 @@ const { App } = globalThis.ExtApps;
       fill.style.width = `${(state.progress / state.total) * 100}%`;
     }
     if (state.done) {
-      label.textContent = "Hoàn thành";
+      label.textContent = "Complete";
       fill.style.width = "100%";
     }
   };
@@ -181,7 +181,7 @@ Widget display không gọi `sendMessage` — chúng render và ở đó. Tool n
 
 ```typescript
 registerAppTool(server, "show_chart", {
-  description: "Render biểu đồ doanh thu",
+  description: "Render a revenue chart",
   inputSchema: { range: z.enum(["week", "month", "year"]) },
   _meta: { ui: { resourceUri: "ui://widgets/chart.html" } },
 }, async ({ range }) => {
@@ -189,7 +189,7 @@ registerAppTool(server, "show_chart", {
   return {
     content: [{
       type: "text",
-      text: `Doanh thu tăng ${data.change}% trong ${range}. Đã render biểu đồ.\n\n` +
+      text: `Revenue is up ${data.change}% over the ${range}. Chart rendered.\n\n` +
             JSON.stringify(data.points),
     }],
   };
@@ -208,7 +208,7 @@ const { App } = globalThis.ExtApps;
   const app = new App({ name: "Chart", version: "1.0.0" }, {});
 
   app.ontoolresult = ({ content }) => {
-    // Parse các điểm JSON từ text content (sau dòng summary)
+    // Parse the JSON points from the text content (after the summary line)
     const text = content[0].text;
     const jsonStart = text.indexOf("\n\n") + 2;
     const points = JSON.parse(text.slice(jsonStart));

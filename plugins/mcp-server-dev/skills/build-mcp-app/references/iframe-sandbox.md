@@ -125,7 +125,7 @@ Host render iframe bên trong card chrome của riêng nó — paint nền **tra
   --line: var(--color-border-default, #e3e6ea);
 }
 html, body { background: transparent; color: var(--ink); }
-:root.dark .thumb { mix-blend-mode: normal; } /* multiply → ảnh biến mất trong dark */
+:root.dark .thumb { mix-blend-mode: normal; } /* multiply → images vanish in dark */
 ```
 
 ```js

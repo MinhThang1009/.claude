@@ -21,22 +21,22 @@ additional_instructions: "Use JWT tokens, not sessions"
 
 # Task: Implement Authentication
 
-Xây dựng xác thực dựa trên JWT cho REST API.
+Build JWT-based authentication for the REST API.
 
-## Yêu Cầu
-- Tạo và validate JWT token
-- Luồng refresh token
-- Hash password an toàn
+## Requirements
+- JWT token generation and validation
+- Refresh token flow
+- Secure password hashing
 
-## Tiêu Chí Thành Công
-- Các endpoint auth đã được triển khai
-- Test pass (100% coverage)
-- PR đã tạo và CI xanh
-- Tài liệu đã cập nhật
+## Success Criteria
+- Auth endpoints implemented
+- Tests passing (100% coverage)
+- PR created and CI green
+- Documentation updated
 
-## Điều Phối
-Phụ thuộc vào Task 3.4 (user model).
-Báo cáo trạng thái cho session 'team-leader'.
+## Coordination
+Depends on Task 3.4 (user model).
+Report status to 'team-leader' session.
 ```
 
 ### Cách Sử Dụng
@@ -140,9 +140,9 @@ completion_promise: "All tests passing and build successful"
 started_at: "2025-01-15T14:30:00Z"
 ---
 
-Sửa tất cả lỗi linting trong project.
-Đảm bảo test pass sau mỗi lần sửa.
-Ghi lại bất kỳ thay đổi cần thiết nào trong CLAUDE.md.
+Fix all the linting errors in the project.
+Make sure tests pass after each fix.
+Document any changes needed in CLAUDE.md.
 ```
 
 ### Cách Sử Dụng

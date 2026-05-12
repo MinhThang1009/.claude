@@ -81,10 +81,10 @@ Nếu roots có sẵn, hãy dùng chúng. Nếu không, fallback về config. D�
 Nếu bạn spawn tiến trình, **đừng bao giờ truyền input người dùng qua shell**.
 
 ```typescript
-// ❌ thảm họa
+// ❌ catastrophic
 exec(`git log ${branch}`);
 
-// ✅ array-args, không shell
+// ✅ array-args, no shell
 execFile("git", ["log", branch]);
 ```
 
@@ -97,10 +97,10 @@ Nếu bạn đang wrap CLI, hãy build toàn bộ argv dưới dạng array. Val
 Tách read và write thành tool riêng biệt. Hầu hết workflow chỉ cần read. Một tool chỉ đọc không thể bị vũ khí hóa để gây mất dữ liệu dù Claude bị đánh lừa gọi với bất kỳ argument nào.
 
 ```
-list_files   ← an toàn để gọi tự do
-read_file    ← an toàn để gọi tự do
-write_file   ← tool riêng, kiểm tra riêng
-delete_file  ← cân nhắc không ship luôn
+list_files   ← safe to call freely
+read_file    ← safe to call freely
+write_file   ← separate tool, separate scrutiny
+delete_file  ← consider not shipping this at all
 ```
 
 Kết hợp với tool annotation — `readOnlyHint: true` trên mọi read tool, `destructiveHint: true` trên delete/overwrite tool. Host hiển thị những thứ này trong permission UI (auto-approve read, confirm-dialog destructive). Xem `../build-mcp-server/references/tool-design.md`.

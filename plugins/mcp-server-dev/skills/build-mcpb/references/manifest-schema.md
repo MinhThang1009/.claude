@@ -71,20 +71,20 @@
   "apiKey": {
     "type": "string",
     "title": "API Key",
-    "description": "API key của dịch vụ. Được lưu mã hóa.",
+    "description": "Your service API key. Stored encrypted.",
     "sensitive": true,
     "required": true
   },
   "rootDir": {
     "type": "directory",
-    "title": "Thư mục root",
-    "description": "Thư mục để expose cho server.",
+    "title": "Root directory",
+    "description": "Directory to expose to the server.",
     "default": "${HOME}/Documents"
   },
   "maxResults": {
     "type": "number",
-    "title": "Số kết quả tối đa",
-    "description": "Số item tối đa trả về mỗi query.",
+    "title": "Max results",
+    "description": "Maximum items returned per query.",
     "default": 50,
     "min": 1,
     "max": 500
@@ -133,8 +133,8 @@ Kiểu `directory` và `file` render native OS picker — ưu tiên dùng thay v
   "manifest_version": "0.4",
   "name": "hello",
   "version": "0.1.0",
-  "description": "MCPB server tối giản.",
-  "author": { "name": "Tên Của Bạn" },
+  "description": "Minimal MCPB server.",
+  "author": { "name": "Your Name" },
   "server": {
     "type": "node",
     "entry_point": "server/index.js",

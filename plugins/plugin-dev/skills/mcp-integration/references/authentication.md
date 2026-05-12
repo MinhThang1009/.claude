@@ -268,7 +268,7 @@ EOF
 
 ### NÊN
 
-Dùng biến môi trường:
+✅ **Dùng biến môi trường:**
 ```json
 {
   "headers": {
@@ -277,15 +277,19 @@ Dùng biến môi trường:
 }
 ```
 
-- Ghi lại các biến cần thiết trong README
-- Luôn dùng HTTPS/WSS
-- Triển khai token rotation
-- Lưu token an toàn (env var, không phải file)
-- Để OAuth xử lý xác thực khi có sẵn
+✅ **Ghi lại các biến cần thiết trong README**
+
+✅ **Luôn dùng HTTPS/WSS**
+
+✅ **Triển khai token rotation**
+
+✅ **Lưu token an toàn (env var, không phải file)**
+
+✅ **Để OAuth xử lý xác thực khi có sẵn**
 
 ### KHÔNG NÊN
 
-Hardcode token:
+❌ **Hardcode token:**
 ```json
 {
   "headers": {
@@ -294,11 +298,15 @@ Hardcode token:
 }
 ```
 
-- Commit token lên git
-- Chia sẻ token trong tài liệu
-- Dùng HTTP thay vì HTTPS
-- Lưu token trong file plugin
-- Log token hoặc header nhạy cảm
+❌ **Commit token lên git**
+
+❌ **Chia sẻ token trong tài liệu**
+
+❌ **Dùng HTTP thay vì HTTPS**
+
+❌ **Lưu token trong file plugin**
+
+❌ **Log token hoặc header nhạy cảm**
 
 ## Các Pattern Multi-Tenancy
 

@@ -1,4 +1,4 @@
-# JSON Schema
+# JSON Schemas
 
 Tài liệu này định nghĩa các JSON schema được skill-creator sử dụng.
 
@@ -14,12 +14,12 @@ Tài liệu này định nghĩa các JSON schema được skill-creator sử d�
   "evals": [
     {
       "id": 1,
-      "prompt": "Prompt ví dụ của người dùng",
-      "expected_output": "Mô tả kết quả mong đợi",
+      "prompt": "User's example prompt",
+      "expected_output": "Description of expected result",
       "files": ["evals/files/sample1.pdf"],
       "expectations": [
-        "Output bao gồm X",
-        "Skill đã dùng script Y"
+        "The output includes X",
+        "The skill used script Y"
       ]
     }
   ]
@@ -91,14 +91,14 @@ Output từ grader agent. Nằm tại `<run-dir>/grading.json`.
 {
   "expectations": [
     {
-      "text": "Output bao gồm tên 'John Smith'",
+      "text": "The output includes the name 'John Smith'",
       "passed": true,
-      "evidence": "Tìm thấy trong transcript Bước 3: 'Extracted names: John Smith, Sarah Johnson'"
+      "evidence": "Found in transcript Step 3: 'Extracted names: John Smith, Sarah Johnson'"
     },
     {
-      "text": "Spreadsheet có công thức SUM trong ô B10",
+      "text": "The spreadsheet has a SUM formula in cell B10",
       "passed": false,
-      "evidence": "Không có spreadsheet nào được tạo. Output là file text."
+      "evidence": "No spreadsheet was created. The output was a text file."
     }
   ],
   "summary": {
@@ -126,25 +126,25 @@ Output từ grader agent. Nằm tại `<run-dir>/grading.json`.
   },
   "claims": [
     {
-      "claim": "Form có 12 fillable field",
+      "claim": "The form has 12 fillable fields",
       "type": "factual",
       "verified": true,
-      "evidence": "Đếm được 12 field trong field_info.json"
+      "evidence": "Counted 12 fields in field_info.json"
     }
   ],
   "user_notes_summary": {
-    "uncertainties": ["Dùng dữ liệu 2023, có thể lỗi thời"],
+    "uncertainties": ["Used 2023 data, may be stale"],
     "needs_review": [],
-    "workarounds": ["Fallback về text overlay cho field không thể điền"]
+    "workarounds": ["Fell back to text overlay for non-fillable fields"]
   },
   "eval_feedback": {
     "suggestions": [
       {
-        "assertion": "Output bao gồm tên 'John Smith'",
-        "reason": "Tài liệu bịa đặt có đề cập tên này cũng sẽ pass"
+        "assertion": "The output includes the name 'John Smith'",
+        "reason": "A hallucinated document that mentions the name would also pass"
       }
     ],
-    "overall": "Assertion kiểm tra sự tồn tại nhưng không kiểm tra tính chính xác."
+    "overall": "Assertions check presence but not correctness."
   }
 }
 ```
@@ -252,8 +252,8 @@ Output từ Benchmark mode. Nằm tại `benchmarks/<timestamp>/benchmark.json`.
         {"text": "...", "passed": true, "evidence": "..."}
       ],
       "notes": [
-        "Dùng dữ liệu 2023, có thể lỗi thời",
-        "Fallback về text overlay cho field không thể điền"
+        "Used 2023 data, may be stale",
+        "Fell back to text overlay for non-fillable fields"
       ]
     }
   ],
@@ -277,10 +277,10 @@ Output từ Benchmark mode. Nằm tại `benchmarks/<timestamp>/benchmark.json`.
   },
 
   "notes": [
-    "Assertion 'Output là file PDF' pass 100% ở cả hai cấu hình - có thể không phân biệt được giá trị skill",
-    "Eval 3 có variance cao (50% ± 40%) - có thể không ổn định hoặc phụ thuộc model",
-    "Các lần chạy without-skill liên tục fail ở expectation trích xuất bảng",
-    "Skill thêm trung bình 13s thời gian thực thi nhưng cải thiện pass rate lên 50%"
+    "Assertion 'Output is a PDF file' passes 100% in both configurations - may not differentiate skill value",
+    "Eval 3 shows high variance (50% ± 40%) - may be flaky or model-dependent",
+    "Without-skill runs consistently fail on table extraction expectations",
+    "Skill adds 13s average execution time but improves pass rate by 50%"
   ]
 }
 ```
@@ -313,7 +313,7 @@ Output từ blind comparator. Nằm tại `<grading-dir>/comparison-N.json`.
 ```json
 {
   "winner": "A",
-  "reasoning": "Output A cung cấp giải pháp hoàn chỉnh với định dạng đúng và đủ tất cả field bắt buộc. Output B thiếu field ngày và có định dạng không nhất quán.",
+  "reasoning": "Output A provides a complete solution with proper formatting and all required fields. Output B is missing the date field and has formatting inconsistencies.",
   "rubric": {
     "A": {
       "content": {
@@ -349,13 +349,13 @@ Output từ blind comparator. Nằm tại `<grading-dir>/comparison-N.json`.
   "output_quality": {
     "A": {
       "score": 9,
-      "strengths": ["Giải pháp hoàn chỉnh", "Định dạng tốt", "Đủ tất cả field"],
-      "weaknesses": ["Không nhất quán nhỏ về style ở header"]
+      "strengths": ["Complete solution", "Well-formatted", "All fields present"],
+      "weaknesses": ["Minor style inconsistency in header"]
     },
     "B": {
       "score": 5,
-      "strengths": ["Output dễ đọc", "Cấu trúc cơ bản đúng"],
-      "weaknesses": ["Thiếu field ngày", "Định dạng không nhất quán", "Trích xuất dữ liệu không đầy đủ"]
+      "strengths": ["Readable output", "Correct basic structure"],
+      "weaknesses": ["Missing date field", "Formatting inconsistencies", "Partial data extraction"]
     }
   },
   "expectation_results": {
@@ -364,7 +364,7 @@ Output từ blind comparator. Nằm tại `<grading-dir>/comparison-N.json`.
       "total": 5,
       "pass_rate": 0.80,
       "details": [
-        {"text": "Output bao gồm tên", "passed": true}
+        {"text": "Output includes name", "passed": true}
       ]
     },
     "B": {
@@ -372,7 +372,7 @@ Output từ blind comparator. Nằm tại `<grading-dir>/comparison-N.json`.
       "total": 5,
       "pass_rate": 0.60,
       "details": [
-        {"text": "Output bao gồm tên", "passed": true}
+        {"text": "Output includes name", "passed": true}
       ]
     }
   }
@@ -391,26 +391,26 @@ Output từ post-hoc analyzer. Nằm tại `<grading-dir>/analysis.json`.
     "winner": "A",
     "winner_skill": "path/to/winner/skill",
     "loser_skill": "path/to/loser/skill",
-    "comparator_reasoning": "Tóm tắt ngắn lý do comparator chọn winner"
+    "comparator_reasoning": "Brief summary of why comparator chose winner"
   },
   "winner_strengths": [
-    "Hướng dẫn từng bước rõ ràng cho việc xử lý tài liệu nhiều trang",
-    "Có script validation bắt được lỗi định dạng"
+    "Clear step-by-step instructions for handling multi-page documents",
+    "Included validation script that caught formatting errors"
   ],
   "loser_weaknesses": [
-    "Hướng dẫn mơ hồ 'xử lý tài liệu phù hợp' dẫn đến hành vi không nhất quán",
-    "Không có script validation, agent phải tự ứng biến"
+    "Vague instruction 'process the document appropriately' led to inconsistent behavior",
+    "No script for validation, agent had to improvise"
   ],
   "instruction_following": {
     "winner": {
       "score": 9,
-      "issues": ["Nhỏ: bỏ qua bước logging tùy chọn"]
+      "issues": ["Minor: skipped optional logging step"]
     },
     "loser": {
       "score": 6,
       "issues": [
-        "Không dùng formatting template của skill",
-        "Tự nghĩ ra cách tiếp cận thay vì làm theo bước 3"
+        "Did not use the skill's formatting template",
+        "Invented own approach instead of following step 3"
       ]
     }
   },
@@ -418,13 +418,13 @@ Output từ post-hoc analyzer. Nằm tại `<grading-dir>/analysis.json`.
     {
       "priority": "high",
       "category": "instructions",
-      "suggestion": "Thay 'xử lý tài liệu phù hợp' bằng các bước tường minh",
-      "expected_impact": "Sẽ loại bỏ sự mơ hồ gây ra hành vi không nhất quán"
+      "suggestion": "Replace 'process the document appropriately' with explicit steps",
+      "expected_impact": "Would eliminate ambiguity that caused inconsistent behavior"
     }
   ],
   "transcript_insights": {
-    "winner_execution_pattern": "Đọc skill -> Làm theo quy trình 5 bước -> Dùng script validation",
-    "loser_execution_pattern": "Đọc skill -> Không rõ cách tiếp cận -> Thử 3 phương pháp khác nhau"
+    "winner_execution_pattern": "Read skill -> Followed 5-step process -> Used validation script",
+    "loser_execution_pattern": "Read skill -> Unclear on approach -> Tried 3 different methods"
   }
 }
 ```

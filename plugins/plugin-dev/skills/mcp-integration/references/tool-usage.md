@@ -47,18 +47,18 @@ Khai báo MCP tool trong frontmatter của command:
 
 ```markdown
 ---
-description: Tạo Asana task mới
+description: Create a new Asana task
 allowed-tools: [
   "mcp__plugin_asana_asana__asana_create_task"
 ]
 ---
 
-# Lệnh Tạo Task
+# Create Task Command
 
-Để tạo task:
-1. Thu thập thông tin task từ người dùng
-2. Dùng mcp__plugin_asana_asana__asana_create_task với thông tin đó
-3. Xác nhận việc tạo với người dùng
+To create a task:
+1. Gather task details from user
+2. Use mcp__plugin_asana_asana__asana_create_task with the details
+3. Confirm creation to user
 ```
 
 ### Nhiều Tool
@@ -88,33 +88,33 @@ allowed-tools: ["mcp__plugin_asana_asana__*"]
 **Ví dụ command:**
 ```markdown
 ---
-description: Tìm kiếm và tạo Asana task
+description: Search and create Asana tasks
 allowed-tools: [
   "mcp__plugin_asana_asana__asana_search_tasks",
   "mcp__plugin_asana_asana__asana_create_task"
 ]
 ---
 
-# Quản Lý Asana Task
+# Asana Task Management
 
-## Tìm Kiếm Task
+## Searching Tasks
 
-Để tìm kiếm task:
-1. Dùng mcp__plugin_asana_asana__asana_search_tasks
-2. Cung cấp search filter (assignee, project, v.v.)
-3. Hiển thị kết quả cho người dùng
+To search for tasks:
+1. Use mcp__plugin_asana_asana__asana_search_tasks
+2. Provide search filters (assignee, project, etc.)
+3. Display results to user
 
-## Tạo Task
+## Creating Tasks
 
-Để tạo task:
-1. Thu thập thông tin task:
-   - Tiêu đề (bắt buộc)
-   - Mô tả
+To create a task:
+1. Gather task details:
+   - Title (required)
+   - Description
    - Project
-   - Người được giao
-   - Ngày hết hạn
-2. Dùng mcp__plugin_asana_asana__asana_create_task
-3. Hiển thị xác nhận với link task
+   - Assignee
+   - Due date
+2. Use mcp__plugin_asana_asana__asana_create_task
+3. Show confirmation with task link
 ```
 
 ## Sử Dụng Tool trong Agent
@@ -126,25 +126,25 @@ Agent có thể dùng MCP tool tự chủ mà không cần pre-allow:
 ```markdown
 ---
 name: asana-status-updater
-description: Dùng agent này khi người dùng yêu cầu "cập nhật trạng thái Asana", "tạo báo cáo project", hoặc "đồng bộ Asana task"
+description: This agent should be used when the user asks to "update Asana status", "generate project report", or "sync Asana tasks"
 model: inherit
 color: blue
 ---
 
-## Vai Trò
+## Role
 
-Agent tự chủ tạo báo cáo trạng thái project Asana.
+Autonomous agent for generating Asana project status reports.
 
-## Quy Trình
+## Process
 
-1. **Query task**: Dùng mcp__plugin_asana_asana__asana_search_tasks để lấy tất cả task
-2. **Phân tích tiến độ**: Tính tỷ lệ hoàn thành và xác định blocker
-3. **Tạo báo cáo**: Tạo bản cập nhật trạng thái có format
-4. **Cập nhật Asana**: Dùng mcp__plugin_asana_asana__asana_create_comment để đăng báo cáo
+1. **Query tasks**: Use mcp__plugin_asana_asana__asana_search_tasks to get all tasks
+2. **Analyze progress**: Calculate completion rates and identify blockers
+3. **Generate report**: Create formatted status update
+4. **Update Asana**: Use mcp__plugin_asana_asana__asana_create_comment to post report
 
-## Tool Có Sẵn
+## Available Tools
 
-Agent có quyền truy cập tất cả Asana MCP tool mà không cần phê duyệt trước.
+The agent has access to all Asana MCP tools without pre-approval.
 ```
 
 ### Quyền Truy Cập Tool của Agent
@@ -217,17 +217,17 @@ Mỗi MCP tool có schema định nghĩa tham số. Xem bằng `/mcp`.
 ```json
 {
   "name": "asana_create_task",
-  "description": "Tạo Asana task mới",
+  "description": "Create a new Asana task",
   "inputSchema": {
     "type": "object",
     "properties": {
       "name": {
         "type": "string",
-        "description": "Tiêu đề task"
+        "description": "Task title"
       },
       "notes": {
         "type": "string",
-        "description": "Mô tả task"
+        "description": "Task description"
       },
       "workspace": {
         "type": "string",
@@ -244,12 +244,12 @@ Mỗi MCP tool có schema định nghĩa tham số. Xem bằng `/mcp`.
 Claude tự động cấu trúc tool call dựa trên schema:
 
 ```typescript
-// Claude tạo nội bộ
+// Claude generates this internally
 {
   toolName: "mcp__plugin_asana_asana__asana_create_task",
   input: {
     name: "Review PR #123",
-    notes: "Code review cho tính năng mới",
+    notes: "Code review for new feature",
     workspace: "12345",
     assignee: "67890",
     due_on: "2025-01-15"
@@ -380,31 +380,31 @@ Các bước:
 
 ### Thông Báo Lỗi
 
-**Thông báo lỗi tốt:**
+**Good error messages:**
 ```
-"Không thể tạo task. Vui lòng kiểm tra:
-   1. Bạn đã đăng nhập Asana
-   2. Bạn có quyền truy cập workspace 'Engineering'
-   3. Project 'Q1 Goals' tồn tại"
+❌ "Could not create task. Please check:
+   1. You're logged into Asana
+   2. You have access to workspace 'Engineering'
+   3. The project 'Q1 Goals' exists"
 ```
 
-**Thông báo lỗi kém:**
+**Poor error messages:**
 ```
-"Error: MCP tool returned 403"
+❌ "Error: MCP tool returned 403"
 ```
 
 ### Tài Liệu Hóa
 
-**Ghi lại việc dùng MCP tool trong command:**
+**Document MCP tool usage in command:**
 ```markdown
-## MCP Tool Được Sử Dụng
+## MCP Tools Used
 
-Command này dùng các Asana MCP tool sau:
-- **asana_search_tasks**: Tìm kiếm task theo tiêu chí
-- **asana_create_task**: Tạo task mới với thông tin chi tiết
-- **asana_update_task**: Cập nhật thuộc tính task hiện có
+This command uses the following Asana MCP tools:
+- **asana_search_tasks**: Search for tasks matching criteria
+- **asana_create_task**: Create new task with details
+- **asana_update_task**: Update existing task properties
 
-Đảm bảo bạn đã xác thực với Asana trước khi chạy command này.
+Ensure you're authenticated to Asana before running this command.
 ```
 
 ## Kiểm Thử Việc Dùng Tool
@@ -459,19 +459,19 @@ allowed-tools: [
 ]
 ---
 
-# Quản Lý Item
+# Item Management
 
-## Tạo
-Dùng create_item với các trường bắt buộc...
+## Create
+Use create_item with required fields...
 
-## Đọc
-Dùng read_item với item ID...
+## Read
+Use read_item with item ID...
 
-## Cập nhật
-Dùng update_item với item ID và thay đổi...
+## Update
+Use update_item with item ID and changes...
 
-## Xóa
-Dùng delete_item với item ID (hỏi xác nhận trước)...
+## Delete
+Use delete_item with item ID (ask for confirmation first)...
 ```
 
 ### Pattern: Tìm Kiếm và Xử Lý

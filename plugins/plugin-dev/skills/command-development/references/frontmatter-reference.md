@@ -254,7 +254,7 @@ description: Deploy to environment
 argument-hint: [app-name] [environment] [version]
 ---
 
-Deploy $1 lên $2 dùng phiên bản $3...
+Deploy $1 to $2 using version $3...
 ```
 
 **Với tùy chọn:**
@@ -264,7 +264,7 @@ description: Run tests with options
 argument-hint: [test-pattern] [options]
 ---
 
-Chạy test khớp $1 với tùy chọn: $2
+Run tests matching $1 with options: $2
 ```
 
 ### disable-model-invocation
@@ -328,7 +328,7 @@ disable-model-invocation: true
 Không cần frontmatter:
 
 ```markdown
-Review đoạn code này để tìm các vấn đề phổ biến và đề xuất cải thiện.
+Review this code for common issues and suggest improvements.
 ```
 
 ### Command Đơn Giản
@@ -340,7 +340,7 @@ Chỉ description:
 description: Review code for issues
 ---
 
-Review đoạn code này để tìm các vấn đề phổ biến và đề xuất cải thiện.
+Review this code for common issues and suggest improvements.
 ```
 
 ### Command Tiêu Chuẩn
@@ -353,12 +353,12 @@ description: Review Git changes
 allowed-tools: Bash(git:*), Read
 ---
 
-Các thay đổi hiện tại: !`git diff --name-only`
+Current changes: !`git diff --name-only`
 
-Review từng file đã thay đổi về:
-- Chất lượng code
-- Bug tiềm ẩn
-- Các nguyên tắc tốt nhất
+Review each changed file for:
+- Code quality
+- Potential bugs
+- Best practices
 ```
 
 ### Command Phức Tạp
@@ -373,14 +373,14 @@ allowed-tools: Bash(kubectl:*), Bash(helm:*), Read
 model: sonnet
 ---
 
-Deploy $1 lên môi trường $2 dùng phiên bản $3
+Deploy $1 to $2 environment using version $3
 
-Kiểm tra trước khi deploy:
-- Xác minh cấu hình $2
-- Kiểm tra trạng thái cluster: !`kubectl cluster-info`
-- Xác nhận phiên bản $3 tồn tại
+Pre-deployment checks:
+- Verify $2 configuration
+- Check cluster status: !`kubectl cluster-info`
+- Validate version $3 exists
 
-Tiến hành deployment theo runbook.
+Proceed with deployment following deployment runbook.
 ```
 
 ### Command Chỉ Thủ Công
@@ -396,21 +396,21 @@ allowed-tools: Bash(gh:*)
 ---
 
 <!--
-YÊU CẦU APPROVAL THỦ CÔNG
-Command này yêu cầu phán đoán của con người và không thể tự động hóa.
+MANUAL APPROVAL REQUIRED
+This command requires human judgment and cannot be automated.
 -->
 
-Review deployment $1 để approve lên production:
+Review deployment $1 for production approval:
 
-Chi tiết deployment: !`gh api /deployments/$1`
+Deployment details: !`gh api /deployments/$1`
 
-Xác minh:
-- Tất cả test đã pass
-- Quét bảo mật sạch
-- Có approval của stakeholder
-- Kế hoạch rollback đã sẵn sàng
+Verify:
+- All tests passed
+- Security scan clean
+- Stakeholder approval
+- Rollback plan ready
 
-Gõ "APPROVED" để xác nhận deployment.
+Type "APPROVED" to confirm deployment.
 ```
 
 ## Validation

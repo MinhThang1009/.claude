@@ -22,7 +22,7 @@ Giới hạn payload của bạn ở ~130KB và degrade theo thứ tự:
 const MAX = 130_000;
 let out = rows;
 if (JSON.stringify(out).length > MAX) {
-  const keep = referencedFields(spec); // refs field: + datum.X
+  const keep = referencedFields(spec); // field: + datum.X refs
   out = rows.map((r) => pick(r, keep));
   if (JSON.stringify(out).length > MAX) {
     const per = JSON.stringify(out[0] ?? {}).length || 1;
