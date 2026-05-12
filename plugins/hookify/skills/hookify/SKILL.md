@@ -5,50 +5,50 @@ allowed-tools: Read Grep Glob Bash Write AskUserQuestion TodoWrite
 argument-hint: "[optional — specific behavior to prevent, e.g.: don't use rm -rf]"
 ---
 
-# Hookify — Tạo Hooks từ Unwanted Behaviors
+# Hookify — Create Hooks from Unwanted Behaviors
 
-Tạo rule files ngăn Claude thực hiện hành vi không mong muốn — không cần edit `settings.json` thủ công.
+Creates rule files to prevent Claude from performing unwanted behaviors — no manual `settings.json` editing required.
 
-## Bước 1: Thu thập behaviors
+## Step 1: Gather behaviors
 
-**Nếu `$ARGUMENTS` có nội dung:**
-- Phân tích instruction của user: `$ARGUMENTS`
-- Scan thêm 10-15 message gần nhất để tìm context/ví dụ.
+**If `$ARGUMENTS` has content:**
+- Analyze the user's instruction: `$ARGUMENTS`
+- Additionally scan the last 10-15 messages for context/examples.
 
-**Nếu `$ARGUMENTS` trống:**
-- Dispatch `conversation-analyzer` agent phân tích transcript (focus **20-30 message** gần nhất).
-- Agent trả về structured findings: issue, tool, pattern, severity (high/medium/low), suggested rule.
+**If `$ARGUMENTS` is empty:**
+- Dispatch a `conversation-analyzer` agent to analyze the transcript (focus on the **last 20-30 messages**).
+- Agent returns structured findings: issue, tool, pattern, severity (high/medium/low), suggested rule.
 
-## Bước 2: Hỏi user xác nhận
+## Step 2: Ask user for confirmation
 
-Dùng AskUserQuestion:
+Use AskUserQuestion:
 
-1. **Chọn behaviors** (multiSelect): liệt kê behaviors phát hiện được (tối đa 4), user chọn cái nào cần hookify.
-2. **Action cho mỗi behavior**: `warn` (hiển thị cảnh báo, cho phép tiếp) hay `block` (ngăn thực thi)?
-3. **Patterns**: hiển thị patterns phát hiện, cho user chỉnh sửa/thêm.
+1. **Choose behaviors** (multiSelect): list discovered behaviors (up to 4), user selects which ones to hookify.
+2. **Action for each behavior**: `warn` (display warning, allow continuing) or `block` (prevent execution)?
+3. **Patterns**: display discovered patterns, allow user to edit/add.
 
-## Bước 3: Tạo rule files
+## Step 3: Create rule files
 
-Mỗi rule = 1 file `.claude/hookify.<rule-name>.local.md` trong **project directory hiện tại** (KHÔNG phải plugin directory).
+Each rule = 1 file `.claude/hookify.<rule-name>.local.md` in the **current project directory** (NOT the plugin directory).
 
-**Naming convention**: kebab-case, bắt đầu bằng action verb: `block-dangerous-rm`, `warn-console-log`, `require-tests-before-stop`.
-Tránh: `hookify.rule1.local.md` (không mô tả), `hookify.md` (thiếu .local), `danger.local.md` (thiếu hookify prefix).
+**Naming convention**: kebab-case, starting with an action verb: `block-dangerous-rm`, `warn-console-log`, `require-tests-before-stop`.
+Avoid: `hookify.rule1.local.md` (not descriptive), `hookify.md` (missing .local), `danger.local.md` (missing hookify prefix).
 
-### Format đơn giản (1 pattern)
+### Simple format (1 pattern)
 
 ```markdown
 ---
 name: <rule-name>
 enabled: true
 event: <bash|file|stop|prompt|all>
-pattern: <regex pattern>  # match vào `command` (bash) hoặc `new_text` (file) — Python regex
-action: <warn|block>   # optional — mặc định là warn nếu không khai báo
+pattern: <regex pattern>  # matches against `command` (bash) or `new_text` (file) — Python regex
+action: <warn|block>   # optional — defaults to warn if not declared
 ---
 
-<Message hiển thị cho Claude khi rule trigger>
+<Message displayed to Claude when the rule triggers>
 ```
 
-### Format phức tạp (nhiều conditions)
+### Complex format (multiple conditions)
 
 ```markdown
 ---
@@ -70,54 +70,54 @@ action: warn
 
 ### Event types
 
-| Event | Match |
-|-------|-------|
+| Event | Matches |
+|-------|---------|
 | `bash` | Bash tool commands |
 | `file` | Edit, Write, MultiEdit tools |
-| `stop` | Khi agent muốn dừng. Dùng cho: nhắc nhở steps bắt buộc, completion checklists, process enforcement |
-| `prompt` | Khi user submit prompt |
-| `all` | Tất cả events |
+| `stop` | When the agent wants to stop. Use for: mandatory step reminders, completion checklists, process enforcement |
+| `prompt` | When user submits a prompt |
+| `all` | All events |
 
-### Operators cho conditions
+### Operators for conditions
 
-| Operator | Mô tả |
-|----------|-------|
-| `regex_match` | Match regex pattern |
-| `contains` | Chứa substring |
-| `equals` | Bằng chính xác |
-| `not_contains` | Không chứa substring |
-| `starts_with` | Bắt đầu bằng |
-| `ends_with` | Kết thúc bằng |
+| Operator | Description |
+|----------|-------------|
+| `regex_match` | Match a regex pattern |
+| `contains` | Contains a substring |
+| `equals` | Exact match |
+| `not_contains` | Does not contain a substring |
+| `starts_with` | Starts with |
+| `ends_with` | Ends with |
 
-### Fields theo event type
+### Fields by event type
 
-| Event | Fields khả dụng |
+| Event | Available fields |
 |-------|-----------------|
 | `bash` | `command` |
-| `file` | `file_path`, `new_text`, `old_text`, `content` (toàn bộ nội dung file sau edit) |
+| `file` | `file_path`, `new_text`, `old_text`, `content` (full file content after edit) |
 | `prompt` | `user_prompt` |
-| `stop` | _(check transcript hoặc completion criteria)_ |
+| `stop` | _(check transcript or completion criteria)_ |
 
 **YAML escaping**:
-- YAML unquoted: `pattern: \s+-rf` — work as-is, không cần escape backslash.
-- YAML quoted: `pattern: "\\s+-rf"` — cần double backslash.
-- Pattern chứa `:`, `#`, `{`, `}` → bắt buộc quote.
-- **Khuyến nghị: dùng unquoted** trừ khi pattern chứa ký tự YAML special.
+- YAML unquoted: `pattern: \s+-rf` — works as-is, no backslash escaping needed.
+- YAML quoted: `pattern: "\\s+-rf"` — requires double backslash.
+- Patterns containing `:`, `#`, `{`, `}` → must be quoted.
+- **Recommendation: use unquoted** unless pattern contains YAML special characters.
 
-## Bước 4: Tạo files và confirm
+## Step 4: Create files and confirm
 
-1. Kiểm tra `.claude/` directory tồn tại → tạo nếu chưa có (`mkdir -p .claude`).
-   - Kiểm tra `.gitignore` — thêm `.claude/*.local.md` nếu chưa có, để tránh commit rule files cá nhân vào repo.
-2. Dùng Write tool tạo từng file.
-3. Hiển thị danh sách đã tạo:
+1. Check that the `.claude/` directory exists → create it if not (`mkdir -p .claude`).
+   - Check `.gitignore` — add `.claude/*.local.md` if not already present, to avoid committing personal rule files to the repo.
+2. Use the Write tool to create each file.
+3. Display the list of created files:
    ```
-   Đã tạo 2 hookify rules:
+   Created 2 hookify rules:
    - .claude/hookify.dangerous-rm.local.md → bash: rm -rf (warn)
    - .claude/hookify.sensitive-files.local.md → file: .env edits (block)
 
-   Rules active ngay — không cần restart! Hook sẽ đọc rules mới vào lần dùng tool tiếp theo.
+   Rules are active immediately — no restart needed! Hooks will read new rules on the next tool use.
    ```
-4. Verify files bằng Glob/Read.
+4. Verify files with Glob/Read.
 
 ## Pattern Tips
 
@@ -132,34 +132,34 @@ action: warn
 ## Sub-commands
 
 ### `/hookify list`
-Liệt kê tất cả rules hiện có dạng table:
+List all existing rules as a table:
 
 | Rule | Event | Pattern | Action | Enabled |
 |------|-------|---------|--------|---------|
 | warn-dangerous-rm | bash | `rm\s+-rf` | warn | ✅ |
 
-Kèm preview message mỗi rule.
+With a preview of each rule's message.
 
 ### `/hookify configure`
-Interactive enable/disable rules bằng AskUserQuestion (multiSelect). Hiển thị danh sách rules → user chọn toggle → update `enabled` field.
+Interactive enable/disable rules via AskUserQuestion (multiSelect). Display rule list → user selects to toggle → update the `enabled` field.
 
 ### `/hookify help`
-Hiển thị tóm tắt cách dùng, event types, operators, ví dụ.
+Display a usage summary, event types, operators, and examples.
 
-## Quản lý rules thủ công
+## Manual rule management
 
-- **Liệt kê**: `ls .claude/hookify.*.local.md` hoặc Glob.
-- **Bật/tắt**: đổi `enabled: true/false` trong frontmatter.
-- **Xóa**: delete file.
-- Thay đổi apply ngay lần dùng tool tiếp theo.
+- **List**: `ls .claude/hookify.*.local.md` or Glob.
+- **Enable/disable**: change `enabled: true/false` in frontmatter.
+- **Delete**: delete the file.
+- Changes take effect on the next tool use.
 
-## Ví dụ workflow
+## Example workflow
 
-**User**: `/hookify Đừng dùng rm -rf mà không hỏi tôi trước`
+**User**: `/hookify Don't use rm -rf without asking me first`
 
-1. Phân tích: user muốn ngăn `rm -rf`.
-2. Hỏi: "Block luôn hay chỉ cảnh báo?" → User chọn "Cảnh báo".
-3. Tạo `.claude/hookify.warn-dangerous-rm.local.md`:
+1. Analyze: user wants to prevent `rm -rf`.
+2. Ask: "Block entirely or just warn?" → User selects "Warn".
+3. Create `.claude/hookify.warn-dangerous-rm.local.md`:
    ```markdown
    ---
    name: warn-dangerous-rm
@@ -169,36 +169,36 @@ Hiển thị tóm tắt cách dùng, event types, operators, ví dụ.
    action: warn
    ---
 
-   ⚠️ **Phát hiện lệnh rm -rf**
-   User yêu cầu được cảnh báo trước khi dùng rm -rf.
-   Hãy xác nhận đường dẫn chính xác trước khi thực thi.
+   ⚠️ **rm -rf command detected**
+   User has requested a warning before using rm -rf.
+   Please confirm the exact path before executing.
    ```
-4. Confirm: "Rule active ngay — thử trigger để test!"
+4. Confirm: "Rule is active immediately — try triggering it to test!"
 
-Dùng TodoWrite để track progress qua các bước.
+Use TodoWrite to track progress through the steps.
 
-## Ví dụ mẫu
+## Sample examples
 
-Xem thư mục `examples/` để tham khảo 4 rules hoàn chỉnh:
-- `warn-console-log.local.md` — cảnh báo khi thêm `console.log`
-- `block-dangerous-rm.local.md` — chặn lệnh `rm -rf`
-- `require-tests-stop.local.md` — yêu cầu chạy test trước khi dừng
-- `warn-sensitive-files.local.md` — cảnh báo khi edit file nhạy cảm (multi-condition)
+See the `examples/` directory for 4 complete rules:
+- `warn-console-log.local.md` — warns when adding `console.log`
+- `block-dangerous-rm.local.md` — blocks `rm -rf` commands
+- `require-tests-stop.local.md` — requires running tests before stopping
+- `warn-sensitive-files.local.md` — warns when editing sensitive files (multi-condition)
 
 ## Testing Patterns
 
-Test regex pattern trước khi dùng: `python3 -c "import re; print(re.search(r'<pattern>', '<test-string>'))"`
-Hoặc dùng [regex101.com](https://regex101.com) (chọn Python flavor) để visualize.
+Test regex patterns before using: `python3 -c "import re; print(re.search(r'<pattern>', '<test-string>'))"`
+Or use [regex101.com](https://regex101.com) (select Python flavor) to visualize.
 
-## Pitfalls thường gặp
+## Common pitfalls
 
-- **Pattern quá rộng**: `rm` match mọi lệnh chứa "rm" (ví dụ `npm run format`). Dùng `\brm\s+-rf` cụ thể hơn.
-- **Pattern quá hẹp**: `rm -rf /` chỉ match exact string, miss `rm -rf ./src`.
-- **Escaping issues**: YAML quoted strings (`"pattern"`) cần double backslash (`\\s`); YAML unquoted (`pattern: \s`) work as-is. Khuyến nghị: dùng unquoted.
-- **Nhiều conditions = AND logic**: tất cả conditions phải match để rule trigger.
+- **Pattern too broad**: `rm` matches any command containing "rm" (e.g., `npm run format`). Use `\brm\s+-rf` for more specificity.
+- **Pattern too narrow**: `rm -rf /` only matches the exact string, missing `rm -rf ./src`.
+- **Escaping issues**: YAML quoted strings (`"pattern"`) need double backslash (`\\s`); YAML unquoted (`pattern: \s`) works as-is. Recommendation: use unquoted.
+- **Multiple conditions = AND logic**: all conditions must match for the rule to trigger.
 
 ## Troubleshooting
 
-- Rule không trigger → kiểm tra file nằm đúng `.claude/` của project (không phải plugin). Đọc lại file bằng Read tool để verify pattern đúng.
-- Pattern không match → test: `python3 -c "import re; print(re.search(r'pattern', 'test'))"`
-- Block quá strict → đổi `action: block` thành `action: warn`.
+- Rule not triggering → check file is in the correct `.claude/` of the project (not the plugin). Re-read the file with the Read tool to verify the pattern is correct.
+- Pattern not matching → test: `python3 -c "import re; print(re.search(r'pattern', 'test'))"`
+- Block too strict → change `action: block` to `action: warn`.

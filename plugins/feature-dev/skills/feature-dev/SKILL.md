@@ -7,117 +7,117 @@ argument-hint: "[feature description to implement]"
 
 # Feature Development — Multi-phase Orchestration
 
-Quy trình phát triển feature có hệ thống: hiểu → khảo sát → hỏi → thiết kế → implement → review → tổng kết.
+A systematic feature development process: understand → explore → ask → design → implement → review → wrap up.
 
 ## Core Principles
 
-- **Hỏi câu hỏi cụ thể** — xác định tất cả ambiguity, edge cases, behaviors chưa specify. Đợi user trả lời trước khi implement. Hỏi sớm — sau khi hiểu codebase, trước khi design architecture.
-- **Hiểu trước khi viết** — đọc code hiện tại, conventions, patterns trước khi tạo code mới.
-- **Đơn giản và elegant** — ưu tiên code readable, maintainable, architecturally sound.
-- **Đọc files từ agents** — khi launch agents, yêu cầu trả về danh sách files quan trọng nhất. Sau khi agents xong → đọc tất cả files đó để build context sâu.
-- **Dùng TodoWrite** — track progress xuyên suốt tất cả phases.
+- **Ask specific questions** — identify all ambiguities, edge cases, unspecified behaviors. Wait for user's answer before implementing. Ask early — after understanding the codebase, before designing the architecture.
+- **Understand before writing** — read existing code, conventions, and patterns before creating new code.
+- **Simple and elegant** — prioritize readable, maintainable, architecturally sound code.
+- **Read files from agents** — when launching agents, ask them to return a list of the most important files. After agents finish → read all listed files to build deep context.
+- **Use TodoWrite** — track progress throughout all phases.
 
 ## Phase 1: Discovery
 
-**Mục tiêu**: Hiểu feature cần build.
+**Goal**: Understand the feature to build.
 
-1. Tạo todo list với tất cả phases.
-2. Yêu cầu feature: `$ARGUMENTS`
-3. Nếu chưa rõ, hỏi user:
-   - Giải quyết vấn đề gì?
-   - Feature cần làm gì cụ thể?
-   - Constraints hoặc requirements?
-4. Tóm tắt hiểu biết, confirm với user trước khi tiếp.
+1. Create a todo list with all phases.
+2. Feature request: `$ARGUMENTS`
+3. If unclear, ask user:
+   - What problem does it solve?
+   - What specifically should the feature do?
+   - Any constraints or requirements?
+4. Summarize understanding, confirm with user before continuing.
 
 ## Phase 2: Codebase Exploration
 
-**Mục tiêu**: Hiểu code hiện tại liên quan đến feature.
+**Goal**: Understand existing code relevant to the feature.
 
-**Skip nếu**: user nói đã hiểu codebase ("tôi biết rồi", "skip explore") — chuyển thẳng Phase 3.
+**Skip if**: user says they already know the codebase ("I know already", "skip explore") — jump directly to Phase 3.
 
-Mỗi agent phải trace qua code toàn diện, tập trung hiểu abstractions, architecture và flow of control; focus vào một khía cạnh khác nhau của codebase.
+Each agent must trace through the code comprehensively, focusing on understanding abstractions, architecture, and flow of control; each focused on a different aspect of the codebase.
 
-Launch **2-3 code-explorer agents song song**, mỗi agent focus khác nhau:
-- Agent 1: "Tìm features tương tự [feature] và trace implementation"
-- Agent 2: "Map architecture và abstractions cho [khu vực liên quan]"
-- Agent 3: "Phân tích implementation hiện tại của [feature/area hiện có], trace qua code toàn diện"
-- Agent 4 (optional): "Phân tích UI patterns / testing approaches / extension points liên quan"
+Launch **2-3 code-explorer agents in parallel**, each with a different focus:
+- Agent 1: "Find features similar to [feature] and trace implementation"
+- Agent 2: "Map architecture and abstractions for [relevant area]"
+- Agent 3: "Analyze current implementation of [existing feature/area], trace through code comprehensively"
+- Agent 4 (optional): "Analyze UI patterns / testing approaches / extension points related to [feature]"
 
-Mỗi agent trả về **danh sách 5-10 key files**. Sau khi agents xong → đọc tất cả files được liệt kê để build context sâu.
+Each agent returns a **list of 5-10 key files**. After agents finish → read all listed files to build deep context.
 
-Trình bày comprehensive summary findings và patterns phát hiện được cho user.
+Present a comprehensive summary of findings and patterns discovered to the user.
 
 ## Phase 3: Clarifying Questions
 
-**CRITICAL**: Đây là một trong những phases quan trọng nhất. KHÔNG ĐƯỢC SKIP.
+**CRITICAL**: This is one of the most important phases. MUST NOT BE SKIPPED.
 
-**Mục tiêu**: Loại bỏ mọi ambiguity trước khi thiết kế.
+**Goal**: Eliminate all ambiguity before designing.
 
-1. Review findings từ Phase 2 + feature request
-2. Xác định aspects chưa rõ: edge cases, error handling, integration points, scope boundaries, **design preferences**, backward compatibility, performance needs
-3. **Trình bày TẤT CẢ câu hỏi cho user** — organized, rõ ràng
-4. **ĐỢI user trả lời** trước khi sang Phase 4
+1. Review findings from Phase 2 + feature request
+2. Identify unclear aspects: edge cases, error handling, integration points, scope boundaries, **design preferences**, backward compatibility, performance needs
+3. **Present ALL questions to the user** — organized and clear
+4. **WAIT for user's answers** before moving to Phase 4
 
-Nếu user nói "tùy bạn" → đưa recommendation cụ thể, xin explicit confirmation.
+If user says "up to you" → give a specific recommendation, ask for explicit confirmation.
 
 ## Phase 4: Architecture Design
 
-**Mục tiêu**: Thiết kế approaches với trade-offs.
+**Goal**: Design approaches with trade-offs.
 
-**Feature nhỏ** (1-2 files, pattern rõ từ codebase): 1 approach đủ, không cần dispatch architect agents — lead tự propose.
-**Feature vừa/lớn**: Launch **2-3 code-architect agents song song** với focuses khác:
-- Agent 1: "Minimal changes — thay đổi ít nhất có thể, tái dùng tối đa"
+**Small feature** (1-2 files, clear pattern from codebase): 1 approach is enough, no need to dispatch architect agents — lead proposes directly.
+**Medium/large feature**: Launch **2-3 code-architect agents in parallel** with different focuses:
+- Agent 1: "Minimal changes — fewest changes possible, maximum reuse"
 - Agent 2: "Clean architecture — maintainability, elegant abstractions"
 - Agent 3: "Pragmatic balance — speed + quality"
 
-Review tất cả approaches và hình thành quan điểm về approach phù hợp nhất cho task cụ thể này (cân nhắc: small fix vs large feature, urgency, complexity, team context). Trình bày user:
-- Summary mỗi approach
+Review all approaches and form a view on which is best suited for this specific task (consider: small fix vs large feature, urgency, complexity, team context). Present to user:
+- Summary of each approach
 - Trade-offs comparison
-- Khác biệt cụ thể trong cách implement
-- **Đề xuất rõ approach nào** + lý do
-- **Hỏi user chọn**
+- Specific implementation differences
+- **Clear recommendation of which approach** + rationale
+- **Ask user to choose**
 
 ## Phase 5: Implementation
 
-**KHÔNG bắt đầu khi chưa có user approval.**
+**DO NOT start without user approval.**
 
-1. Đợi user explicit approve approach
-2. Đọc lại files liên quan từ Phase 2
-3. Implement theo architecture đã chọn
-4. Follow codebase conventions một cách nghiêm ngặt (đọc CLAUDE.md)
-5. Viết code clean, well-documented (comment WHY bằng tiếng Việt nếu cần)
-6. Update todo list theo tiến độ
+1. Wait for explicit user approval of the approach
+2. Re-read relevant files from Phase 2
+3. Implement per the chosen architecture
+4. Follow codebase conventions strictly (read CLAUDE.md)
+5. Write clean, well-documented code (comment WHY in Vietnamese if needed)
+6. Update todo list as work progresses
 
 ## Phase 6: Quality Review
 
-**Mục tiêu**: Verify code quality trước khi báo xong.
+**Goal**: Verify code quality before declaring done.
 
-**Feature nhỏ** (≤3 files changed): 1 code-reviewer agent đủ.
-**Feature vừa/lớn**: Launch **3 code-reviewer agents song song**:
-- Agent 1: **simplicity, DRY, elegant abstractions** — code có đơn giản nhất có thể không?
-- Agent 2: **bugs, functional correctness** — logic có đúng không? Edge cases?
-- Agent 3: **project conventions, naming, patterns nhất quán** — tuân thủ codebase conventions?
-- Agent 4 (optional, security-auditor): **chỉ nếu** feature đụng auth, payment, crypto, user input, API endpoint mới.
+**Small feature** (≤3 files changed): 1 code-reviewer agent is sufficient.
+**Medium/large feature**: Launch **3 code-reviewer agents in parallel**:
+- Agent 1: **simplicity, DRY, elegant abstractions** — is the code as simple as it can be?
+- Agent 2: **bugs, functional correctness** — is the logic correct? Edge cases?
+- Agent 3: **project conventions, naming, consistent patterns** — does it follow codebase conventions?
+- Agent 4 (optional, security-auditor): **only if** the feature touches auth, payment, crypto, user input, or new API endpoints.
 
-Mỗi reviewer chỉ report finding có **confidence ≥80%**.
+Each reviewer only reports findings with **confidence ≥80%**.
 
-Consolidate findings (đếm, dedup, severity cao hơn wins). Trình bày user:
-- Issues tìm được (grouped by severity)
-- **Hỏi user**: fix ngay, fix sau, hoặc proceed as-is?
-- Fix theo user decision
+Consolidate findings (count, dedup, higher severity wins). Present to user:
+- Issues found (grouped by severity)
+- **Ask user**: fix now, fix later, or proceed as-is?
+- Fix per user decision
 
 ## Phase 7: Summary
 
-1. Mark tất cả todos complete
-2. Tóm tắt:
-   - Đã build gì
-   - Key decisions đã chốt
+1. Mark all todos as complete
+2. Summarize:
+   - What was built
+   - Key decisions made
    - Files modified
    - Suggested next steps
 
-## KHÔNG làm
+## Do NOT
 
-- KHÔNG skip Phase 3 (Clarifying Questions) — đây là phase quan trọng nhất
-- KHÔNG implement trước khi user approve architecture
-- KHÔNG dispatch >3 agents cùng lúc (cost + quality)
-- KHÔNG assume codebase conventions — đọc CLAUDE.md + scan existing code
+- DO NOT skip Phase 3 (Clarifying Questions) — this is the most important phase
+- DO NOT implement before user approves the architecture
+- DO NOT dispatch >3 agents at once (cost + quality)
+- DO NOT assume codebase conventions — read CLAUDE.md + scan existing code

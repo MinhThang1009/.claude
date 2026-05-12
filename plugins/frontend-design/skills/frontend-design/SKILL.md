@@ -7,59 +7,59 @@ argument-hint: "[component or page description]"
 
 # Frontend Design — Distinctive Interfaces
 
-Tạo giao diện production-grade với aesthetic cao, tránh generic "AI slop".
+Create production-grade interfaces with high aesthetic quality, avoiding generic "AI slop".
 
-## Design Thinking — Trước khi code
+## Design Thinking — Before coding
 
-1. **Purpose**: Giao diện giải quyết vấn đề gì? Ai dùng?
-2. **Tone**: Chọn một **thái cực** thẩm mỹ — brutally minimal, maximalist chaos, retro-futuristic, organic/natural, luxury/refined, playful/toy-like, editorial/magazine, brutalist/raw, art deco/geometric, soft/pastel, industrial/utilitarian... Dùng những hướng này làm cảm hứng, nhưng thiết kế sao cho trung thực với hướng thẩm mỹ đã chọn.
+1. **Purpose**: What problem does this interface solve? Who uses it?
+2. **Tone**: Choose one **aesthetic extreme** — brutally minimal, maximalist chaos, retro-futuristic, organic/natural, luxury/refined, playful/toy-like, editorial/magazine, brutalist/raw, art deco/geometric, soft/pastel, industrial/utilitarian... Use these directions as inspiration, but design in a way that is authentic to the chosen aesthetic direction.
 3. **Constraints**: Framework, performance, accessibility requirements.
-4. **Differentiation**: Điều gì khiến giao diện này **đáng nhớ**? 1 yếu tố nổi bật.
+4. **Differentiation**: What makes this interface **memorable**? 1 standout element.
 
-**CRITICAL**: Chọn hướng conceptual rõ ràng và thực thi chính xác. Bold maximalism hay refined minimalism đều tốt — quan trọng là intentionality.
+**CRITICAL**: Choose a clear conceptual direction and execute it precisely. Bold maximalism or refined minimalism are both fine — what matters is intentionality.
 
-Sau đó implement working code đảm bảo:
-- Production-grade và functional
-- Visually striking và memorable
-- Cohesive với clear aesthetic point-of-view
-- Meticulously refined ở mọi chi tiết
+Then implement working code that ensures:
+- Production-grade and functional
+- Visually striking and memorable
+- Cohesive with a clear aesthetic point-of-view
+- Meticulously refined in every detail
 
 ## Aesthetic Guidelines
 
 ### Typography
-- Chọn font đẹp, độc đáo, có cá tính — những lựa chọn bất ngờ, giàu character, nâng tầm aesthetic. Pair display font nổi bật với body font tinh tế.
-- **Tránh** font generic như Arial, Inter; chọn font distinctive nâng tầm aesthetic.
+- Choose beautiful, distinctive fonts with personality — surprising choices with rich character that elevate the aesthetic. Pair a prominent display font with a subtle body font.
+- **Avoid** generic fonts like Arial, Inter; choose distinctive fonts that elevate the aesthetic.
 
 ### Color & Theme
-- Cam kết với một aesthetic cohesive. CSS variables cho consistency.
-- Dominant color với sharp accents — tốt hơn palettes phân bổ đều, nhạt nhẽo.
+- Commit to a cohesive aesthetic. CSS variables for consistency.
+- Dominant color with sharp accents — better than evenly distributed, bland palettes.
 
 ### Motion
-- Dùng animation cho effects và micro-interactions.
-- CSS-only cho HTML thuần. Motion library cho React khi available.
-- Focus high-impact moments: staggered page load reveals (`animation-delay`), scroll-triggered animations, hover states bất ngờ.
-- 1 orchestrated page load > nhiều micro-interactions rải rác.
+- Use animation for effects and micro-interactions.
+- CSS-only for plain HTML. Motion libraries for React when available.
+- Focus on high-impact moments: staggered page load reveals (`animation-delay`), scroll-triggered animations, surprising hover states.
+- 1 orchestrated page load > many scattered micro-interactions.
 
 ### Spatial Composition
 - Asymmetry, overlap, diagonal flow, grid-breaking elements.
-- Generous negative space HOẶC controlled density — không trung bình.
+- Generous negative space OR controlled density — not the average of the two.
 
 ### Backgrounds & Visual Details
-- Tạo atmosphere và depth thay vì solid colors mặc định. Thêm contextual effects và textures phù hợp với overall aesthetic.
+- Create atmosphere and depth instead of default solid colors. Add contextual effects and textures suited to the overall aesthetic.
 - Gradient meshes, noise textures, geometric patterns, layered transparencies, dramatic shadows, decorative borders, custom cursors, grain overlays.
 
-## Anti-patterns — KHÔNG BAO GIỜ
+## Anti-patterns — NEVER
 
-- Font families overused (Inter, Roboto, Arial, system fonts)
+- Overused font families (Inter, Roboto, Arial, system fonts)
 - Purple gradients on white backgrounds
 - Predictable layouts, cookie-cutter components
-- Diễn giải sáng tạo và đưa ra lựa chọn bất ngờ, cảm giác được thiết kế riêng cho context. Mỗi design phải **khác biệt** — không design nào giống nhau.
-- Vary light/dark themes, fonts, aesthetics giữa các project. KHÔNG hội tụ về common choices (ví dụ: Space Grotesk) qua các lần generate.
+- Make creative interpretations and unexpected choices that feel designed for the specific context. Every design must be **distinct** — no two designs should look the same.
+- Vary light/dark themes, fonts, aesthetics between projects. DO NOT converge on common choices (e.g.: Space Grotesk) across generations.
 
 ## Implementation
 
-- **IMPORTANT**: Match implementation complexity với aesthetic vision. Maximalist → elaborate code với extensive animations và effects. Minimalist hoặc refined → restraint, precision, chú ý tỉ mỉ spacing, typography và subtle details. Elegance đến từ việc thực thi vision đúng cách.
-- Code phải production-grade, functional, accessible.
-- Viết clean, well-documented code (comment WHY bằng tiếng Việt).
+- **IMPORTANT**: Match implementation complexity to the aesthetic vision. Maximalist → elaborate code with extensive animations and effects. Minimalist or refined → restraint, precision, meticulous attention to spacing, typography, and subtle details. Elegance comes from executing the vision correctly.
+- Code must be production-grade, functional, and accessible.
+- Write clean, well-documented code (comment WHY in English).
 
-Claude có khả năng tạo creative work phi thường. Đừng giữ lại — hãy cho thấy điều thực sự có thể tạo ra khi tư duy vượt khuôn khổ và cam kết trọn vẹn với một tầm nhìn thiết kế riêng biệt.
+Claude is capable of creating extraordinary creative work. Do not hold back — show what can truly be created when thinking beyond conventions and fully committing to a distinctive design vision.

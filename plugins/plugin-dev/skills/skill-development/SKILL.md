@@ -4,252 +4,253 @@ description: This skill should be used when the user wants to "create a skill", 
 version: 0.1.0
 ---
 
-# Phát triển Skill cho Claude Code Plugins
+# Skill Development for Claude Code Plugins
 
-Skill này cung cấp hướng dẫn để tạo các skill hiệu quả cho Claude Code plugins.
+This skill provides guidance for creating effective skills for Claude Code plugins.
 
-## Về Skills
+## About Skills
 
-Skills là các gói module hóa, độc lập, mở rộng khả năng của Claude bằng cách cung cấp
-kiến thức chuyên biệt, workflow và tool. Hãy coi chúng như "hướng dẫn onboarding" cho các
-lĩnh vực hoặc tác vụ cụ thể — chúng biến Claude từ một agent đa năng thành một agent chuyên biệt
-được trang bị kiến thức thủ tục mà không model nào có thể sở hữu đầy đủ.
+Skills are modular, self-contained packages that extend Claude's capabilities by providing
+specialized knowledge, workflows, and tools. Think of them as "onboarding guides" for specific
+domains or tasks—they transform Claude from a general-purpose agent into a specialized agent
+equipped with procedural knowledge that no model can fully possess.
 
-### Skills cung cấp những gì
+### What Skills Provide
 
-1. Workflow chuyên biệt - Các quy trình nhiều bước cho các lĩnh vực cụ thể
-2. Tích hợp tool - Hướng dẫn làm việc với các định dạng file hoặc API cụ thể
-3. Chuyên môn lĩnh vực - Kiến thức đặc thù của công ty, schema, business logic
-4. Tài nguyên bundled - Script, tài liệu tham chiếu và asset cho các tác vụ phức tạp và lặp lại
+1. Specialized workflows - Multi-step procedures for specific domains
+2. Tool integrations - Instructions for working with specific file formats or APIs
+3. Domain expertise - Company-specific knowledge, schemas, business logic
+4. Bundled resources - Scripts, references, and assets for complex and repetitive tasks
 
-### Cấu tạo của một Skill
+### Anatomy of a Skill
 
-Mỗi skill bao gồm file SKILL.md bắt buộc và các tài nguyên bundled tùy chọn:
+Every skill consists of a required SKILL.md file and optional bundled resources:
 
 ```
 skill-name/
-├── SKILL.md (bắt buộc)
-│   ├── Metadata YAML frontmatter (bắt buộc)
-│   │   ├── name: (bắt buộc)
-│   │   └── description: (bắt buộc)
-│   └── Hướng dẫn Markdown (bắt buộc)
-└── Tài nguyên Bundled (tùy chọn)
-    ├── scripts/          - Code thực thi được (Python/Bash/v.v.)
-    ├── references/       - Tài liệu dùng để load vào context khi cần
-    └── assets/           - File dùng trong output (template, icon, font, v.v.)
+├── SKILL.md (required)
+│   ├── YAML frontmatter metadata (required)
+│   │   ├── name: (required)
+│   │   └── description: (required)
+│   └── Markdown instructions (required)
+└── Bundled Resources (optional)
+    ├── scripts/          - Executable code (Python/Bash/etc.)
+    ├── references/       - Documentation intended to be loaded into context as needed
+    └── assets/           - Files used in output (templates, icons, fonts, etc.)
 ```
 
-#### SKILL.md (bắt buộc)
+#### SKILL.md (required)
 
-**Chất lượng Metadata:** `name` và `description` trong YAML frontmatter xác định khi nào Claude sẽ dùng skill. Mô tả cụ thể skill làm gì và khi nào nên dùng. Dùng ngôi thứ ba (ví dụ: "This skill should be used when..." thay vì "Use this skill when...").
+**Metadata Quality:** The `name` and `description` in YAML frontmatter determine when Claude will use the skill. Be specific about what the skill does and when to use it. Use the third-person (e.g. "This skill should be used when..." instead of "Use this skill when...").
 
-#### Tài nguyên Bundled (tùy chọn)
+#### Bundled Resources (optional)
 
 ##### Scripts (`scripts/`)
 
-Code thực thi được (Python/Bash/v.v.) cho các tác vụ cần độ tin cậy tất định hoặc bị viết lại nhiều lần.
+Executable code (Python/Bash/etc.) for tasks that require deterministic reliability or are repeatedly rewritten.
 
-- **Khi nào nên có**: Khi cùng một đoạn code bị viết lại nhiều lần hoặc cần độ tin cậy tất định
-- **Ví dụ**: `scripts/rotate_pdf.py` cho tác vụ xoay PDF
-- **Lợi ích**: Tiết kiệm token, tất định, có thể thực thi mà không cần load vào context
-- **Lưu ý**: Script vẫn có thể cần Claude đọc để vá lỗi hoặc điều chỉnh theo môi trường cụ thể
+- **When to include**: When the same code is being rewritten repeatedly or deterministic reliability is needed
+- **Example**: `scripts/rotate_pdf.py` for PDF rotation tasks
+- **Benefits**: Token efficient, deterministic, may be executed without loading into context
+- **Note**: Scripts may still need to be read by Claude for patching or environment-specific adjustments
 
 ##### References (`references/`)
 
-Tài liệu và tài liệu tham chiếu dùng để load vào context khi cần để thông tin cho quá trình xử lý và suy luận của Claude.
+Documentation and reference material intended to be loaded as needed into context to inform Claude's process and thinking.
 
-- **Khi nào nên có**: Khi có tài liệu mà Claude nên tham chiếu trong lúc làm việc
-- **Ví dụ**: `references/finance.md` cho schema tài chính, `references/mnda.md` cho template NDA của công ty, `references/policies.md` cho chính sách công ty, `references/api_docs.md` cho đặc tả API
-- **Trường hợp sử dụng**: Database schema, tài liệu API, kiến thức lĩnh vực, chính sách công ty, hướng dẫn workflow chi tiết
-- **Lợi ích**: Giữ SKILL.md gọn, chỉ load khi Claude xác định cần thiết
-- **Best practice**: Nếu file lớn (>10k từ), thêm các pattern tìm kiếm grep vào SKILL.md
-- **Tránh trùng lặp**: Thông tin nên tồn tại ở SKILL.md hoặc references, không phải cả hai. Ưu tiên references cho thông tin chi tiết trừ khi thực sự là cốt lõi của skill — điều này giữ SKILL.md gọn trong khi vẫn có thể khám phá thông tin mà không chiếm dụng context window. Chỉ giữ hướng dẫn thủ tục thiết yếu và workflow trong SKILL.md; chuyển tài liệu tham chiếu chi tiết, schema và ví dụ sang references.
+- **When to include**: For documentation that Claude should reference while working
+- **Examples**: `references/finance.md` for financial schemas, `references/mnda.md` for company NDA template, `references/policies.md` for company policies, `references/api_docs.md` for API specifications
+- **Use cases**: Database schemas, API documentation, domain knowledge, company policies, detailed workflow guides
+- **Benefits**: Keeps SKILL.md lean, loaded only when Claude determines it's needed
+- **Best practice**: If files are large (>10k words), include grep search patterns in SKILL.md
+- **Avoid duplication**: Information should live in either SKILL.md or references files, not both. Prefer references files for detailed information unless it's truly core to the skill—this keeps SKILL.md lean while making information discoverable without hogging the context window. Keep only essential procedural instructions and workflow guidance in SKILL.md; move detailed reference material, schemas, and examples to references files.
 
 ##### Assets (`assets/`)
 
-Các file không dùng để load vào context, mà dùng trong output mà Claude tạo ra.
+Files not intended to be loaded into context, but rather used within the output Claude produces.
 
-- **Khi nào nên có**: Khi skill cần file sẽ được dùng trong output cuối cùng
-- **Ví dụ**: `assets/logo.png` cho brand asset, `assets/slides.pptx` cho template PowerPoint, `assets/frontend-template/` cho boilerplate HTML/React, `assets/font.ttf` cho typography
-- **Trường hợp sử dụng**: Template, hình ảnh, icon, boilerplate code, font, tài liệu mẫu được copy hoặc chỉnh sửa
-- **Lợi ích**: Tách biệt tài nguyên output khỏi tài liệu, cho phép Claude dùng file mà không cần load vào context
+- **When to include**: When the skill needs files that will be used in the final output
+- **Examples**: `assets/logo.png` for brand assets, `assets/slides.pptx` for PowerPoint templates, `assets/frontend-template/` for HTML/React boilerplate, `assets/font.ttf` for typography
+- **Use cases**: Templates, images, icons, boilerplate code, fonts, sample documents that get copied or modified
+- **Benefits**: Separates output resources from documentation, enables Claude to use files without loading them into context
 
-### Nguyên tắc thiết kế Progressive Disclosure
+### Progressive Disclosure Design Principle
 
-Skills dùng hệ thống tải ba cấp để quản lý context hiệu quả:
+Skills use a three-level loading system to manage context efficiently:
 
-1. **Metadata (name + description)** - Luôn có trong context (~100 từ)
-2. **SKILL.md body** - Khi skill được kích hoạt (<5k từ)
-3. **Tài nguyên bundled** - Khi Claude cần (Không giới hạn*)
+1. **Metadata (name + description)** - Always in context (~100 words)
+2. **SKILL.md body** - When skill triggers (<5k words)
+3. **Bundled resources** - As needed by Claude (Unlimited*)
 
-*Không giới hạn vì script có thể thực thi mà không cần đọc vào context window.
+*Unlimited because scripts can be executed without reading into context window.
 
-## Quy trình tạo Skill
+## Skill Creation Process
 
-Để tạo skill, thực hiện "Quy trình tạo Skill" theo thứ tự, bỏ qua bước chỉ khi có lý do rõ ràng tại sao nó không áp dụng.
+To create a skill, follow the "Skill Creation Process" in order, skipping steps only if there is a clear reason why they are not applicable.
 
-### Bước 1: Hiểu Skill qua các Ví dụ cụ thể
+### Step 1: Understanding the Skill with Concrete Examples
 
-Bỏ qua bước này chỉ khi các pattern sử dụng của skill đã được hiểu rõ. Bước này vẫn có giá trị kể cả khi làm việc với skill đã có sẵn.
+Skip this step only when the skill's usage patterns are already clearly understood. It remains valuable even when working with an existing skill.
 
-Để tạo skill hiệu quả, cần hiểu rõ các ví dụ cụ thể về cách skill sẽ được sử dụng. Sự hiểu biết này có thể đến từ ví dụ trực tiếp của người dùng hoặc các ví dụ được tạo ra rồi xác nhận với phản hồi của người dùng.
+To create an effective skill, clearly understand concrete examples of how the skill will be used. This understanding can come from either direct user examples or generated examples that are validated with user feedback.
 
-Ví dụ, khi xây dựng skill image-editor, các câu hỏi liên quan bao gồm:
+For example, when building an image-editor skill, relevant questions include:
 
-- "Skill image-editor nên hỗ trợ những chức năng gì? Chỉnh sửa, xoay, hay gì khác?"
-- "Bạn có thể cho ví dụ về cách skill này sẽ được dùng không?"
-- "Tôi hình dung người dùng có thể hỏi những câu như 'Xóa mắt đỏ khỏi ảnh này' hoặc 'Xoay ảnh này'. Bạn có nghĩ đến cách dùng nào khác không?"
-- "Người dùng sẽ nói gì để kích hoạt skill này?"
+- "What functionality should the image-editor skill support? Editing, rotating, anything else?"
+- "Can you give some examples of how this skill would be used?"
+- "I can imagine users asking for things like 'Remove the red-eye from this image' or 'Rotate this image'. Are there other ways you imagine this skill being used?"
+- "What would a user say that should trigger this skill?"
 
-Để tránh làm người dùng choáng ngợp, tránh hỏi quá nhiều câu trong một lần. Bắt đầu với câu hỏi quan trọng nhất và hỏi thêm khi cần để tăng hiệu quả.
+To avoid overwhelming users, avoid asking too many questions in a single message. Start with the most important questions and follow up as needed for better effectiveness.
 
-Kết thúc bước này khi đã có cảm nhận rõ về chức năng mà skill cần hỗ trợ.
+Conclude this step when there is a clear sense of the functionality the skill should support.
 
-### Bước 2: Lên kế hoạch Nội dung Skill tái sử dụng
+### Step 2: Planning the Reusable Skill Contents
 
-Để biến các ví dụ cụ thể thành skill hiệu quả, phân tích từng ví dụ bằng cách:
+To turn concrete examples into an effective skill, analyze each example by:
 
-1. Cân nhắc cách thực hiện ví dụ đó từ đầu
-2. Xác định những script, references và assets nào sẽ hữu ích khi thực hiện các workflow này nhiều lần
+1. Considering how to execute on the example from scratch
+2. Identifying what scripts, references, and assets would be helpful when executing these workflows repeatedly
 
-Ví dụ: Khi xây dựng skill `pdf-editor` để xử lý câu hỏi "Giúp tôi xoay PDF này," phân tích cho thấy:
+Example: When building a `pdf-editor` skill to handle queries like "Help me rotate this PDF," the analysis shows:
 
-1. Xoay PDF đòi hỏi viết lại cùng đoạn code mỗi lần
-2. Script `scripts/rotate_pdf.py` sẽ hữu ích để lưu trong skill
+1. Rotating a PDF requires re-writing the same code each time
+2. A `scripts/rotate_pdf.py` script would be helpful to store in the skill
 
-Ví dụ: Khi thiết kế skill `frontend-webapp-builder` cho câu hỏi "Tạo cho tôi một todo app" hoặc "Tạo cho tôi một dashboard để theo dõi số bước đi," phân tích cho thấy:
+Example: When designing a `frontend-webapp-builder` skill for queries like "Build me a todo app" or "Build me a dashboard to track my steps," the analysis shows:
 
-1. Viết frontend webapp đòi hỏi cùng boilerplate HTML/React mỗi lần
-2. Template `assets/hello-world/` chứa các file project HTML/React boilerplate sẽ hữu ích để lưu trong skill
+1. Writing a frontend webapp requires the same boilerplate HTML/React each time
+2. An `assets/hello-world/` template containing the boilerplate HTML/React project files would be helpful to store in the skill
 
-Ví dụ: Khi xây dựng skill `big-query` để xử lý câu hỏi "Hôm nay có bao nhiêu người dùng đăng nhập?" phân tích cho thấy:
+Example: When building a `big-query` skill to handle queries like "How many users have logged in today?" the analysis shows:
 
-1. Query BigQuery đòi hỏi tái khám phá table schema và mối quan hệ mỗi lần
-2. File `references/schema.md` ghi lại table schema sẽ hữu ích để lưu trong skill
+1. Querying BigQuery requires re-discovering the table schemas and relationships each time
+2. A `references/schema.md` file documenting the table schemas would be helpful to store in the skill
 
-**Cho Claude Code plugins:** Khi xây dựng skill hooks, phân tích cho thấy:
-1. Developers thường xuyên cần validate hooks.json và kiểm thử hook script
-2. Tiện ích `scripts/validate-hook-schema.sh` và `scripts/test-hook.sh` sẽ hữu ích
-3. `references/patterns.md` cho các pattern hook chi tiết để tránh làm SKILL.md phình to
+**For Claude Code plugins:** When building a hooks skill, the analysis shows:
+1. Developers repeatedly need to validate hooks.json and test hook scripts
+2. `scripts/validate-hook-schema.sh` and `scripts/test-hook.sh` utilities would be helpful
+3. `references/patterns.md` for detailed hook patterns to avoid bloating SKILL.md
 
-Để xác lập nội dung của skill, phân tích từng ví dụ cụ thể để tạo danh sách tài nguyên tái sử dụng cần có: scripts, references và assets.
+To establish the skill's contents, analyze each concrete example to create a list of the reusable resources to include: scripts, references, and assets.
 
-### Bước 3: Tạo cấu trúc Skill
+### Step 3: Create Skill Structure
 
-Cho Claude Code plugins, tạo cấu trúc thư mục skill:
+For Claude Code plugins, create the skill directory structure:
 
 ```bash
 mkdir -p plugin-name/skills/skill-name/{references,examples,scripts}
 touch plugin-name/skills/skill-name/SKILL.md
 ```
 
-**Lưu ý:** Khác với skill-creator tổng quát dùng `init_skill.py`, plugin skill được tạo trực tiếp trong thư mục `skills/` của plugin với cấu trúc thủ công đơn giản hơn.
+**Note:** Unlike the generic skill-creator which uses `init_skill.py`, plugin skills are created directly in the plugin's `skills/` directory with a simpler manual structure.
 
-### Bước 4: Chỉnh sửa Skill
+### Step 4: Edit the Skill
 
-Khi chỉnh sửa skill (mới tạo hoặc đã có), nhớ rằng skill đang được tạo cho một instance Claude khác sử dụng. Tập trung vào việc đưa vào những thông tin có lợi và không hiển nhiên với Claude. Cân nhắc kiến thức thủ tục, chi tiết chuyên ngành hoặc asset tái sử dụng nào sẽ giúp một instance Claude khác thực hiện các tác vụ này hiệu quả hơn.
+When editing the (newly-created or existing) skill, remember that the skill is being created for another instance of Claude to use. Focus on including information that would be beneficial and non-obvious to Claude. Consider what procedural knowledge, domain-specific details, or reusable assets would help another Claude instance execute these tasks more effectively.
 
-#### Bắt đầu với Nội dung Skill tái sử dụng
+#### Start with Reusable Skill Contents
 
-Để bắt đầu triển khai, bắt đầu với các tài nguyên tái sử dụng đã xác định ở trên: các file `scripts/`, `references/` và `assets/`. Lưu ý bước này có thể cần input của người dùng. Ví dụ, khi triển khai skill `brand-guidelines`, người dùng có thể cần cung cấp brand asset hoặc template để lưu trong `assets/`, hoặc tài liệu để lưu trong `references/`.
+To begin implementation, start with the reusable resources identified above: `scripts/`, `references/`, and `assets/` files. Note that this step may require user input. For example, when implementing a `brand-guidelines` skill, the user may need to provide brand assets or templates to store in `assets/`, or documentation to store in `references/`.
 
-Ngoài ra, xóa các file và thư mục ví dụ không cần cho skill. Chỉ tạo các thư mục thực sự cần (references/, examples/, scripts/).
+Also, delete any example files and directories not needed for the skill. Create only the directories you actually need (references/, examples/, scripts/).
 
-#### Cập nhật SKILL.md
+#### Update SKILL.md
 
-**Phong cách viết:** Viết toàn bộ skill theo **dạng mệnh lệnh/nguyên thể** (câu bắt đầu bằng động từ), không dùng ngôi thứ hai. Dùng ngôn ngữ khách quan, mang tính chỉ dẫn (ví dụ: "To accomplish X, do Y" thay vì "You should do X" hoặc "If you need to do X"). Điều này duy trì sự nhất quán và rõ ràng cho AI xử lý.
+**Writing Style:** Write the entire skill using **imperative/infinitive form** (verb-first instructions), not second person. Use objective, instructional language (e.g., "To accomplish X, do Y" rather than "You should do X" or "If you need to do X"). This maintains consistency and clarity for AI consumption.
 
-**Description (Frontmatter):** Dùng định dạng ngôi thứ ba với các cụm từ kích hoạt cụ thể:
+**Description (Frontmatter):** Use third-person format with specific trigger phrases:
 
 ```yaml
 ---
 name: Skill Name
 description: This skill should be used when the user asks to "specific phrase 1", "specific phrase 2", "specific phrase 3". Include exact phrases users would say that should trigger this skill. Be concrete and specific.
+version: 0.1.0
 ---
 ```
 
-**Ví dụ description tốt:**
+**Good description examples:**
 ```yaml
 description: This skill should be used when the user asks to "create a hook", "add a PreToolUse hook", "validate tool use", "implement prompt-based hooks", or mentions hook events (PreToolUse, PostToolUse, Stop).
 ```
 
-**Ví dụ description kém:**
+**Bad description examples:**
 ```yaml
-description: Use this skill when working with hooks.  # Sai ngôi, mơ hồ
-description: Load when user needs hook help.  # Không phải ngôi thứ ba
-description: Provides hook guidance.  # Không có cụm từ kích hoạt
+description: Use this skill when working with hooks.  # Wrong person, vague
+description: Load when user needs hook help.  # Not third person
+description: Provides hook guidance.  # No trigger phrases
 ```
 
-Để hoàn thiện phần body của SKILL.md, trả lời các câu hỏi sau:
+To complete SKILL.md body, answer the following questions:
 
-1. Mục đích của skill là gì, trong vài câu?
-2. Khi nào nên dùng skill? (Thêm vào mô tả frontmatter với các trigger cụ thể)
-3. Trong thực tế, Claude nên dùng skill như thế nào? Tất cả nội dung skill tái sử dụng đã phát triển ở trên phải được tham chiếu để Claude biết cách dùng.
+1. What is the purpose of the skill, in a few sentences?
+2. When should the skill be used? (Include this in frontmatter description with specific triggers)
+3. In practice, how should Claude use the skill? All reusable skill contents developed above should be referenced so that Claude knows how to use them.
 
-**Giữ SKILL.md gọn:** Target 1,500-2,000 từ cho phần body. Chuyển nội dung chi tiết sang references/:
-- Pattern chi tiết → `references/patterns.md`
-- Kỹ thuật nâng cao → `references/advanced.md`
-- Hướng dẫn migration → `references/migration.md`
-- Tham chiếu API → `references/api-reference.md`
+**Keep SKILL.md lean:** Target 1,500-2,000 words for the body. Move detailed content to references/:
+- Detailed patterns → `references/patterns.md`
+- Advanced techniques → `references/advanced.md`
+- Migration guides → `references/migration.md`
+- API references → `references/api-reference.md`
 
-**Tham chiếu tài nguyên trong SKILL.md:**
+**Reference resources in SKILL.md:**
 ```markdown
-## Tài nguyên bổ sung
+## Additional Resources
 
-### Các file tham chiếu
+### Reference Files
 
-Để biết pattern và kỹ thuật chi tiết, tham khảo:
-- **`references/patterns.md`** - Các pattern phổ biến
-- **`references/advanced.md`** - Trường hợp sử dụng nâng cao
+For detailed patterns and techniques, consult:
+- **`references/patterns.md`** - Common patterns
+- **`references/advanced.md`** - Advanced use cases
 
-### Các file ví dụ
+### Example Files
 
-Ví dụ hoạt động trong `examples/`:
-- **`example-script.sh`** - Ví dụ hoạt động
+Working examples in `examples/`:
+- **`example-script.sh`** - Working example
 ```
 
-### Bước 5: Xác thực và Kiểm thử
+### Step 5: Validate and Test
 
-**Đối với plugin skill, xác thực khác với skill tổng quát:**
+**For plugin skills, validation is different from generic skills:**
 
-1. **Kiểm tra cấu trúc**: Thư mục skill trong `plugin-name/skills/skill-name/`
-2. **Xác thực SKILL.md**: Có frontmatter với name và description
-3. **Kiểm tra cụm từ kích hoạt**: Description có query người dùng cụ thể
-4. **Xác minh phong cách viết**: Body dùng dạng mệnh lệnh/nguyên thể, không dùng ngôi thứ hai
-5. **Kiểm tra progressive disclosure**: SKILL.md gọn (~1,500-2,000 từ), nội dung chi tiết trong references/
-6. **Kiểm tra references**: Tất cả file được tham chiếu đều tồn tại
-7. **Xác thực examples**: Ví dụ đầy đủ và đúng
-8. **Kiểm thử scripts**: Script có thể thực thi và hoạt động đúng
+1. **Check structure**: Skill directory in `plugin-name/skills/skill-name/`
+2. **Validate SKILL.md**: Has frontmatter with name and description
+3. **Check trigger phrases**: Description includes specific user queries
+4. **Verify writing style**: Body uses imperative/infinitive form, not second person
+5. **Test progressive disclosure**: SKILL.md is lean (~1,500-2,000 words), detailed content in references/
+6. **Check references**: All referenced files exist
+7. **Validate examples**: Examples are complete and correct
+8. **Test scripts**: Scripts are executable and work correctly
 
-**Dùng skill-reviewer agent:**
+**Use the skill-reviewer agent:**
 ```
-Hỏi: "Review my skill and check if it follows best practices"
+Ask: "Review my skill and check if it follows best practices"
 ```
 
-Skill-reviewer agent sẽ kiểm tra chất lượng description, tổ chức nội dung và progressive disclosure.
+The skill-reviewer agent will check description quality, content organization, and progressive disclosure.
 
-### Bước 6: Lặp cải tiến
+### Step 6: Iterate
 
-Sau khi kiểm thử skill, người dùng có thể yêu cầu cải tiến. Thường xảy ra ngay sau khi dùng skill, khi context về hiệu suất của skill còn tươi.
+After testing the skill, users may request improvements. Often this happens right after using the skill, with fresh context of how the skill performed.
 
-**Workflow lặp cải tiến:**
-1. Dùng skill trên các tác vụ thực tế
-2. Chú ý những điểm vướng mắc hoặc kém hiệu quả
-3. Xác định SKILL.md hoặc tài nguyên bundled nên cập nhật như thế nào
-4. Triển khai thay đổi và kiểm thử lại
+**Iteration workflow:**
+1. Use the skill on real tasks
+2. Notice struggles or inefficiencies
+3. Identify how SKILL.md or bundled resources should be updated
+4. Implement changes and test again
 
-**Các cải tiến phổ biến:**
-- Tăng cường cụm từ kích hoạt trong description
-- Chuyển các section dài từ SKILL.md sang references/
-- Thêm ví dụ hoặc script còn thiếu
-- Làm rõ hướng dẫn mơ hồ
-- Thêm xử lý các trường hợp edge case
+**Common improvements:**
+- Strengthen trigger phrases in description
+- Move long sections from SKILL.md to references/
+- Add missing examples or scripts
+- Clarify ambiguous instructions
+- Add edge case handling
 
-## Cân nhắc dành riêng cho Plugin
+## Plugin-Specific Considerations
 
-### Vị trí Skill trong Plugins
+### Skill Location in Plugins
 
-Plugin skill nằm trong thư mục `skills/` của plugin:
+Plugin skills live in the plugin's `skills/` directory:
 
 ```
 my-plugin/
@@ -265,290 +266,290 @@ my-plugin/
         └── scripts/
 ```
 
-### Tự động phát hiện
+### Auto-Discovery
 
-Claude Code tự động phát hiện skill:
-- Quét thư mục `skills/`
-- Tìm các thư mục con chứa `SKILL.md`
-- Luôn load metadata skill (name + description)
-- Load SKILL.md body khi skill được kích hoạt
-- Load references/examples khi cần
+Claude Code automatically discovers skills:
+- Scans `skills/` directory
+- Finds subdirectories containing `SKILL.md`
+- Loads skill metadata (name + description) always
+- Loads SKILL.md body when skill triggers
+- Loads references/examples when needed
 
-### Không cần đóng gói
+### No Packaging Needed
 
-Plugin skill được phân phối như một phần của plugin, không phải file ZIP riêng lẻ. Người dùng nhận skill khi cài đặt plugin.
+Plugin skills are distributed as part of the plugin, not as separate ZIP files. Users get skills when they install the plugin.
 
-### Kiểm thử trong Plugins
+### Testing in Plugins
 
-Kiểm thử skill bằng cách cài đặt plugin cục bộ:
+Test skills by installing plugin locally:
 
 ```bash
-# Kiểm thử với --plugin-dir
+# Test with --plugin-dir
 cc --plugin-dir /path/to/plugin
 
-# Đặt câu hỏi để kích hoạt skill
-# Xác minh skill load đúng
+# Ask questions that should trigger the skill
+# Verify skill loads correctly
 ```
 
-## Ví dụ từ Plugin-Dev
+## Examples from Plugin-Dev
 
-Nghiên cứu các skill trong plugin này như ví dụ về best practices:
+Study the skills in this plugin as examples of best practices:
 
-**skill hook-development:**
-- Cụm từ kích hoạt xuất sắc: "create a hook", "add a PreToolUse hook", v.v.
-- SKILL.md gọn (1.651 từ)
-- 3 file references/ cho nội dung chi tiết
-- 3 examples/ về hook hoạt động
-- 3 script/ tiện ích
+**hook-development skill:**
+- Excellent trigger phrases: "create a hook", "add a PreToolUse hook", etc.
+- Lean SKILL.md (1,651 words)
+- 3 references/ files for detailed content
+- 3 examples/ of working hooks
+- 3 scripts/ utilities
 
-**skill agent-development:**
-- Trigger mạnh: "create an agent", "agent frontmatter", v.v.
-- SKILL.md tập trung (1.438 từ)
-- References có prompt tạo AI từ Claude Code
-- Ví dụ agent đầy đủ
+**agent-development skill:**
+- Strong triggers: "create an agent", "agent frontmatter", etc.
+- Focused SKILL.md (1,438 words)
+- References include the AI generation prompt from Claude Code
+- Complete agent examples
 
-**skill plugin-settings:**
-- Trigger cụ thể: "plugin settings", ".local.md files", "YAML frontmatter"
-- References cho thấy triển khai thực tế (multi-agent-swarm, ralph-loop)
-- Script phân tích hoạt động
+**plugin-settings skill:**
+- Specific triggers: "plugin settings", ".local.md files", "YAML frontmatter"
+- References show real implementations (multi-agent-swarm, ralph-loop)
+- Working parsing scripts
 
-Mỗi skill thể hiện progressive disclosure và triggering mạnh.
+Each demonstrates progressive disclosure and strong triggering.
 
-## Progressive Disclosure trong thực tế
+## Progressive Disclosure in Practice
 
-### Nội dung vào SKILL.md
+### What Goes in SKILL.md
 
-**Đưa vào (luôn load khi skill kích hoạt):**
-- Khái niệm cốt lõi và tổng quan
-- Quy trình thiết yếu và workflow
-- Bảng tham chiếu nhanh
-- Con trỏ đến references/examples/scripts
-- Các trường hợp sử dụng phổ biến nhất
+**Include (always loaded when skill triggers):**
+- Core concepts and overview
+- Essential procedures and workflows
+- Quick reference tables
+- Pointers to references/examples/scripts
+- Most common use cases
 
-**Giữ dưới 3.000 từ, lý tưởng là 1.500-2.000 từ**
+**Keep under 3,000 words, ideally 1,500-2,000 words**
 
-### Nội dung vào references/
+### What Goes in references/
 
-**Chuyển sang references/ (load khi cần):**
-- Pattern chi tiết và kỹ thuật nâng cao
-- Tài liệu API toàn diện
-- Hướng dẫn migration
-- Edge case và troubleshooting
-- Ví dụ và walkthrough đầy đủ
+**Move to references/ (loaded as needed):**
+- Detailed patterns and advanced techniques
+- Comprehensive API documentation
+- Migration guides
+- Edge cases and troubleshooting
+- Extensive examples and walkthroughs
 
-**Mỗi file tham chiếu có thể lớn (2.000-5.000+ từ)**
+**Each reference file can be large (2,000-5,000+ words)**
 
-### Nội dung vào examples/
+### What Goes in examples/
 
-**Ví dụ code hoạt động:**
-- Script đầy đủ, chạy được
-- File cấu hình
-- File template
-- Ví dụ sử dụng thực tế
+**Working code examples:**
+- Complete, runnable scripts
+- Configuration files
+- Template files
+- Real-world usage examples
 
-**Người dùng có thể copy và adapt trực tiếp**
+**Users can copy and adapt these directly**
 
-### Nội dung vào scripts/
+### What Goes in scripts/
 
-**Script tiện ích:**
-- Tool xác thực
-- Helper kiểm thử
-- Tiện ích phân tích
-- Script tự động hóa
+**Utility scripts:**
+- Validation tools
+- Testing helpers
+- Parsing utilities
+- Automation scripts
 
-**Nên có thể thực thi và được ghi lại**
+**Should be executable and documented**
 
-## Yêu cầu phong cách viết
+## Writing Style Requirements
 
-### Dạng mệnh lệnh/Nguyên thể
+### Imperative/Infinitive Form
 
-Viết theo câu bắt đầu bằng động từ, không dùng ngôi thứ hai:
+Write using verb-first instructions, not second person:
 
-**Đúng (mệnh lệnh):**
+**Correct (imperative):**
 ```
 To create a hook, define the event type.
 Configure the MCP server with authentication.
 Validate settings before use.
 ```
 
-**Sai (ngôi thứ hai):**
+**Incorrect (second person):**
 ```
 You should create a hook by defining the event type.
 You need to configure the MCP server.
 You must validate settings before use.
 ```
 
-### Ngôi thứ ba trong Description
+### Third-Person in Description
 
-Description trong frontmatter phải dùng ngôi thứ ba:
+The frontmatter description must use third person:
 
-**Đúng:**
+**Correct:**
 ```yaml
 description: This skill should be used when the user asks to "create X", "configure Y"...
 ```
 
-**Sai:**
+**Incorrect:**
 ```yaml
 description: Use this skill when you want to create X...
 description: Load this skill when user asks...
 ```
 
-### Ngôn ngữ khách quan, mang tính chỉ dẫn
+### Objective, Instructional Language
 
-Tập trung vào việc phải làm gì, không phải ai làm:
+Focus on what to do, not who should do it:
 
-**Đúng:**
+**Correct:**
 ```
 Parse the frontmatter using sed.
 Extract fields with grep.
 Validate values before use.
 ```
 
-**Sai:**
+**Incorrect:**
 ```
 You can parse the frontmatter...
 Claude should extract fields...
 The user might validate values...
 ```
 
-## Checklist xác thực
+## Validation Checklist
 
-Trước khi hoàn thiện một skill:
+Before finalizing a skill:
 
-**Cấu trúc:**
-- [ ] File SKILL.md tồn tại với YAML frontmatter hợp lệ
-- [ ] Frontmatter có trường `name` và `description`
-- [ ] Phần body Markdown có mặt và đầy đủ
-- [ ] Các file được tham chiếu thực sự tồn tại
+**Structure:**
+- [ ] SKILL.md file exists with valid YAML frontmatter
+- [ ] Frontmatter has `name` and `description` fields
+- [ ] Markdown body is present and substantial
+- [ ] Referenced files actually exist
 
-**Chất lượng Description:**
-- [ ] Dùng ngôi thứ ba ("This skill should be used when...")
-- [ ] Có cụm từ kích hoạt cụ thể mà người dùng sẽ nói
-- [ ] Liệt kê các tình huống cụ thể ("create X", "configure Y")
-- [ ] Không mơ hồ hoặc chung chung
+**Description Quality:**
+- [ ] Uses third person ("This skill should be used when...")
+- [ ] Includes specific trigger phrases users would say
+- [ ] Lists concrete scenarios ("create X", "configure Y")
+- [ ] Not vague or generic
 
-**Chất lượng Nội dung:**
-- [ ] SKILL.md body dùng dạng mệnh lệnh/nguyên thể
-- [ ] Body tập trung và gọn (lý tưởng 1.500-2.000 từ, tối đa <5k)
-- [ ] Nội dung chi tiết đã chuyển sang references/
-- [ ] Ví dụ đầy đủ và hoạt động
-- [ ] Script có thể thực thi và được ghi lại
+**Content Quality:**
+- [ ] SKILL.md body uses imperative/infinitive form
+- [ ] Body is focused and lean (1,500-2,000 words ideal, <5k max)
+- [ ] Detailed content moved to references/
+- [ ] Examples are complete and working
+- [ ] Scripts are executable and documented
 
 **Progressive Disclosure:**
-- [ ] Khái niệm cốt lõi trong SKILL.md
-- [ ] Tài liệu chi tiết trong references/
-- [ ] Code hoạt động trong examples/
-- [ ] Tiện ích trong scripts/
-- [ ] SKILL.md tham chiếu đến các tài nguyên này
+- [ ] Core concepts in SKILL.md
+- [ ] Detailed docs in references/
+- [ ] Working code in examples/
+- [ ] Utilities in scripts/
+- [ ] SKILL.md references these resources
 
-**Kiểm thử:**
-- [ ] Skill kích hoạt theo query người dùng mong đợi
-- [ ] Nội dung hữu ích cho các tác vụ đích
-- [ ] Không có thông tin trùng lặp giữa các file
-- [ ] References load khi cần
+**Testing:**
+- [ ] Skill triggers on expected user queries
+- [ ] Content is helpful for intended tasks
+- [ ] No duplicated information across files
+- [ ] References load when needed
 
-## Các lỗi thường gặp cần tránh
+## Common Mistakes to Avoid
 
-### Lỗi 1: Description kích hoạt yếu
+### Mistake 1: Weak Trigger Description
 
-❌ **Kém:**
+❌ **Bad:**
 ```yaml
 description: Provides guidance for working with hooks.
 ```
 
-**Lý do kém:** Mơ hồ, không có cụm từ kích hoạt cụ thể, không dùng ngôi thứ ba
+**Why bad:** Vague, no specific trigger phrases, not third person
 
-✅ **Tốt:**
+✅ **Good:**
 ```yaml
 description: This skill should be used when the user asks to "create a hook", "add a PreToolUse hook", "validate tool use", or mentions hook events. Provides comprehensive hooks API guidance.
 ```
 
-**Lý do tốt:** Ngôi thứ ba, cụm từ cụ thể, tình huống rõ ràng
+**Why good:** Third person, specific phrases, concrete scenarios
 
-### Lỗi 2: Quá nhiều nội dung trong SKILL.md
+### Mistake 2: Too Much in SKILL.md
 
-❌ **Kém:**
+❌ **Bad:**
 ```
 skill-name/
-└── SKILL.md  (8.000 từ - tất cả trong một file)
+└── SKILL.md  (8,000 words - everything in one file)
 ```
 
-**Lý do kém:** Làm phình context khi skill load, nội dung chi tiết luôn được load
+**Why bad:** Bloats context when skill loads, detailed content always loaded
 
-✅ **Tốt:**
+✅ **Good:**
 ```
 skill-name/
-├── SKILL.md  (1.800 từ - những điều cốt lõi thiết yếu)
+├── SKILL.md  (1,800 words - core essentials)
 └── references/
-    ├── patterns.md (2.500 từ)
-    └── advanced.md (3.700 từ)
+    ├── patterns.md (2,500 words)
+    └── advanced.md (3,700 words)
 ```
 
-**Lý do tốt:** Progressive disclosure, nội dung chi tiết chỉ load khi cần
+**Why good:** Progressive disclosure, detailed content loaded only when needed
 
-### Lỗi 3: Viết theo ngôi thứ hai
+### Mistake 3: Second Person Writing
 
-❌ **Kém:**
+❌ **Bad:**
 ```markdown
 You should start by reading the configuration file.
 You need to validate the input.
 You can use the grep tool to search.
 ```
 
-**Lý do kém:** Ngôi thứ hai, không phải dạng mệnh lệnh
+**Why bad:** Second person, not imperative form
 
-✅ **Tốt:**
+✅ **Good:**
 ```markdown
 Start by reading the configuration file.
 Validate the input before processing.
 Use the grep tool to search for patterns.
 ```
 
-**Lý do tốt:** Dạng mệnh lệnh, hướng dẫn trực tiếp
+**Why good:** Imperative form, direct instructions
 
-### Lỗi 4: Thiếu tham chiếu đến tài nguyên
+### Mistake 4: Missing Resource References
 
-❌ **Kém:**
+❌ **Bad:**
 ```markdown
 # SKILL.md
 
-[Nội dung cốt lõi]
+[Core content]
 
-[Không đề cập references/ hoặc examples/]
+[No mention of references/ or examples/]
 ```
 
-**Lý do kém:** Claude không biết references tồn tại
+**Why bad:** Claude doesn't know references exist
 
-✅ **Tốt:**
+✅ **Good:**
 ```markdown
 # SKILL.md
 
-[Nội dung cốt lõi]
+[Core content]
 
-## Tài nguyên bổ sung
+## Additional Resources
 
-### Các file tham chiếu
-- **`references/patterns.md`** - Pattern chi tiết
-- **`references/advanced.md`** - Kỹ thuật nâng cao
+### Reference Files
+- **`references/patterns.md`** - Detailed patterns
+- **`references/advanced.md`** - Advanced techniques
 
-### Các file ví dụ
-- **`examples/script.sh`** - Ví dụ hoạt động
+### Examples
+- **`examples/script.sh`** - Working example
 ```
 
-**Lý do tốt:** Claude biết tìm thêm thông tin ở đâu
+**Why good:** Claude knows where to find additional information
 
-## Tham chiếu nhanh
+## Quick Reference
 
-### Skill tối giản
+### Minimal Skill
 
 ```
 skill-name/
 └── SKILL.md
 ```
 
-Phù hợp cho: Kiến thức đơn giản, không cần tài nguyên phức tạp
+Good for: Simple knowledge, no complex resources needed
 
-### Skill tiêu chuẩn (Khuyến nghị)
+### Standard Skill (Recommended)
 
 ```
 skill-name/
@@ -559,9 +560,9 @@ skill-name/
     └── working-example.sh
 ```
 
-Phù hợp cho: Hầu hết plugin skill có tài liệu chi tiết
+Good for: Most plugin skills with detailed documentation
 
-### Skill đầy đủ
+### Complete Skill
 
 ```
 skill-name/
@@ -576,61 +577,61 @@ skill-name/
     └── validate.sh
 ```
 
-Phù hợp cho: Lĩnh vực phức tạp có tiện ích xác thực
+Good for: Complex domains with validation utilities
 
-## Tóm tắt Best Practices
+## Best Practices Summary
 
-✅ **NÊN:**
-- Dùng ngôi thứ ba trong description ("This skill should be used when...")
-- Có cụm từ kích hoạt cụ thể ("create X", "configure Y")
-- Giữ SKILL.md gọn (1.500-2.000 từ)
-- Dùng progressive disclosure (chuyển chi tiết sang references/)
-- Viết theo dạng mệnh lệnh/nguyên thể
-- Tham chiếu các file hỗ trợ rõ ràng
-- Cung cấp ví dụ hoạt động
-- Tạo script tiện ích cho các thao tác phổ biến
-- Nghiên cứu skill của plugin-dev như template
+✅ **DO:**
+- Use third-person in description ("This skill should be used when...")
+- Include specific trigger phrases ("create X", "configure Y")
+- Keep SKILL.md lean (1,500-2,000 words)
+- Use progressive disclosure (move details to references/)
+- Write in imperative/infinitive form
+- Reference supporting files clearly
+- Provide working examples
+- Create utility scripts for common operations
+- Study plugin-dev's skills as templates
 
-❌ **KHÔNG NÊN:**
-- Dùng ngôi thứ hai ở bất kỳ đâu
-- Để điều kiện kích hoạt mơ hồ
-- Nhồi tất cả vào SKILL.md (>3.000 từ mà không có references/)
-- Viết theo ngôi thứ hai ("You should...")
-- Để tài nguyên không được tham chiếu
-- Thêm ví dụ không đầy đủ hoặc bị lỗi
-- Bỏ qua xác thực
+❌ **DON'T:**
+- Use second person anywhere
+- Have vague trigger conditions
+- Put everything in SKILL.md (>3,000 words without references/)
+- Write in second person ("You should...")
+- Leave resources unreferenced
+- Include broken or incomplete examples
+- Skip validation
 
-## Tài nguyên bổ sung
+## Additional Resources
 
-### Nghiên cứu các Skill này
+### Study These Skills
 
-Skill của plugin-dev thể hiện best practices:
-- `../hook-development/` - Progressive disclosure, tiện ích
-- `../agent-development/` - Tạo có sự hỗ trợ của AI, references
-- `../mcp-integration/` - References toàn diện
-- `../plugin-settings/` - Ví dụ thực tế
-- `../command-development/` - Khái niệm quan trọng rõ ràng
-- `../plugin-structure/` - Tổ chức tốt
+Plugin-dev's skills demonstrate best practices:
+- `../hook-development/` - Progressive disclosure, utilities
+- `../agent-development/` - AI-assisted creation, references
+- `../mcp-integration/` - Comprehensive references
+- `../plugin-settings/` - Real-world examples
+- `../command-development/` - Clear critical concepts
+- `../plugin-structure/` - Good organization
 
-### Các file tham chiếu
+### Reference Files
 
-Để xem phương pháp skill-creator đầy đủ:
-- **`references/skill-creator-original.md`** - Nội dung skill-creator gốc đầy đủ
+For complete skill-creator methodology:
+- **`references/skill-creator-original.md`** - Full original skill-creator content
 
-## Quy trình triển khai
+## Implementation Workflow
 
-Để tạo skill cho plugin của bạn:
+To create a skill for your plugin:
 
-1. **Hiểu use case**: Xác định các ví dụ cụ thể về cách dùng skill
-2. **Lên kế hoạch tài nguyên**: Xác định scripts/references/examples nào cần có
-3. **Tạo cấu trúc**: `mkdir -p skills/skill-name/{references,examples,scripts}`
-4. **Viết SKILL.md**:
-   - Frontmatter với description ngôi thứ ba và cụm từ kích hoạt
-   - Body gọn (1.500-2.000 từ) theo dạng mệnh lệnh
-   - Tham chiếu các file hỗ trợ
-5. **Thêm tài nguyên**: Tạo references/, examples/, scripts/ khi cần
-6. **Xác thực**: Kiểm tra description, phong cách viết, tổ chức
-7. **Kiểm thử**: Xác minh skill load theo trigger mong đợi
-8. **Lặp cải tiến**: Cải thiện dựa trên sử dụng thực tế
+1. **Understand use cases**: Identify concrete examples of skill usage
+2. **Plan resources**: Determine what scripts/references/examples needed
+3. **Create structure**: `mkdir -p skills/skill-name/{references,examples,scripts}`
+4. **Write SKILL.md**:
+   - Frontmatter with third-person description and trigger phrases
+   - Lean body (1,500-2,000 words) in imperative form
+   - Reference supporting files
+5. **Add resources**: Create references/, examples/, scripts/ as needed
+6. **Validate**: Check description, writing style, organization
+7. **Test**: Verify skill loads on expected triggers
+8. **Iterate**: Improve based on usage
 
-Tập trung vào description kích hoạt mạnh, progressive disclosure và phong cách viết mệnh lệnh để có skill hiệu quả, load đúng lúc và cung cấp hướng dẫn đúng trọng tâm.
+Focus on strong trigger descriptions, progressive disclosure, and imperative writing style for effective skills that load when needed and provide targeted guidance.

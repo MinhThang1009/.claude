@@ -4,22 +4,22 @@ description: This skill should be used when the user asks to "create an agent", 
 version: 0.1.0
 ---
 
-# Phát triển Agent cho Claude Code Plugins
+# Agent Development for Claude Code Plugins
 
-## Tổng quan
+## Overview
 
-Agent là các subprocess tự trị xử lý các nhiệm vụ phức tạp, nhiều bước một cách độc lập. Hiểu cấu trúc agent, điều kiện kích hoạt, và thiết kế system prompt giúp tạo ra khả năng tự trị mạnh mẽ.
+Agents are autonomous subprocesses that handle complex, multi-step tasks independently. Understanding agent structure, triggering conditions, and system prompt design enables creating powerful autonomous capabilities.
 
-**Khái niệm chính:**
-- Agent dành cho công việc tự trị, command dành cho hành động do người dùng khởi tạo
-- Định dạng file Markdown với frontmatter YAML
-- Kích hoạt qua trường description kèm ví dụ
-- System prompt định nghĩa hành vi của agent
-- Tùy chỉnh model và màu sắc
+**Key concepts:**
+- Agents are FOR autonomous work, commands are FOR user-initiated actions
+- Markdown file format with YAML frontmatter
+- Triggering via description field with examples
+- System prompt defines agent behavior
+- Model and color customization
 
-## Cấu trúc File Agent
+## Agent File Structure
 
-### Định dạng Đầy đủ
+### Complete Format
 
 ```markdown
 ---
@@ -49,103 +49,103 @@ You are [agent role description]...
 [What to return]
 ```
 
-## Các Trường Frontmatter
+## Frontmatter Fields
 
-### name (bắt buộc)
+### name (required)
 
-Định danh agent dùng để đặt tên namespace và gọi.
+Agent identifier used for namespacing and invocation.
 
-**Định dạng:** chữ thường, số, dấu gạch ngang
-**Độ dài:** 3-50 ký tự
-**Pattern:** Phải bắt đầu và kết thúc bằng ký tự chữ số
+**Format:** lowercase, numbers, hyphens only
+**Length:** 3-50 characters
+**Pattern:** Must start and end with alphanumeric
 
-**Ví dụ tốt:**
+**Good examples:**
 - `code-reviewer`
 - `test-generator`
 - `api-docs-writer`
 - `security-analyzer`
 
-**Ví dụ xấu:**
-- `helper` (quá chung chung)
-- `-agent-` (bắt đầu/kết thúc bằng dấu gạch ngang)
-- `my_agent` (dấu gạch dưới không được phép)
-- `ag` (quá ngắn, < 3 ký tự)
+**Bad examples:**
+- `helper` (too generic)
+- `-agent-` (starts/ends with hyphen)
+- `my_agent` (underscores not allowed)
+- `ag` (too short, < 3 chars)
 
-### description (bắt buộc)
+### description (required)
 
-Định nghĩa khi nào Claude nên kích hoạt agent này. **Đây là trường quan trọng nhất** — được load vào context mỗi khi agent được đăng ký, để harness quyết định khi nào dispatch.
+Defines when Claude should trigger this agent. **This is the most critical field** — it is loaded into context whenever the agent is registered, so the harness can decide when to dispatch.
 
-**Phải bao gồm:**
-1. Điều kiện kích hoạt ("Use this agent when...")
-2. Tóm tắt prose ngắn về các trigger scenario điển hình
-3. Con trỏ đến section "When to invoke" trong body agent cho các worked scenario chi tiết
+**Must include:**
+1. Triggering conditions ("Use this agent when...")
+2. A short prose summary of the typical trigger scenarios
+3. A pointer to a "When to invoke" section in the agent body for the detailed worked scenarios
 
-**Định dạng:**
+**Format:**
 ```
 Use this agent when [conditions]. Typical triggers include [scenario 1 in prose], [scenario 2 in prose], and [scenario 3 in prose]. See "When to invoke" in the agent body for worked scenarios.
 ```
 
-**Thực hành tốt nhất:**
-- Nêu tên 2-4 trigger scenario trong prose summary
-- Bao gồm cả kích hoạt chủ động (assistant tự gọi) và phản ứng (user yêu cầu)
-- Bao gồm các cách diễn đạt khác nhau cho cùng ý định
-- Nêu rõ khi nào KHÔNG dùng agent
-- Đặt các worked scenario chi tiết trong body dưới section "When to invoke" dưới dạng danh sách prose bullet
+**Best practices:**
+- Name 2-4 trigger scenarios in the prose summary
+- Cover both proactive (assistant invokes itself) and reactive (user requests) triggering
+- Cover different phrasings of the same intent
+- Be specific about when NOT to use the agent
+- Put detailed scenarios in the body under "When to invoke" as a bullet list of prose descriptions
 
-### model (bắt buộc)
+### model (required)
 
-Model nào agent nên sử dụng.
+Which model the agent should use.
 
-**Tùy chọn:**
-- `inherit` - Dùng cùng model với parent (khuyến nghị)
-- `sonnet` - Claude Sonnet (cân bằng)
-- `opus` - Claude Opus (mạnh nhất, tốn kém)
-- `haiku` - Claude Haiku (nhanh, rẻ)
+**Options:**
+- `inherit` - Use same model as parent (recommended)
+- `sonnet` - Claude Sonnet (balanced)
+- `opus` - Claude Opus (most capable, expensive)
+- `haiku` - Claude Haiku (fast, cheap)
 
-**Khuyến nghị:** Dùng `inherit` trừ khi agent cần khả năng model cụ thể.
+**Recommendation:** Use `inherit` unless agent needs specific model capabilities.
 
-### color (bắt buộc)
+### color (required)
 
-Định danh trực quan cho agent trong UI.
+Visual identifier for agent in UI.
 
-**Tùy chọn:** `blue`, `cyan`, `green`, `yellow`, `magenta`, `red`
+**Options:** `blue`, `cyan`, `green`, `yellow`, `magenta`, `red`
 
-**Hướng dẫn:**
-- Chọn màu khác biệt cho các agent khác nhau trong cùng plugin
-- Dùng màu nhất quán cho các loại agent tương tự
-- Blue/cyan: Phân tích, review
-- Green: Nhiệm vụ định hướng thành công
-- Yellow: Thận trọng, xác thực
-- Red: Quan trọng, bảo mật
-- Magenta: Sáng tạo, tạo sinh
+**Guidelines:**
+- Choose distinct colors for different agents in same plugin
+- Use consistent colors for similar agent types
+- Blue/cyan: Analysis, review
+- Green: Success-oriented tasks
+- Yellow: Caution, validation
+- Red: Critical, security
+- Magenta: Creative, generation
 
-### tools (tùy chọn)
+### tools (optional)
 
-Giới hạn agent chỉ dùng các tool cụ thể.
+Restrict agent to specific tools.
 
-**Định dạng:** Mảng tên tool
+**Format:** Array of tool names
 
 ```yaml
 tools: ["Read", "Write", "Grep", "Bash"]
 ```
 
-**Mặc định:** Nếu bỏ qua, agent có quyền truy cập tất cả tool
+**Default:** If omitted, agent has access to all tools
 
-**Thực hành tốt nhất:** Giới hạn tool ở mức tối thiểu cần thiết (nguyên tắc đặc quyền tối thiểu)
+**Best practice:** Limit tools to minimum needed (principle of least privilege)
 
-**Bộ tool phổ biến:**
-- Phân tích chỉ đọc: `["Read", "Grep", "Glob"]`
-- Tạo code: `["Read", "Write", "Grep"]`
-- Kiểm tra: `["Read", "Bash", "Grep"]`
-- Toàn quyền: Bỏ qua trường hoặc dùng `["*"]`
+**Common tool sets:**
+- Read-only analysis: `["Read", "Grep", "Glob"]`
+- Code generation: `["Read", "Write", "Grep"]`
+- Testing: `["Read", "Bash", "Grep"]`
+- Full access: Omit field or use `["*"]`
 
-## Thiết kế System Prompt
+## System Prompt Design
 
-Phần markdown body trở thành system prompt của agent. Viết ở ngôi thứ hai, xưng hô trực tiếp với agent.
+The markdown body becomes the agent's system prompt. Write in second person, addressing the agent directly.
 
-### Cấu trúc
+### Structure
 
-**Template chuẩn:**
+**Standard template:**
 ```markdown
 You are [role] specializing in [domain].
 
@@ -175,30 +175,30 @@ Handle these situations:
 - [Edge case 2]: [How to handle]
 ```
 
-### Thực hành Tốt nhất
+### Best Practices
 
-✅ **NÊN:**
-- Viết ở ngôi thứ hai ("You are...", "You will...")
-- Nêu rõ trách nhiệm
-- Cung cấp quy trình từng bước
-- Định nghĩa định dạng output
-- Bao gồm tiêu chuẩn chất lượng
-- Xử lý các edge case
-- Giữ dưới 10.000 ký tự
+✅ **DO:**
+- Write in second person ("You are...", "You will...")
+- Be specific about responsibilities
+- Provide step-by-step process
+- Define output format
+- Include quality standards
+- Address edge cases
+- Keep under 10,000 characters
 
-❌ **KHÔNG NÊN:**
-- Viết ở ngôi thứ nhất ("I am...", "I will...")
-- Mơ hồ hoặc chung chung
-- Bỏ qua các bước quy trình
-- Để định dạng output không xác định
-- Bỏ qua hướng dẫn chất lượng
-- Bỏ qua các trường hợp lỗi
+❌ **DON'T:**
+- Write in first person ("I am...", "I will...")
+- Be vague or generic
+- Omit process steps
+- Leave output format undefined
+- Skip quality guidance
+- Ignore error cases
 
-## Tạo Agent
+## Creating Agents
 
-### Phương pháp 1: Tạo có Hỗ trợ AI
+### Method 1: AI-Assisted Generation
 
-Dùng pattern prompt này (trích xuất từ Claude Code):
+Use this prompt pattern (extracted from Claude Code):
 
 ```
 Create an agent configuration based on this request: "[YOUR DESCRIPTION]"
@@ -223,50 +223,50 @@ Return JSON with:
 }
 ```
 
-Sau đó chuyển sang định dạng file agent với frontmatter.
+Then convert to agent file format with frontmatter.
 
-Xem `examples/agent-creation-prompt.md` để biết template đầy đủ.
+See `examples/agent-creation-prompt.md` for complete template.
 
-### Phương pháp 2: Tạo Thủ công
+### Method 2: Manual Creation
 
-1. Chọn định danh agent (3-50 ký tự, chữ thường, dấu gạch ngang)
-2. Viết description kèm ví dụ
-3. Chọn model (thường là `inherit`)
-4. Chọn màu để nhận dạng trực quan
-5. Định nghĩa tool (nếu giới hạn quyền truy cập)
-6. Viết system prompt theo cấu trúc trên
-7. Lưu thành `agents/agent-name.md`
+1. Choose agent identifier (3-50 chars, lowercase, hyphens)
+2. Write description with examples
+3. Select model (usually `inherit`)
+4. Choose color for visual identification
+5. Define tools (if restricting access)
+6. Write system prompt with structure above
+7. Save as `agents/agent-name.md`
 
-## Quy tắc Xác thực
+## Validation Rules
 
-### Xác thực Định danh
+### Identifier Validation
 
 ```
-✅ Hợp lệ: code-reviewer, test-gen, api-analyzer-v2
-❌ Không hợp lệ: ag (quá ngắn), -start (bắt đầu bằng dấu gạch ngang), my_agent (dấu gạch dưới)
+✅ Valid: code-reviewer, test-gen, api-analyzer-v2
+❌ Invalid: ag (too short), -start (starts with hyphen), my_agent (underscore)
 ```
 
-**Quy tắc:**
-- 3-50 ký tự
-- Chỉ chữ thường, số, dấu gạch ngang
-- Phải bắt đầu và kết thúc bằng ký tự chữ số
-- Không có dấu gạch dưới, khoảng trắng, hoặc ký tự đặc biệt
+**Rules:**
+- 3-50 characters
+- Lowercase letters, numbers, hyphens only
+- Must start and end with alphanumeric
+- No underscores, spaces, or special characters
 
-### Xác thực Description
+### Description Validation
 
-**Độ dài:** 10-5.000 ký tự
-**Phải bao gồm:** Điều kiện kích hoạt và ví dụ
-**Tốt nhất:** 200-1.000 ký tự với 2-4 ví dụ
+**Length:** 10-5,000 characters
+**Must include:** Triggering conditions and examples
+**Best:** 200-1,000 characters with 2-4 examples
 
-### Xác thực System Prompt
+### System Prompt Validation
 
-**Độ dài:** 20-10.000 ký tự
-**Tốt nhất:** 500-3.000 ký tự
-**Cấu trúc:** Trách nhiệm rõ ràng, quy trình, định dạng output
+**Length:** 20-10,000 characters
+**Best:** 500-3,000 characters
+**Structure:** Clear responsibilities, process, output format
 
-## Tổ chức Agent
+## Agent Organization
 
-### Thư mục Agent của Plugin
+### Plugin Agents Directory
 
 ```
 plugin-name/
@@ -276,38 +276,38 @@ plugin-name/
     └── generator.md
 ```
 
-Tất cả file `.md` trong `agents/` được tự động phát hiện.
+All `.md` files in `agents/` are auto-discovered.
 
-### Đặt tên Namespace
+### Namespacing
 
-Agent được đặt tên namespace tự động:
-- Một plugin: `agent-name`
-- Với thư mục con: `plugin:subdir:agent-name`
+Agents are namespaced automatically:
+- Single plugin: `agent-name`
+- With subdirectories: `plugin:subdir:agent-name`
 
-## Kiểm tra Agent
+## Testing Agents
 
-### Kiểm tra Kích hoạt
+### Test Triggering
 
-Tạo kịch bản kiểm tra để xác minh agent kích hoạt đúng:
+Create test scenarios to verify agent triggers correctly:
 
-1. Viết agent với ví dụ kích hoạt cụ thể
-2. Dùng cách diễn đạt tương tự ví dụ trong kiểm tra
-3. Kiểm tra Claude tải agent
-4. Xác minh agent cung cấp chức năng mong đợi
+1. Write agent with specific triggering examples
+2. Use similar phrasing to examples in test
+3. Check Claude loads the agent
+4. Verify agent provides expected functionality
 
-### Kiểm tra System Prompt
+### Test System Prompt
 
-Đảm bảo system prompt hoàn chỉnh:
+Ensure system prompt is complete:
 
-1. Giao cho agent nhiệm vụ điển hình
-2. Kiểm tra nó tuân theo các bước quy trình
-3. Xác minh định dạng output đúng
-4. Kiểm tra các edge case được đề cập trong prompt
-5. Xác nhận tiêu chuẩn chất lượng được đáp ứng
+1. Give agent typical task
+2. Check it follows process steps
+3. Verify output format is correct
+4. Test edge cases mentioned in prompt
+5. Confirm quality standards are met
 
-## Tham chiếu Nhanh
+## Quick Reference
 
-### Agent Tối giản
+### Minimal Agent
 
 ```markdown
 ---
@@ -331,71 +331,71 @@ Process:
 Output: [What to provide]
 ```
 
-### Tóm tắt Các Trường Frontmatter
+### Frontmatter Fields Summary
 
-| Trường | Bắt buộc | Định dạng | Ví dụ |
-|--------|----------|-----------|-------|
-| name | Có | lowercase-hyphens | code-reviewer |
-| description | Có | Prose triggers | Use when... Typical triggers include... |
-| model | Có | inherit/sonnet/opus/haiku | inherit |
-| color | Có | Tên màu | blue |
-| tools | Không | Mảng tên tool | ["Read", "Grep"] |
+| Field | Required | Format | Example |
+|-------|----------|--------|---------|
+| name | Yes | lowercase-hyphens | code-reviewer |
+| description | Yes | Prose triggers | Use when... Typical triggers include... |
+| model | Yes | inherit/sonnet/opus/haiku | inherit |
+| color | Yes | Color name | blue |
+| tools | No | Array of tool names | ["Read", "Grep"] |
 
-### Thực hành Tốt nhất
+### Best Practices
 
-**NÊN:**
-- ✅ Nêu tên 2-4 trigger scenario trong description (dạng prose)
-- ✅ Đặt worked scenario chi tiết trong section "When to invoke" ở body, dạng prose bullet
-- ✅ Viết điều kiện kích hoạt cụ thể
-- ✅ Dùng `inherit` cho model trừ khi có nhu cầu cụ thể
-- ✅ Chọn tool phù hợp (đặc quyền tối thiểu)
-- ✅ Viết system prompt rõ ràng, có cấu trúc
-- ✅ Kiểm tra kích hoạt agent kỹ lưỡng
+**DO:**
+- ✅ Name 2-4 trigger scenarios in the description (as prose)
+- ✅ Put detailed worked scenarios in a "When to invoke" body section, as prose bullets
+- ✅ Write specific triggering conditions
+- ✅ Use `inherit` for model unless specific need
+- ✅ Choose appropriate tools (least privilege)
+- ✅ Write clear, structured system prompts
+- ✅ Test agent triggering thoroughly
 
-**KHÔNG NÊN:**
-- ❌ Dùng description chung chung không có trigger scenario
-- ❌ Bỏ qua điều kiện kích hoạt
-- ❌ Cho tất cả agent cùng màu
-- ❌ Cấp quyền truy cập tool không cần thiết
-- ❌ Viết system prompt mơ hồ
-- ❌ Bỏ qua kiểm tra
+**DON'T:**
+- ❌ Use generic descriptions without trigger scenarios
+- ❌ Omit triggering conditions
+- ❌ Give all agents same color
+- ❌ Grant unnecessary tool access
+- ❌ Write vague system prompts
+- ❌ Skip testing
 
-## Tài nguyên Bổ sung
+## Additional Resources
 
-### File Tham chiếu
+### Reference Files
 
-Để biết hướng dẫn chi tiết, tham khảo:
+For detailed guidance, consult:
 
-- **`references/system-prompt-design.md`** - Pattern system prompt đầy đủ
-- **`references/triggering-examples.md`** - Định dạng ví dụ và thực hành tốt nhất
-- **`references/agent-creation-system-prompt.md`** - Prompt chính xác từ Claude Code
+- **`references/system-prompt-design.md`** - Complete system prompt patterns
+- **`references/triggering-examples.md`** - Example formats and best practices
+- **`references/agent-creation-system-prompt.md`** - The exact prompt from Claude Code
 
-### File Ví dụ
+### Example Files
 
-Ví dụ hoạt động trong `examples/`:
+Working examples in `examples/`:
 
-- **`agent-creation-prompt.md`** - Template tạo agent có hỗ trợ AI
-- **`complete-agent-examples.md`** - Ví dụ agent đầy đủ cho các trường hợp dùng khác nhau
+- **`agent-creation-prompt.md`** - AI-assisted agent generation template
+- **`complete-agent-examples.md`** - Full agent examples for different use cases
 
-### Script Tiện ích
+### Utility Scripts
 
-Công cụ phát triển trong `scripts/`:
+Development tools in `scripts/`:
 
-- **`validate-agent.sh`** - Xác thực cấu trúc file agent
-- **`test-agent-trigger.sh`** - Kiểm tra xem agent có kích hoạt đúng không
+- **`validate-agent.sh`** - Validate agent file structure
+- **`test-agent-trigger.sh`** - Test if agent triggers correctly
 
-## Quy trình Triển khai
+## Implementation Workflow
 
-Để tạo agent cho một plugin:
+To create an agent for a plugin:
 
-1. Xác định mục đích agent và điều kiện kích hoạt
-2. Chọn phương pháp tạo (có hỗ trợ AI hoặc thủ công)
-3. Tạo file `agents/agent-name.md`
-4. Viết frontmatter với tất cả trường bắt buộc
-5. Viết system prompt theo thực hành tốt nhất
-6. Nêu tên 2-4 trigger scenario trong description (prose) và chi tiết hóa chúng trong section "When to invoke" ở body
-7. Xác thực với `scripts/validate-agent.sh`
-8. Kiểm tra kích hoạt với các kịch bản thực tế
-9. Ghi lại agent trong README của plugin
+1. Define agent purpose and triggering conditions
+2. Choose creation method (AI-assisted or manual)
+3. Create `agents/agent-name.md` file
+4. Write frontmatter with all required fields
+5. Write system prompt following best practices
+6. Name 2-4 trigger scenarios in description (prose) and detail them in a "When to invoke" body section
+7. Validate with `scripts/validate-agent.sh`
+8. Test triggering with real scenarios
+9. Document agent in plugin README
 
-Tập trung vào điều kiện kích hoạt rõ ràng và system prompt toàn diện để vận hành tự trị.
+Focus on clear triggering conditions and comprehensive system prompts for autonomous operation.

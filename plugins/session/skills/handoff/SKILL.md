@@ -6,101 +6,101 @@ argument-hint: "[--save | --inject]"
 model: inherit
 ---
 
-# Skill: Handoff giữa các session
+# Skill: Handoff between sessions
 
-Theo hướng dẫn từ Anthropic ([Using Claude Code session management and 1M context](https://claude.com/blog/using-claude-code-session-management-and-1m-context)) và kinh nghiệm cộng đồng: **resume một session dài thường tệ hơn brief-injection vào session mới** — vì resume kéo theo stale environment data (tool output cũ, file content cũ) còn brief chỉ mang quyết định và trạng thái hiện tại.
+Per guidance from Anthropic ([Using Claude Code session management and 1M context](https://claude.com/blog/using-claude-code-session-management-and-1m-context)) and community experience: **resuming a long session is often worse than brief-injection into a new session** — because resuming drags in stale environment data (old tool output, old file content) whereas a brief carries only decisions and current state.
 
-## Tình huống áp dụng
+## When to apply
 
-| Tình huống                                                | Hành động                                         |
-| --------------------------------------------------------- | ------------------------------------------------- |
-| Sắp `/compact` (context 60-77% wrap-up zone) — vẫn làm tiếp cùng task | `/handoff` rồi `/compact <chỉ dẫn>`        |
-| Sắp `/clear` — chuyển sang task mới nhưng cần nhớ vài thứ | `/handoff --save` rồi `/clear`                    |
-| Bắt đầu session mới sau khi nghỉ                          | Mở session mới, paste handoff vào prompt đầu tiên |
-| Sau crash / session lỗi                                   | `claude --continue` → `/handoff` để xem state     |
+| Situation                                                  | Action                                             |
+| ---------------------------------------------------------- | -------------------------------------------------- |
+| About to `/compact` (context 60-77% wrap-up zone) — continuing the same task | `/handoff` then `/compact <instructions>` |
+| About to `/clear` — switching to a new task but need to remember a few things | `/handoff --save` then `/clear` |
+| Starting a new session after a break                        | Open new session, paste handoff into first prompt  |
+| After crash / session error                                 | `claude --continue` → `/handoff` to check state    |
 
-## Quy trình
+## Process
 
-### Bước 1 — Kiểm tra context hiện tại
+### Step 1 — Check current context
 
 ```bash
-# Người dùng tự xem qua /context. Tôi (Claude) tự đọc git để biết state code (skip nếu không phải git repo):
+# User checks via /context themselves. I (Claude) read git to know code state (skip if not a git repo):
 !`git rev-parse --git-dir >/dev/null 2>&1 && git status --short || echo "(not a git repo — skip git context)"`
 !`git rev-parse --git-dir >/dev/null 2>&1 && git log --oneline -5 || true`
 !`git rev-parse --git-dir >/dev/null 2>&1 && git diff --stat HEAD || true`
 ```
 
-### Bước 2 — Soạn handoff brief
+### Step 2 — Draft the handoff brief
 
-Tôi viết brief **NGẮN** (≤300 từ nội dung, không tính headings) theo format dưới đây. Bỏ section nào không áp dụng. Brief phải tự đọc được mà không cần history.
+I write a **SHORT** brief (≤300 words of content, not counting headings) in the format below. Omit any section that does not apply. The brief must be self-contained without requiring the session history.
 
 ```markdown
 # Handoff — <task name> — <YYYY-MM-DD HH:MM>
 
-## Mục tiêu phiên hiện tại
-<1 câu — đang giải quyết vấn đề gì>
+## Current session goal
+<1 sentence — what problem is being solved>
 
-## Đã xong
-- <bullet ngắn — gì đã làm được, kèm path file nếu có>
+## Done
+- <short bullet — what was accomplished, with file path if applicable>
 - ...
 
-## Đang dở
-- <việc đang dở dang, dừng ở bước nào>
-- File đang sửa: `path/to/file.ts:120` — <ghi chú>
+## In progress
+- <work in progress, where it stopped>
+- File being edited: `path/to/file.ts:120` — <note>
 
-## Quyết định đã chốt (kèm lý do 1 câu)
-- <Quyết định 1>: <lý do>
-- <Quyết định 2>: <lý do>
+## Decisions made (with 1-sentence rationale)
+- <Decision 1>: <rationale>
+- <Decision 2>: <rationale>
 
-## Constraint / điều cần nhớ
+## Constraints / things to remember
 - <perf, compat, security, business rule>
 
-## Việc tránh / đã thử nhưng không work
-- <approach X — bị reject vì lý do Y>
+## Things to avoid / tried but didn't work
+- <approach X — rejected because of reason Y>
 
-## Bước tiếp theo
-1. <hành động cụ thể>
-2. <hành động cụ thể>
+## Next steps
+1. <specific action>
+2. <specific action>
 
-## Lệnh hữu ích cho project này
+## Useful commands for this project
 - Build: `<command>`
 - Test: `<command>`
 - Lint: `<command>`
 ```
 
-### Bước 3 — Lưu hoặc inject
+### Step 3 — Save or inject
 
-**Nếu user chạy `/handoff` không kèm flag** → in brief ra chat. User sẽ:
-- Copy thủ công vào session mới, HOẶC
-- Tôi tiếp tục với `/compact <brief>` để giữ continuity.
+**If user runs `/handoff` without a flag** → print the brief to chat. User will:
+- Copy it manually into a new session, OR
+- I continue with `/compact <brief>` to maintain continuity.
 
-**Nếu user chạy `/handoff --save`** → ghi brief vào `<project>/HANDOFF.md` (project root, không phải `.claude/` — `.claude/` là config directory). Trước khi ghi: check `.gitignore` có entry `HANDOFF.md` chưa — nếu chưa thì thêm vào `.gitignore` (tránh commit notes nội bộ).
-- Session mới sẽ tự đọc khi user nói "đọc HANDOFF.md".
+**If user runs `/handoff --save`** → write brief to `<project>/HANDOFF.md` (project root, not `.claude/` — `.claude/` is a config directory). Before writing: check `.gitignore` for a `HANDOFF.md` entry — if absent, add it (avoid committing internal notes).
+- New session will read it when user says "read HANDOFF.md".
 
-**Nếu user chạy `/handoff --inject`** → in 1 dòng paste-ready để user paste vào session mới:
+**If user runs `/handoff --inject`** → print 1 paste-ready line for user to paste into a new session:
 ```text
-Tiếp tục từ handoff: [brief inline 5-7 dòng]. File chính: <list>. Bước tiếp: <action>.
+Continuing from handoff: [inline brief 5-7 lines]. Main files: <list>. Next step: <action>.
 ```
 
-## Quy tắc viết brief
+## Rules for writing the brief
 
-- **Quyết định, không quá trình**: ghi "Chốt dùng JWT RS256 vì legal yêu cầu", KHÔNG ghi "Đã thử HS256, sau đó thử RS256, sau đó thảo luận với...".
-- **Đường đi đã đóng = bỏ qua** trừ khi quan trọng để session sau biết KHÔNG thử lại.
-- **Path tuyệt đối hoặc rel-from-repo-root** cho file. Không "file kia".
-- **Lệnh chính xác** — copy paste chạy được, không "chạy lệnh build".
-- **Bỏ qua tool output dài** (build log, test result chi tiết). Chỉ giữ kết quả: pass/fail/skip.
+- **Decisions, not process**: write "Decided to use JWT RS256 because legal requires it", NOT "Tried HS256, then tried RS256, then discussed...".
+- **Closed paths = skip** unless it is important for the next session to know NOT to try them again.
+- **Absolute paths or repo-root-relative paths** for files. Not "that other file".
+- **Exact commands** — copy-paste ready, not "run the build command".
+- **Skip long tool output** (build logs, detailed test results). Keep only the result: pass/fail/skip.
 
-## Tích hợp với `/compact`
+## Integration with `/compact`
 
-Sau khi soạn brief xong, user có thể chạy:
+After drafting the brief, user can run:
 ```text
-/compact Giữ lại brief vừa soạn, drop debugging history và tool output cũ.
+/compact Keep the brief just drafted, drop debugging history and old tool output.
 ```
-Câu chỉ dẫn này giúp Claude compact có hướng, brief survives cao hơn auto-summary.
+This guided compact instruction helps Claude compact with direction, giving the brief a higher chance of surviving auto-summary.
 
-## Anti-pattern — KHÔNG làm
+## Anti-patterns — Do NOT
 
-- KHÔNG copy-paste lại toàn bộ code đã sửa vào brief. Chỉ ghi path + tóm tắt.
-- KHÔNG viết brief dài hơn 1 màn hình terminal. Quá dài → trở thành noise.
-- KHÔNG đưa secret/token/key vào brief.
-- KHÔNG đoán bước tiếp theo nếu chưa rõ. Ghi "Cần user xác nhận hướng đi".
+- Do NOT paste entire modified code into the brief. Just write path + summary.
+- Do NOT write a brief longer than 1 terminal screen. Too long → becomes noise.
+- Do NOT include secrets/tokens/keys in the brief.
+- Do NOT guess next steps when direction is unclear. Write "Needs user confirmation on direction".

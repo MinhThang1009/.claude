@@ -5,106 +5,106 @@ allowed-tools: Read Grep Glob Bash(git log:*) Bash(git blame:*) WebFetch WebSear
 argument-hint: "[file path, function/class name, or question]"
 ---
 
-# Skill: Giải thích code
+# Skill: Explain code
 
-Bạn được gọi để giải thích code/thuật toán/concept cho user. Mục tiêu: user hiểu **tại sao** code chạy như vậy, không chỉ *cái gì* nó làm.
+You are called to explain code/algorithms/concepts to the user. Goal: the user understands **why** the code works the way it does, not just *what* it does.
 
-## Bước 1: Xác định đối tượng
+## Step 1: Identify the subject
 
-Tùy vào `$ARGUMENTS`:
-- Đường dẫn file → giải thích file đó
-- Tên hàm/class/symbol → tìm bằng Grep, giải thích
-- Câu hỏi mở ("hệ thống auth hoạt động thế nào") → khảo sát codebase, tổng hợp
+Depending on `$ARGUMENTS`:
+- File path → explain that file
+- Function/class/symbol name → find with Grep, explain it
+- Open-ended question ("how does the auth system work") → explore the codebase, synthesize
 
-## Bước 2: Đọc đủ context
+## Step 2: Read enough context
 
-KHÔNG đọc 1 file rồi đi giải thích. Tối thiểu:
-- File chính
-- Caller của file/hàm này (Grep tên hàm trong codebase)
-- Type/interface liên quan
-- Test tương ứng (test thường là tài liệu sống tốt nhất)
-- Git log của file → có context lịch sử quan trọng nào không?
+Do NOT read 1 file and then explain. Minimum:
+- The main file
+- Callers of this file/function (Grep the function name in the codebase)
+- Related types/interfaces
+- Corresponding tests (tests are often the best living documentation)
+- Git log for the file → is there any important historical context?
 
-## Bước 3: Cấu trúc giải thích
+## Step 3: Structure the explanation
 
-Theo mô hình **kim tự tháp ngược** (top-down):
+Follow the **inverted pyramid** model (top-down):
 
-### 1. Tóm tắt 1 câu
-"Đoạn code này làm X bằng cách Y."
+### 1. One-sentence summary
+"This code does X by doing Y."
 
-### 2. Bức tranh lớn (3-5 câu)
-- Nó nằm ở đâu trong hệ thống?
-- Ai gọi nó? Nó gọi gì?
-- Khi nào chạy? Bao nhiêu lần?
+### 2. The big picture (3-5 sentences)
+- Where does it live in the system?
+- Who calls it? What does it call?
+- When does it run? How often?
 
-### 3. Đi vào chi tiết
-- Đi qua từng phần quan trọng
-- Mỗi đoạn code có chú thích ngắn về **WHY**, không lặp lại WHAT
-- Đánh dấu các điểm khó hiểu hoặc phản trực giác
+### 3. Go into the details
+- Walk through each important part
+- Each code block gets a short note on **WHY**, not repeating WHAT
+- Flag anything confusing or counter-intuitive
 
-### 4. Ví dụ cụ thể
-- Cho input cụ thể, trace qua code, output là gì?
-- Edge case: input rỗng, input lớn, input sai → behavior?
+### 4. Concrete examples
+- For a specific input, trace through the code — what is the output?
+- Edge cases: empty input, large input, invalid input → behavior?
 
-### 5. Pitfall & gotcha
-- Có chỗ nào dễ hiểu sai không?
-- Có giả định ngầm nào không?
-- Có TODO/FIXME nào liên quan không?
+### 5. Pitfalls & gotchas
+- Are there any places that are easy to misunderstand?
+- Are there any implicit assumptions?
+- Are there any related TODO/FIXME items?
 
-## Bước 4: Format
+## Step 4: Format
 
-Tùy độ dài giải thích:
+Depending on explanation length:
 
-**Ngắn (< 5 câu)**: viết prose thẳng, không cần heading.
+**Short (< 5 sentences)**: write plain prose, no headings needed.
 
-**Trung bình (5-15 câu)**: dùng bullet hoặc 2-3 đoạn rõ ràng.
+**Medium (5-15 sentences)**: use bullets or 2-3 clear paragraphs.
 
-**Dài (> 15 câu hoặc giải thích kiến trúc)**: dùng heading, ví dụ:
+**Long (> 15 sentences or architectural explanation)**: use headings, for example:
 
 ```markdown
 ## TL;DR
-[1-2 câu]
+[1-2 sentences]
 
-## Bức tranh tổng thể
-[Diagram nếu được — dùng ASCII art hoặc Mermaid]
+## Big picture
+[Diagram if possible — use ASCII art or Mermaid]
 
-## Chi tiết
-### Phần A: [tên]
+## Details
+### Part A: [name]
 ...
 
-### Phần B: [tên]
+### Part B: [name]
 ...
 
-## Ví dụ trace
+## Trace example
 Input: ...
 Output: ...
 [step-by-step]
 
-## Lưu ý
+## Notes
 - ...
 ```
 
-## Quy tắc
+## Rules
 
-- **Dùng ngôn ngữ phù hợp với user**. Nếu user là junior, tránh từ chuyên ngành chưa giải thích. Nếu user là senior, đi nhanh.
-- **Không tự bịa**. Nếu code có chỗ không chắc → đọc thêm hoặc nói thẳng "phần này cần verify". KHÔNG bịa ra "có lẽ nó làm X".
-- **Liên kết tới nguồn**: link tới file:line cụ thể, hoặc PR/commit nếu thông tin từ git history.
-- **So sánh với pattern quen thuộc**: "Đây là Observer pattern", "Cấu trúc giống Express middleware". Giúp user mapping từ kiến thức có sẵn.
-- **Không lecture**. Giải thích vừa đủ user hỏi, không kể lể history của ngôn ngữ.
+- **Use language appropriate for the user**. If the user is a junior, avoid unexplained jargon. If the user is a senior, move quickly.
+- **Do not fabricate**. If there is an uncertain part in the code → read more or say outright "this part needs verification". Do NOT guess "it probably does X".
+- **Link to sources**: link to specific file:line, or PR/commit if information comes from git history.
+- **Compare to familiar patterns**: "This is the Observer pattern", "Structure is like Express middleware". Helps user map to existing knowledge.
+- **Do not lecture**. Explain only what was asked, do not narrate the history of the language.
 
-## Khi user hỏi "tại sao code lại viết thế này"
+## When user asks "why is the code written this way"
 
-Đây là câu hỏi về intent:
-1. Đọc git blame để tìm commit gốc.
-2. Đọc commit message và PR description (nếu có).
-3. Nếu không tìm được → nói thẳng "không có tài liệu lịch sử cho quyết định này, dưới đây là những lý do *kỹ thuật* có thể có dựa trên code:".
-4. Liệt kê 2-3 giả thuyết, ghi rõ "đây là suy luận, không phải xác nhận".
+This is a question about intent:
+1. Read `git blame` to find the original commit.
+2. Read the commit message and PR description (if any).
+3. If nothing is found → say outright "there is no historical documentation for this decision; here are some *technical* reasons that may apply based on the code:".
+4. List 2-3 hypotheses, clearly marked as "this is inference, not confirmed".
 
-## Khi user hỏi về thuật toán/concept không có trong code
+## When user asks about an algorithm/concept not present in the code
 
-(Ví dụ: "giải thích Bloom filter", "giải thích React reconciliation")
+(e.g., "explain Bloom filter", "explain React reconciliation")
 
-- Trả lời từ kiến thức sẵn có.
-- Nếu liên quan đến framework/library mới (< 1 năm) → WebSearch để confirm version-specific behavior.
-- Đưa ví dụ minh họa bằng pseudo-code hoặc code ngắn.
-- Trỏ tới nguồn chính thức (docs, paper) nếu user muốn đào sâu.
+- Answer from existing knowledge.
+- If it relates to a new framework/library (< 1 year old) → WebSearch to confirm version-specific behavior.
+- Provide illustrative examples using pseudo-code or short code.
+- Point to official sources (docs, paper) if the user wants to go deeper.

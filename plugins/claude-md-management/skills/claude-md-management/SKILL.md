@@ -7,78 +7,78 @@ argument-hint: "[audit | revise | path to CLAUDE.md]"
 
 # CLAUDE.md Management — Audit & Improve
 
-Hai chế độ: **audit** (đánh giá + cải thiện) và **revise** (capture session learnings).
+Two modes: **audit** (evaluate + improve) and **revise** (capture session learnings).
 
-## Chế độ 1: Audit (mặc định)
+## Mode 1: Audit (default)
 
-Khi `$ARGUMENTS` trống hoặc chứa `audit`:
+When `$ARGUMENTS` is empty or contains `audit`:
 
 ### Phase 1: Discovery
 
-Tìm tất cả CLAUDE.md files:
+Find all CLAUDE.md files:
 
 ```bash
 find . -name "CLAUDE.md" -o -name ".claude.md" -o -name ".claude.local.md" 2>/dev/null | head -50
 ```
 
-| Loại | Vị trí | Mục đích |
-|------|--------|----------|
-| Project root | `./CLAUDE.md` | Context chính (git, shared) |
-| Local override | `./.claude.local.md` | Cá nhân (gitignored) |
-| Global | `~/.claude/CLAUDE.md` | Mặc định cross-project |
-| Package-specific | `./packages/*/CLAUDE.md` | Module-level trong monorepo |
-| Subdirectory | Bất kỳ nested dir | Feature/domain-specific context |
+| Type | Location | Purpose |
+|------|----------|---------|
+| Project root | `./CLAUDE.md` | Primary context (git, shared) |
+| Local override | `./.claude.local.md` | Personal (gitignored) |
+| Global | `~/.claude/CLAUDE.md` | Cross-project defaults |
+| Package-specific | `./packages/*/CLAUDE.md` | Module-level in a monorepo |
+| Subdirectory | Any nested dir | Feature/domain-specific context |
 
-Claude auto-discovers CLAUDE.md files trong parent directories — monorepo setup tự động work.
+Claude auto-discovers CLAUDE.md files in parent directories — monorepo setup works automatically.
 
 ### Phase 2: Quality Assessment
 
-Đánh giá từng file theo 6 tiêu chí:
+Evaluate each file against 6 criteria:
 
-| Tiêu chí | Trọng số | Kiểm tra |
-|-----------|----------|----------|
-| Commands/workflows | Cao | Build/test/deploy commands có không? |
-| Architecture clarity | Cao | Claude hiểu codebase structure không? |
-| Non-obvious patterns | TB | Gotchas, quirks đã document? |
-| Conciseness | TB | Có verbose hoặc info hiển nhiên? |
-| Currency | Cao | Phản ánh đúng codebase hiện tại? |
-| Actionability | Cao | Instructions có executable, không mơ hồ? |
+| Criterion | Weight | Check |
+|-----------|--------|-------|
+| Commands/workflows | High | Are build/test/deploy commands present? |
+| Architecture clarity | High | Does Claude understand the codebase structure? |
+| Non-obvious patterns | Medium | Are gotchas and quirks documented? |
+| Conciseness | Medium | Is there verbosity or obvious information? |
+| Currency | High | Does it accurately reflect the current codebase? |
+| Actionability | High | Are instructions executable and unambiguous? |
 
-Thang điểm: **A** (90-100), **B** (70-89), **C** (50-69), **D** (30-49), **F** (0-29).
+Scale: **A** (90-100), **B** (70-89), **C** (50-69), **D** (30-49), **F** (0-29).
 
-Scoring per-level (ví dụ Commands/workflows, max 20):
-- **20**: đầy đủ build/test/dev/lint/deploy, copy-paste ready
-- **15**: có commands chính nhưng thiếu 1-2 (vd chỉ có build, thiếu test)
-- **10**: có nhưng mơ hồ hoặc outdated
-- **5**: chỉ mention "run tests" mà không có command cụ thể
-- **0**: không có
+Per-level scoring (example: Commands/workflows, max 20):
+- **20**: complete build/test/dev/lint/deploy, copy-paste ready
+- **15**: has main commands but missing 1-2 (e.g., only build, no test)
+- **10**: present but vague or outdated
+- **5**: only mentions "run tests" without a specific command
+- **0**: none
 
-**Red Flags** — flag ngay khi phát hiện:
-- Commands mà khi chạy thực tế sẽ fail
-- References tới files/dirs đã bị xóa
-- Copy-paste từ template mà chưa customize cho project
-- TODO items chưa bao giờ complete
-- Duplicate info giữa nhiều CLAUDE.md files trong cùng repo
+**Red Flags** — flag immediately upon discovery:
+- Commands that would fail if actually run
+- References to files/dirs that have been deleted
+- Copy-pasted from a template but never customized for the project
+- TODO items never completed
+- Duplicate information between multiple CLAUDE.md files in the same repo
 
 ### Phase 3: Quality Report
 
-**LUÔN output report TRƯỚC khi sửa bất kỳ file nào.**
+**ALWAYS output the report BEFORE modifying any file.**
 
 ```markdown
 ## CLAUDE.md Quality Report
 
-### Tóm tắt
-- Files tìm thấy: X
-- Điểm trung bình: X/100
-- Files cần cập nhật: X
+### Summary
+- Files found: X
+- Average score: X/100
+- Files needing updates: X
 
-### Đánh giá từng file
+### Per-file evaluation
 
 #### 1. ./CLAUDE.md (Project Root)
-**Điểm: XX/100 (Grade: X)**
+**Score: XX/100 (Grade: X)**
 
-| Tiêu chí | Điểm | Ghi chú |
-|-----------|-------|---------|
+| Criterion | Score | Notes |
+|-----------|-------|-------|
 | Commands/workflows | X/20 | ... |
 | Architecture clarity | X/20 | ... |
 | Non-obvious patterns | X/15 | ... |
@@ -86,70 +86,70 @@ Scoring per-level (ví dụ Commands/workflows, max 20):
 | Currency | X/15 | ... |
 | Actionability | X/15 | ... |
 
-**Vấn đề:** [liệt kê]
-**Đề xuất bổ sung:** [liệt kê]
+**Issues:** [list]
+**Suggested additions:** [list]
 ```
 
 ### Phase 4: Targeted Updates
 
-Sau report, hỏi user xác nhận trước khi sửa.
+After the report, ask user for confirmation before editing.
 
-Nguyên tắc:
-- **Chỉ bổ sung thông tin hữu ích**: commands discovered, gotchas, package relationships, testing approaches, config quirks.
-- **Tránh**: info hiển nhiên từ code, generic best practices, one-off fixes, verbose explanations.
-- **Show diff** cho mỗi thay đổi kèm lý do ngắn.
+Principles:
+- **Only add useful information**: discovered commands, gotchas, package relationships, testing approaches, config quirks.
+- **Avoid**: information obvious from code, generic best practices, one-off fixes, verbose explanations.
+- **Show diff** for each change with a brief rationale.
 
 ### Phase 5: Apply
 
-Sau user approve → dùng Edit tool. Giữ nguyên structure hiện có.
+After user approves → use the Edit tool. Preserve the existing structure.
 
-## Chế độ 2: Revise (capture session learnings)
+## Mode 2: Revise (capture session learnings)
 
-Khi `$ARGUMENTS` chứa `revise`:
+When `$ARGUMENTS` contains `revise`:
 
-### Bước 1: Reflect
+### Step 1: Reflect
 
-Context nào thiếu mà lẽ ra giúp Claude hiệu quả hơn?
-- Bash commands đã dùng/phát hiện
-- Code style patterns đã follow
-- Testing approaches work
+What context was missing that would have made Claude more effective?
+- Bash commands used/discovered
+- Code style patterns followed
+- Testing approaches that worked
 - Environment/config quirks
-- Gotchas gặp phải
+- Gotchas encountered
 
-### Bước 2: Draft
+### Step 2: Draft
 
-**Ngắn gọn** — 1 dòng/concept. CLAUDE.md là phần của prompt, brevity quan trọng.
+**Be concise** — 1 line per concept. CLAUDE.md is part of the prompt; brevity matters.
 
-Phân biệt:
+Distinguish between:
 - `CLAUDE.md` → team-shared (git)
-- `.claude.local.md` → cá nhân (gitignored)
+- `.claude.local.md` → personal (gitignored)
 
-### Bước 3: Show + Apply
+### Step 3: Show + Apply
 
-Hiển thị diff + lý do cho mỗi addition. Chỉ apply sau khi user approve.
+Display diff + rationale for each addition. Only apply after user approves.
 
-## CLAUDE.md tốt gồm những gì
+## What a good CLAUDE.md contains
 
-**Nguyên tắc**: ngắn gọn, actionable, project-specific.
+**Principle**: concise, actionable, project-specific.
 
-**Sections khuyến nghị** (chỉ dùng cái relevant):
+**Recommended sections** (only include what is relevant):
 - **Commands**: build, test, dev, lint — copy-paste ready
 - **Architecture**: directory structure, key modules
 - **Key Files**: entry points, config files
-- **Code Style**: project conventions (không generic best practices)
+- **Code Style**: project conventions (not generic best practices)
 - **Environment**: required env vars, setup steps
 - **Testing**: commands, patterns, frameworks
 - **Gotchas**: quirks, common mistakes, non-obvious behaviors
-- **Workflow**: khi nào làm gì (deploy process, PR flow)
+- **Workflow**: when to do what (deploy process, PR flow)
 
-## Templates theo project type
+## Templates by project type
 
-Khi tạo CLAUDE.md mới từ đầu, dùng template phù hợp:
+When creating a CLAUDE.md from scratch, use the appropriate template:
 
-### Minimal (project nhỏ, script, tool)
+### Minimal (small project, script, tool)
 ```markdown
 # Project Name
-[1 câu mô tả]
+[1-sentence description]
 ## Commands
 \`\`\`bash
 npm run dev    # Development server
@@ -162,7 +162,7 @@ npm test       # Run tests
 ### Comprehensive (web app, API service)
 ```markdown
 # Project Name
-[1-2 câu mô tả]
+[1-2 sentence description]
 ## Commands
 [build, test, dev, lint, deploy]
 ## Architecture
@@ -189,10 +189,10 @@ npm test       # Run tests
 ## Cross-package Patterns
 [Shared types, build order, dependency rules]
 ## Per-package CLAUDE.md
-[packages/api/CLAUDE.md, packages/web/CLAUDE.md — mỗi package có file riêng]
+[packages/api/CLAUDE.md, packages/web/CLAUDE.md — each package has its own file]
 ```
 
-### Package/Module (trong monorepo)
+### Package/Module (in a monorepo)
 ```markdown
 # Package Name
 [Relationship to other packages]
@@ -204,35 +204,35 @@ npm test       # Run tests
 
 ## Verify currency
 
-Khi đánh giá "Currency": chạy (mentally hoặc thực tế) các commands được document — nếu fail thì flag là stale.
+When assessing "Currency": run (mentally or actually) the documented commands — if they fail, flag as stale.
 
-## Diff format cho updates
+## Diff format for updates
 
-Mỗi thay đổi trình bày:
+Present each change as:
 
 ```markdown
 ### Update: ./CLAUDE.md
 
-**Lý do:** [1 dòng giải thích tại sao bổ sung này giúp ích]
+**Reason:** [1-line explanation of why this addition is helpful]
 
 \`\`\`diff
-+ [nội dung bổ sung — giữ ngắn]
++ [content to add — keep it short]
 \`\`\`
 ```
 
 ## Common Issues to Flag
 
-1. **Stale commands**: build commands không còn work
-2. **Missing deps**: tools cần thiết chưa mention
-3. **Outdated architecture**: file structure đã đổi
-4. **Missing env setup**: env vars hoặc config cần thiết
-5. **Broken test commands**: test scripts đã thay đổi
-6. **Undocumented gotchas**: non-obvious patterns chưa capture
+1. **Stale commands**: build commands that no longer work
+2. **Missing deps**: required tools not mentioned
+3. **Outdated architecture**: file structure has changed
+4. **Missing env setup**: required env vars or config not mentioned
+5. **Broken test commands**: test scripts have changed
+6. **Undocumented gotchas**: non-obvious patterns not captured
 
-## Tips cho user
+## Tips for users
 
-- **Phím `#`**: trong session, nhấn `#` để Claude auto-incorporate learnings vào CLAUDE.md.
-- **Giữ ngắn**: dense tốt hơn verbose.
-- **Actionable commands**: tất cả commands phải copy-paste ready.
-- **`.claude.local.md`**: dùng cho preferences cá nhân (thêm vào `.gitignore`).
-- **Global defaults**: đặt user-wide preferences vào `~/.claude/CLAUDE.md`.
+- **`#` key**: during a session, press `#` to have Claude auto-incorporate learnings into CLAUDE.md.
+- **Keep it short**: dense is better than verbose.
+- **Actionable commands**: all commands must be copy-paste ready.
+- **`.claude.local.md`**: use for personal preferences (add to `.gitignore`).
+- **Global defaults**: put user-wide preferences in `~/.claude/CLAUDE.md`.

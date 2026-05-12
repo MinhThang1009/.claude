@@ -9,118 +9,118 @@ argument-hint: "[optional: branch name or PR number]"
 
 # Skill: Code Review
 
-Bạn được gọi để review code một cách kỹ lưỡng nhưng có ưu tiên.
+You are called to review code thoroughly but with prioritization.
 
-## Context tự động inject
+## Auto-injected context
 
 ```!
 git diff HEAD 2>/dev/null || echo "No git diff available"
 ```
 
-## Bước 1: Xác định scope
+## Step 1: Determine scope
 
-Tùy theo `$ARGUMENTS`:
+Depending on `$ARGUMENTS`:
 
-- **Không có argument**: review diff đã inject ở trên (unstaged + staged changes)
-- **Số (123)**: review PR #123 (`gh pr diff 123` — yêu cầu GitHub CLI; nếu không có `gh` → hỏi user cung cấp diff)
-- **Đường dẫn (`src/foo.ts`)**: review nội dung file đó
-- **`branch <name>`**: review thay đổi của branch so với default branch (auto-detect: `git symbolic-ref refs/remotes/origin/HEAD` → fallback `main` → `master`)
+- **No argument**: review the diff injected above (unstaged + staged changes)
+- **Number (123)**: review PR #123 (`gh pr diff 123` — requires GitHub CLI; if `gh` is not available → ask user to provide diff)
+- **Path (`src/foo.ts`)**: review the contents of that file
+- **`branch <name>`**: review changes of the branch against the default branch (auto-detect: `git symbolic-ref refs/remotes/origin/HEAD` → fallback `main` → `master`)
 
-Hiển thị scope đã chọn cho user trước khi tiếp tục.
+Display the selected scope to the user before continuing.
 
-## Bước 2: Đọc context
+## Step 2: Read context
 
-- Đọc file liên quan trong diff để hiểu đầy đủ context (không chỉ đọc hunk).
-- Đọc file test tương ứng (nếu có).
-- Kiểm tra commit message và PR description (nếu có) để hiểu intent.
-- **Git history**: `git blame` cho các dòng thay đổi — hiểu ai viết, khi nào, commit nào. Nếu có `gh` → check PR comments/reviews cũ trên file đó (`gh pr list --search "file:path" --state merged --limit 3`).
-- **CLAUDE.md + REVIEW.md**: đọc nếu tồn tại — dùng làm baseline cho compliance check ở Bước 3.
+- Read related files in the diff to fully understand context (not just the hunk).
+- Read corresponding test files (if any).
+- Check commit message and PR description (if any) to understand intent.
+- **Git history**: `git blame` for changed lines — understand who wrote it, when, which commit. If `gh` is available → check old PR comments/reviews on that file (`gh pr list --search "file:path" --state merged --limit 3`).
+- **CLAUDE.md + REVIEW.md**: read if they exist — use as baseline for compliance check in Step 3.
 
-## Bước 3: Review theo 6 góc nhìn
+## Step 3: Review from 6 perspectives
 
-Theo thứ tự ưu tiên:
+In priority order:
 
 ### 1. Correctness (Critical)
-- Logic có đúng intent không? Có edge case nào miss?
-- Off-by-one, null/undefined, race condition, type coercion sai?
-- Error handling có nuốt lỗi không?
+- Does the logic match the intent? Are there any missed edge cases?
+- Off-by-one, null/undefined, race condition, incorrect type coercion?
+- Does error handling swallow errors?
 
 ### 2. Security (Critical)
-- Có hardcode secret/token không?
-- Có injection (SQL, command, XSS, SSRF, path traversal) không?
-- Validate input ở boundary?
-- Auth/authz check trên endpoint mới?
+- Are there hardcoded secrets/tokens?
+- Is there injection (SQL, command, XSS, SSRF, path traversal)?
+- Is input validated at the boundary?
+- Auth/authz check on new endpoints?
 
 ### 3. Tests (High)
-- Code mới có test không? Test có thực sự verify behavior không?
-- Test có đủ edge case không (boundary, null, empty, error path)?
-- Có thay đổi behavior nào làm test cũ thành sai semantic không?
+- Does new code have tests? Do tests actually verify behavior?
+- Are edge cases sufficiently covered (boundary, null, empty, error path)?
+- Do any behavior changes make existing tests semantically incorrect?
 
 ### 4. Performance (Medium)
 - N+1 query?
-- Loop lồng có cần thiết?
-- Cache miss cho thứ đáng cache?
+- Unnecessary nested loops?
+- Cache miss for something worth caching?
 - Bundle size impact (frontend)?
 
 ### 5. Maintainability (Medium)
-- Naming có rõ không?
-- Function có quá dài không? (Reference: [`coding-standards.md` dòng 11](../../../../rules/coding-standards.md) — <50 lý tưởng, >100 đề xuất tách)
-- Code có duplicate đoạn nào trong codebase không (gợi ý: dùng Grep tìm pattern)?
-- Comment giải thích WHY hay chỉ lặp lại WHAT?
-- **Code comments compliance**: đọc comments trong files bị sửa — verify thay đổi không contradict guidance trong existing comments (vd: comment nói "must be called before X" nhưng diff bỏ call đó).
+- Is naming clear?
+- Is the function too long? (Reference: [`coding-standards.md` line 11](../../../../rules/coding-standards.md) — <50 ideal, >100 suggest splitting)
+- Are there duplicate code segments elsewhere in the codebase (suggestion: use Grep to find patterns)?
+- Do comments explain WHY or just repeat WHAT?
+- **Code comments compliance**: read comments in modified files — verify changes do not contradict guidance in existing comments (e.g., a comment says "must be called before X" but the diff removes that call).
 
 ### 6. CLAUDE.md / REVIEW.md Compliance (Low)
-- Nếu CLAUDE.md hoặc REVIEW.md có quy tắc cụ thể → kiểm tra diff có vi phạm không.
-- Chỉ flag khi guideline **explicitly mention** issue đó (không suy diễn rộng).
-- Vi phạm compliance → severity 🟡 (non-blocking), trừ khi guideline nói rõ là blocking.
+- If CLAUDE.md or REVIEW.md has specific rules → check whether the diff violates them.
+- Only flag when the guideline **explicitly mentions** that issue (do not infer broadly).
+- Compliance violations → severity 🟡 (non-blocking), unless the guideline explicitly states it is blocking.
 
 ### 7. Style (Low)
-- Theo convention codebase?
-- Format đúng (formatter của project)?
-- Lint pass?
+- Following codebase convention?
+- Correct formatting (project formatter)?
+- Lint passing?
 
-## Bước 4: Trình bày kết quả
+## Step 4: Present results
 
-Format chuẩn:
+Standard format:
 
 ```markdown
-## Tóm tắt
-[1-2 câu: code này làm gì, có nên merge không, mức độ thay đổi]
+## Summary
+[1-2 sentences: what this code does, whether it should be merged, scale of changes]
 
-## 🔴 Phải sửa (blocking)
-- **<file>:<line>** — <vấn đề ngắn>
-  → <gợi ý fix cụ thể, có code nếu được>
+## 🔴 Must fix (blocking)
+- **<file>:<line>** — <brief issue>
+  → <specific fix suggestion, with code if possible>
 
-## 🟡 Nên sửa (non-blocking nhưng đáng làm)
+## 🟡 Should fix (non-blocking but worth doing)
 - ...
 
-## 🟢 Gợi ý (optional)
+## 🟢 Suggestions (optional)
 - ...
 
-## ✅ Điểm tốt
-- [Khen ngắn gọn — quan trọng để cân bằng feedback]
+## ✅ Strengths
+- [Brief praise — important for balanced feedback]
 ```
 
-Quy tắc:
-- Mỗi finding phải có **vị trí cụ thể** (file:line) và **gợi ý fix**.
-- **Confidence scoring**: chỉ report finding có confidence ≥80%. Tự đánh giá theo rubric: 100 = chắc chắn bug/vulnerability, 75 = rất có thể sai, 50 = có thể sai nhưng cần context thêm, 25 = chỉ là gợi ý style, 0 = không chắc. Finding <80% → bỏ hoặc gộp vào 🟢 Gợi ý.
-- KHÔNG nitpick style nếu có formatter — formatter chạy tự động xử lý.
-- KHÔNG đề xuất rewrite kiểu "làm khác đi" nếu chỉ là preference.
-- KHÔNG flag pre-existing issues (code cũ không nằm trong diff) trừ khi diff làm nó trở thành vấn đề.
-- KHÔNG flag issues mà linter/typecheck sẽ bắt (đã có CI).
-- KHÔNG flag intentional behavior changes đã giải thích trong commit message/PR description.
-- KHÔNG flag code có lint-ignore comment (đã được acknowledge).
-- Nếu mọi thứ ổn → nói rõ "Không có vấn đề blocking, có thể merge". Đừng bịa lỗi.
+Rules:
+- Each finding must have a **specific location** (file:line) and a **fix suggestion**.
+- **Confidence scoring**: only report findings with confidence ≥80%. Self-assess using this rubric: 100 = certain bug/vulnerability, 75 = very likely wrong, 50 = possibly wrong but needs more context, 25 = style suggestion only, 0 = uncertain. Findings <80% → drop or move to 🟢 Suggestions.
+- Do NOT nitpick style if a formatter is in use — the formatter handles it automatically.
+- Do NOT suggest rewrites as "do it differently" if it is merely a preference.
+- Do NOT flag pre-existing issues (old code not in the diff) unless the diff makes them a problem.
+- Do NOT flag issues that linter/typecheck will catch (CI handles those).
+- Do NOT flag intentional behavior changes already explained in the commit message/PR description.
+- Do NOT flag code that has a lint-ignore comment (already acknowledged).
+- If everything looks fine → clearly state "No blocking issues, ready to merge." Do not fabricate problems.
 
-## Bước 5: Hỏi tiếp
+## Step 5: Follow-up question
 
-Sau khi đưa kết quả, hỏi: "Có cần diff cụ thể cho các issue 🔴 không, hay dừng ở mức liệt kê?"
+After delivering results, ask: "Do you need specific diffs for the 🔴 issues, or is the list sufficient?"
 
-Skill này read-only (frontmatter `allowed-tools` không có Edit/Write). Output diff là **text suggestion** trong chat — user tự copy/apply. Nếu muốn auto-apply, dùng skill `/refactor` hoặc subagent có Edit/Write.
+This skill is read-only (frontmatter `allowed-tools` does not include Edit/Write). Diff output is a **text suggestion** in chat — user copies/applies it. To auto-apply, use the `/refactor` skill or a subagent with Edit/Write.
 
 ## Gotchas
 
-- **Race condition, off-by-one, memory leak**: không obvious từ diff. Đọc CONTEXT xung quanh, không chỉ dòng thay đổi.
-- **Security holes** (SQLi, XSS, IDOR, SSRF): check input validation + auth check, không tin diff "trông OK".
-- **Test coverage ≠ quality**: test có thể test sai thứ. Đọc test assertion, không chỉ count coverage %.
-- **Style nit priority THẤP NHẤT**: flag nhưng không block PR nếu logic OK. Ưu tiên fix bug + security trước.
+- **Race conditions, off-by-one, memory leaks**: not obvious from the diff. Read SURROUNDING CONTEXT, not just changed lines.
+- **Security holes** (SQLi, XSS, IDOR, SSRF): check input validation + auth checks; do not trust a diff that "looks OK".
+- **Test coverage ≠ quality**: tests may test the wrong thing. Read test assertions, not just coverage %.
+- **Style nit priority is LOWEST**: flag them but do not block the PR if the logic is correct. Prioritize bug + security fixes first.

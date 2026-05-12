@@ -4,25 +4,25 @@ description: This skill should be used when the user asks to "add MCP server", "
 version: 0.1.0
 ---
 
-# Tích hợp MCP cho Claude Code Plugins
+# MCP Integration for Claude Code Plugins
 
-## Tổng quan
+## Overview
 
-Model Context Protocol (MCP) cho phép Claude Code plugins tích hợp với các dịch vụ và API bên ngoài bằng cách cung cấp quyền truy cập tool có cấu trúc. Dùng tích hợp MCP để expose các khả năng của dịch vụ bên ngoài thành tool trong Claude Code.
+Model Context Protocol (MCP) enables Claude Code plugins to integrate with external services and APIs by providing structured tool access. Use MCP integration to expose external service capabilities as tools within Claude Code.
 
-**Các khả năng chính:**
-- Kết nối với dịch vụ bên ngoài (databases, APIs, file systems)
-- Cung cấp hơn 10 tool liên quan từ một dịch vụ duy nhất
-- Xử lý OAuth và các luồng xác thực phức tạp
-- Bundle MCP servers với plugins để cài đặt tự động
+**Key capabilities:**
+- Connect to external services (databases, APIs, file systems)
+- Provide 10+ related tools from a single service
+- Handle OAuth and complex authentication flows
+- Bundle MCP servers with plugins for automatic setup
 
-## Các phương thức cấu hình MCP Server
+## MCP Server Configuration Methods
 
-Plugins có thể bundle MCP servers theo hai cách:
+Plugins can bundle MCP servers in two ways:
 
-### Phương thức 1: .mcp.json riêng biệt (Khuyến nghị)
+### Method 1: Dedicated .mcp.json (Recommended)
 
-Tạo `.mcp.json` tại thư mục gốc của plugin:
+Create `.mcp.json` at plugin root:
 
 ```json
 {
@@ -36,14 +36,14 @@ Tạo `.mcp.json` tại thư mục gốc của plugin:
 }
 ```
 
-**Ưu điểm:**
-- Tách biệt rõ ràng các mối quan tâm
-- Dễ bảo trì hơn
-- Phù hợp hơn cho nhiều server
+**Benefits:**
+- Clear separation of concerns
+- Easier to maintain
+- Better for multiple servers
 
-### Phương thức 2: Inline trong plugin.json
+### Method 2: Inline in plugin.json
 
-Thêm trường `mcpServers` vào plugin.json:
+Add `mcpServers` field to plugin.json:
 
 ```json
 {
@@ -58,17 +58,17 @@ Thêm trường `mcpServers` vào plugin.json:
 }
 ```
 
-**Ưu điểm:**
-- File cấu hình duy nhất
-- Phù hợp cho plugin đơn giản chỉ có một server
+**Benefits:**
+- Single configuration file
+- Good for simple single-server plugins
 
-## Các loại MCP Server
+## MCP Server Types
 
-### stdio (Tiến trình cục bộ)
+### stdio (Local Process)
 
-Thực thi MCP server cục bộ dưới dạng tiến trình con. Phù hợp nhất cho tool cục bộ và server tùy chỉnh.
+Execute local MCP servers as child processes. Best for local tools and custom servers.
 
-**Cấu hình:**
+**Configuration:**
 ```json
 {
   "filesystem": {
@@ -81,22 +81,22 @@ Thực thi MCP server cục bộ dưới dạng tiến trình con. Phù hợp nh
 }
 ```
 
-**Trường hợp sử dụng:**
-- Truy cập file system
-- Kết nối database cục bộ
-- MCP server tùy chỉnh
-- MCP server đóng gói dạng NPM
+**Use cases:**
+- File system access
+- Local database connections
+- Custom MCP servers
+- NPM-packaged MCP servers
 
-**Quản lý tiến trình:**
-- Claude Code spawn và quản lý tiến trình
-- Giao tiếp qua stdin/stdout
-- Kết thúc khi Claude Code thoát
+**Process management:**
+- Claude Code spawns and manages the process
+- Communicates via stdin/stdout
+- Terminates when Claude Code exits
 
 ### SSE (Server-Sent Events)
 
-Kết nối với MCP server được host sẵn có hỗ trợ OAuth. Phù hợp nhất cho cloud services.
+Connect to hosted MCP servers with OAuth support. Best for cloud services.
 
-**Cấu hình:**
+**Configuration:**
 ```json
 {
   "asana": {
@@ -106,22 +106,22 @@ Kết nối với MCP server được host sẵn có hỗ trợ OAuth. Phù hợ
 }
 ```
 
-**Trường hợp sử dụng:**
-- MCP server được host chính thức (Asana, GitHub, v.v.)
-- Cloud services có MCP endpoint
-- Xác thực dựa trên OAuth
-- Không cần cài đặt cục bộ
+**Use cases:**
+- Official hosted MCP servers (Asana, GitHub, etc.)
+- Cloud services with MCP endpoints
+- OAuth-based authentication
+- No local installation needed
 
-**Xác thực:**
-- Luồng OAuth được xử lý tự động
-- Người dùng được nhắc xác thực lần đầu sử dụng
-- Token được Claude Code quản lý
+**Authentication:**
+- OAuth flows handled automatically
+- User prompted on first use
+- Tokens managed by Claude Code
 
 ### HTTP (REST API)
 
-Kết nối với MCP server dạng RESTful có xác thực bằng token.
+Connect to RESTful MCP servers with token authentication.
 
-**Cấu hình:**
+**Configuration:**
 ```json
 {
   "api-service": {
@@ -135,17 +135,17 @@ Kết nối với MCP server dạng RESTful có xác thực bằng token.
 }
 ```
 
-**Trường hợp sử dụng:**
-- MCP server dựa trên REST API
-- Xác thực bằng token
-- API backend tùy chỉnh
-- Tương tác phi trạng thái
+**Use cases:**
+- REST API-based MCP servers
+- Token-based authentication
+- Custom API backends
+- Stateless interactions
 
-### WebSocket (Thời gian thực)
+### WebSocket (Real-time)
 
-Kết nối với MCP server WebSocket cho giao tiếp hai chiều thời gian thực.
+Connect to WebSocket MCP servers for real-time bidirectional communication.
 
-**Cấu hình:**
+**Configuration:**
 ```json
 {
   "realtime-service": {
@@ -158,24 +158,24 @@ Kết nối với MCP server WebSocket cho giao tiếp hai chiều thời gian t
 }
 ```
 
-**Trường hợp sử dụng:**
-- Streaming dữ liệu thời gian thực
-- Kết nối liên tục
-- Push notification từ server
-- Yêu cầu độ trễ thấp
+**Use cases:**
+- Real-time data streaming
+- Persistent connections
+- Push notifications from server
+- Low-latency requirements
 
-## Mở rộng biến môi trường
+## Environment Variable Expansion
 
-Tất cả cấu hình MCP đều hỗ trợ thay thế biến môi trường:
+All MCP configurations support environment variable substitution:
 
-**${CLAUDE_PLUGIN_ROOT}** - Thư mục plugin (luôn dùng để đảm bảo tính di động):
+**${CLAUDE_PLUGIN_ROOT}** - Plugin directory (always use for portability):
 ```json
 {
   "command": "${CLAUDE_PLUGIN_ROOT}/servers/my-server"
 }
 ```
 
-**Biến môi trường người dùng** - Từ shell của người dùng:
+**User environment variables** - From user's shell:
 ```json
 {
   "env": {
@@ -185,23 +185,23 @@ Tất cả cấu hình MCP đều hỗ trợ thay thế biến môi trường:
 }
 ```
 
-**Best practice:** Ghi lại tất cả biến môi trường bắt buộc trong README của plugin.
+**Best practice:** Document all required environment variables in plugin README.
 
-## Đặt tên MCP Tool
+## MCP Tool Naming
 
-Khi MCP server cung cấp tool, chúng được tự động thêm prefix:
+When MCP servers provide tools, they're automatically prefixed:
 
 **Format:** `mcp__plugin_<plugin-name>_<server-name>__<tool-name>`
 
-**Ví dụ:**
+**Example:**
 - Plugin: `asana`
 - Server: `asana`
 - Tool: `create_task`
-- **Tên đầy đủ:** `mcp__plugin_asana_asana__asana_create_task`
+- **Full name:** `mcp__plugin_asana_asana__asana_create_task`
 
-### Dùng MCP Tool trong Commands
+### Using MCP Tools in Commands
 
-Pre-allow các MCP tool cụ thể trong frontmatter của command:
+Pre-allow specific MCP tools in command frontmatter:
 
 ```markdown
 ---
@@ -212,37 +212,37 @@ allowed-tools: [
 ---
 ```
 
-**Wildcard (dùng hạn chế):**
+**Wildcard (use sparingly):**
 ```markdown
 ---
 allowed-tools: ["mcp__plugin_asana_asana__*"]
 ---
 ```
 
-**Best practice:** Pre-allow tool cụ thể, không dùng wildcard, vì lý do bảo mật.
+**Best practice:** Pre-allow specific tools, not wildcards, for security.
 
-## Quản lý vòng đời
+## Lifecycle Management
 
-**Khởi động tự động:**
-- MCP server khởi động khi plugin được bật
-- Kết nối được thiết lập trước lần sử dụng tool đầu tiên
-- Cần restart khi thay đổi cấu hình
+**Automatic startup:**
+- MCP servers start when plugin enables
+- Connection established before first tool use
+- Restart required for configuration changes
 
-**Vòng đời:**
-1. Plugin tải
-2. Cấu hình MCP được phân tích
-3. Tiến trình server được khởi động (stdio) hoặc kết nối được thiết lập (SSE/HTTP/WS)
-4. Tool được phát hiện và đăng ký
-5. Tool có thể dùng dưới dạng `mcp__plugin_...__...`
+**Lifecycle:**
+1. Plugin loads
+2. MCP configuration parsed
+3. Server process started (stdio) or connection established (SSE/HTTP/WS)
+4. Tools discovered and registered
+5. Tools available as `mcp__plugin_...__...`
 
-**Xem các server:**
-Dùng lệnh `/mcp` để xem tất cả server kể cả server do plugin cung cấp.
+**Viewing servers:**
+Use `/mcp` command to see all servers including plugin-provided ones.
 
-## Các pattern xác thực
+## Authentication Patterns
 
 ### OAuth (SSE/HTTP)
 
-OAuth được Claude Code xử lý tự động:
+OAuth handled automatically by Claude Code:
 
 ```json
 {
@@ -251,11 +251,11 @@ OAuth được Claude Code xử lý tự động:
 }
 ```
 
-Người dùng xác thực trên trình duyệt lần đầu sử dụng. Không cần cấu hình thêm.
+User authenticates in browser on first use. No additional configuration needed.
 
-### Dựa trên Token (Headers)
+### Token-Based (Headers)
 
-Token tĩnh hoặc từ biến môi trường:
+Static or environment variable tokens:
 
 ```json
 {
@@ -267,11 +267,11 @@ Token tĩnh hoặc từ biến môi trường:
 }
 ```
 
-Ghi lại các biến môi trường bắt buộc trong README.
+Document required environment variables in README.
 
-### Biến môi trường (stdio)
+### Environment Variables (stdio)
 
-Truyền cấu hình cho MCP server:
+Pass configuration to MCP server:
 
 ```json
 {
@@ -285,11 +285,11 @@ Truyền cấu hình cho MCP server:
 }
 ```
 
-## Các pattern tích hợp
+## Integration Patterns
 
 ### Pattern 1: Simple Tool Wrapper
 
-Commands dùng MCP tool với tương tác người dùng:
+Commands use MCP tools with user interaction:
 
 ```markdown
 # Command: create-item.md
@@ -303,11 +303,11 @@ Steps:
 3. Confirm creation
 ```
 
-**Dùng khi:** Cần thêm validation hoặc tiền xử lý trước khi gọi MCP.
+**Use for:** Adding validation or preprocessing before MCP calls.
 
 ### Pattern 2: Autonomous Agent
 
-Agent dùng MCP tool một cách tự động:
+Agents use MCP tools autonomously:
 
 ```markdown
 # Agent: data-analyzer.md
@@ -318,11 +318,11 @@ Analysis Process:
 3. Generate insights report
 ```
 
-**Dùng khi:** Workflow MCP nhiều bước không cần tương tác người dùng.
+**Use for:** Multi-step MCP workflows without user interaction.
 
 ### Pattern 3: Multi-Server Plugin
 
-Tích hợp nhiều MCP server:
+Integrate multiple MCP servers:
 
 ```json
 {
@@ -337,34 +337,34 @@ Tích hợp nhiều MCP server:
 }
 ```
 
-**Dùng khi:** Workflow trải dài trên nhiều dịch vụ.
+**Use for:** Workflows spanning multiple services.
 
-## Best Practices bảo mật
+## Security Best Practices
 
-### Dùng HTTPS/WSS
+### Use HTTPS/WSS
 
-Luôn dùng kết nối bảo mật:
+Always use secure connections:
 
 ```json
 ✅ "url": "https://mcp.example.com/sse"
 ❌ "url": "http://mcp.example.com/sse"
 ```
 
-### Quản lý Token
+### Token Management
 
-**NÊN:**
-- ✅ Dùng biến môi trường cho token
-- ✅ Ghi lại các env var bắt buộc trong README
-- ✅ Để luồng OAuth xử lý xác thực
+**DO:**
+- ✅ Use environment variables for tokens
+- ✅ Document required env vars in README
+- ✅ Let OAuth flow handle authentication
 
-**KHÔNG NÊN:**
-- ❌ Hardcode token trong cấu hình
-- ❌ Commit token lên git
-- ❌ Chia sẻ token trong tài liệu
+**DON'T:**
+- ❌ Hardcode tokens in configuration
+- ❌ Commit tokens to git
+- ❌ Share tokens in documentation
 
-### Phạm vi Permission
+### Permission Scoping
 
-Pre-allow chỉ những MCP tool cần thiết:
+Pre-allow only necessary MCP tools:
 
 ```markdown
 ✅ allowed-tools: [
@@ -375,180 +375,180 @@ Pre-allow chỉ những MCP tool cần thiết:
 ❌ allowed-tools: ["mcp__plugin_api_server__*"]
 ```
 
-## Xử lý lỗi
+## Error Handling
 
-### Lỗi kết nối
+### Connection Failures
 
-Xử lý khi MCP server không khả dụng:
-- Cung cấp hành vi fallback trong commands
-- Thông báo cho người dùng về vấn đề kết nối
-- Kiểm tra URL server và cấu hình
+Handle MCP server unavailability:
+- Provide fallback behavior in commands
+- Inform user of connection issues
+- Check server URL and configuration
 
-### Lỗi gọi Tool
+### Tool Call Errors
 
-Xử lý khi thao tác MCP thất bại:
-- Validate đầu vào trước khi gọi MCP tool
-- Cung cấp thông báo lỗi rõ ràng
-- Kiểm tra rate limiting và quota
+Handle failed MCP operations:
+- Validate inputs before calling MCP tools
+- Provide clear error messages
+- Check rate limiting and quotas
 
-### Lỗi cấu hình
+### Configuration Errors
 
-Validate cấu hình MCP:
-- Test kết nối server trong quá trình phát triển
-- Validate cú pháp JSON
-- Kiểm tra các biến môi trường bắt buộc
+Validate MCP configuration:
+- Test server connectivity during development
+- Validate JSON syntax
+- Check required environment variables
 
-## Cân nhắc về hiệu năng
+## Performance Considerations
 
 ### Lazy Loading
 
-MCP server kết nối theo yêu cầu:
-- Không phải tất cả server kết nối khi khởi động
-- Lần sử dụng tool đầu tiên kích hoạt kết nối
-- Connection pooling được quản lý tự động
+MCP servers connect on-demand:
+- Not all servers connect at startup
+- First tool use triggers connection
+- Connection pooling managed automatically
 
 ### Batching
 
-Gộp các request tương tự khi có thể:
+Batch similar requests when possible:
 
 ```
-# Tốt: Một query với bộ lọc
+# Good: Single query with filters
 tasks = search_tasks(project="X", assignee="me", limit=50)
 
-# Tránh: Nhiều query riêng lẻ
+# Avoid: Many individual queries
 for id in task_ids:
     task = get_task(id)
 ```
 
-## Kiểm thử tích hợp MCP
+## Testing MCP Integration
 
-### Kiểm thử cục bộ
+### Local Testing
 
-1. Cấu hình MCP server trong `.mcp.json`
-2. Cài đặt plugin cục bộ (`.claude-plugin/`)
-3. Chạy `/mcp` để xác minh server xuất hiện
-4. Kiểm thử các lời gọi tool trong commands
-5. Kiểm tra log `claude --debug` để phát hiện lỗi kết nối
+1. Configure MCP server in `.mcp.json`
+2. Install plugin locally (`.claude-plugin/`)
+3. Run `/mcp` to verify server appears
+4. Test tool calls in commands
+5. Check `claude --debug` logs for connection issues
 
-### Checklist xác thực
+### Validation Checklist
 
-- [ ] Cấu hình MCP là JSON hợp lệ
-- [ ] URL server đúng và có thể truy cập
-- [ ] Các biến môi trường bắt buộc được ghi lại
-- [ ] Tool xuất hiện trong output `/mcp`
-- [ ] Xác thực hoạt động (OAuth hoặc token)
-- [ ] Lời gọi tool thành công từ commands
-- [ ] Các trường hợp lỗi được xử lý ổn thỏa
+- [ ] MCP configuration is valid JSON
+- [ ] Server URL is correct and accessible
+- [ ] Required environment variables documented
+- [ ] Tools appear in `/mcp` output
+- [ ] Authentication works (OAuth or tokens)
+- [ ] Tool calls succeed from commands
+- [ ] Error cases handled gracefully
 
-## Debug
+## Debugging
 
-### Bật Debug Logging
+### Enable Debug Logging
 
 ```bash
 claude --debug
 ```
 
-Chú ý tìm:
-- Các lần thử kết nối MCP server
-- Log phát hiện tool
-- Luồng xác thực
-- Lỗi gọi tool
+Look for:
+- MCP server connection attempts
+- Tool discovery logs
+- Authentication flows
+- Tool call errors
 
-### Các vấn đề thường gặp
+### Common Issues
 
-**Server không kết nối được:**
-- Kiểm tra URL có đúng không
-- Xác minh server đang chạy (stdio)
-- Kiểm tra kết nối mạng
-- Xem lại cấu hình xác thực
+**Server not connecting:**
+- Check URL is correct
+- Verify server is running (stdio)
+- Check network connectivity
+- Review authentication configuration
 
-**Tool không khả dụng:**
-- Xác minh server đã kết nối thành công
-- Kiểm tra tên tool khớp chính xác
-- Chạy `/mcp` để xem các tool có sẵn
-- Restart Claude Code sau khi thay đổi cấu hình
+**Tools not available:**
+- Verify server connected successfully
+- Check tool names match exactly
+- Run `/mcp` to see available tools
+- Restart Claude Code after config changes
 
-**Xác thực thất bại:**
-- Xóa auth token đã cache
-- Xác thực lại
-- Kiểm tra phạm vi và quyền của token
-- Xác minh các biến môi trường đã được đặt
+**Authentication failing:**
+- Clear cached auth tokens
+- Re-authenticate
+- Check token scopes and permissions
+- Verify environment variables set
 
-## Tham chiếu nhanh
+## Quick Reference
 
-### Các loại MCP Server
+### MCP Server Types
 
-| Loại | Transport | Phù hợp cho | Xác thực |
-|------|-----------|-------------|----------|
-| stdio | Process | Tool cục bộ, server tùy chỉnh | Env vars |
-| SSE | HTTP | Dịch vụ được host, cloud API | OAuth |
-| HTTP | REST | API backend, xác thực token | Tokens |
-| ws | WebSocket | Thời gian thực, streaming | Tokens |
+| Type | Transport | Best For | Auth |
+|------|-----------|----------|------|
+| stdio | Process | Local tools, custom servers | Env vars |
+| SSE | HTTP | Hosted services, cloud APIs | OAuth |
+| HTTP | REST | API backends, token auth | Tokens |
+| ws | WebSocket | Real-time, streaming | Tokens |
 
-### Checklist cấu hình
+### Configuration Checklist
 
-- [ ] Loại server được chỉ định (stdio/SSE/HTTP/ws)
-- [ ] Các trường theo loại được điền đủ (command hoặc url)
-- [ ] Xác thực được cấu hình
-- [ ] Các biến môi trường được ghi lại
-- [ ] Dùng HTTPS/WSS (không dùng HTTP/WS)
-- [ ] Dùng ${CLAUDE_PLUGIN_ROOT} cho các path
+- [ ] Server type specified (stdio/SSE/HTTP/ws)
+- [ ] Type-specific fields complete (command or url)
+- [ ] Authentication configured
+- [ ] Environment variables documented
+- [ ] HTTPS/WSS used (not HTTP/WS)
+- [ ] ${CLAUDE_PLUGIN_ROOT} used for paths
 
 ### Best Practices
 
-**NÊN:**
-- ✅ Dùng ${CLAUDE_PLUGIN_ROOT} cho path di động
-- ✅ Ghi lại các biến môi trường bắt buộc
-- ✅ Dùng kết nối bảo mật (HTTPS/WSS)
-- ✅ Pre-allow MCP tool cụ thể trong commands
-- ✅ Kiểm thử tích hợp MCP trước khi publish
-- ✅ Xử lý lỗi kết nối và lỗi tool một cách ổn thỏa
+**DO:**
+- ✅ Use ${CLAUDE_PLUGIN_ROOT} for portable paths
+- ✅ Document required environment variables
+- ✅ Use secure connections (HTTPS/WSS)
+- ✅ Pre-allow specific MCP tools in commands
+- ✅ Test MCP integration before publishing
+- ✅ Handle connection and tool errors gracefully
 
-**KHÔNG NÊN:**
-- ❌ Hardcode đường dẫn tuyệt đối
-- ❌ Commit credentials lên git
-- ❌ Dùng HTTP thay vì HTTPS
-- ❌ Pre-allow tất cả tool bằng wildcard
-- ❌ Bỏ qua xử lý lỗi
-- ❌ Quên ghi lại hướng dẫn cài đặt
+**DON'T:**
+- ❌ Hardcode absolute paths
+- ❌ Commit credentials to git
+- ❌ Use HTTP instead of HTTPS
+- ❌ Pre-allow all tools with wildcards
+- ❌ Skip error handling
+- ❌ Forget to document setup
 
-## Tài nguyên bổ sung
+## Additional Resources
 
-### Các file tham chiếu
+### Reference Files
 
-Để biết thông tin chi tiết, tham khảo:
+For detailed information, consult:
 
-- **`references/server-types.md`** - Tìm hiểu sâu về từng loại server
-- **`references/authentication.md`** - Các pattern xác thực và OAuth
-- **`references/tool-usage.md`** - Dùng MCP tool trong commands và agents
+- **`references/server-types.md`** - Deep dive on each server type
+- **`references/authentication.md`** - Authentication patterns and OAuth
+- **`references/tool-usage.md`** - Using MCP tools in commands and agents
 
-### Các cấu hình ví dụ
+### Example Configurations
 
-Ví dụ hoạt động trong `examples/`:
+Working examples in `examples/`:
 
-- **`stdio-server.json`** - MCP server stdio cục bộ
-- **`sse-server.json`** - SSE server được host với OAuth
-- **`http-server.json`** - REST API với xác thực token
+- **`stdio-server.json`** - Local stdio MCP server
+- **`sse-server.json`** - Hosted SSE server with OAuth
+- **`http-server.json`** - REST API with token auth
 
-### Tài nguyên bên ngoài
+### External Resources
 
-- **Tài liệu MCP chính thức**: <https://modelcontextprotocol.io/>
-- **Tài liệu Claude Code MCP**: <https://docs.claude.com/en/docs/claude-code/mcp>
+- **Official MCP Docs**: https://modelcontextprotocol.io/
+- **Claude Code MCP Docs**: https://docs.claude.com/en/docs/claude-code/mcp
 - **MCP SDK**: @modelcontextprotocol/sdk
-- **Kiểm thử**: Dùng `claude --debug` và lệnh `/mcp`
+- **Testing**: Use `claude --debug` and `/mcp` command
 
-## Quy trình triển khai
+## Implementation Workflow
 
-Để thêm tích hợp MCP vào plugin:
+To add MCP integration to a plugin:
 
-1. Chọn loại MCP server (stdio, SSE, HTTP, ws)
-2. Tạo `.mcp.json` tại thư mục gốc plugin với cấu hình
-3. Dùng ${CLAUDE_PLUGIN_ROOT} cho tất cả tham chiếu file
-4. Ghi lại các biến môi trường bắt buộc trong README
-5. Kiểm thử cục bộ với lệnh `/mcp`
-6. Pre-allow MCP tool trong các command liên quan
-7. Xử lý xác thực (OAuth hoặc token)
-8. Kiểm thử các trường hợp lỗi (lỗi kết nối, lỗi xác thực)
-9. Ghi lại tích hợp MCP trong README của plugin
+1. Choose MCP server type (stdio, SSE, HTTP, ws)
+2. Create `.mcp.json` at plugin root with configuration
+3. Use ${CLAUDE_PLUGIN_ROOT} for all file references
+4. Document required environment variables in README
+5. Test locally with `/mcp` command
+6. Pre-allow MCP tools in relevant commands
+7. Handle authentication (OAuth or tokens)
+8. Test error cases (connection failures, auth errors)
+9. Document MCP integration in plugin README
 
-Ưu tiên stdio cho server tùy chỉnh/cục bộ, SSE cho dịch vụ được host có OAuth.
+Focus on stdio for custom/local servers, SSE for hosted services with OAuth.

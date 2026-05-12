@@ -5,109 +5,109 @@ allowed-tools: Read Grep Glob Bash Edit
 argument-hint: "[bug description or error message]"
 ---
 
-# Skill: Debug có hệ thống
+# Skill: Systematic Debugging
 
-Bạn được gọi để debug. **KHÔNG** sửa ngẫu nhiên cho đến khi hiểu vấn đề.
+You have been called to debug. **DO NOT** make random fixes until you understand the problem.
 
-## Nguyên tắc
+## Principles
 
 > "A bug you can reproduce reliably is half-fixed."
 
-## Bước 1: Thu thập triệu chứng
+## Step 1: Gather symptoms
 
-Hỏi user (nếu chưa rõ):
-- Triệu chứng cụ thể là gì? (lỗi gì, output sai gì, crash chỗ nào)
-- Khi nào xảy ra? (luôn, ngẫu nhiên, chỉ trong môi trường nào)
-- Trước đây có hoạt động không? Nếu có, thay đổi gần nhất là gì?
-- Có error message / stack trace không? Paste vào.
+Ask the user (if not yet clear):
+- What exactly are the symptoms? (what error, what wrong output, where does it crash)
+- When does it occur? (always, randomly, only in certain environments)
+- Did it work before? If so, what is the most recent change?
+- Is there an error message / stack trace? Paste it in.
 
-## Bước 2: Reproduce
+## Step 2: Reproduce
 
-Trước khi đoán nguyên nhân, **reproduce trong môi trường local**:
-- Chạy lệnh user mô tả
-- Mở file, gọi hàm, gửi request — tái tạo điều kiện gây lỗi
-- Capture output đầy đủ
+Before guessing the cause, **reproduce in the local environment**:
+- Run the command the user described
+- Open the file, call the function, send the request — recreate the conditions that trigger the error
+- Capture the full output
 
-Nếu **KHÔNG reproduce được**:
-- Nói rõ với user
-- Đề xuất bước thu thập thêm thông tin (log thêm, env khác, version khác)
-- KHÔNG đoán mò sửa khi chưa reproduce.
+If **CANNOT reproduce**:
+- Tell the user clearly
+- Suggest steps to gather more information (add more logging, try different env, different version)
+- DO NOT make guesses and fix blindly when reproduction has not been achieved.
 
-## Bước 3: Khoanh vùng nguyên nhân
+## Step 3: Narrow down the cause
 
-Áp dụng phương pháp khoa học:
+Apply the scientific method:
 
-1. **Quan sát**: chính xác output sai là gì so với output đúng kỳ vọng?
-2. **Giả thuyết**: liệt kê 2-4 nguyên nhân khả dĩ, theo độ tin cậy.
-3. **Verify**: với mỗi giả thuyết, xác định **thí nghiệm** kiểm chứng (đọc file nào, chạy lệnh nào, log gì). Bắt đầu từ giả thuyết có chi phí kiểm chứng thấp nhất.
-4. **Khoanh vùng**: bisect — chia đôi không gian khả nghi (commit, file, hàm, input range) cho đến khi tìm được phần nhỏ nhất gây lỗi.
+1. **Observe**: what exactly is the wrong output compared to the expected correct output?
+2. **Hypothesize**: list 2-4 plausible causes, ranked by confidence.
+3. **Verify**: for each hypothesis, identify the **experiment** to validate it (which file to read, which command to run, what to log). Start with the hypothesis that has the lowest verification cost.
+4. **Narrow down**: bisect — split the suspicious space in half (commit, file, function, input range) until the smallest component causing the error is found.
 
-Công cụ:
-- `git bisect` cho regression
-- Binary search trong code: comment/uncomment chia đôi
-- Log thêm tại các điểm quan trọng (nhớ xóa sau khi fix)
-- Reproduce với input nhỏ nhất gây lỗi (minimal reproducer)
+Tools:
+- `git bisect` for regressions
+- Binary search in code: comment/uncomment to split in half
+- Add logging at key points (remember to remove after fixing)
+- Reproduce with the smallest possible input that triggers the error (minimal reproducer)
 
-## Bước 4: Hiểu nguyên nhân (root cause, KHÔNG phải triệu chứng)
+## Step 4: Understand the cause (root cause, NOT the symptom)
 
-Khi tìm thấy chỗ lỗi:
-- Tại sao code này gây lỗi? (cơ chế cụ thể, không phải "nó sai")
-- Tại sao nó được viết như vậy? (đọc git blame, đọc PR cũ)
-- Có nơi nào khác trong codebase có pattern tương tự không? (dùng Grep — fix một chỗ thường không đủ)
+When the error location is found:
+- Why does this code cause the error? (specific mechanism, not just "it's wrong")
+- Why was it written this way? (read git blame, read old PRs)
+- Are there other places in the codebase with a similar pattern? (use Grep — fixing one place is usually not enough)
 
-## Bước 5: Viết failing test
+## Step 5: Write a failing test
 
-Trước khi fix:
-- Viết test reproduce bug. Test này phải **FAIL** trên code hiện tại.
-- Test phải minimal, chỉ test cái bug, không test thứ khác.
-- Đặt tên test mô tả bug: `it('không crash khi input là array rỗng', ...)`.
+Before fixing:
+- Write a test that reproduces the bug. This test MUST **FAIL** on the current code.
+- The test must be minimal, only testing the bug, not other things.
+- Name the test to describe the bug: `it('does not crash when input is an empty array', ...)`.
 
-Nếu project không có test framework hoặc bug khó test (UI bug, race condition) → tạo **manual reproduction script** thay thế.
+If the project has no test framework, or the bug is hard to test (UI bug, race condition) → create a **manual reproduction script** instead.
 
-## Bước 6: Fix
+## Step 6: Fix
 
-- Fix root cause, KHÔNG patch triệu chứng.
-- Nếu fix có nhiều cách → chọn cách ít xâm lấn nhất, có ít side effect nhất.
-- Sửa CẢ các nơi khác có pattern tương tự (đã tìm ở bước 4).
+- Fix the root cause, DO NOT patch the symptom.
+- If there are multiple ways to fix → choose the least invasive with the fewest side effects.
+- Fix ALL other places with a similar pattern (found in step 4).
 
-## Bước 7: Verify
+## Step 7: Verify
 
-- Chạy lại failing test → giờ phải PASS.
-- Chạy toàn bộ test suite → không break test khác.
-- Reproduce lại bug ban đầu manually → không còn xảy ra.
+- Re-run the failing test → it must now PASS.
+- Run the full test suite → it must not break other tests.
+- Manually reproduce the original bug → it must no longer occur.
 
-## Bước 8: Báo cáo
+## Step 8: Report
 
 ```markdown
-## Bug: <mô tả ngắn>
+## Bug: <short description>
 
-**Nguyên nhân**: <root cause cụ thể, 1-3 câu>
+**Cause**: <specific root cause, 1-3 sentences>
 
-**Fix**: <cách sửa, 1-3 câu>
+**Fix**: <how it was fixed, 1-3 sentences>
 
-**File thay đổi**:
-- src/foo.ts (line 42-45) — sửa logic check empty
-- tests/foo.test.ts — thêm test reproduce
+**Files changed**:
+- src/foo.ts (line 42-45) — fixed empty check logic
+- tests/foo.test.ts — added reproduction test
 
 **Verify**:
-- ✓ failing test giờ pass
-- ✓ test suite full pass
-- ✓ reproduce thủ công không còn lỗi
+- ✓ failing test now passes
+- ✓ full test suite passes
+- ✓ manual reproduction no longer errors
 ```
 
-## Khi bug không reproduce được
+## When the bug cannot be reproduced
 
-Trường hợp khó (race condition, env khác, "works-on-my-machine"):
-- KHÔNG đoán fix rồi báo "chắc xong rồi". Nói thẳng: "Không reproduce được, fix sau đây dựa trên giả thuyết X. Cần verify bằng [cách Y]."
-- Đề xuất thêm log/telemetry để bắt được lần xảy ra tiếp theo.
+Difficult cases (race condition, different env, "works-on-my-machine"):
+- DO NOT guess a fix and say "probably done". Be direct: "Cannot reproduce. The following fix is based on hypothesis X. Needs verification via [method Y]."
+- Suggest adding logging/telemetry to capture the next occurrence.
 
-## Khi đã sửa 2 lần vẫn không đúng
+## When two fixes have failed
 
-DỪNG. Đề xuất: "Đã thử 2 cách không thành. Đề xuất `/clear` rồi mô tả lại bug với context tốt hơn — có thể đang miss điểm gì đó."
+STOP. Suggest: "Tried 2 approaches without success. Recommending `/clear` then describe the bug again with better context — something may be getting missed."
 
 ## Gotchas
 
-- **Bug bay biến** = chưa thực sự reproduce. Chạy lại 5-10 lần xác nhận reproducibility trước khi đoán nguyên nhân.
-- **Failing test PHẢI fail bằng test runner của project** (pytest, jest, go test, cargo test, v.v.) — không chỉ manual. Test không reproducible = chưa nắm được bug.
-- **Race condition / async**: bug hiện không đều = nghi race. Đừng fix bằng retry loop — tìm shared state thực sự.
-- **Fix symptom ≠ fix root cause**: in/log nguyên nhân ra trước khi sửa. Nếu không giải thích được "tại sao", chưa fix xong.
+- **Bug disappears** = not actually reproduced yet. Run 5-10 times to confirm reproducibility before guessing the cause.
+- **Failing test MUST fail via the project's test runner** (pytest, jest, go test, cargo test, etc.) — not just manually. An irreproducible test = bug not yet understood.
+- **Race condition / async**: bug occurs intermittently = suspect a race. Do not fix with a retry loop — find the actual shared state.
+- **Fixing the symptom ≠ fixing the root cause**: log/print the cause before fixing. If you cannot explain "why", the fix is not complete.

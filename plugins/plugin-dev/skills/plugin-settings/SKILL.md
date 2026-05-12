@@ -4,22 +4,22 @@ description: This skill should be used when the user asks about "plugin settings
 version: 0.1.0
 ---
 
-# Pattern Plugin Settings cho Claude Code Plugins
+# Plugin Settings Pattern for Claude Code Plugins
 
-## Tổng quan
+## Overview
 
-Plugins có thể lưu cài đặt do user cấu hình và state trong files `.claude/plugin-name.local.md` trong project directory. Pattern này dùng YAML frontmatter cho structured configuration và markdown content cho prompts hoặc context bổ sung.
+Plugins can store user-configurable settings and state in `.claude/plugin-name.local.md` files within the project directory. This pattern uses YAML frontmatter for structured configuration and markdown content for prompts or additional context.
 
-**Các đặc điểm chính:**
-- Vị trí file: `.claude/plugin-name.local.md` trong project root
-- Cấu trúc: YAML frontmatter + markdown body
-- Mục đích: Per-project plugin configuration và state
-- Cách dùng: Đọc từ hooks, commands, và agents
-- Lifecycle: Do user quản lý (không trong git, nên có trong `.gitignore`)
+**Key characteristics:**
+- File location: `.claude/plugin-name.local.md` in project root
+- Structure: YAML frontmatter + markdown body
+- Purpose: Per-project plugin configuration and state
+- Usage: Read from hooks, commands, and agents
+- Lifecycle: User-managed (not in git, should be in `.gitignore`)
 
-## Cấu trúc File
+## File Structure
 
-### Template cơ bản
+### Basic Template
 
 ```markdown
 ---
@@ -32,14 +32,14 @@ list_setting: ["item1", "item2"]
 
 # Additional Context
 
-Markdown body này có thể chứa:
+This markdown body can contain:
 - Task descriptions
 - Additional instructions
-- Prompts để feed lại cho Claude
-- Documentation hoặc notes
+- Prompts to feed back to Claude
+- Documentation or notes
 ```
 
-### Ví dụ: Plugin State File
+### Example: Plugin State File
 
 **.claude/my-plugin.local.md:**
 ```markdown
@@ -57,11 +57,11 @@ This plugin is configured for standard validation mode.
 Contact @team-lead with questions.
 ```
 
-## Đọc Settings Files
+## Reading Settings Files
 
-### Từ Hooks (Bash Scripts)
+### From Hooks (Bash Scripts)
 
-**Pattern: Kiểm tra tồn tại và parse frontmatter**
+**Pattern: Check existence and parse frontmatter**
 
 ```bash
 #!/bin/bash
@@ -94,11 +94,11 @@ if [[ "$STRICT_MODE" == "true" ]]; then
 fi
 ```
 
-Xem `examples/read-settings-hook.sh` để biết complete working example.
+See `examples/read-settings-hook.sh` for complete working example.
 
-### Từ Commands
+### From Commands
 
-Commands có thể đọc settings files để customize behavior:
+Commands can read settings files to customize behavior:
 
 ```markdown
 ---
@@ -116,33 +116,33 @@ Steps:
 5. Execute with configured behavior
 ```
 
-### Từ Agents
+### From Agents
 
-Agents có thể tham chiếu settings trong instructions của họ:
+Agents can reference settings in their instructions:
 
 ```markdown
 ---
 name: configured-agent
-description: Agent adapts theo project settings
+description: Agent that adapts to project settings
 ---
 
-Kiểm tra plugin settings tại `.claude/my-plugin.local.md`.
-Nếu có, parse YAML frontmatter và điều chỉnh behavior theo:
-- enabled: Plugin có active không
+Check for plugin settings at `.claude/my-plugin.local.md`.
+If present, parse YAML frontmatter and adapt behavior according to:
+- enabled: Whether plugin is active
 - mode: Processing mode (strict, standard, lenient)
-- Các configuration fields bổ sung
+- Additional configuration fields
 ```
 
-## Kỹ thuật Parsing
+## Parsing Techniques
 
 ### Extract Frontmatter
 
 ```bash
-# Extract mọi thứ giữa các marker ---
+# Extract everything between --- markers
 FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$FILE")
 ```
 
-### Đọc từng Field
+### Read Individual Fields
 
 **String fields:**
 ```bash
@@ -152,56 +152,56 @@ VALUE=$(echo "$FRONTMATTER" | grep '^field_name:' | sed 's/field_name: *//' | se
 **Boolean fields:**
 ```bash
 ENABLED=$(echo "$FRONTMATTER" | grep '^enabled:' | sed 's/enabled: *//')
-# So sánh: if [[ "$ENABLED" == "true" ]]; then
+# Compare: if [[ "$ENABLED" == "true" ]]; then
 ```
 
 **Numeric fields:**
 ```bash
 MAX=$(echo "$FRONTMATTER" | grep '^max_value:' | sed 's/max_value: *//')
-# Dùng: if [[ $MAX -gt 100 ]]; then
+# Use: if [[ $MAX -gt 100 ]]; then
 ```
 
-### Đọc Markdown Body
+### Read Markdown Body
 
-Extract nội dung sau `---` thứ hai:
+Extract content after second `---`:
 
 ```bash
-# Lấy mọi thứ sau closing ---
+# Get everything after closing ---
 BODY=$(awk '/^---$/{i++; next} i>=2' "$FILE")
 ```
 
-## Các Pattern Phổ biến
+## Common Patterns
 
 ### Pattern 1: Temporarily Active Hooks
 
-Dùng settings file để kiểm soát kích hoạt hook:
+Use settings file to control hook activation:
 
 ```bash
 #!/bin/bash
 STATE_FILE=".claude/security-scan.local.md"
 
-# Thoát nhanh nếu chưa cấu hình
+# Quick exit if not configured
 if [[ ! -f "$STATE_FILE" ]]; then
   exit 0
 fi
 
-# Đọc enabled flag
+# Read enabled flag
 FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$STATE_FILE")
 ENABLED=$(echo "$FRONTMATTER" | grep '^enabled:' | sed 's/enabled: *//')
 
 if [[ "$ENABLED" != "true" ]]; then
-  exit 0  # Đã disabled
+  exit 0  # Disabled
 fi
 
-# Chạy hook logic
+# Run hook logic
 # ...
 ```
 
-**Use case:** Enable/disable hooks mà không cần edit hooks.json (yêu cầu restart).
+**Use case:** Enable/disable hooks without editing hooks.json (requires restart).
 
 ### Pattern 2: Agent State Management
 
-Lưu agent-specific state và configuration:
+Store agent-specific state and configuration:
 
 **.claude/multi-agent-swarm.local.md:**
 ```markdown
@@ -216,21 +216,21 @@ dependencies: ["Task 3.4"]
 
 # Task Assignment
 
-Implement JWT authentication cho API.
+Implement JWT authentication for the API.
 
 **Success Criteria:**
-- Authentication endpoints đã tạo
+- Authentication endpoints created
 - Tests passing
-- PR đã tạo và CI green
+- PR created and CI green
 ```
 
-Đọc từ hooks để coordinate agents:
+Read from hooks to coordinate agents:
 
 ```bash
 AGENT_NAME=$(echo "$FRONTMATTER" | grep '^agent_name:' | sed 's/agent_name: *//')
 COORDINATOR=$(echo "$FRONTMATTER" | grep '^coordinator_session:' | sed 's/coordinator_session: *//')
 
-# Gửi notification đến coordinator
+# Send notification to coordinator
 tmux send-keys -t "$COORDINATOR" "Agent $AGENT_NAME completed task" Enter
 ```
 
@@ -247,53 +247,53 @@ enable_logging: true
 
 # Validation Configuration
 
-Strict mode đã kích hoạt cho project này.
-Tất cả writes được validate theo security policies.
+Strict mode enabled for this project.
+All writes validated against security policies.
 ```
 
-Dùng trong hooks hoặc commands:
+Use in hooks or commands:
 
 ```bash
 LEVEL=$(echo "$FRONTMATTER" | grep '^validation_level:' | sed 's/validation_level: *//')
 
 case "$LEVEL" in
   strict)
-    # Áp dụng strict validation
+    # Apply strict validation
     ;;
   standard)
-    # Áp dụng standard validation
+    # Apply standard validation
     ;;
   lenient)
-    # Áp dụng lenient validation
+    # Apply lenient validation
     ;;
 esac
 ```
 
-## Tạo Settings Files
+## Creating Settings Files
 
-### Từ Commands
+### From Commands
 
-Commands có thể tạo settings files:
+Commands can create settings files:
 
 ```markdown
 # Setup Command
 
-Các bước:
-1. Hỏi user về configuration preferences
-2. Tạo `.claude/my-plugin.local.md` với YAML frontmatter
-3. Set các giá trị phù hợp dựa trên user input
-4. Thông báo user đã lưu settings
-5. Nhắc user restart Claude Code để hooks nhận ra thay đổi
+Steps:
+1. Ask user for configuration preferences
+2. Create `.claude/my-plugin.local.md` with YAML frontmatter
+3. Set appropriate values based on user input
+4. Inform user that settings are saved
+5. Remind user to restart Claude Code for hooks to recognize changes
 ```
 
 ### Template Generation
 
-Cung cấp template trong plugin README:
+Provide template in plugin README:
 
 ```markdown
 ## Configuration
 
-Tạo `.claude/my-plugin.local.md` trong project của bạn:
+Create `.claude/my-plugin.local.md` in your project:
 
 \`\`\`markdown
 ---
@@ -304,48 +304,48 @@ max_retries: 3
 
 # Plugin Configuration
 
-Các settings của bạn đang active.
+Your settings are active.
 \`\`\`
 
-Sau khi tạo hoặc chỉnh sửa, restart Claude Code để thay đổi có hiệu lực.
+After creating or editing, restart Claude Code for changes to take effect.
 ```
 
 ## Best Practices
 
-### Đặt tên File
+### File Naming
 
-Nên làm:
-- Dùng format `.claude/plugin-name.local.md`
-- Khớp tên plugin chính xác
-- Dùng suffix `.local.md` cho user-local files
+✅ **DO:**
+- Use `.claude/plugin-name.local.md` format
+- Match plugin name exactly
+- Use `.local.md` suffix for user-local files
 
-Không nên làm:
-- Dùng directory khác (không phải `.claude/`)
-- Đặt tên không nhất quán
-- Dùng `.md` không có `.local` (có thể bị commit)
+❌ **DON'T:**
+- Use different directory (not `.claude/`)
+- Use inconsistent naming
+- Use `.md` without `.local` (might be committed)
 
 ### Gitignore
 
-Luôn thêm vào `.gitignore`:
+Always add to `.gitignore`:
 
 ```gitignore
 .claude/*.local.md
 .claude/*.local.json
 ```
 
-Document điều này trong plugin README.
+Document this in plugin README.
 
 ### Defaults
 
-Cung cấp sensible defaults khi settings file không tồn tại:
+Provide sensible defaults when settings file doesn't exist:
 
 ```bash
 if [[ ! -f "$STATE_FILE" ]]; then
-  # Dùng defaults
+  # Use defaults
   ENABLED=true
   MODE=standard
 else
-  # Đọc từ file
+  # Read from file
   # ...
 fi
 ```
@@ -360,39 +360,39 @@ MAX=$(echo "$FRONTMATTER" | grep '^max_value:' | sed 's/max_value: *//')
 # Validate numeric range
 if ! [[ "$MAX" =~ ^[0-9]+$ ]] || [[ $MAX -lt 1 ]] || [[ $MAX -gt 100 ]]; then
   echo "⚠️  Invalid max_value in settings (must be 1-100)" >&2
-  MAX=10  # Dùng default
+  MAX=10  # Use default
 fi
 ```
 
-### Yêu cầu Restart
+### Restart Requirement
 
-**Quan trọng:** Thay đổi settings yêu cầu Claude Code restart.
+**Important:** Settings changes require Claude Code restart.
 
-Document trong README của bạn:
+Document in your README:
 
 ```markdown
-## Thay đổi Settings
+## Changing Settings
 
-Sau khi edit `.claude/my-plugin.local.md`:
-1. Lưu file
-2. Thoát Claude Code
-3. Restart: `claude` hoặc `cc`
-4. Settings mới sẽ được load
+After editing `.claude/my-plugin.local.md`:
+1. Save the file
+2. Exit Claude Code
+3. Restart: `claude` or `cc`
+4. New settings will be loaded
 ```
 
-Hooks không thể hot-swap trong session.
+Hooks cannot be hot-swapped within a session.
 
 ## Security Considerations
 
 ### Sanitize User Input
 
-Khi viết settings files từ user input:
+When writing settings files from user input:
 
 ```bash
-# Escape quotes trong user input
+# Escape quotes in user input
 SAFE_VALUE=$(echo "$USER_INPUT" | sed 's/"/\\"/g')
 
-# Ghi vào file
+# Write to file
 cat > "$STATE_FILE" <<EOF
 ---
 user_setting: "$SAFE_VALUE"
@@ -402,12 +402,12 @@ EOF
 
 ### Validate File Paths
 
-Nếu settings chứa file paths:
+If settings contain file paths:
 
 ```bash
 FILE_PATH=$(echo "$FRONTMATTER" | grep '^data_file:' | sed 's/data_file: *//')
 
-# Kiểm tra path traversal
+# Check for path traversal
 if [[ "$FILE_PATH" == *".."* ]]; then
   echo "⚠️  Invalid path in settings (path traversal)" >&2
   exit 2
@@ -416,14 +416,14 @@ fi
 
 ### Permissions
 
-Settings files nên:
-- Chỉ readable bởi user (`chmod 600`)
-- Không được commit vào git
-- Không được chia sẻ giữa các users
+Settings files should be:
+- Readable by user only (`chmod 600`)
+- Not committed to git
+- Not shared between users
 
-## Ví dụ Thực tế
+## Real-World Examples
 
-### Plugin multi-agent-swarm
+### multi-agent-swarm Plugin
 
 **.claude/multi-agent-swarm.local.md:**
 ```markdown
@@ -439,17 +439,17 @@ additional_instructions: Use JWT tokens, not sessions
 
 # Task: Implement Authentication
 
-Build JWT-based authentication cho REST API.
-Coordinate với auth-agent về shared types.
+Build JWT-based authentication for the REST API.
+Coordinate with auth-agent on shared types.
 ```
 
 **Hook usage (agent-stop-notification.sh):**
-- Kiểm tra file tồn tại (dòng 15-18: thoát nhanh nếu không có)
-- Parse frontmatter để lấy coordinator_session, agent_name, enabled
-- Gửi notifications đến coordinator nếu enabled
-- Cho phép quick activation/deactivation qua `enabled: true/false`
+- Checks if file exists (line 15-18: quick exit if not)
+- Parses frontmatter to get coordinator_session, agent_name, enabled
+- Sends notifications to coordinator if enabled
+- Allows quick activation/deactivation via `enabled: true/false`
 
-### Plugin ralph-loop
+### ralph-loop Plugin
 
 **.claude/ralph-loop.local.md:**
 ```markdown
@@ -464,15 +464,15 @@ Make sure tests pass after each fix.
 ```
 
 **Hook usage (stop-hook.sh):**
-- Kiểm tra file tồn tại (dòng 15-18: thoát nhanh nếu không active)
-- Đọc iteration count và max_iterations
-- Extract completion_promise để xác định loop termination
-- Đọc body như prompt để feed lại
-- Cập nhật iteration count mỗi vòng lặp
+- Checks if file exists (line 15-18: quick exit if not active)
+- Reads iteration count and max_iterations
+- Extracts completion_promise for loop termination
+- Reads body as the prompt to feed back
+- Updates iteration count on each loop
 
 ## Quick Reference
 
-### Vị trí File
+### File Location
 
 ```
 project-root/
@@ -480,65 +480,65 @@ project-root/
     └── plugin-name.local.md
 ```
 
-### Parsing Frontmatter
+### Frontmatter Parsing
 
 ```bash
 # Extract frontmatter
 FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$FILE")
 
-# Đọc field
+# Read field
 VALUE=$(echo "$FRONTMATTER" | grep '^field:' | sed 's/field: *//' | sed 's/^"\(.*\)"$/\1/')
 ```
 
-### Parsing Body
+### Body Parsing
 
 ```bash
-# Extract body (sau second ---)
+# Extract body (after second ---)
 BODY=$(awk '/^---$/{i++; next} i>=2' "$FILE")
 ```
 
-### Pattern Thoát nhanh
+### Quick Exit Pattern
 
 ```bash
 if [[ ! -f ".claude/my-plugin.local.md" ]]; then
-  exit 0  # Chưa cấu hình
+  exit 0  # Not configured
 fi
 ```
 
-## Tài nguyên Bổ sung
+## Additional Resources
 
 ### Reference Files
 
-Để biết implementation patterns chi tiết:
+For detailed implementation patterns:
 
-- **`references/parsing-techniques.md`** - Hướng dẫn đầy đủ để parse YAML frontmatter và markdown bodies
-- **`references/real-world-examples.md`** - Deep dive vào implementations của multi-agent-swarm và ralph-loop
+- **`references/parsing-techniques.md`** - Complete guide to parsing YAML frontmatter and markdown bodies
+- **`references/real-world-examples.md`** - Deep dive into multi-agent-swarm and ralph-loop implementations
 
 ### Example Files
 
-Working examples trong `examples/`:
+Working examples in `examples/`:
 
-- **`read-settings-hook.sh`** - Hook đọc và dùng settings
-- **`create-settings-command.md`** - Command tạo settings file
+- **`read-settings-hook.sh`** - Hook that reads and uses settings
+- **`create-settings-command.md`** - Command that creates settings file
 - **`example-settings.md`** - Template settings file
 
 ### Utility Scripts
 
-Development tools trong `scripts/`:
+Development tools in `scripts/`:
 
-- **`validate-settings.sh`** - Validate cấu trúc settings file
+- **`validate-settings.sh`** - Validate settings file structure
 - **`parse-frontmatter.sh`** - Extract frontmatter fields
 
 ## Implementation Workflow
 
-Để thêm settings vào plugin:
+To add settings to a plugin:
 
-1. Thiết kế settings schema (field nào, types, defaults)
-2. Tạo template file trong plugin documentation
-3. Thêm gitignore entry cho `.claude/*.local.md`
-4. Implement settings parsing trong hooks/commands
-5. Dùng quick-exit pattern (kiểm tra file tồn tại, kiểm tra enabled field)
-6. Document settings trong plugin README kèm template
-7. Nhắc users rằng thay đổi yêu cầu Claude Code restart
+1. Design settings schema (which fields, types, defaults)
+2. Create template file in plugin documentation
+3. Add gitignore entry for `.claude/*.local.md`
+4. Implement settings parsing in hooks/commands
+5. Use quick-exit pattern (check file exists, check enabled field)
+6. Document settings in plugin README with template
+7. Remind users that changes require Claude Code restart
 
-Tập trung giữ settings đơn giản và cung cấp defaults tốt khi settings file không tồn tại.
+Focus on keeping settings simple and providing good defaults when settings file doesn't exist.

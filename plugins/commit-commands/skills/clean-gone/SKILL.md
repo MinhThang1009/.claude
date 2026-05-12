@@ -5,37 +5,37 @@ description: "Cleans up all local git branches marked as [gone] (deleted on remo
 
 ## Your Task
 
-Bạn cần thực thi các lệnh bash sau để dọn dẹp các local branch cũ đã bị xóa khỏi remote repository.
+You need to execute the following bash commands to clean up stale local branches that have been deleted from the remote repository.
 
 ## Commands to Execute
 
-1. **Đầu tiên, liệt kê các branch để xác định những branch có trạng thái [gone]**
-   Thực thi lệnh sau:
+1. **First, list branches to identify those with [gone] status**
+   Execute the following command:
    ```bash
    git branch -v
    ```
 
-   Lưu ý: Branch có tiền tố '+' có worktree liên kết và phải được xóa worktree trước khi xóa branch.
+   Note: Branches prefixed with '+' have an associated worktree and must have that worktree removed before the branch can be deleted.
 
-2. **Tiếp theo, xác định các worktree cần xóa cho các branch [gone]**
-   Thực thi lệnh sau:
+2. **Next, identify worktrees to remove for [gone] branches**
+   Execute the following command:
    ```bash
    git worktree list
    ```
 
-3. **Cuối cùng, xóa worktree và xóa các branch [gone] (xử lý cả branch thường và branch có worktree)**
-   Thực thi lệnh sau:
+3. **Finally, remove worktrees and delete [gone] branches (handles both regular branches and branches with worktrees)**
+   Execute the following command:
    ```bash
-   # Xử lý tất cả branch [gone], loại bỏ tiền tố '+' nếu có
+   # Process all [gone] branches, stripping the '+' prefix if present
    git branch -v | grep '\[gone\]' | sed 's/^[+* ]//' | awk '{print $1}' | while read branch; do
      echo "Processing branch: $branch"
-     # Tìm và xóa worktree nếu tồn tại
+     # Find and remove worktree if one exists
      worktree=$(git worktree list | grep "\\[$branch\\]" | awk '{print $1}')
      if [ ! -z "$worktree" ] && [ "$worktree" != "$(git rev-parse --show-toplevel)" ]; then
        echo "  Removing worktree: $worktree"
        git worktree remove --force "$worktree"
      fi
-     # Xóa branch
+     # Delete the branch
      echo "  Deleting branch: $branch"
      git branch -D "$branch"
    done
@@ -43,11 +43,11 @@ Bạn cần thực thi các lệnh bash sau để dọn dẹp các local branch 
 
 ## Expected Behavior
 
-Sau khi thực thi các lệnh này, bạn sẽ:
+After executing these commands, you will:
 
-- Thấy danh sách tất cả local branch với trạng thái của chúng
-- Xác định và xóa các worktree liên kết với branch [gone]
-- Xóa tất cả branch được đánh dấu [gone]
-- Cung cấp phản hồi về các worktree và branch đã được xóa
+- See a list of all local branches with their statuses
+- Identify and remove worktrees associated with [gone] branches
+- Delete all branches marked as [gone]
+- Provide feedback on which worktrees and branches were removed
 
-Nếu không có branch nào được đánh dấu [gone], báo cáo rằng không cần dọn dẹp.
+If no branches are marked as [gone], report that no cleanup is needed.

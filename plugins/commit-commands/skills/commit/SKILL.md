@@ -7,127 +7,127 @@ argument-hint: "[optional custom instructions, e.g.: fix #123]"
 model: inherit
 ---
 
-# Skill: Commit thông minh
+# Skill: Smart Commit
 
-Mục đích: tạo 1 commit chuẩn Conventional Commits với subject **tiếng Việt**, type **tiếng Anh**, KHÔNG attribution Claude.
+Purpose: create 1 Conventional Commits-compliant commit with a **Vietnamese subject**, **English type**, NO Claude attribution.
 
-## Quy trình 5 bước
+## 5-step process
 
-### Bước 1 — Đọc trạng thái
+### Step 1 — Read state
 
 ```bash
-!`git rev-parse --git-dir >/dev/null 2>&1 && git status --short || echo "(không phải git repo — không thể commit)"`
+!`git rev-parse --git-dir >/dev/null 2>&1 && git status --short || echo "(not a git repo — cannot commit)"`
 !`git rev-parse --git-dir >/dev/null 2>&1 && git diff --stat || true`
 !`git rev-parse --git-dir >/dev/null 2>&1 && git log --oneline -5 || true`
 ```
 
-Phân loại file thành nhóm logic (ví dụ: file auth, file test, file docs). 1 commit = 1 chủ đề.
+Group files into logical groups (e.g., auth files, test files, docs files). 1 commit = 1 topic.
 
-### Bước 2 — Đề xuất grouping
+### Step 2 — Propose grouping
 
-Nếu nhiều file thuộc nhiều chủ đề khác nhau → đề xuất tách commit:
+If multiple files span multiple topics → propose splitting commits:
 
-> Tôi thấy 3 nhóm thay đổi:
-> 1. `src/auth/*` — feature OAuth (5 files)
-> 2. `tests/auth/*` — test cho OAuth (2 files)
+> I see 3 groups of changes:
+> 1. `src/auth/*` — OAuth feature (5 files)
+> 2. `tests/auth/*` — OAuth tests (2 files)
 > 3. `README.md`, `CHANGELOG.md` — docs
 >
-> Đề xuất 2 commits: (1+2 chung), (3 riêng). Bạn đồng ý?
+> Proposing 2 commits: (1+2 together), (3 separately). Agree?
 
-Nếu user không có instruction đặc biệt → 1 commit/PR scope nhỏ thì gộp, lớn thì tách.
+If user has no special instruction → 1 commit for small/focused PRs, split for larger ones.
 
-### Bước 3 — Phân tích diff để chọn type & scope
+### Step 3 — Analyze diff to choose type & scope
 
-Đọc `git diff --staged` chi tiết, suy ra:
+Read `git diff --staged` in detail, infer:
 
-| Type       | Tình huống áp dụng                                        |
+| Type       | When to apply                                             |
 | ---------- | --------------------------------------------------------- |
-| `feat`     | Thêm chức năng người dùng cảm nhận được                   |
-| `fix`      | Sửa bug có ảnh hưởng đến hành vi                          |
-| `refactor` | Sửa code KHÔNG đổi behavior                               |
-| `perf`     | Tối ưu performance                                        |
-| `docs`     | Chỉ docs (`*.md`, comment, docstring)                     |
-| `test`     | Chỉ test                                                  |
-| `style`    | Format, lint (không đổi logic)                            |
-| `build`    | Build system, dependency                                  |
+| `feat`     | Adds user-visible functionality                           |
+| `fix`      | Fixes a bug that affects behavior                         |
+| `refactor` | Code changes that do NOT change behavior                  |
+| `perf`     | Performance optimization                                  |
+| `docs`     | Docs only (`*.md`, comments, docstrings)                  |
+| `test`     | Tests only                                                |
+| `style`    | Formatting, linting (no logic changes)                    |
+| `build`    | Build system, dependencies                                |
 | `ci`       | CI/CD config                                              |
-| `chore`    | Task vặt khác (rename file, dọn comment, update lockfile) |
-| `revert`   | Revert commit                                             |
+| `chore`    | Other miscellaneous tasks (rename files, clean comments, update lockfile) |
+| `revert`   | Revert a commit                                           |
 
-`<scope>` = module/component bị ảnh hưởng (`auth`, `api`, `ui`, `db`, `parser`...). Optional nếu thay đổi rộng.
+`<scope>` = module/component affected (`auth`, `api`, `ui`, `db`, `parser`...). Optional if the change is broad.
 
-### Bước 4 — Soạn message
+### Step 4 — Draft the message
 
 Format:
 ```text
-<type>(<scope>): <mô tả tiếng Việt, ≤72 ký tự, không chấm cuối>
+<type>(<scope>): <Vietnamese description, ≤72 chars, no trailing period>
 
-<body tiếng Việt — giải thích WHY (không phải WHAT). Có thể nhiều đoạn.>
+<Vietnamese body — explains WHY (not WHAT). Can be multiple paragraphs.>
 
-<footer — references issue: Closes #123, Refs #456, BREAKING CHANGE: ...>
+<footer — issue references: Closes #123, Refs #456, BREAKING CHANGE: ...>
 ```
 
-**Ví dụ commit nhỏ**:
+**Small commit example**:
 ```text
-fix(api): trả về 404 khi user không tồn tại thay vì 500
+fix(api): return 404 when user does not exist instead of 500
 
-Trước đây service throw NoSuchKey khi gọi getUser với id không
-tồn tại, controller bắt thành 500. Đổi thành ném UserNotFoundError
-được catch trong middleware → trả 404.
+Previously the service threw NoSuchKey when calling getUser with a
+non-existent id; the controller caught it as 500. Changed to throw
+UserNotFoundError caught in middleware → returns 404.
 
 Closes #218
 ```
 
-**Ví dụ commit feature**:
+**Feature commit example**:
 ```text
-feat(auth): thêm đăng nhập bằng Google OAuth 2.0
+feat(auth): add Google OAuth 2.0 login
 
-Tích hợp passport-google-oauth20:
-- Endpoint mới: GET /auth/google, GET /auth/google/callback
-- User được tạo tự động lần đầu login (lookup theo email)
-- Avatar đồng bộ từ Google profile
+Integrated passport-google-oauth20:
+- New endpoints: GET /auth/google, GET /auth/google/callback
+- User is auto-created on first login (lookup by email)
+- Avatar synced from Google profile
 
-Cần thêm GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET vào .env.
+Requires GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET in .env.
 
 Closes #142
 ```
 
-**Ví dụ breaking change**:
+**Breaking change example**:
 ```text
-refactor(api)!: đổi format response /users từ array sang paginated
+refactor(api)!: change /users response format from array to paginated
 
-BREAKING CHANGE: GET /users trước trả về array users, giờ trả
-{ items, total, page, pageSize }. Frontend cần cập nhật.
+BREAKING CHANGE: GET /users previously returned an array of users,
+now returns { items, total, page, pageSize }. Frontend needs updating.
 
-Lý do: client gặp OOM khi user >10k. Pagination giúp ổn định.
+Reason: client hit OOM with >10k users. Pagination stabilizes memory.
 
 Refs #305
 ```
 
-### Bước 5 — Xác nhận và commit
+### Step 5 — Confirm and commit
 
-In message ra cho user **xác nhận** trước:
+Print the message for user **confirmation** first:
 
 ```text
-Tôi sẽ commit với message:
+I will commit with this message:
 
-[message ở đây]
+[message here]
 
-OK chứ?
+OK?
 ```
 
-Nếu OK → chạy (Claude tự generate command thực với value cụ thể):
+If OK → run (Claude generates the actual command with specific values):
 
-**Cho message ngắn, ASCII (1 dòng):**
+**For short, ASCII messages (1 line):**
 ```bash
-git add <files cụ thể>
+git add <specific files>
 git commit -m "<subject>"
 ```
 
-**Cho message multiline hoặc có Unicode (tiếng Việt, emoji)**, dùng `-F` file để tránh lỗi encoding (đặc biệt trên Windows + PowerShell):
+**For multiline messages or those containing Unicode (Vietnamese, emoji)**, use `-F` file to avoid encoding errors (especially on Windows + PowerShell):
 ```bash
-git add <files cụ thể>
-# Tạo file message tạm — Linux/macOS/Git Bash dùng /tmp/, Windows PowerShell dùng $env:TEMP\
+git add <specific files>
+# Create a temporary message file — Linux/macOS/Git Bash use /tmp/, Windows PowerShell use $env:TEMP\
 cat > /tmp/commit-msg.txt <<'EOF'
 <subject>
 
@@ -139,49 +139,49 @@ git commit -F /tmp/commit-msg.txt
 rm /tmp/commit-msg.txt
 ```
 
-> **Lưu ý OS**:
-> - Trên Git Bash (Windows) `/tmp/` map tới `%TEMP%` (thường là `C:\Users\<user>\AppData\Local\Temp\`) — thư mục này đã tồn tại sẵn, không cần tạo.
-> - Trên PowerShell native (không có Git Bash) dùng `$env:TEMP\commit-msg.txt` thay `/tmp/...`.
-> - `git commit -m "subj" -m "body"` qua PowerShell here-string có thể garbled Unicode. Dùng `-F` an toàn cross-platform.
+> **OS note**:
+> - On Git Bash (Windows) `/tmp/` maps to `%TEMP%` (usually `C:\Users\<user>\AppData\Local\Temp\`) — this directory already exists, no need to create it.
+> - On native PowerShell (without Git Bash) use `$env:TEMP\commit-msg.txt` instead of `/tmp/...`.
+> - `git commit -m "subj" -m "body"` via PowerShell here-string may garble Unicode. Using `-F` is safe cross-platform.
 
-## Quy tắc bắt buộc
+## Mandatory rules
 
-- **KHÔNG `git add .`** — chỉ add file đã review.
-- **KHÔNG thêm `Co-Authored-By: Claude`** hay tagline `🤖 Generated with Claude Code` (đã tắt qua settings).
-- **KHÔNG commit** nếu lint/test/typecheck fail. Exception chỉ áp dụng khi user explicit nêu 1 trong các lý do: (1) WIP commit trên branch cá nhân (chưa tới CI), (2) test fail do infrastructure (DB down, network), (3) commit để bisect/debug. Lý do "đang vội" / "fix sau" → KHÔNG đủ, hỏi lại.
-- **KHÔNG `--no-verify`** trừ khi user yêu cầu.
-- **KHÔNG `--amend`** commit của người khác.
-- **KHÔNG commit secret** — quét diff tìm pattern: chuỗi 32+ hex, JWT, AWS key, Bearer, Basic auth.
-- File mới có vẻ là binary lớn (>1MB) → cảnh báo trước khi add.
+- **NO `git add .`** — only add files that have been reviewed.
+- **NO `Co-Authored-By: Claude`** or `🤖 Generated with Claude Code` tagline (disabled via settings).
+- **NO commit** if lint/test/typecheck fails. Exception only when user explicitly states one of: (1) WIP commit on personal branch (not yet in CI), (2) test failure due to infrastructure (DB down, network), (3) commit for bisect/debug. "In a hurry" / "fix later" → NOT sufficient, ask again.
+- **NO `--no-verify`** unless user explicitly requests it.
+- **NO `--amend`** on someone else's commit.
+- **NO committing secrets** — scan diff for patterns: 32+ hex strings, JWT, AWS key, Bearer, Basic auth.
+- New file that looks like a large binary (>1MB) → warn before adding.
 
-## Khi không chắc
+## When uncertain
 
-- Subject không quá 72 ký tự nhưng vẫn rõ → ưu tiên rõ.
-- Không chắc type giữa `feat` vs `fix` → nghĩ "Hành vi user thấy có khác trước không?". Có → `feat`/`fix`. Không → `refactor`/`chore`.
-- Không chắc scope → bỏ scope.
+- Subject under 72 chars but still clear → prioritize clarity.
+- Unsure between `feat` vs `fix` → think "Does the user-visible behavior differ from before?". Yes → `feat`/`fix`. No → `refactor`/`chore`.
+- Unsure about scope → omit scope.
 
-## Chế độ mở rộng
+## Extended modes
 
-### `/commit push-pr` — Commit + Push + Tạo PR
+### `/commit push-pr` — Commit + Push + Create PR
 
-Khi `$ARGUMENTS` chứa `push-pr` hoặc `push pr`:
+When `$ARGUMENTS` contains `push-pr` or `push pr`:
 
-1. Chạy Bước 1→5 như trên (commit bình thường).
-2. Nếu đang ở `main`/`master`/`develop` → tạo branch mới trước: `git checkout -b <type>/<scope>-<short-desc>`.
+1. Run Steps 1→5 as above (normal commit).
+2. If on `main`/`master`/`develop` → create a new branch first: `git checkout -b <type>/<scope>-<short-desc>`.
 3. `git push -u origin HEAD`.
-4. Tạo PR bằng `gh pr create --fill` (yêu cầu GitHub CLI). Nếu `gh` không có → hướng dẫn cài + dừng.
-5. Hiển thị PR URL cho user.
+4. Create PR with `gh pr create --fill` (requires GitHub CLI). If `gh` is absent → provide install instructions + stop.
+5. Display PR URL to user.
 
-### `/commit clean` — Dọn branch stale
+### `/commit clean` — Clean stale branches
 
-Khi `$ARGUMENTS` chứa `clean` hoặc `clean-gone`:
+When `$ARGUMENTS` contains `clean` or `clean-gone`:
 
 1. `git fetch --prune`
-2. Tìm branch có upstream `[gone]`: `git branch -vv | grep ': gone]'`
-3. Nếu branch linked với worktree → `git worktree remove <path>` trước.
-4. Liệt kê branch sẽ xóa, **hỏi user xác nhận**.
-5. `git branch -d <branch>` cho từng branch (dùng `-d` không dùng `-D` — an toàn hơn, fail nếu chưa merge).
+2. Find branches with `[gone]` upstream: `git branch -vv | grep ': gone]'`
+3. If branch is linked to a worktree → `git worktree remove <path>` first.
+4. List branches to be deleted, **ask user for confirmation**.
+5. `git branch -d <branch>` for each branch (use `-d` not `-D` — safer, fails if unmerged).
 
 ## $ARGUMENTS
 
-Nếu user đưa argument (ví dụ `/commit gộp tất cả thành 1 commit duy nhất`), tuân theo. Mặc định: tự đề xuất grouping.
+If user provides an argument (e.g., `/commit combine everything into 1 commit`), follow it. Default: auto-propose grouping.
