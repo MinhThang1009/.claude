@@ -97,8 +97,10 @@ jobs:
           python-version: '3.x'
       - name: Install ruff
         run: pip install --quiet ruff
-      - name: Lint hooks/
-        run: ruff check hooks/
+      - name: Lint hooks/ and scripts/
+        run: ruff check hooks/ scripts/
+      - name: Format check hooks/ and scripts/
+        run: ruff format --check hooks/ scripts/
 
   python-tests:
     name: Python tests (${{ matrix.os }}, py${{ matrix.python-version }})
@@ -181,8 +183,11 @@ jobs:
         run: python scripts/validate-marketplace.py
 
   symlinks-test:
-    name: Test create-symlinks.sh (Ubuntu)
-    runs-on: ubuntu-latest
+    name: Test create-symlinks.sh (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
     steps:
       - uses: actions/checkout@v6
       - name: Run create-symlinks.sh
