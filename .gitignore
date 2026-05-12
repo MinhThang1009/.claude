@@ -38,6 +38,7 @@ projects/
 file-history/
 sessions/
 session-env/
+.claude/
 
 # Auto-generated
 policy-limits.json
