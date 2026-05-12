@@ -9,7 +9,16 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
-EXCLUDE_DIRS = {".git", ".pytest_cache", "node_modules", "__pycache__", "dist", "build"}
+EXCLUDE_DIRS = {
+    ".git",
+    ".pytest_cache",
+    "node_modules",
+    "__pycache__",
+    "dist",
+    "build",
+    # plugins/ chứa official Anthropic files với internal links trỏ đến files không có trong repo
+    "plugins",
+}
 
 
 def _collect_md_files() -> list[Path]:

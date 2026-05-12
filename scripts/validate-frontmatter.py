@@ -30,6 +30,8 @@ SCHEMAS = {
         "allowed": {
             "name",
             "description",
+            "license",
+            "tools",
             "version",
             "when_to_use",
             "argument-hint",
@@ -101,10 +103,30 @@ def parse_frontmatter(path: Path):
         return None, "missing closing '---'"
 
     fm_text = "\n".join(lines[1:end])
+    # Một số official files có description chứa literal \n và colon-space (vd "Context: ...")
+    # → quote description line trước khi parse để tránh YAML hiểu nhầm thành mapping
+    import re as _re
+
+    def _quote_if_needed(m: "_re.Match[str]") -> str:
+        val = m.group(2)
+        # Skip nếu đã quoted hoặc là block scalar indicator
+        if val and val[0] in ('"', "'", "|", ">"):
+            return m.group(0)
+        return m.group(1) + '"' + val.replace('"', '\\"') + '"'
+
+    fm_text_safe = _re.sub(
+        r"^(description:\s*)(.*)$",
+        _quote_if_needed,
+        fm_text,
+        flags=_re.MULTILINE,
+    )
     try:
-        fm = yaml.safe_load(fm_text)
-    except yaml.YAMLError as e:
-        return None, f"YAML parse error: {e}"
+        fm = yaml.safe_load(fm_text_safe)
+    except yaml.YAMLError:
+        try:
+            fm = yaml.safe_load(fm_text)
+        except yaml.YAMLError as e:
+            return None, f"YAML parse error: {e}"
 
     if not isinstance(fm, dict):
         return None, "frontmatter must be a YAML mapping (got %s)" % type(fm).__name__
