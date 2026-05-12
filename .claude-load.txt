@@ -47,3 +47,8 @@ claude-md-management
 # webapp-testing           # Test web apps với Playwright
 # web-artifacts-builder    # Build HTML artifacts (React, Tailwind)
 # session-report           # Generate session reports
+# code-review              # Standalone PR code review command
+# docx                     # Word document creation/editing
+# pdf                      # PDF manipulation
+# pptx                     # PowerPoint creation/editing
+# xlsx                     # Spreadsheet creation/editing
