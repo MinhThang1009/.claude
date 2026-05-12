@@ -95,7 +95,7 @@ Viết JSON file với cấu trúc này:
 ```json
 {
   "winner": "A",
-  "reasoning": "Output A cung cấp giải pháp hoàn chỉnh với formatting đúng và tất cả required fields. Output B thiếu date field và có formatting inconsistencies.",
+  "reasoning": "Output A provides a complete solution with proper formatting and all required fields. Output B is missing the date field and has formatting inconsistencies.",
   "rubric": {
     "A": {
       "content": {
@@ -131,13 +131,13 @@ Viết JSON file với cấu trúc này:
   "output_quality": {
     "A": {
       "score": 9,
-      "strengths": ["Giải pháp hoàn chỉnh", "Format đẹp", "Tất cả fields có đủ"],
-      "weaknesses": ["Minor style inconsistency trong header"]
+      "strengths": ["Complete solution", "Well-formatted", "All fields present"],
+      "weaknesses": ["Minor style inconsistency in header"]
     },
     "B": {
       "score": 5,
-      "strengths": ["Output dễ đọc", "Cấu trúc cơ bản đúng"],
-      "weaknesses": ["Thiếu date field", "Formatting inconsistencies", "Partial data extraction"]
+      "strengths": ["Readable output", "Correct basic structure"],
+      "weaknesses": ["Missing date field", "Formatting inconsistencies", "Partial data extraction"]
     }
   },
   "expectation_results": {

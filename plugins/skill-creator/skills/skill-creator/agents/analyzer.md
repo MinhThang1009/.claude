@@ -98,31 +98,31 @@ Viết JSON file với cấu trúc này:
     "winner": "A",
     "winner_skill": "path/to/winner/skill",
     "loser_skill": "path/to/loser/skill",
-    "comparator_reasoning": "Tóm tắt ngắn lý do comparator chọn bên thắng"
+    "comparator_reasoning": "Brief summary of why comparator chose winner"
   },
   "winner_strengths": [
-    "Instructions step-by-step rõ ràng cho xử lý multi-page documents",
-    "Bao gồm validation script phát hiện formatting errors",
-    "Hướng dẫn rõ ràng về fallback behavior khi OCR fail"
+    "Clear step-by-step instructions for handling multi-page documents",
+    "Included validation script that caught formatting errors",
+    "Explicit guidance on fallback behavior when OCR fails"
   ],
   "loser_weaknesses": [
-    "Instruction mơ hồ 'process the document appropriately' dẫn đến behavior không nhất quán",
-    "Không có script validation, agent phải improvise và mắc lỗi",
-    "Không có hướng dẫn khi OCR fail, agent từ bỏ thay vì thử alternatives"
+    "Vague instruction 'process the document appropriately' led to inconsistent behavior",
+    "No script for validation, agent had to improvise and made errors",
+    "No guidance on OCR failure, agent gave up instead of trying alternatives"
   ],
   "instruction_following": {
     "winner": {
       "score": 9,
       "issues": [
-        "Minor: bỏ qua optional logging step"
+        "Minor: skipped optional logging step"
       ]
     },
     "loser": {
       "score": 6,
       "issues": [
-        "Không dùng formatting template của skill",
-        "Tự phát minh cách tiếp cận thay vì làm theo bước 3",
-        "Bỏ lỡ instruction 'always validate output'"
+        "Did not use the skill's formatting template",
+        "Invented own approach instead of following step 3",
+        "Missed the 'always validate output' instruction"
       ]
     }
   },
@@ -130,25 +130,25 @@ Viết JSON file với cấu trúc này:
     {
       "priority": "high",
       "category": "instructions",
-      "suggestion": "Thay 'process the document appropriately' bằng các bước rõ ràng: 1) Extract text, 2) Identify sections, 3) Format theo template",
-      "expected_impact": "Sẽ loại bỏ sự mơ hồ gây ra behavior không nhất quán"
+      "suggestion": "Replace 'process the document appropriately' with explicit steps: 1) Extract text, 2) Identify sections, 3) Format per template",
+      "expected_impact": "Would eliminate ambiguity that caused inconsistent behavior"
     },
     {
       "priority": "high",
       "category": "tools",
-      "suggestion": "Thêm script validate_output.py tương tự cách tiếp cận validation của winner skill",
-      "expected_impact": "Sẽ bắt được formatting errors trước final output"
+      "suggestion": "Add validate_output.py script similar to winner skill's validation approach",
+      "expected_impact": "Would catch formatting errors before final output"
     },
     {
       "priority": "medium",
       "category": "error_handling",
-      "suggestion": "Thêm fallback instructions: 'Nếu OCR fail, thử: 1) độ phân giải khác, 2) image preprocessing, 3) manual extraction'",
-      "expected_impact": "Sẽ ngăn early failure trên documents khó"
+      "suggestion": "Add fallback instructions: 'If OCR fails, try: 1) different resolution, 2) image preprocessing, 3) manual extraction'",
+      "expected_impact": "Would prevent early failure on difficult documents"
     }
   ],
   "transcript_insights": {
-    "winner_execution_pattern": "Đọc skill -> Làm theo quy trình 5 bước -> Dùng validation script -> Sửa 2 vấn đề -> Tạo output",
-    "loser_execution_pattern": "Đọc skill -> Không rõ cách tiếp cận -> Thử 3 methods khác nhau -> Không validation -> Output có lỗi"
+    "winner_execution_pattern": "Read skill -> Followed 5-step process -> Used validation script -> Fixed 2 issues -> Produced output",
+    "loser_execution_pattern": "Read skill -> Unclear on approach -> Tried 3 different methods -> No validation -> Output had errors"
   }
 }
 ```
@@ -239,12 +239,12 @@ Viết freeform observations dưới dạng list of strings. Mỗi note phải:
 - Giúp user hiểu điều gì mà aggregate metrics không hiển thị
 
 Ví dụ:
-- "Assertion 'Output is a PDF file' pass 100% trong cả hai configurations - có thể không phân biệt giá trị skill"
-- "Eval 3 cho thấy variance cao (50% ± 40%) - run 2 có failure bất thường có thể là flaky"
-- "Without-skill runs nhất quán fail trên table extraction expectations (0% pass rate)"
-- "Skill thêm 13s average execution time nhưng cải thiện pass rate 50%"
-- "Token usage cao hơn 80% với skill, chủ yếu do script output parsing"
-- "Cả 3 without-skill runs cho eval 1 đều tạo ra empty output"
+- "Assertion 'Output is a PDF file' passes 100% in both configurations - may not differentiate skill value"
+- "Eval 3 shows high variance (50% ± 40%) - run 2 had an unusual failure that may be flaky"
+- "Without-skill runs consistently fail on table extraction expectations (0% pass rate)"
+- "Skill adds 13s average execution time but improves pass rate by 50%"
+- "Token usage is 80% higher with skill, primarily due to script output parsing"
+- "All 3 without-skill runs for eval 1 produced empty output"
 
 ### Bước 6: Ghi Notes
 
@@ -252,10 +252,10 @@ Lưu notes vào `{output_path}` dạng JSON array of strings:
 
 ```json
 [
-  "Assertion 'Output is a PDF file' pass 100% trong cả hai configurations - có thể không phân biệt giá trị skill",
-  "Eval 3 cho thấy variance cao (50% ± 40%) - run 2 có failure bất thường",
-  "Without-skill runs nhất quán fail trên table extraction expectations",
-  "Skill thêm 13s average execution time nhưng cải thiện pass rate 50%"
+  "Assertion 'Output is a PDF file' passes 100% in both configurations - may not differentiate skill value",
+  "Eval 3 shows high variance (50% ± 40%) - run 2 had an unusual failure",
+  "Without-skill runs consistently fail on table extraction expectations",
+  "Skill adds 13s average execution time but improves pass rate by 50%"
 ]
 ```
 

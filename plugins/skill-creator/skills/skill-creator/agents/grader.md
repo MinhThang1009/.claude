@@ -113,17 +113,17 @@ Viết JSON file với cấu trúc này:
     {
       "text": "Output includes the name 'John Smith'",
       "passed": true,
-      "evidence": "Tìm thấy trong transcript Bước 3: 'Extracted names: John Smith, Sarah Johnson'"
+      "evidence": "Found in transcript Step 3: 'Extracted names: John Smith, Sarah Johnson'"
     },
     {
       "text": "The spreadsheet has a SUM formula in cell B10",
       "passed": false,
-      "evidence": "Không có spreadsheet nào được tạo. Output là text file."
+      "evidence": "No spreadsheet was created. The output was a text file."
     },
     {
       "text": "The assistant used the skill's OCR script",
       "passed": true,
-      "evidence": "Transcript Bước 2 cho thấy: 'Tool: Bash - python ocr_script.py image.png'"
+      "evidence": "Transcript Step 2 shows: 'Tool: Bash - python ocr_script.py image.png'"
     }
   ],
   "summary": {
@@ -151,34 +151,34 @@ Viết JSON file với cấu trúc này:
   },
   "claims": [
     {
-      "claim": "Form có 12 fillable fields",
+      "claim": "The form has 12 fillable fields",
       "type": "factual",
       "verified": true,
-      "evidence": "Đếm được 12 fields trong field_info.json"
+      "evidence": "Counted 12 fields in field_info.json"
     },
     {
-      "claim": "Tất cả required fields được điền",
+      "claim": "All required fields were populated",
       "type": "quality",
       "verified": false,
-      "evidence": "Reference section bị để trống dù data có sẵn"
+      "evidence": "Reference section was left blank despite data being available"
     }
   ],
   "user_notes_summary": {
-    "uncertainties": ["Dùng data 2023, có thể outdated"],
+    "uncertainties": ["Used 2023 data, may be stale"],
     "needs_review": [],
-    "workarounds": ["Dùng text overlay cho non-fillable fields vì không điền được trực tiếp"]
+    "workarounds": ["Fell back to text overlay for non-fillable fields"]
   },
   "eval_feedback": {
     "suggestions": [
       {
-        "assertion": "Output includes the name 'John Smith'",
-        "reason": "Document bịa đặt đề cập tên này cũng sẽ pass — hãy xem xét kiểm tra nó xuất hiện như primary contact với matching phone và email từ input"
+        "assertion": "The output includes the name 'John Smith'",
+        "reason": "A hallucinated document that mentions the name would also pass — consider checking it appears as the primary contact with matching phone and email from the input"
       },
       {
-        "reason": "Không có assertion nào kiểm tra phone numbers extracted có khớp với input không — tôi quan sát thấy số không đúng trong output mà không bị bắt"
+        "reason": "No assertion checks whether the extracted phone numbers match the input — I observed incorrect numbers in the output that went uncaught"
       }
     ],
-    "overall": "Assertions kiểm tra sự hiện diện nhưng không kiểm tra correctness. Hãy xem xét thêm content verification."
+    "overall": "Assertions check presence but not correctness. Consider adding content verification."
   }
 }
 ```

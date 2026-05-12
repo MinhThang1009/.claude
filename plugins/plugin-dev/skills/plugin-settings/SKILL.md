@@ -231,7 +231,7 @@ AGENT_NAME=$(echo "$FRONTMATTER" | grep '^agent_name:' | sed 's/agent_name: *//'
 COORDINATOR=$(echo "$FRONTMATTER" | grep '^coordinator_session:' | sed 's/coordinator_session: *//')
 
 # Gửi notification đến coordinator
-tmux send-keys -t "$COORDINATOR" "Agent $AGENT_NAME đã hoàn thành task" Enter
+tmux send-keys -t "$COORDINATOR" "Agent $AGENT_NAME completed task" Enter
 ```
 
 ### Pattern 3: Configuration-Driven Behavior
@@ -359,7 +359,7 @@ MAX=$(echo "$FRONTMATTER" | grep '^max_value:' | sed 's/max_value: *//')
 
 # Validate numeric range
 if ! [[ "$MAX" =~ ^[0-9]+$ ]] || [[ $MAX -lt 1 ]] || [[ $MAX -gt 100 ]]; then
-  echo "Giá trị max_value trong settings không hợp lệ (phải 1-100)" >&2
+  echo "⚠️  Invalid max_value in settings (must be 1-100)" >&2
   MAX=10  # Dùng default
 fi
 ```
@@ -409,7 +409,7 @@ FILE_PATH=$(echo "$FRONTMATTER" | grep '^data_file:' | sed 's/data_file: *//')
 
 # Kiểm tra path traversal
 if [[ "$FILE_PATH" == *".."* ]]; then
-  echo "Path trong settings không hợp lệ (path traversal)" >&2
+  echo "⚠️  Invalid path in settings (path traversal)" >&2
   exit 2
 fi
 ```
@@ -434,7 +434,7 @@ pr_number: 1234
 coordinator_session: team-leader
 enabled: true
 dependencies: ["Task 3.4"]
-additional_instructions: Dùng JWT tokens, không dùng sessions
+additional_instructions: Use JWT tokens, not sessions
 ---
 
 # Task: Implement Authentication
