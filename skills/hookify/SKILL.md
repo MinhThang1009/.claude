@@ -16,12 +16,8 @@ Tạo rule files ngăn Claude thực hiện hành vi không mong muốn — khô
 - Scan thêm 10-15 message gần nhất để tìm context/ví dụ.
 
 **Nếu `$ARGUMENTS` trống:**
-- Dispatch subagent phân tích conversation (focus **20-30 message** gần nhất):
-  - Tìm corrections ("don't do X", "stop doing Y")
-  - Tìm reversions (user sửa lại action của Claude)
-  - Tìm frustrated reactions ("tại sao lại...", "không phải thế")
-  - Tìm repeated issues (cùng vấn đề nhiều lần)
-- Mỗi issue: tool nào, pattern gì, tại sao có vấn đề, severity (high/medium/low).
+- Dispatch `conversation-analyzer` agent phân tích transcript (focus **20-30 message** gần nhất).
+- Agent trả về structured findings: issue, tool, pattern, severity (high/medium/low), suggested rule.
 
 ## Bước 2: Hỏi user xác nhận
 
