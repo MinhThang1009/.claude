@@ -28,13 +28,13 @@ foreach ($f in $files) {
     Write-Host "OK file: $f"
 }
 
-# --- agents/: collect từ plugins/*/agents/*.md → flat symlinks ---
+# --- agents/: collect từ plugins/**/agents/*.md → flat symlinks (recursive) ---
 $agentsDir = "$dst\agents"
 $a = Get-Item $agentsDir -ErrorAction SilentlyContinue
 if ($a) { $a.Delete() }
 New-Item -ItemType Directory -Force $agentsDir | Out-Null
-Get-ChildItem "$src\plugins" -Directory | ForEach-Object {
-    $d = "$($_.FullName)\agents"
+Get-ChildItem "$src\plugins" -Recurse -Filter "agents" -Directory | ForEach-Object {
+    $d = $_.FullName
     if (Test-Path $d) {
         Get-ChildItem $d -Filter "*.md" | ForEach-Object {
             $link = "$agentsDir\$($_.Name)"

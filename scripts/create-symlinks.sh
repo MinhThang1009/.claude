@@ -22,13 +22,13 @@ for f in CLAUDE.md README.md; do
     echo "OK file: $f"
 done
 
-# --- agents/: collect từ plugins/*/agents/*.md → flat symlinks ---
+# --- agents/: collect từ plugins/**/agents/*.md → flat symlinks (recursive) ---
 rm -rf "$DST/agents"
 mkdir -p "$DST/agents"
-for agent in "$SRC"/plugins/*/agents/*.md; do
+while IFS= read -r agent; do
     [ -f "$agent" ] || continue
     ln -s "$agent" "$DST/agents/$(basename "$agent")"
-done
+done < <(find "$SRC/plugins" -path "*/agents/*.md")
 echo "OK agents: $(ls "$DST/agents" | wc -l | tr -d ' ') files"
 
 # --- skills/: collect từ plugins/*/skills/*/ → flat dir symlinks ---
