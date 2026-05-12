@@ -109,6 +109,62 @@
       "author": { "name": "Minh Thang" },
       "source": "./plugins/claude-md-management",
       "category": "productivity"
+    },
+    {
+      "name": "claude-code-setup",
+      "description": "Analyze a codebase and recommend Claude Code automations (hooks, subagents, skills, plugins, MCP servers)",
+      "author": { "name": "Minh Thang" },
+      "source": "./plugins/claude-code-setup",
+      "category": "productivity"
+    },
+    {
+      "name": "mcp-server-dev",
+      "description": "Build high-quality MCP servers: remote HTTP, MCPB bundles, and MCP apps with UI widgets",
+      "author": { "name": "Minh Thang" },
+      "source": "./plugins/mcp-server-dev",
+      "category": "development"
+    },
+    {
+      "name": "mcp-builder",
+      "description": "Build high-quality MCP servers using FastMCP or the MCP SDK",
+      "author": { "name": "Minh Thang" },
+      "source": "./plugins/mcp-builder",
+      "category": "development"
+    },
+    {
+      "name": "skill-creator",
+      "description": "Create new skills, modify and improve existing skills, and measure skill performance",
+      "author": { "name": "Minh Thang" },
+      "source": "./plugins/skill-creator",
+      "category": "development"
+    },
+    {
+      "name": "claude-api",
+      "description": "Build, debug, and optimize Claude API and Anthropic SDK applications",
+      "author": { "name": "Minh Thang" },
+      "source": "./plugins/claude-api",
+      "category": "development"
+    },
+    {
+      "name": "webapp-testing",
+      "description": "Test local web applications with Playwright, taking screenshots, checking console logs, and automating browser interactions",
+      "author": { "name": "Minh Thang" },
+      "source": "./plugins/webapp-testing",
+      "category": "development"
+    },
+    {
+      "name": "web-artifacts-builder",
+      "description": "Build complex HTML artifacts (React, Tailwind, shadcn/ui) with state management for inline rendering in Claude",
+      "author": { "name": "Minh Thang" },
+      "source": "./plugins/web-artifacts-builder",
+      "category": "design"
+    },
+    {
+      "name": "session-report",
+      "description": "Generates a visual HTML report summarizing Claude Code session activity, time spent, and key decisions",
+      "author": { "name": "Minh Thang" },
+      "source": "./plugins/session-report",
+      "category": "productivity"
     }
   ]
 }

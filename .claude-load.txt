@@ -34,7 +34,8 @@ frontend-design:skills
 claude-md-management
 
 # === OPTIONAL: bỏ comment để enable ===
-# mcp-server-dev           # Build MCP servers
+# mcp-server-dev           # Build MCP servers (remote HTTP, MCPB, UI widgets)
+# mcp-builder              # Build MCP servers (FastMCP/SDK)
 # plugin-dev               # Phát triển Claude Code plugins
 # skill-creator            # Tạo/eval skills
 # code-modernization       # Migrate legacy code
@@ -42,3 +43,7 @@ claude-md-management
 # performance              # profiling + dependency audit
 # claude-code-setup        # Recommend automations
 # test-toolkit             # test-writer, test-analyzer
+# claude-api               # Claude API/SDK development
+# webapp-testing           # Test web apps với Playwright
+# web-artifacts-builder    # Build HTML artifacts (React, Tailwind)
+# session-report           # Generate session reports
