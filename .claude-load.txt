@@ -1,26 +1,44 @@
 # Cấu hình plugins cần load vào ~/.claude/
-# Mỗi dòng = 1 plugin name (tên thư mục trong plugins/)
-# Dòng bắt đầu bằng # là comment, bị bỏ qua
-# Nếu file này trống hoặc không có → load TẤT CẢ plugins
+# Format:
+#   plugin-name          → load tất cả (agents + skills + commands)
+#   plugin-name:agents   → chỉ load agents
+#   plugin-name:skills   → chỉ load skills
+#   plugin-name:commands → chỉ load commands
+# Dòng bắt đầu bằng # là comment. Nếu file trống → load TẤT CẢ.
 
-# === CORE: dùng hàng ngày ===
-pr-review-toolkit
+# === AGENTS từ pr-review-toolkit (không cần skills vì đã có commands) ===
+pr-review-toolkit:agents
+pr-review-toolkit:commands
+
+# === FEATURE DEV ===
 feature-dev
+
+# === GIT WORKFLOW ===
 commit-commands
+
+# === DEBUG ===
 debug
-security-guidance
+
+# === SECURITY ===
+security-guidance:agents
+
+# === HOOKS ===
 hookify
-session
-code-simplifier
-frontend-design
+
+# === SESSION MANAGEMENT ===
+session:skills
+
+# === CODE QUALITY ===
+code-simplifier:skills
+frontend-design:skills
 claude-md-management
 
 # === OPTIONAL: bỏ comment để enable ===
-# mcp-server-dev       # Chỉ khi build MCP servers
-# plugin-dev           # Chỉ khi phát triển Claude Code plugins
-# skill-creator        # Chỉ khi tạo/eval skills
-# code-modernization   # Chỉ khi migrate legacy code
-# documentation        # Agents cho viết docs, Next.js
-# performance          # Agents cho profiling/dependency audit
-# claude-code-setup    # Phân tích codebase, recommend automations
-# test-toolkit         # test-writer, test-analyzer (pr-test-analyzer đã cover PR)
+# mcp-server-dev           # Build MCP servers
+# plugin-dev               # Phát triển Claude Code plugins
+# skill-creator            # Tạo/eval skills
+# code-modernization       # Migrate legacy code
+# documentation            # docs + Next.js agents
+# performance              # profiling + dependency audit
+# claude-code-setup        # Recommend automations
+# test-toolkit             # test-writer, test-analyzer

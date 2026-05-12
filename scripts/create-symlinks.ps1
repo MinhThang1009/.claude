@@ -7,24 +7,34 @@ Write-Host "Source: $src"
 Write-Host "Target: $dst"
 New-Item -ItemType Directory -Force $dst | Out-Null
 
-# --- Đọc .claude-load.txt để lọc plugins ---
+# --- Parse .claude-load.txt ---
+# Format: "plugin" | "plugin:agents" | "plugin:skills" | "plugin:commands"
 $loadFile = "$src\.claude-load.txt"
-$loadedPlugins = $null
+# loadMap: plugin -> set of types ("agents","skills","commands","all")
+$loadMap = @{}
+
 if (Test-Path $loadFile) {
-    $loadedPlugins = Get-Content $loadFile |
-        Where-Object { $_ -notmatch '^\s*#' -and $_ -match '\S' } |
-        ForEach-Object { $_.Trim() }
-    if ($loadedPlugins.Count -gt 0) {
-        Write-Host "Loading plugins: $($loadedPlugins -join ', ')"
-    } else {
-        $loadedPlugins = $null
+    Get-Content $loadFile | Where-Object { $_ -notmatch '^\s*#' -and $_ -match '\S' } | ForEach-Object {
+        $line = $_.Trim()
+        if ($line -match '^(.+):(.+)$') {
+            $plugin = $matches[1].Trim(); $type = $matches[2].Trim()
+            if (-not $loadMap.ContainsKey($plugin)) { $loadMap[$plugin] = @() }
+            $loadMap[$plugin] += $type
+        } else {
+            $loadMap[$line] = @("all")
+        }
     }
 }
-if (-not $loadedPlugins) { Write-Host "Loading ALL plugins" }
 
-function Should-Load($pluginName) {
-    if (-not $loadedPlugins) { return $true }
-    return $loadedPlugins -contains $pluginName
+$loadAll = $loadMap.Count -eq 0
+if ($loadAll) { Write-Host "Loading ALL plugins" }
+else { Write-Host "Load config: $($loadMap.Keys -join ', ')" }
+
+function Should-Load-Type($plugin, $type) {
+    if ($loadAll) { return $true }
+    if (-not $loadMap.ContainsKey($plugin)) { return $false }
+    $types = $loadMap[$plugin]
+    return ($types -contains "all") -or ($types -contains $type)
 }
 
 # --- Dirs symlinked as whole ---
@@ -48,45 +58,42 @@ foreach ($f in $files) {
     Write-Host "OK file: $f"
 }
 
-# --- agents/: collect từ plugins/**/agents/*.md → flat symlinks (recursive) ---
+# --- agents/ ---
 $agentsDir = "$dst\agents"
 if (Test-Path $agentsDir) { Remove-Item $agentsDir -Recurse -Force }
 New-Item -ItemType Directory -Force $agentsDir | Out-Null
-Get-ChildItem "$src\plugins" -Directory | Where-Object { Should-Load $_.Name } | ForEach-Object {
+Get-ChildItem "$src\plugins" -Directory | Where-Object { Should-Load-Type $_.Name "agents" } | ForEach-Object {
     Get-ChildItem $_.FullName -Recurse -Filter "agents" -Directory | ForEach-Object {
         Get-ChildItem $_.FullName -Filter "*.md" | ForEach-Object {
-            $link = "$agentsDir\$($_.Name)"
-            & cmd.exe /c "mklink `"$link`" `"$($_.FullName)`"" | Out-Null
+            & cmd.exe /c "mklink `"$agentsDir\$($_.Name)`" `"$($_.FullName)`"" | Out-Null
         }
     }
 }
 Write-Host "OK agents: $((Get-ChildItem $agentsDir).Count) files"
 
-# --- skills/: collect từ plugins/*/skills/*/ → flat dir symlinks ---
+# --- skills/ ---
 $skillsDir = "$dst\skills"
 if (Test-Path $skillsDir) { Remove-Item $skillsDir -Recurse -Force }
 New-Item -ItemType Directory -Force $skillsDir | Out-Null
-Get-ChildItem "$src\plugins" -Directory | Where-Object { Should-Load $_.Name } | ForEach-Object {
+Get-ChildItem "$src\plugins" -Directory | Where-Object { Should-Load-Type $_.Name "skills" } | ForEach-Object {
     $d = "$($_.FullName)\skills"
     if (Test-Path $d) {
         Get-ChildItem $d -Directory | ForEach-Object {
-            $link = "$skillsDir\$($_.Name)"
-            & cmd.exe /c "mklink /D `"$link`" `"$($_.FullName)`"" | Out-Null
+            & cmd.exe /c "mklink /D `"$skillsDir\$($_.Name)`" `"$($_.FullName)`"" | Out-Null
         }
     }
 }
 Write-Host "OK skills: $((Get-ChildItem $skillsDir).Count) dirs"
 
-# --- commands/: collect từ plugins/*/commands/*.md → flat symlinks ---
+# --- commands/ ---
 $commandsDir = "$dst\commands"
 if (Test-Path $commandsDir) { Remove-Item $commandsDir -Recurse -Force }
 New-Item -ItemType Directory -Force $commandsDir | Out-Null
-Get-ChildItem "$src\plugins" -Directory | Where-Object { Should-Load $_.Name } | ForEach-Object {
+Get-ChildItem "$src\plugins" -Directory | Where-Object { Should-Load-Type $_.Name "commands" } | ForEach-Object {
     $d = "$($_.FullName)\commands"
     if (Test-Path $d) {
         Get-ChildItem $d -Filter "*.md" | ForEach-Object {
-            $link = "$commandsDir\$($_.Name)"
-            & cmd.exe /c "mklink `"$link`" `"$($_.FullName)`"" | Out-Null
+            & cmd.exe /c "mklink `"$commandsDir\$($_.Name)`" `"$($_.FullName)`"" | Out-Null
         }
     }
 }
