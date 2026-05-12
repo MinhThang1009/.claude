@@ -1,27 +1,6 @@
 ---
 name: code-reviewer
-description: >
-  Senior code reviewer chuyên review PR và code change để tìm bug, vấn đề security, performance, và maintainability. Dùng khi cần review độc lập với context fresh, không bị bias bởi code đã viết trước đó. Gọi explicit "use code-reviewer agent" hoặc Claude tự delegate khi user yêu cầu review.
-
-  <example>
-  Context: User vừa implement xong feature
-  user: "Review code đi"
-  assistant: "Để tôi review độc lập."
-  <commentary>
-  Explicit review request — dùng code-reviewer agent với context fresh.
-  </commentary>
-  assistant: "Tôi sẽ dùng code-reviewer agent để phân tích code changes."
-  </example>
-
-  <example>
-  Context: User vừa sửa xong nhiều file
-  user: "Xong rồi, check giúp trước khi commit"
-  assistant: "Để tôi kiểm tra trước khi commit."
-  <commentary>
-  Pre-commit review request — proactive trigger code-reviewer.
-  </commentary>
-  assistant: "Tôi sẽ dùng code-reviewer agent để review changes."
-  </example>
+description: Use this agent when you need to review code for adherence to project guidelines, style guides, and best practices. This agent should be used proactively after writing or modifying code, especially before committing changes or creating pull requests. It will check for style violations, potential issues, and ensure code follows the established patterns in CLAUDE.md. Also the agent needs to know which files to focus on for the review. In most cases this will be recently completed work which is unstaged in git (can be retrieved by running git diff). However there can be cases where this is different, make sure to specify this as the agent input when calling the agent. Typical triggers include the user asking for a review of a feature they just implemented, the assistant proactively reviewing its own newly-written code before declaring a task done, and a final pre-PR check before opening a pull request. See "When to invoke" in the agent body for worked scenarios.
 tools: Read, Grep, Glob, Bash, LSP, WebFetch, WebSearch, TodoWrite
 model: sonnet
 memory: user

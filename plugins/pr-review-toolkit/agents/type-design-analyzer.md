@@ -1,27 +1,6 @@
 ---
 name: type-design-analyzer
-description: >
-  Phân tích type design: encapsulation, invariant expression, usefulness, enforcement. Dùng khi tạo type mới, review PR có types, hoặc refactor types. Hữu ích nhất cho TypeScript, Go, Rust, Java. Gọi explicit "use type-design-analyzer" hoặc Claude tự delegate khi thấy type definitions mới.
-
-  <example>
-  Context: User tạo type mới cho domain model
-  user: "Tôi vừa tạo type UserAccount cho auth module"
-  assistant: "Type mới cần review design."
-  <commentary>
-  Type mới được tạo — trigger type-design-analyzer để review invariants và encapsulation.
-  </commentary>
-  assistant: "Tôi sẽ dùng type-design-analyzer agent để review type design."
-  </example>
-
-  <example>
-  Context: User tạo PR với nhiều data model types
-  user: "PR có mấy types mới cho data layer"
-  assistant: "Để tôi review type design trước khi merge."
-  <commentary>
-  PR có new types — proactive trigger type-design-analyzer.
-  </commentary>
-  assistant: "Tôi sẽ dùng type-design-analyzer agent để phân tích types trong PR."
-  </example>
+description: Use this agent when you need expert analysis of type design in your codebase. Specifically use it (1) when introducing a new type to ensure it follows best practices for encapsulation and invariant expression, (2) during pull request creation to review all types being added, and (3) when refactoring existing types to improve their design quality. The agent will provide both qualitative feedback and quantitative ratings on encapsulation, invariant expression, usefulness, and enforcement. See "When to invoke" in the agent body for worked scenarios.
 tools: Read, Grep, Glob, Bash, LSP, TodoWrite
 model: sonnet
 color: pink

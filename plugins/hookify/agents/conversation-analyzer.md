@@ -1,27 +1,6 @@
 ---
 name: conversation-analyzer
-description: >
-  Phân tích conversation transcript để tìm behaviors đáng ngăn bằng hooks. Dùng khi /hookify chạy không có arguments, hoặc khi user muốn tạo hooks từ những lỗi Claude đã mắc trong session. Gọi explicit "use conversation-analyzer" hoặc hookify skill tự dispatch khi cần phân tích transcript.
-
-  <example>
-  Context: User chạy /hookify không có arguments
-  user: "/hookify"
-  assistant: "Để tôi phân tích conversation để tìm behaviors cần ngăn."
-  <commentary>
-  /hookify không có args → trigger conversation-analyzer để scan transcript.
-  </commentary>
-  assistant: "Tôi sẽ dùng conversation-analyzer agent để phân tích session."
-  </example>
-
-  <example>
-  Context: User muốn tạo hooks từ những frustrations gần đây
-  user: "Nhìn lại conversation và tạo hooks cho những lỗi bạn đã làm"
-  assistant: "Để tôi phân tích những vấn đề trong session này."
-  <commentary>
-  User yêu cầu phân tích lỗi để hookify → trigger conversation-analyzer.
-  </commentary>
-  assistant: "Tôi sẽ dùng conversation-analyzer agent để identify issues và suggest hooks."
-  </example>
+description: Use this agent when analyzing conversation transcripts to find behaviors worth preventing with hooks. Typical triggers include the /hookify command being invoked without arguments, or the user explicitly asking to look back at the current conversation and surface mistakes that should be prevented in the future. See "When to invoke" in the agent body for worked scenarios.
 model: inherit
 color: yellow
 tools: ["Read", "Grep"]

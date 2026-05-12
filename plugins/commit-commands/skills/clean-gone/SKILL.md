@@ -1,6 +1,6 @@
 ---
 name: clean-gone
-description: Dọn dẹp tất cả git branch bị đánh dấu [gone] (branch đã bị xóa trên remote nhưng vẫn tồn tại local), bao gồm xóa các worktree liên quan.
+description: "Cleans up all local git branches marked as [gone] (deleted on remote but still exist locally), including removing associated worktrees."
 ---
 
 ## Your Task

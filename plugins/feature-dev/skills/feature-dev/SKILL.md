@@ -1,8 +1,8 @@
 ---
 name: feature-dev
-description: Guided feature development — explore codebase → hỏi clarify → thiết kế architecture → implement → review. Dùng khi cần implement feature mới có ảnh hưởng nhiều module. Gọi /feature-dev hoặc khi user mô tả feature lớn cần plan.
+description: "Guided feature development — explore codebase → clarify requirements → design architecture → implement → review. Use when implementing new features affecting multiple modules."
 allowed-tools: Read Grep Glob Bash Edit Write WebFetch WebSearch
-argument-hint: "[mô tả feature cần implement]"
+argument-hint: "[feature description to implement]"
 ---
 
 # Feature Development — Multi-phase Orchestration

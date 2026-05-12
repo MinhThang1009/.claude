@@ -1,6 +1,6 @@
 ---
 name: review-pr
-description: "Review pull request toàn diện bằng các agent chuyên biệt"
+description: "Comprehensive PR review using specialized agents, each focusing on a different aspect of code quality."
 argument-hint: "[review-aspects]"
 allowed-tools: ["Bash", "Glob", "Grep", "Read", "Task"]
 ---

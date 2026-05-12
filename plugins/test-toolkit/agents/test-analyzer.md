@@ -1,27 +1,6 @@
 ---
 name: test-analyzer
-description: >
-  Phân tích test coverage quality: behavioral coverage, critical gaps, test quality, brittle tests. Khác test-writer (viết test mới) — agent này đánh giá tests đã có đủ và tốt chưa. Dùng khi review PR, trước merge, hoặc audit test suite. Gọi explicit "use test-analyzer" hoặc Claude tự delegate khi cần đánh giá test coverage.
-
-  <example>
-  Context: User tạo PR với functionality mới
-  user: "PR ready, tests có đủ không?"
-  assistant: "Để tôi phân tích test coverage."
-  <commentary>
-  User hỏi về test coverage quality trong PR — trigger test-analyzer.
-  </commentary>
-  assistant: "Tôi sẽ dùng test-analyzer agent để đánh giá test coverage."
-  </example>
-
-  <example>
-  Context: User vừa thêm validation logic
-  user: "Đã thêm validation, check tests giúp trước khi merge"
-  assistant: "Validation cần test kỹ edge cases."
-  <commentary>
-  Pre-merge test coverage check — proactive trigger test-analyzer.
-  </commentary>
-  assistant: "Tôi sẽ dùng test-analyzer agent để kiểm tra test coverage cho validation."
-  </example>
+description: "Analyzes test coverage quality: behavioral coverage, critical gaps, test quality, brittle tests. Different from test-writer (writes new tests) — this agent evaluates whether existing tests are sufficient and good. Use when reviewing PRs, before merging, or auditing test suites. Examples: <example>Context: User creates PR with new functionality\nuser: \"PR ready, are the tests sufficient?\"\nassistant: \"I'll use the test-analyzer agent to evaluate test coverage quality.\"\n<commentary>User asks about test coverage quality in PR — trigger test-analyzer.</commentary></example>"
 tools: Read, Grep, Glob, Bash, TodoWrite
 model: sonnet
 memory: project

@@ -1,7 +1,7 @@
 ---
 name: commit-push-pr
 allowed-tools: Bash(git checkout --branch:*), Bash(git add:*), Bash(git status:*), Bash(git push:*), Bash(git commit:*), Bash(gh pr create:*)
-description: Commit, push và mở pull request
+description: Commit, push, and open a pull request
 ---
 
 ## Context

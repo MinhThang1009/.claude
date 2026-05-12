@@ -1,6 +1,6 @@
 ---
 name: context-check
-description: Kiểm tra mức tiêu thụ context window và đề xuất hành động (compact/clear/subagent/handoff). Gọi khi user nói "context bao nhiêu rồi", "có cần compact không", "kiểm tra token", hoặc tự động khi thấy phản hồi của Claude xuống chất lượng.
+description: "Checks context window usage and recommends actions (compact/clear/subagent/handoff). Use when asking about context levels or when response quality seems to be declining."
 allowed-tools: Read
 model: inherit
 ---

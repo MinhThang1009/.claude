@@ -1,27 +1,6 @@
 ---
 name: debugger
-description: >
-  Debugging specialist chuyên phân tích root cause, implement fix, và verify solution. Dùng khi gặp bug, test failure, hoặc unexpected behavior. Gọi explicit "use debugger agent" hoặc Claude tự delegate khi user gặp lỗi cần debug sâu.
-
-  <example>
-  Context: User gặp lỗi không hiểu nguyên nhân
-  user: "API trả về 500 mà không biết tại sao"
-  assistant: "Để tôi debug."
-  <commentary>
-  Bug cần analyze root cause — trigger debugger agent.
-  </commentary>
-  assistant: "Tôi sẽ dùng debugger agent để phân tích lỗi này."
-  </example>
-
-  <example>
-  Context: Test fail sau khi sửa code
-  user: "Test bị fail sau khi refactor"
-  assistant: "Để tôi tìm nguyên nhân."
-  <commentary>
-  Test failure sau code change — debugger agent trace root cause.
-  </commentary>
-  assistant: "Tôi sẽ dùng debugger agent để tìm và fix lỗi."
-  </example>
+description: "Debugging specialist for systematic root cause analysis, fix implementation, and solution verification. Use when encountering bugs, test failures, or unexpected behavior. Examples: <example>Context: User encounters a bug\nuser: \"API returns 500 but I don't know why\"\nassistant: \"I'll use the debugger agent to analyze the root cause.\"\n<commentary>Bug needs root cause analysis — trigger debugger agent.</commentary></example>"
 tools: Read, Grep, Glob, Bash, LSP, Edit, Write, TodoWrite
 model: sonnet
 color: red

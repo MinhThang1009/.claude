@@ -1,9 +1,9 @@
 ---
 name: commit
-description: Tạo Conventional Commit thông minh (subject tiếng Việt, type tiếng Anh) sau khi review staged diff. Gọi khi user muốn commit work hiện tại — đảm bảo commit message rõ ràng, đúng convention, không tự thêm attribution Claude.
+description: Creates smart Conventional Commits following the project's commit conventions. Analyzes staged changes and generates appropriate commit messages.
 allowed-tools: Bash(git status:*) Bash(git diff:*) Bash(git log:*) Bash(git add:*) Bash(git commit:*) Read
 disable-model-invocation: true
-argument-hint: "[chỉ thị riêng nếu có, vd: 'gộp 2 file kia thành 1 commit']"
+argument-hint: "[optional custom instructions, e.g.: fix #123]"
 model: inherit
 ---
 

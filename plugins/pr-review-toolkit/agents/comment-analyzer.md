@@ -1,27 +1,6 @@
 ---
 name: comment-analyzer
-description: >
-  Phân tích comment/docstring: accuracy, completeness, comment rot, long-term maintainability. Dùng sau khi viết documentation, trước khi tạo PR, hoặc khi review comments cũ. Gọi explicit "use comment-analyzer" hoặc Claude tự delegate khi cần kiểm tra comment quality.
-
-  <example>
-  Context: User vừa viết documentation cho functions
-  user: "Tôi đã thêm docs cho các functions, check giúp"
-  assistant: "Để tôi kiểm tra accuracy của comments."
-  <commentary>
-  User thêm documentation comments — trigger comment-analyzer verify accuracy vs code thực tế.
-  </commentary>
-  assistant: "Tôi sẽ dùng comment-analyzer agent để review comments."
-  </example>
-
-  <example>
-  Context: User chuẩn bị tạo PR
-  user: "PR ready, review trước khi tạo"
-  assistant: "Để tôi kiểm tra comments trước khi tạo PR."
-  <commentary>
-  Pre-PR review — proactive trigger comment-analyzer để tìm comment rot.
-  </commentary>
-  assistant: "Tôi sẽ dùng comment-analyzer agent để verify comments trong PR."
-  </example>
+description: Use this agent when you need to analyze code comments for accuracy, completeness, and long-term maintainability. This includes (1) after generating large documentation comments or docstrings, (2) before finalizing a pull request that adds or modifies comments, (3) when reviewing existing comments for potential technical debt or comment rot, and (4) when you need to verify that comments accurately reflect the code they describe. See "When to invoke" in the agent body for worked scenarios.
 tools: Read, Grep, Glob, Bash, TodoWrite
 model: sonnet
 color: cyan

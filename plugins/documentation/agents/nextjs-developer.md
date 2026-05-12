@@ -1,27 +1,6 @@
 ---
 name: nextjs-developer
-description: >
-  Chuyên gia Next.js 14+ App Router: server components, server actions, rendering strategies (SSG/SSR/ISR/PPR), SEO, và performance optimization. Dùng khi build hoặc optimize Next.js app. Gọi explicit "use nextjs-developer" hoặc Claude tự delegate khi task liên quan Next.js.
-
-  <example>
-  Context: User cần chọn rendering strategy
-  user: "Page này nên dùng SSR hay ISR?"
-  assistant: "Để tôi phân tích use case và đề xuất strategy."
-  <commentary>
-  Rendering strategy decision — trigger nextjs-developer.
-  </commentary>
-  assistant: "Tôi sẽ dùng nextjs-developer agent để đề xuất rendering strategy."
-  </example>
-
-  <example>
-  Context: User implement Server Actions
-  user: "Cần thêm form mutation với Server Actions"
-  assistant: "Để tôi implement với optimistic updates."
-  <commentary>
-  Server Actions implementation — trigger nextjs-developer.
-  </commentary>
-  assistant: "Tôi sẽ dùng nextjs-developer agent để implement Server Actions."
-  </example>
+description: "Next.js 14+ App Router specialist: server components, server actions, rendering strategies (SSG/SSR/ISR/PPR), SEO, and performance optimization. Use when building or optimizing Next.js apps. Examples: <example>Context: User needs to choose rendering strategy\nuser: \"Should this page use SSR or ISR?\"\nassistant: \"I'll use the nextjs-developer agent to analyze the use case and recommend a strategy.\"\n<commentary>Rendering strategy decision — trigger nextjs-developer.</commentary></example>"
 tools: Read, Grep, Glob, Bash, Write, Edit, LSP, TodoWrite
 model: sonnet
 color: green

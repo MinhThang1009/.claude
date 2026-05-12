@@ -1,8 +1,8 @@
 ---
 name: hookify
-description: Tạo Claude Code hooks ngăn unwanted behaviors từ phân tích conversation hoặc explicit instructions. Dùng khi user nói "tạo hook", "ngăn behavior X", "hookify", hoặc gọi /hookify.
+description: "Creates Claude Code hooks to prevent unwanted behaviors by analyzing conversation patterns or from explicit instructions. Use when user says 'create a hook', 'prevent behavior X', or invokes /hookify."
 allowed-tools: Read Grep Glob Bash Write AskUserQuestion TodoWrite
-argument-hint: "[tùy chọn — behavior cụ thể cần ngăn, vd: 'đừng dùng rm -rf']"
+argument-hint: "[optional — specific behavior to prevent, e.g.: don't use rm -rf]"
 ---
 
 # Hookify — Tạo Hooks từ Unwanted Behaviors

@@ -1,37 +1,6 @@
 ---
 name: documentation-engineer
-description: >
-  Viết, cập nhật, và maintain documentation: README, API docs, architecture guides, tutorials, CHANGELOG. Dùng khi cần tạo docs mới, cập nhật docs sau code change, hoặc audit docs hiện tại tìm gaps. Gọi explicit "use documentation-engineer" hoặc Claude tự delegate khi user yêu cầu viết docs.
-
-  <example>
-  Context: User vừa implement xong feature mới
-  user: "Viết docs cho feature này"
-  assistant: "Để tôi phân tích code và viết documentation."
-  <commentary>
-  Explicit request viết docs — trigger documentation-engineer.
-  </commentary>
-  assistant: "Tôi sẽ dùng documentation-engineer agent để viết docs."
-  </example>
-
-  <example>
-  Context: User chuẩn bị release
-  user: "Update README và CHANGELOG trước khi release"
-  assistant: "Để tôi review code changes và cập nhật docs."
-  <commentary>
-  Pre-release docs update — trigger documentation-engineer.
-  </commentary>
-  assistant: "Tôi sẽ dùng documentation-engineer agent để cập nhật docs."
-  </example>
-
-  <example>
-  Context: Docs cũ, không khớp code hiện tại
-  user: "Docs này outdated rồi, cập nhật lại đi"
-  assistant: "Để tôi so sánh docs với code hiện tại."
-  <commentary>
-  Docs drift detected — trigger documentation-engineer để sync.
-  </commentary>
-  assistant: "Tôi sẽ dùng documentation-engineer agent để sync docs với code."
-  </example>
+description: "Writes, updates, and maintains documentation: README, API docs, architecture guides, tutorials, CHANGELOG. Use when creating new docs, updating docs after code changes, or auditing existing docs for gaps. Examples: <example>Context: User just implemented a new feature\nuser: \"Write docs for this feature\"\nassistant: \"I'll use the documentation-engineer agent to analyze the code and write documentation.\"\n<commentary>Explicit request to write docs — trigger documentation-engineer.</commentary></example>"
 tools: Read, Grep, Glob, Bash, Write, Edit, WebFetch, TodoWrite
 model: sonnet
 color: cyan

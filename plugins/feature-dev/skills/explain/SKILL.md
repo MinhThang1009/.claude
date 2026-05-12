@@ -1,8 +1,8 @@
 ---
 name: explain
-description: Giải thích code, thuật toán, hoặc kiến trúc cho người chưa biết. Đi từ tổng quan xuống chi tiết, có ví dụ cụ thể. Dùng khi user nói "giải thích", "đoạn này làm gì", "tại sao thế này lại work", hoặc gọi /explain.
+description: "Explains code, algorithms, or architecture to those unfamiliar with it. Goes from overview to details with concrete examples. Use when user says 'explain', 'what does this do', or 'why does this work'."
 allowed-tools: Read Grep Glob Bash(git log:*) Bash(git blame:*) WebFetch WebSearch
-argument-hint: "[đường dẫn file, tên hàm/class, hoặc câu hỏi]"
+argument-hint: "[file path, function/class name, or question]"
 ---
 
 # Skill: Giải thích code

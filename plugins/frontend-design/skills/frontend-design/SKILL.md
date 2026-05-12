@@ -1,8 +1,8 @@
 ---
 name: frontend-design
-description: Tạo giao diện frontend distinctive, production-grade, tránh AI slop aesthetics. Tự kích hoạt khi user yêu cầu build UI components, pages, hoặc web applications. Gọi /frontend-design hoặc khi user mô tả giao diện cần thiết kế.
+description: Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, or applications. Generates creative, polished code that avoids generic AI aesthetics.
 allowed-tools: Read Grep Glob Bash Edit Write
-argument-hint: "[mô tả component/page cần thiết kế]"
+argument-hint: "[component or page description]"
 ---
 
 # Frontend Design — Distinctive Interfaces

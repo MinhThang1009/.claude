@@ -1,8 +1,8 @@
 ---
 name: claude-md-management
-description: Audit, đánh giá chất lượng, và cải thiện CLAUDE.md files. Dùng khi user nói "check CLAUDE.md", "audit CLAUDE.md", "cập nhật CLAUDE.md", "improve project memory", hoặc gọi /claude-md-management. Cũng dùng cuối session để capture learnings.
+description: Audit and improve CLAUDE.md files in repositories. Use when user asks to check, audit, update, improve, or fix CLAUDE.md files. Scans for all CLAUDE.md files, evaluates quality against templates, outputs quality report, then makes targeted updates. Also use when the user mentions "CLAUDE.md maintenance" or "project memory optimization".
 allowed-tools: Read Grep Glob Bash Edit
-argument-hint: "[audit | revise | tùy chọn — đường dẫn CLAUDE.md cụ thể]"
+argument-hint: "[audit | revise | path to CLAUDE.md]"
 ---
 
 # CLAUDE.md Management — Audit & Improve

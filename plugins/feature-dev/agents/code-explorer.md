@@ -1,27 +1,6 @@
 ---
 name: code-explorer
-description: >
-  Phân tích sâu codebase: trace execution paths, map architecture layers, document dependencies. Dùng khi cần hiểu feature/module trước khi sửa, hoặc explore codebase mới. Gọi explicit "use code-explorer" hoặc Claude tự delegate khi cần research codebase.
-
-  <example>
-  Context: User muốn hiểu feature authentication trước khi sửa
-  user: "Giải thích auth flow trong project này hoạt động thế nào?"
-  assistant: "Cần trace qua codebase để hiểu flow."
-  <commentary>
-  User cần hiểu feature trước khi sửa — trigger code-explorer để trace execution paths.
-  </commentary>
-  assistant: "Tôi sẽ dùng code-explorer agent để phân tích auth flow."
-  </example>
-
-  <example>
-  Context: User bắt đầu feature mới, cần hiểu codebase hiện tại
-  user: "Tôi mới join project, cho tôi overview architecture"
-  assistant: "Để tôi khảo sát codebase."
-  <commentary>
-  Cần map architecture layers cho người mới — trigger code-explorer.
-  </commentary>
-  assistant: "Tôi sẽ dùng code-explorer agent để map architecture và dependencies."
-  </example>
+description: Deeply analyzes existing codebase features by tracing execution paths, mapping architecture layers, understanding patterns and abstractions, and documenting dependencies to inform new development
 tools: Read, Grep, Glob, Bash, LSP, WebFetch, WebSearch, TodoWrite, NotebookRead
 model: sonnet
 memory: project

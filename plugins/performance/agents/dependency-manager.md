@@ -1,27 +1,6 @@
 ---
 name: dependency-manager
-description: >
-  Audit dependencies: security vulnerabilities, unused packages, outdated versions, license compliance, bundle size. Dùng khi cần review deps trước deploy, update strategy, hoặc giảm bundle size. Gọi explicit "use dependency-manager" hoặc Claude tự delegate khi user hỏi về dependencies.
-
-  <example>
-  Context: User chuẩn bị deploy
-  user: "Check dependencies trước khi deploy"
-  assistant: "Để tôi audit security và outdated packages."
-  <commentary>
-  Pre-deploy dependency audit — trigger dependency-manager.
-  </commentary>
-  assistant: "Tôi sẽ dùng dependency-manager agent để audit dependencies."
-  </example>
-
-  <example>
-  Context: Bundle size quá lớn
-  user: "Bundle 2MB, cần giảm"
-  assistant: "Để tôi phân tích dependency tree và tìm cách optimize."
-  <commentary>
-  Bundle optimization — trigger dependency-manager.
-  </commentary>
-  assistant: "Tôi sẽ dùng dependency-manager agent để phân tích bundle."
-  </example>
+description: "Audits dependencies for security vulnerabilities, unused packages, outdated versions, license compliance, and bundle size. Use when reviewing deps before deploy, planning update strategy, or reducing bundle size. Examples: <example>Context: User preparing to deploy\nuser: \"Check dependencies before deploy\"\nassistant: \"I'll use the dependency-manager agent to audit security and outdated packages.\"\n<commentary>Pre-deploy dependency audit — trigger dependency-manager.</commentary></example>"
 tools: Read, Grep, Glob, Bash, Write, Edit, TodoWrite
 model: sonnet
 color: pink

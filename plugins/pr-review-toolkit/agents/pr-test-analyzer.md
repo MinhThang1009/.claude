@@ -1,34 +1,6 @@
 ---
 name: pr-test-analyzer
-description: >
-  Chuyên gia phân tích test coverage cho pull request. Dùng để kiểm tra chất lượng và độ đầy đủ của test khi review PR, đảm bảo test cover được functionality mới và edge case mà không quá cầu toàn về 100% coverage. Gọi explicit "use pr-test-analyzer agent" hoặc khi user yêu cầu review test trong PR.
-
-  <example>
-  Context: User vừa tạo PR với functionality mới
-  user: "Tôi đã tạo PR. Bạn check giúp xem test có đầy đủ không?"
-  assistant: "Tôi sẽ dùng pr-test-analyzer agent để review test coverage và tìm các gap quan trọng."
-  <commentary>
-  User hỏi về độ đầy đủ của test trong PR — dùng Task tool launch pr-test-analyzer agent.
-  </commentary>
-  </example>
-
-  <example>
-  Context: PR vừa được update với code changes mới
-  user: "PR sẵn sàng review rồi — tôi đã thêm validation logic mới như đã bàn"
-  assistant: "Để tôi phân tích PR đảm bảo test cover được validation logic mới và edge case."
-  <commentary>
-  PR có functionality mới cần phân tích test coverage — dùng pr-test-analyzer agent.
-  </commentary>
-  </example>
-
-  <example>
-  Context: Review feedback trước khi mark PR là ready
-  user: "Trước khi mark PR là ready, bạn double-check giúp test coverage được không?"
-  assistant: "Tôi sẽ dùng pr-test-analyzer agent để review kỹ test coverage và tìm các gap critical trước khi bạn mark ready."
-  <commentary>
-  User muốn check coverage lần cuối trước khi mark PR ready — dùng pr-test-analyzer agent.
-  </commentary>
-  </example>
+description: Use this agent when you need to review a pull request for test coverage quality and completeness. This agent should be invoked after a PR is created or updated to ensure tests adequately cover new functionality and edge cases. Typical triggers include the user asking whether tests on a freshly-created PR are thorough, an updated PR adding new logic that needs coverage analysis, and a final pre-merge double-check before marking a PR ready. See "When to invoke" in the agent body for worked scenarios.
 model: inherit
 color: cyan
 ---

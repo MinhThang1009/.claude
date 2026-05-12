@@ -1,27 +1,6 @@
 ---
 name: silent-failure-hunter
-description: >
-  Tìm silent failures, catch blocks thiếu, error handling sai, fallback không hợp lý. Dùng khi review code có try-catch, error handling, fallback logic, hoặc trước deploy. Gọi explicit "use silent-failure-hunter" hoặc Claude tự delegate khi thấy error handling code.
-
-  <example>
-  Context: User vừa implement error handling cho API client
-  user: "Đã thêm error handling cho API, review giúp"
-  assistant: "Error handling cần kiểm tra kỹ."
-  <commentary>
-  Code có error handling mới — trigger silent-failure-hunter để tìm silent failures.
-  </commentary>
-  assistant: "Tôi sẽ dùng silent-failure-hunter agent để kiểm tra error handling."
-  </example>
-
-  <example>
-  Context: User tạo PR có try-catch blocks
-  user: "Review PR #42"
-  assistant: "PR có error handling — cần kiểm tra silent failures."
-  <commentary>
-  PR có try-catch blocks — proactive trigger silent-failure-hunter.
-  </commentary>
-  assistant: "Tôi sẽ dùng silent-failure-hunter agent để audit error handling trong PR."
-  </example>
+description: Use this agent when reviewing code changes in a pull request to identify silent failures, inadequate error handling, and inappropriate fallback behavior. This agent should be invoked proactively after completing a logical chunk of work that involves error handling, catch blocks, fallback logic, or any code that could potentially suppress errors. Examples:\n\n<example>\nContext: Daisy has just finished implementing a new feature that fetches data from an API with fallback behavior.\nDaisy: "I've added error handling to the API client. Can you review it?"\nAssistant: "Let me use the silent-failure-hunter agent to thoroughly examine the error handling in your changes."\n<Task tool invocation to launch silent-failure-hunter agent>\n</example>\n\n<example>\nContext: Daisy has created a PR with changes that include try-catch blocks.\nDaisy: "Please review PR #1234"\nAssistant: "I'll use the silent-failure-hunter agent to check for any silent failures or inadequate error handling in this PR."\n<Task tool invocation to launch silent-failure-hunter agent>\n</example>\n\n<example>\nContext: Daisy has just refactored error handling code.\nDaisy: "I've updated the error handling in the authentication module"\nAssistant: "Let me proactively use the silent-failure-hunter agent to ensure the error handling changes don't introduce silent failures."\n<Task tool invocation to launch silent-failure-hunter agent>\n</example>
 tools: Read, Grep, Glob, Bash, TodoWrite
 model: sonnet
 effort: high
