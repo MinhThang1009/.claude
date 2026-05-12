@@ -1,5 +1,5 @@
 ---
-name: Agent Development
+name: agent-development
 description: This skill should be used when the user asks to "create an agent", "add an agent", "write a subagent", "agent frontmatter", "when to use description", "agent examples", "agent tools", "agent colors", "autonomous agent", or needs guidance on agent structure, system prompts, triggering conditions, or agent development best practices for Claude Code plugins.
 version: 0.1.0
 ---
@@ -24,27 +24,19 @@ Agent là các subprocess tự trị xử lý các nhiệm vụ phức tạp, nh
 ```markdown
 ---
 name: agent-identifier
-description: Use this agent when [triggering conditions]. Examples:
-
-<example>
-Context: [Situation description]
-user: "[User request]"
-assistant: "[How assistant should respond and use this agent]"
-<commentary>
-[Why this agent should be triggered]
-</commentary>
-</example>
-
-<example>
-[Additional example...]
-</example>
-
+description: Use this agent when [triggering conditions]. Typical triggers include [scenario 1 in prose], [scenario 2 in prose], and [scenario 3 in prose]. See "When to invoke" in the agent body for worked scenarios.
 model: inherit
 color: blue
 tools: ["Read", "Write", "Grep"]
 ---
 
 You are [agent role description]...
+
+## When to invoke
+
+[Two to four representative scenarios written as prose, e.g.:]
+- **[Scenario name].** [What the situation looks like and what the agent should do.]
+- **[Scenario name].** [Same.]
 
 **Your Core Responsibilities:**
 1. [Responsibility 1]
@@ -81,36 +73,24 @@ You are [agent role description]...
 
 ### description (bắt buộc)
 
-Định nghĩa khi nào Claude nên kích hoạt agent này. **Đây là trường quan trọng nhất.**
+Định nghĩa khi nào Claude nên kích hoạt agent này. **Đây là trường quan trọng nhất** — được load vào context mỗi khi agent được đăng ký, để harness quyết định khi nào dispatch.
 
 **Phải bao gồm:**
 1. Điều kiện kích hoạt ("Use this agent when...")
-2. Nhiều khối `<example>` hiển thị cách dùng
-3. Ngữ cảnh, yêu cầu người dùng, và phản hồi của assistant trong mỗi ví dụ
-4. `<commentary>` giải thích tại sao agent kích hoạt
+2. Tóm tắt prose ngắn về các trigger scenario điển hình
+3. Con trỏ đến section "When to invoke" trong body agent cho các worked scenario chi tiết
 
 **Định dạng:**
 ```
-Use this agent when [conditions]. Examples:
-
-<example>
-Context: [Scenario description]
-user: "[What user says]"
-assistant: "[How Claude should respond]"
-<commentary>
-[Why this agent is appropriate]
-</commentary>
-</example>
-
-[More examples...]
+Use this agent when [conditions]. Typical triggers include [scenario 1 in prose], [scenario 2 in prose], and [scenario 3 in prose]. See "When to invoke" in the agent body for worked scenarios.
 ```
 
 **Thực hành tốt nhất:**
-- Bao gồm 2-4 ví dụ cụ thể
-- Hiển thị cả kích hoạt chủ động và phản ứng
+- Nêu tên 2-4 trigger scenario trong prose summary
+- Bao gồm cả kích hoạt chủ động (assistant tự gọi) và phản ứng (user yêu cầu)
 - Bao gồm các cách diễn đạt khác nhau cho cùng ý định
-- Giải thích lý do trong commentary
 - Nêu rõ khi nào KHÔNG dùng agent
+- Đặt các worked scenario chi tiết trong body dưới section "When to invoke" dưới dạng danh sách prose bullet
 
 ### model (bắt buộc)
 
@@ -231,14 +211,14 @@ Requirements:
    - Specific methodologies
    - Edge case handling
    - Output format
+   - A "When to invoke" section listing 2-4 trigger scenarios as prose bullets
 4. Create identifier (lowercase, hyphens, 3-50 chars)
-5. Write description with triggering conditions
-6. Include 2-3 <example> blocks showing when to use
+5. Write description with triggering conditions and a short prose summary of trigger scenarios
 
 Return JSON with:
 {
   "identifier": "agent-name",
-  "whenToUse": "Use this agent when... Examples: <example>...</example>",
+  "whenToUse": "Use this agent when... Typical triggers include [...]. See \"When to invoke\" in the agent body.",
   "systemPrompt": "You are..."
 }
 ```
@@ -332,12 +312,17 @@ Tạo kịch bản kiểm tra để xác minh agent kích hoạt đúng:
 ```markdown
 ---
 name: simple-agent
-description: Use this agent when... Examples: <example>...</example>
+description: Use this agent when [condition]. Typical triggers include [trigger 1] and [trigger 2]. See "When to invoke" in the agent body.
 model: inherit
 color: blue
 ---
 
 You are an agent that [does X].
+
+## When to invoke
+
+- **[Scenario A].** [Description.]
+- **[Scenario B].** [Description.]
 
 Process:
 1. [Step 1]
@@ -351,7 +336,7 @@ Output: [What to provide]
 | Trường | Bắt buộc | Định dạng | Ví dụ |
 |--------|----------|-----------|-------|
 | name | Có | lowercase-hyphens | code-reviewer |
-| description | Có | Văn bản + ví dụ | Use when... <example>... |
+| description | Có | Prose triggers | Use when... Typical triggers include... |
 | model | Có | inherit/sonnet/opus/haiku | inherit |
 | color | Có | Tên màu | blue |
 | tools | Không | Mảng tên tool | ["Read", "Grep"] |
@@ -359,7 +344,8 @@ Output: [What to provide]
 ### Thực hành Tốt nhất
 
 **NÊN:**
-- ✅ Bao gồm 2-4 ví dụ cụ thể trong description
+- ✅ Nêu tên 2-4 trigger scenario trong description (dạng prose)
+- ✅ Đặt worked scenario chi tiết trong section "When to invoke" ở body, dạng prose bullet
 - ✅ Viết điều kiện kích hoạt cụ thể
 - ✅ Dùng `inherit` cho model trừ khi có nhu cầu cụ thể
 - ✅ Chọn tool phù hợp (đặc quyền tối thiểu)
@@ -367,7 +353,7 @@ Output: [What to provide]
 - ✅ Kiểm tra kích hoạt agent kỹ lưỡng
 
 **KHÔNG NÊN:**
-- ❌ Dùng description chung chung không có ví dụ
+- ❌ Dùng description chung chung không có trigger scenario
 - ❌ Bỏ qua điều kiện kích hoạt
 - ❌ Cho tất cả agent cùng màu
 - ❌ Cấp quyền truy cập tool không cần thiết
@@ -407,7 +393,7 @@ Công cụ phát triển trong `scripts/`:
 3. Tạo file `agents/agent-name.md`
 4. Viết frontmatter với tất cả trường bắt buộc
 5. Viết system prompt theo thực hành tốt nhất
-6. Bao gồm 2-4 ví dụ kích hoạt trong description
+6. Nêu tên 2-4 trigger scenario trong description (prose) và chi tiết hóa chúng trong section "When to invoke" ở body
 7. Xác thực với `scripts/validate-agent.sh`
 8. Kiểm tra kích hoạt với các kịch bản thực tế
 9. Ghi lại agent trong README của plugin

@@ -1,5 +1,5 @@
 ---
-name: Skill Development
+name: skill-development
 description: This skill should be used when the user wants to "create a skill", "add a skill to plugin", "write a new skill", "improve skill description", "organize skill content", or needs guidance on skill structure, progressive disclosure, or skill development best practices for Claude Code plugins.
 version: 0.1.0
 ---
@@ -309,7 +309,7 @@ Nghiên cứu các skill trong plugin này như ví dụ về best practices:
 
 **skill plugin-settings:**
 - Trigger cụ thể: "plugin settings", ".local.md files", "YAML frontmatter"
-- References cho thấy triển khai thực tế (multi-agent-swarm, ralph-wiggum)
+- References cho thấy triển khai thực tế (multi-agent-swarm, ralph-loop)
 - Script phân tích hoạt động
 
 Mỗi skill thể hiện progressive disclosure và triggering mạnh.
@@ -531,7 +531,7 @@ Use the grep tool to search for patterns.
 - **`references/patterns.md`** - Pattern chi tiết
 - **`references/advanced.md`** - Kỹ thuật nâng cao
 
-### Ví dụ
+### Các file ví dụ
 - **`examples/script.sh`** - Ví dụ hoạt động
 ```
 
