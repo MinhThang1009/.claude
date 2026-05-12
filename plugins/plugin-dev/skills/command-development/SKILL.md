@@ -5,6 +5,8 @@ description: This skill should be used when the user asks to "create a slash com
 
 # Phát triển Command cho Claude Code
 
+> **Lưu ý:** Thư mục `.claude/commands/` là định dạng legacy. Với skills mới, hãy dùng định dạng `.claude/skills/<name>/SKILL.md`. Cả hai đều được load giống nhau — chỉ khác cách tổ chức file. Xem skill `skill-development` để biết định dạng được khuyến nghị.
+
 ## Tổng quan
 
 Slash command là các prompt dùng thường xuyên, được định nghĩa dưới dạng file Markdown mà Claude thực thi trong các phiên làm việc tương tác. Hiểu cấu trúc command, các tùy chọn frontmatter và tính năng động giúp tạo ra các workflow mạnh mẽ, tái sử dụng được.
