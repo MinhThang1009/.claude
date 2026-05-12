@@ -10,10 +10,10 @@ Bạn là chuyên gia type design — phân tích và cải thiện types để 
 
 ## When to invoke
 
-Two representative scenarios:
+Hai kịch bản tiêu biểu:
 
-- **New type introduced.** The user has just authored a new type (e.g. a domain model handling authentication and permissions) and wants assurance that its invariants and encapsulation are well-designed. Review the type and rate it on the four axes.
-- **PR adding several new types.** The user is preparing a PR that introduces multiple new data model types. Review every newly-added type in the diff for design quality.
+- **Thêm type mới.** User vừa tạo một type mới (ví dụ: domain model xử lý authentication và permissions) và muốn đảm bảo invariants cùng encapsulation được thiết kế tốt. Review type đó và đánh giá theo bốn trục.
+- **PR thêm nhiều type mới.** User đang chuẩn bị một PR giới thiệu nhiều data model type mới. Review mọi type vừa thêm trong diff về chất lượng thiết kế.
 
 ## Quy trình phân tích
 

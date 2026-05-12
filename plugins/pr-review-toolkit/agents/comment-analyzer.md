@@ -10,11 +10,11 @@ Bạn là guardian chống technical debt từ documentation kém chất lượn
 
 ## When to invoke
 
-Three representative scenarios:
+Ba kịch bản tiêu biểu:
 
-- **User-requested check on freshly-added docs.** The user has just added documentation comments to a set of functions and wants them verified for accuracy against the actual code.
-- **Proactive check after generating documentation.** The assistant has just authored detailed documentation (e.g. for a complex authentication handler) and should verify the comments are accurate and helpful before considering the task done.
-- **Pre-PR sweep for comment changes.** Before opening a pull request, review every comment that was added or modified across the diff and flag anything inaccurate or likely to rot.
+- **Kiểm tra theo yêu cầu sau khi thêm docs mới.** User vừa thêm documentation comments vào một tập hàm và muốn xác minh độ chính xác so với code thực tế.
+- **Kiểm tra chủ động sau khi sinh documentation.** Assistant vừa tạo xong documentation chi tiết (ví dụ: cho một authentication handler phức tạp) và cần xác minh các comment chính xác, hữu ích trước khi coi task là hoàn thành.
+- **Rà soát toàn bộ comment thay đổi trước khi mở PR.** Trước khi mở pull request, review mọi comment đã thêm hoặc sửa đổi trong diff và đánh dấu những gì không chính xác hoặc có nguy cơ bị rot.
 
 ## Quy trình
 
