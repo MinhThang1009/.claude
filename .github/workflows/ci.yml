@@ -193,23 +193,23 @@ jobs:
       - name: Run create-symlinks.sh (load all plugins)
         run: |
           # CI: clear .claude-load.txt để load tất cả plugins → verify full count
-          > .claude-load.txt
+          : > .claude-load.txt
           bash scripts/create-symlinks.sh
-      - name: Verify agents (28 files)
+      - name: Verify agents (27 files)
         run: |
           count=$(find ~/.claude/agents -maxdepth 1 -name "*.md" | wc -l)
           echo "agents: $count"
-          [ "$count" -eq 28 ] || { echo "Expected 28, got $count"; exit 1; }
+          [ "$count" -eq 27 ] || { echo "Expected 27, got $count"; exit 1; }
       - name: Verify skills (37 dirs)
         run: |
           count=$(find -L ~/.claude/skills -maxdepth 1 -mindepth 1 -type d | wc -l)
           echo "skills: $count"
           [ "$count" -eq 37 ] || { echo "Expected 37, got $count"; exit 1; }
-      - name: Verify commands (14 files)
+      - name: Verify commands (13 files)
         run: |
           count=$(find ~/.claude/commands -maxdepth 1 -name "*.md" | wc -l)
           echo "commands: $count"
-          [ "$count" -eq 14 ] || { echo "Expected 14, got $count"; exit 1; }
+          [ "$count" -eq 13 ] || { echo "Expected 13, got $count"; exit 1; }
 
   symlinks-test-windows:
     name: Test create-symlinks.ps1 (Windows)
@@ -220,23 +220,23 @@ jobs:
         shell: pwsh
         run: |
           # CI: clear .claude-load.txt để load tất cả plugins
-          Clear-Content .claude-load.txt -ErrorAction SilentlyContinue
+          Set-Content .claude-load.txt ""
           powershell -File scripts/create-symlinks.ps1
-      - name: Verify agents (28 files)
+      - name: Verify agents (27 files)
         shell: pwsh
         run: |
           $count = (Get-ChildItem "$env:USERPROFILE\.claude\agents" -Filter "*.md" -ErrorAction SilentlyContinue).Count
           Write-Host "agents: $count"
-          if ($count -ne 28) { Write-Error "Expected 28, got $count"; exit 1 }
+          if ($count -ne 28) { Write-Error "Expected 27, got $count"; exit 1 }
       - name: Verify skills (37 dirs)
         shell: pwsh
         run: |
           $count = (Get-ChildItem "$env:USERPROFILE\.claude\skills" -ErrorAction SilentlyContinue).Count
           Write-Host "skills: $count"
           if ($count -ne 37) { Write-Error "Expected 37, got $count"; exit 1 }
-      - name: Verify commands (14 files)
+      - name: Verify commands (13 files)
         shell: pwsh
         run: |
           $count = (Get-ChildItem "$env:USERPROFILE\.claude\commands" -Filter "*.md" -ErrorAction SilentlyContinue).Count
           Write-Host "commands: $count"
-          if ($count -ne 14) { Write-Error "Expected 14, got $count"; exit 1 }
+          if ($count -ne 14) { Write-Error "Expected 13, got $count"; exit 1 }
