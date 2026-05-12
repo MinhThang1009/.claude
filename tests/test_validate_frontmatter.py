@@ -212,7 +212,7 @@ class TestMain:
         assert code == 0
 
     def test_valid_skill(self, tmp_path, capsys):
-        sk = tmp_path / "skills" / "demo"
+        sk = tmp_path / "plugins" / "test-plugin" / "skills" / "demo"
         sk.mkdir(parents=True)
         (sk / "SKILL.md").write_text("---\ndescription: ok\n---\n", encoding="utf-8")
         code = self._run()
@@ -220,8 +220,8 @@ class TestMain:
         assert "All 1 frontmatter file valid" in capsys.readouterr().out
 
     def test_valid_agent_and_style(self, tmp_path, capsys):
-        ag = tmp_path / "agents"
-        ag.mkdir()
+        ag = tmp_path / "plugins" / "test-plugin" / "agents"
+        ag.mkdir(parents=True)
         (ag / "a.md").write_text(
             "---\nname: a\ndescription: d\n---\n", encoding="utf-8"
         )
@@ -235,8 +235,8 @@ class TestMain:
         assert "All 2 frontmatter file valid" in capsys.readouterr().out
 
     def test_invalid_file_exits_1(self, tmp_path, capsys):
-        ag = tmp_path / "agents"
-        ag.mkdir()
+        ag = tmp_path / "plugins" / "test-plugin" / "agents"
+        ag.mkdir(parents=True)
         # Missing required 'description'
         (ag / "bad.md").write_text("---\nname: t\n---\n", encoding="utf-8")
         code = self._run()

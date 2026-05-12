@@ -189,16 +189,16 @@ jobs:
         run: bash scripts/create-symlinks.sh
       - name: Verify agents (18 files)
         run: |
-          count=$(ls ~/.claude/agents/*.md 2>/dev/null | wc -l)
+          count=$(find ~/.claude/agents -maxdepth 1 -name "*.md" | wc -l)
           echo "agents: $count"
           [ "$count" -eq 18 ] || { echo "Expected 18, got $count"; exit 1; }
       - name: Verify skills (20 dirs)
         run: |
-          count=$(ls -d ~/.claude/skills/*/ 2>/dev/null | wc -l)
+          count=$(find ~/.claude/skills -maxdepth 1 -mindepth 1 -type d | wc -l)
           echo "skills: $count"
           [ "$count" -eq 20 ] || { echo "Expected 20, got $count"; exit 1; }
       - name: Verify commands (12 files)
         run: |
-          count=$(ls ~/.claude/commands/*.md 2>/dev/null | wc -l)
+          count=$(find ~/.claude/commands -maxdepth 1 -name "*.md" | wc -l)
           echo "commands: $count"
           [ "$count" -eq 12 ] || { echo "Expected 12, got $count"; exit 1; }
