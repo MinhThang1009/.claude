@@ -192,12 +192,12 @@ jobs:
       - uses: actions/checkout@v6
       - name: Run create-symlinks.sh
         run: bash scripts/create-symlinks.sh
-      - name: Verify agents (18 files)
+      - name: Verify agents (27 files)
         run: |
           count=$(find ~/.claude/agents -maxdepth 1 -name "*.md" | wc -l)
           echo "agents: $count"
           [ "$count" -eq 27 ] || { echo "Expected 18, got $count"; exit 1; }
-      - name: Verify skills (20 dirs)
+      - name: Verify skills (26 dirs)
         run: |
           count=$(find -L ~/.claude/skills -maxdepth 1 -mindepth 1 -type d | wc -l)
           echo "skills: $count"
@@ -216,18 +216,18 @@ jobs:
       - name: Run create-symlinks.ps1
         shell: pwsh
         run: powershell -File scripts/create-symlinks.ps1
-      - name: Verify agents (18 files)
+      - name: Verify agents (27 files)
         shell: pwsh
         run: |
           $count = (Get-ChildItem "$env:USERPROFILE\.claude\agents" -Filter "*.md" -ErrorAction SilentlyContinue).Count
           Write-Host "agents: $count"
-          if ($count -ne 18) { Write-Error "Expected 18, got $count"; exit 1 }
-      - name: Verify skills (20 dirs)
+          if ($count -ne 27) { Write-Error "Expected 27, got $count"; exit 1 }
+      - name: Verify skills (26 dirs)
         shell: pwsh
         run: |
           $count = (Get-ChildItem "$env:USERPROFILE\.claude\skills" -ErrorAction SilentlyContinue).Count
           Write-Host "skills: $count"
-          if ($count -ne 20) { Write-Error "Expected 20, got $count"; exit 1 }
+          if ($count -ne 26) { Write-Error "Expected 26, got $count"; exit 1 }
       - name: Verify commands (12 files)
         shell: pwsh
         run: |
