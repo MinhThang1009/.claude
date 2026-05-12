@@ -45,7 +45,10 @@
 │   ├── handoff/SKILL.md            # Brief để chuyển session
 │   ├── context-check/SKILL.md      # Đánh giá context, đề xuất action
 │   ├── feature-dev/SKILL.md        # Guided feature development
-│   └── full-review/SKILL.md        # Multi-agent review dispatch
+│   ├── full-review/SKILL.md        # Multi-agent review dispatch
+│   ├── claude-md-management/SKILL.md # Audit và cải thiện CLAUDE.md
+│   ├── frontend-design/SKILL.md    # Giao diện distinctive, tránh AI slop
+│   └── hookify/SKILL.md            # Tạo hooks ngăn unwanted behaviors
 ├── agents/                         # Subagent chuyên biệt (context riêng)
 │   ├── code-reviewer.md            # Senior reviewer + a11y checklist (sonnet)
 │   ├── code-explorer.md            # Trace execution paths (sonnet)
@@ -57,6 +60,7 @@
 │   ├── type-design-analyzer.md     # Phân tích type design (sonnet)
 │   ├── comment-analyzer.md         # Phân tích comment quality (sonnet)
 │   ├── silent-failure-hunter.md    # Tìm silent failures (sonnet)
+│   ├── architecture-critic.md     # Adversarial architecture review (sonnet)
 │   ├── debugger.md                 # Root cause analysis + fix (sonnet)
 │   ├── documentation-engineer.md   # Viết/maintain docs (sonnet)
 │   ├── performance-engineer.md     # Profiling + optimization (sonnet)
@@ -81,7 +85,7 @@
     └── skill-evals.json            # → <skill>/evals/evals.json (eval-driven optimize)
 ```
 
-**Baseline tokens** — đo thực tế bằng `/context` (Opus 4.7 1M context, snapshot session start, 2026-05-10, 15 agents, 9 skills):
+**Baseline tokens** — đo thực tế bằng `/context` (Opus 4.7 1M context, snapshot session start, 2026-05-10, 16 agents, 12 skills):
 
 | Category                      | Tokens     | % of 1M   |
 | ----------------------------- | ---------- | --------- |
@@ -92,14 +96,14 @@
 | ├── `rules/security`          | 3,100      | —         |
 | ├── `rules/verification`      | 2,700      | —         |
 | └── `rules/communication`     | 1,900      | —         |
-| Custom agents (15)            | 6,400      | 0.6%      |
+| Custom agents (16)            | 6,800      | 0.7%      |
 | ├── `code-architect`          | 647        | —         |
 | ├── `documentation-engineer`  | 538        | —         |
 | ├── `security-auditor`        | 438        | —         |
 | ├── `test-analyzer`           | 430        | —         |
 | ├── `code-explorer`           | 422        | —         |
-| └── … (10 agents còn lại)     | 3,925      | —         |
-| Skills (9)                    | 1,100      | 0.1%      |
+| └── … (11 agents còn lại)     | 4,325      | —         |
+| Skills (12)                   | 1,400      | 0.1%      |
 | ├── `commit`                  | —          | —         |
 | ├── `code-review`             | —          | —         |
 | ├── `full-review`             | —          | —         |
@@ -108,7 +112,10 @@
 | ├── `refactor`                | —          | —         |
 | ├── `explain`                 | —          | —         |
 | ├── `handoff`                 | —          | —         |
-| └── `context-check`           | —          | —         |
+| ├── `context-check`           | —          | —         |
+| ├── `claude-md-management`    | —          | —         |
+| ├── `frontend-design`         | —          | —         |
+| └── `hookify`                 | —          | —         |
 | Messages (start)              | 13         | <0.1%     |
 | **Total used (start)**        | **46,000** | **~5%**   |
 | Autocompact buffer (reserved) | 33,000     | 3.3%      |
@@ -116,7 +123,7 @@
 
 **Ghi chú**:
 - Vietnamese tokenize ~2.3 chars/token cho prose (ước lượng empirical, đo bằng `/context` trên tokenizer Claude — Anthropic không publish ratio chính thức cho từng ngôn ngữ); kém hiệu quả hơn English ~4 chars/token; baseline ~46k cao hơn config English (~10-15k) là expected.
-- 15 agents (6,400 tokens tổng descriptions) — chỉ load descriptions tại session start, body load khi spawn agent.
+- 16 agents (6,800 tokens tổng descriptions) — chỉ load descriptions tại session start, body load khi spawn agent.
 - 2 references còn lại ([`coding-standards.md`](references/coding-standards.md), [`git-workflow.md`](references/git-workflow.md)) chỉ load khi `@`-reference → KHÔNG ăn baseline.
 - Autocompact buffer 33k reserved (không tính vào used) — Claude Code dành chỗ cho compact summary khi context đầy.
 
