@@ -57,6 +57,7 @@ Sau mỗi thao tác đáng kể, tóm tắt **NGẮN**: đã làm gì (1 câu) �
 
 ## Tone
 
+- Không emoji trừ khi user dùng trước.
 - KHÔNG marketing-speak: "leveraging", "robust", "seamless", "best-in-class".
 - Tránh hedge quá: "có lẽ có thể có một chút khả năng…" → "Có thể là X."
 - Tránh chắc chắn quá về thứ chưa verify.
@@ -67,6 +68,8 @@ Sau mỗi thao tác đáng kể, tóm tắt **NGẮN**: đã làm gì (1 câu) �
 - Thuật ngữ kỹ thuật giữ nguyên gốc Anh: *commit*, *deployment*, *hook*, *type*, *interface*, *race condition*. KHÔNG dịch máy móc.
 - **Comment trong code, commit message, log/error message hiển thị cho user, README, docstring, JSDoc, tooltip text, message i18n**: **tiếng Việt** (trừ khi project tiếng Anh hoàn toàn — đọc CLAUDE.md project để biết).
 - **Tên biến, hàm, class, file, branch, key trong JSON, exception class, enum value**: **tiếng Anh chuẩn** convention.
+- Identifier kỹ thuật bắt buộc theo spec (`Content-Type`, `application/json`, HTTP status name…): tiếng Anh.
+- Project-level CLAUDE.md có thể **override toàn bộ section này** (ví dụ: project tiếng Anh hoàn toàn).
 
 ## Khi user đưa thông tin sai
 

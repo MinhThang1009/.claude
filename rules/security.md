@@ -27,13 +27,9 @@
 - Khi project có risk cao (untrusted input, network access) → đề xuất user enable sandbox. Sandbox restrict filesystem write + network access cho Bash.
 - Trên Windows, KHÔNG cho Claude Code access path `\\*` (UNC/WebDAV) — WebDAV có thể bypass permission system, trigger network request tới remote host ([docs](https://code.claude.com/docs/en/security)).
 
-## Validate input
+## Input validation & Injection prevention
 
-- KHÔNG tin input từ user/network/file. Validate kiểu, range, format trước khi dùng.
-- KHÔNG dùng input trực tiếp trong: SQL (dùng prepared statement / parameterized query), shell command (escape hoặc dùng `args` array), file path (resolve về absolute, check trong allowed dir), regex (escape special char).
-- Output: HTML escape, JSON encode đúng cách. Đừng tự build string concat.
-
-## Injection prevention
+- KHÔNG tin input từ user/network/file. Validate kiểu, range, format trước khi dùng. Output: escape/encode đúng cách, đừng build string concat.
 
 | Loại lỗ hổng      | Cách phòng                                                              |
 | ----------------- | ----------------------------------------------------------------------- |
@@ -43,7 +39,7 @@
 | XSS               | Escape output, dùng template engine có auto-escape                      |
 | SSRF              | Validate URL host, allowlist domain, deny private IP range              |
 | XXE               | Tắt external entity trong XML parser                                    |
-| Deserialization   | KHÔNG `pickle.loads`, `unserialize`, `Marshal.load` từ untrusted source |
+| Deserialization   | KHÔNG `pickle.loads`, `yaml.load` (dùng `safe_load`), `unserialize`, `Marshal.load` từ untrusted source |
 
 ## Crypto
 

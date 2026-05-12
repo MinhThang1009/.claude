@@ -41,6 +41,6 @@
 
 ## External dependencies
 
-- Dùng GitHub Action / package bên ngoài → **verify tồn tại** (WebFetch check repo/tag) trước khi commit. Không bịa tag version. WebFetch fail khi verify → áp dụng "Tool output reliability": thử URL khác hoặc ghi cần user confirm.
+- Dùng GitHub Action / package bên ngoài → **verify tồn tại** (WebFetch check repo/tag) trước khi commit. WebFetch fail khi verify → áp dụng "Tool output reliability": thử URL khác hoặc ghi cần user confirm.
 - Dep tồn tại nhưng **version mismatch** → cảnh báo user, không tự downgrade/upgrade.
 - Sửa **1 file** bằng Python script `open(file, 'w')` → **dùng Edit tool** thay vì viết script (tránh vô tình truncate). Batch op (rename N file, mass refactor) → script OK nhưng PHẢI: (1) preview list file affected, (2) backup hoặc git stash trước, (3) chạy với dry-run flag nếu có.
