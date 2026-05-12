@@ -1,0 +1,7 @@
+{
+  "name": "test-toolkit",
+  "description": "Specialized agents for writing tests and analyzing test coverage quality",
+  "author": {
+    "name": "Minh Thang"
+  }
+}

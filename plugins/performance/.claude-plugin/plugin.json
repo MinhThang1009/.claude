@@ -1,0 +1,7 @@
+{
+  "name": "performance",
+  "description": "Performance profiling, optimization, and dependency audit agents",
+  "author": {
+    "name": "Minh Thang"
+  }
+}

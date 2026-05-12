@@ -1,0 +1,7 @@
+{
+  "name": "security-guidance",
+  "description": "Senior security engineer agent for finding vulnerabilities including injection, auth flaws, insecure crypto, SSRF, XSS, and common CWEs",
+  "author": {
+    "name": "Minh Thang"
+  }
+}

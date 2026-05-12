@@ -47,7 +47,6 @@ backups/
 shell-snapshots/
 downloads/
 plans/
-plugins/
 ide/
 .vscode/
 .last-cleanup
