@@ -165,6 +165,41 @@
       "author": { "name": "Minh Thang" },
       "source": "./plugins/session-report",
       "category": "productivity"
+    },
+    {
+      "name": "code-review",
+      "description": "Automated code review for pull requests using multiple specialized agents with confidence-based scoring",
+      "author": { "name": "Minh Thang" },
+      "source": "./plugins/code-review",
+      "category": "development"
+    },
+    {
+      "name": "docx",
+      "description": "Create, read, edit, and manipulate Word documents (.docx files)",
+      "author": { "name": "Minh Thang" },
+      "source": "./plugins/docx",
+      "category": "productivity"
+    },
+    {
+      "name": "pdf",
+      "description": "Read, extract, merge, split, encrypt PDFs; OCR support",
+      "author": { "name": "Minh Thang" },
+      "source": "./plugins/pdf",
+      "category": "productivity"
+    },
+    {
+      "name": "pptx",
+      "description": "Create, read, edit, and manipulate PowerPoint presentations (.pptx files)",
+      "author": { "name": "Minh Thang" },
+      "source": "./plugins/pptx",
+      "category": "productivity"
+    },
+    {
+      "name": "xlsx",
+      "description": "Open, read, edit, and create spreadsheets (.xlsx/.csv/.tsv)",
+      "author": { "name": "Minh Thang" },
+      "source": "./plugins/xlsx",
+      "category": "productivity"
     }
   ]
 }

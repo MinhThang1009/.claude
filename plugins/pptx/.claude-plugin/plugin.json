@@ -1,0 +1,5 @@
+{
+  "name": "pptx",
+  "description": "Create, read, edit, and manipulate PowerPoint presentations (.pptx files)",
+  "author": { "name": "Minh Thang" }
+}
