@@ -1,24 +1,6 @@
 ---
 name: conversation-analyzer
-description: Phân tích conversation transcript để tìm behaviors đáng ngăn bằng hooks. Dùng khi /hookify chạy không có arguments, hoặc khi user muốn tạo hooks từ những lỗi Claude đã mắc trong session. Gọi explicit "use conversation-analyzer" hoặc hookify skill tự dispatch khi cần phân tích transcript.
-<example>
-Context: User chạy /hookify không có arguments
-user: "/hookify"
-assistant: "Để tôi phân tích conversation để tìm behaviors cần ngăn."
-<commentary>
-/hookify không có args → trigger conversation-analyzer để scan transcript.
-</commentary>
-assistant: "Tôi sẽ dùng conversation-analyzer agent để phân tích session."
-</example>
-<example>
-Context: User muốn tạo hooks từ những frustrations gần đây
-user: "Nhìn lại conversation và tạo hooks cho những lỗi bạn đã làm"
-assistant: "Để tôi phân tích những vấn đề trong session này."
-<commentary>
-User yêu cầu phân tích lỗi để hookify → trigger conversation-analyzer.
-</commentary>
-assistant: "Tôi sẽ dùng conversation-analyzer agent để identify issues và suggest hooks."
-</example>
+description: "Phân tích conversation transcript để tìm behaviors đáng ngăn bằng hooks. Dùng khi /hookify chạy không có arguments, hoặc khi user muốn tạo hooks từ những lỗi Claude đã mắc trong session. Gọi explicit \"use conversation-analyzer\" hoặc hookify skill tự dispatch khi cần phân tích transcript. Examples: <example>Context: User chạy /hookify không có arguments\nuser: \"/hookify\"\nassistant: \"Để tôi phân tích conversation để tìm behaviors cần ngăn.\"\n<commentary>\n/hookify không có args → trigger conversation-analyzer để scan transcript.\n</commentary>\nassistant: \"Tôi sẽ dùng conversation-analyzer agent để phân tích session.\"</example> <example>Context: User muốn tạo hooks từ những frustrations gần đây\nuser: \"Nhìn lại conversation và tạo hooks cho những lỗi bạn đã làm\"\nassistant: \"Để tôi phân tích những vấn đề trong session này.\"\n<commentary>\nUser yêu cầu phân tích lỗi để hookify → trigger conversation-analyzer.\n</commentary>\nassistant: \"Tôi sẽ dùng conversation-analyzer agent để identify issues và suggest hooks.\"</example>"
 model: inherit
 color: yellow
 tools: ["Read", "Grep"]
@@ -130,6 +112,22 @@ Return your findings as structured text in this format:
 - Event: bash
 - Pattern: rm\s+-rf
 - Message: "Dangerous rm command detected. Verify path before proceeding."
+
+---
+
+### Issue 2: Console.log in TypeScript
+**Severity**: Medium
+**Tool**: Edit/Write
+**Pattern**: `console\.log\(`
+**Occurrences**: 2 times
+**Context**: Added console.log statements to production TypeScript files
+**User Reaction**: "Don't use console.log in production code"
+
+**Suggested Rule:**
+- Name: warn-console-log
+- Event: file
+- Pattern: console\.log\(
+- Message: "Console.log detected. Use proper logging library instead."
 
 ---
 
