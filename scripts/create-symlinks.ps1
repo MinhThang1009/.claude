@@ -7,6 +7,26 @@ Write-Host "Source: $src"
 Write-Host "Target: $dst"
 New-Item -ItemType Directory -Force $dst | Out-Null
 
+# --- Đọc .claude-load.txt để lọc plugins ---
+$loadFile = "$src\.claude-load.txt"
+$loadedPlugins = $null
+if (Test-Path $loadFile) {
+    $loadedPlugins = Get-Content $loadFile |
+        Where-Object { $_ -notmatch '^\s*#' -and $_ -match '\S' } |
+        ForEach-Object { $_.Trim() }
+    if ($loadedPlugins.Count -gt 0) {
+        Write-Host "Loading plugins: $($loadedPlugins -join ', ')"
+    } else {
+        $loadedPlugins = $null
+    }
+}
+if (-not $loadedPlugins) { Write-Host "Loading ALL plugins" }
+
+function Should-Load($pluginName) {
+    if (-not $loadedPlugins) { return $true }
+    return $loadedPlugins -contains $pluginName
+}
+
 # --- Dirs symlinked as whole ---
 $dirs = @(".claude-plugin", "docs", "hooks", "output-styles", "rules", "templates")
 foreach ($d in $dirs) {
@@ -30,13 +50,11 @@ foreach ($f in $files) {
 
 # --- agents/: collect từ plugins/**/agents/*.md → flat symlinks (recursive) ---
 $agentsDir = "$dst\agents"
-$a = Get-Item $agentsDir -ErrorAction SilentlyContinue
-if ($a) { $a.Delete() }
+if (Test-Path $agentsDir) { Remove-Item $agentsDir -Recurse -Force }
 New-Item -ItemType Directory -Force $agentsDir | Out-Null
-Get-ChildItem "$src\plugins" -Recurse -Filter "agents" -Directory | ForEach-Object {
-    $d = $_.FullName
-    if (Test-Path $d) {
-        Get-ChildItem $d -Filter "*.md" | ForEach-Object {
+Get-ChildItem "$src\plugins" -Directory | Where-Object { Should-Load $_.Name } | ForEach-Object {
+    Get-ChildItem $_.FullName -Recurse -Filter "agents" -Directory | ForEach-Object {
+        Get-ChildItem $_.FullName -Filter "*.md" | ForEach-Object {
             $link = "$agentsDir\$($_.Name)"
             & cmd.exe /c "mklink `"$link`" `"$($_.FullName)`"" | Out-Null
         }
@@ -46,10 +64,9 @@ Write-Host "OK agents: $((Get-ChildItem $agentsDir).Count) files"
 
 # --- skills/: collect từ plugins/*/skills/*/ → flat dir symlinks ---
 $skillsDir = "$dst\skills"
-$s = Get-Item $skillsDir -ErrorAction SilentlyContinue
-if ($s) { $s.Delete() }
+if (Test-Path $skillsDir) { Remove-Item $skillsDir -Recurse -Force }
 New-Item -ItemType Directory -Force $skillsDir | Out-Null
-Get-ChildItem "$src\plugins" -Directory | ForEach-Object {
+Get-ChildItem "$src\plugins" -Directory | Where-Object { Should-Load $_.Name } | ForEach-Object {
     $d = "$($_.FullName)\skills"
     if (Test-Path $d) {
         Get-ChildItem $d -Directory | ForEach-Object {
@@ -62,10 +79,9 @@ Write-Host "OK skills: $((Get-ChildItem $skillsDir).Count) dirs"
 
 # --- commands/: collect từ plugins/*/commands/*.md → flat symlinks ---
 $commandsDir = "$dst\commands"
-$c = Get-Item $commandsDir -ErrorAction SilentlyContinue
-if ($c) { $c.Delete() }
+if (Test-Path $commandsDir) { Remove-Item $commandsDir -Recurse -Force }
 New-Item -ItemType Directory -Force $commandsDir | Out-Null
-Get-ChildItem "$src\plugins" -Directory | ForEach-Object {
+Get-ChildItem "$src\plugins" -Directory | Where-Object { Should-Load $_.Name } | ForEach-Object {
     $d = "$($_.FullName)\commands"
     if (Test-Path $d) {
         Get-ChildItem $d -Filter "*.md" | ForEach-Object {
@@ -77,4 +93,4 @@ Get-ChildItem "$src\plugins" -Directory | ForEach-Object {
 Write-Host "OK commands: $((Get-ChildItem $commandsDir -Filter '*.md').Count) files"
 
 Write-Host ""
-Write-Host "Done! Restart Claude Code để apply changes."
+Write-Host "Done! Restart Claude Code de apply changes."

@@ -1,0 +1,26 @@
+# Cấu hình plugins cần load vào ~/.claude/
+# Mỗi dòng = 1 plugin name (tên thư mục trong plugins/)
+# Dòng bắt đầu bằng # là comment, bị bỏ qua
+# Nếu file này trống hoặc không có → load TẤT CẢ plugins
+
+# === CORE: dùng hàng ngày ===
+pr-review-toolkit
+feature-dev
+commit-commands
+debug
+security-guidance
+hookify
+session
+code-simplifier
+frontend-design
+claude-md-management
+
+# === OPTIONAL: bỏ comment để enable ===
+# mcp-server-dev       # Chỉ khi build MCP servers
+# plugin-dev           # Chỉ khi phát triển Claude Code plugins
+# skill-creator        # Chỉ khi tạo/eval skills
+# code-modernization   # Chỉ khi migrate legacy code
+# documentation        # Agents cho viết docs, Next.js
+# performance          # Agents cho profiling/dependency audit
+# claude-code-setup    # Phân tích codebase, recommend automations
+# test-toolkit         # test-writer, test-analyzer (pr-test-analyzer đã cover PR)
