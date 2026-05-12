@@ -1,5 +1,4 @@
 {
-  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "claude-plugins",
   "description": "A curated collection of Claude Code plugins for development workflows, code review, security, and productivity",
   "owner": {

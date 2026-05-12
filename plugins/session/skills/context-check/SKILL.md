@@ -25,7 +25,7 @@ Sau khi user gửi output `/context`, phân tích theo các bước dưới.
 > - `<30/<40/60%` + "dumb zone": [Dex Horthy at MLOps Community](https://youtu.be/YwZR6tc7qYg?t=1541) (2026-03-24)
 > - `300-400k tokens` context rot (1M model): Thariq Shihipar (Anthropic Claude Code team) via [howborisusesclaudecode.com](https://howborisusesclaudecode.com/)
 > - `155k tokens` auto-compact (200k window): [Boris Cherny X tweet](https://x.com/bcherny/status/1977163445205450783)
-> - Trích dẫn đầy đủ + nuance theo task complexity: [docs/REFERENCE.md §16](../../docs/REFERENCE.md#16-quản-lý-context-window--chi-tiết). Anthropic không publish % chính thức.
+> - Trích dẫn đầy đủ + nuance theo task complexity: [docs/REFERENCE.md §16](../../../../docs/REFERENCE.md#16-quản-lý-context-window--chi-tiết). Anthropic không publish % chính thức.
 
 | % context | Trạng thái                          | Hành động đề xuất                                                        |
 | --------- | ----------------------------------- | ------------------------------------------------------------------------ |

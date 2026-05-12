@@ -43,7 +43,7 @@ Tham khảo workflow fact-check trong commit history (search `docs: fix .* fact-
 
 ### Style guidelines
 
-- **Commit message**: [Conventional Commits](https://www.conventionalcommits.org/), subject **tiếng Việt**, type tiếng Anh (`feat`, `fix`, `docs`, `refactor`, `style`, `test`, `chore`...). Tham khảo [skills/commit/SKILL.md](../skills/commit/SKILL.md).
+- **Commit message**: [Conventional Commits](https://www.conventionalcommits.org/), subject **tiếng Việt**, type tiếng Anh (`feat`, `fix`, `docs`, `refactor`, `style`, `test`, `chore`...). Tham khảo [skills/commit/SKILL.md](../plugins/commit-commands/skills/commit/SKILL.md).
 - **Markdown**: Theo style file đang sửa (terse, bullet-heavy, tiếng Việt cho prose, tiếng Anh cho identifier/code).
 - **Không thêm dependency** vào hooks/* mà không thảo luận trước (issue).
 

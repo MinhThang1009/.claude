@@ -64,7 +64,7 @@ Theo thứ tự ưu tiên:
 
 ### 5. Maintainability (Medium)
 - Naming có rõ không?
-- Function có quá dài không? (Reference: [`coding-standards.md` dòng 11](../../rules/coding-standards.md) — <50 lý tưởng, >100 đề xuất tách)
+- Function có quá dài không? (Reference: [`coding-standards.md` dòng 11](../../../../rules/coding-standards.md) — <50 lý tưởng, >100 đề xuất tách)
 - Code có duplicate đoạn nào trong codebase không (gợi ý: dùng Grep tìm pattern)?
 - Comment giải thích WHY hay chỉ lặp lại WHAT?
 - **Code comments compliance**: đọc comments trong files bị sửa — verify thay đổi không contradict guidance trong existing comments (vd: comment nói "must be called before X" nhưng diff bỏ call đó).

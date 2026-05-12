@@ -31,7 +31,7 @@
 
 ## Git
 
-- KHÔNG `git commit`/`git push` trừ khi tôi yêu cầu rõ — phải có động từ explicit: `commit`, `push`, `ship`, `merge`, hoặc gọi [`/commit`](skills/commit/SKILL.md). Câu mơ hồ như "save it", "looks good", "done" → KHÔNG đủ, hỏi lại.
+- KHÔNG `git commit`/`git push` trừ khi tôi yêu cầu rõ — phải có động từ explicit: `commit`, `push`, `ship`, `merge`, hoặc gọi [`/commit`](plugins/commit-commands/skills/commit/SKILL.md). Câu mơ hồ như "save it", "looks good", "done" → KHÔNG đủ, hỏi lại.
 - KHÔNG `git add .` — add từng file cụ thể.
 - KHÔNG `--force` trần. KHÔNG `git reset --hard` trên work của tôi.
 - KHÔNG thêm `Co-Authored-By: Claude` hay tagline `🤖 Generated with Claude Code` vào commit (đã tắt qua `attribution.commit: ""`).
@@ -57,7 +57,7 @@
 
 - Theo dõi `/context` thường xuyên. **<40% sweet spot**, **40-60% dumb zone bắt đầu**, **60-77% wrap up actively**, **>77% sau auto-compact PHẢI act**. Ngưỡng community-curated, chi tiết + source tại [`docs/REFERENCE.md` §16.2](docs/REFERENCE.md).
 - Hoàn thành 1 phase (auth xong, refactor xong) → đề xuất `/compact` ngay, đừng đợi auto-compact firing (~77% của 200k window = ~155k tokens, theo [Boris Cherny — Anthropic, Claude Code lead](https://x.com/bcherny/status/1977163445205450783); docs mới ghi default ~95% — có thể đã thay đổi qua versions).
-- Trước khi compact/clear → tôi sẽ yêu cầu bạn viết handoff brief; bạn dùng skill [`/handoff`](skills/handoff/SKILL.md).
+- Trước khi compact/clear → tôi sẽ yêu cầu bạn viết handoff brief; bạn dùng skill [`/handoff`](plugins/session/skills/handoff/SKILL.md).
 - Câu hỏi nhanh không cần lưu history → tôi dùng `/btw`.
 
 ## Compact Instructions
