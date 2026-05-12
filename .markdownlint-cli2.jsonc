@@ -33,6 +33,26 @@
   },
   "ignores": [
     "node_modules/",
-    ".git/"
+    ".git/",
+    // Official Anthropic files copied as-is — không lint để tránh modify nội dung gốc
+    "plugins/*/skills/*/references/",
+    "plugins/*/skills/*/reference/",
+    "plugins/*/reference/",
+    "plugins/*/README.md",
+    "plugins/*/skills/*/shared/",
+    "plugins/*/skills/claude-api/csharp/",
+    "plugins/*/skills/claude-api/curl/",
+    "plugins/*/skills/claude-api/go/",
+    "plugins/*/skills/claude-api/java/",
+    "plugins/*/skills/claude-api/php/",
+    "plugins/*/skills/claude-api/python/",
+    "plugins/*/skills/claude-api/ruby/",
+    "plugins/*/skills/claude-api/typescript/",
+    "plugins/*/skills/pptx/editing.md",
+    "plugins/*/skills/pptx/pptxgenjs.md",
+    "plugins/*/skills/pdf/forms.md",
+    "plugins/*/skills/pdf/reference.md",
+    "plugins/explanatory-output-style/",
+    "plugins/learning-output-style/"
   ]
 }
