@@ -6,42 +6,42 @@ license: Complete terms in LICENSE.txt
 
 # Web Application Testing
 
-Để test các web application local, viết script Playwright Python native.
+To test local web applications, write native Python Playwright scripts.
 
-**Helper Scripts có sẵn**:
-- `scripts/with_server.py` - Quản lý vòng đời server (hỗ trợ nhiều server)
+**Helper Scripts Available**:
+- `scripts/with_server.py` - Manages server lifecycle (supports multiple servers)
 
-**Luôn chạy script với `--help` đầu tiên** để xem cách dùng. KHÔNG đọc source trước khi đã thử chạy script và phát hiện ra rằng cần giải pháp tùy chỉnh thực sự. Các script này có thể rất lớn và làm ô nhiễm context window. Chúng tồn tại để được gọi trực tiếp như black-box scripts thay vì nạp vào context window.
+**Always run scripts with `--help` first** to see usage. DO NOT read the source until you try running the script first and find that a customized solution is abslutely necessary. These scripts can be very large and thus pollute your context window. They exist to be called directly as black-box scripts rather than ingested into your context window.
 
-## Cây quyết định: Chọn cách tiếp cận
+## Decision Tree: Choosing Your Approach
 
 ```
-User task → Có phải static HTML không?
-    ├─ Có → Đọc file HTML trực tiếp để xác định selector
-    │         ├─ Thành công → Viết script Playwright dùng selector đó
-    │         └─ Fail/Không đủ → Xử lý như dynamic (bên dưới)
+User task → Is it static HTML?
+    ├─ Yes → Read HTML file directly to identify selectors
+    │         ├─ Success → Write Playwright script using selectors
+    │         └─ Fails/Incomplete → Treat as dynamic (below)
     │
-    └─ Không (dynamic webapp) → Server đã chạy chưa?
-        ├─ Chưa → Chạy: python scripts/with_server.py --help
-        │         Rồi dùng helper + viết script Playwright đơn giản
+    └─ No (dynamic webapp) → Is the server already running?
+        ├─ No → Run: python scripts/with_server.py --help
+        │        Then use the helper + write simplified Playwright script
         │
-        └─ Rồi → Reconnaissance-then-action:
-            1. Navigate và đợi networkidle
-            2. Chụp screenshot hoặc inspect DOM
-            3. Xác định selector từ rendered state
-            4. Thực thi action với selector đã tìm được
+        └─ Yes → Reconnaissance-then-action:
+            1. Navigate and wait for networkidle
+            2. Take screenshot or inspect DOM
+            3. Identify selectors from rendered state
+            4. Execute actions with discovered selectors
 ```
 
-## Ví dụ: Dùng with_server.py
+## Example: Using with_server.py
 
-Để khởi động server, chạy `--help` đầu tiên, rồi dùng helper:
+To start a server, run `--help` first, then use the helper:
 
-**Một server:**
+**Single server:**
 ```bash
 python scripts/with_server.py --server "npm run dev" --port 5173 -- python your_automation.py
 ```
 
-**Nhiều server (vd: backend + frontend):**
+**Multiple servers (e.g., backend + frontend):**
 ```bash
 python scripts/with_server.py \
   --server "cd backend && python server.py" --port 3000 \
@@ -49,7 +49,7 @@ python scripts/with_server.py \
   -- python your_automation.py
 ```
 
-Để tạo automation script, chỉ include logic Playwright (server được quản lý tự động):
+To create an automation script, include only Playwright logic (servers are managed automatically):
 ```python
 from playwright.sync_api import sync_playwright
 
@@ -62,7 +62,7 @@ with sync_playwright() as p:
     browser.close()
 ```
 
-## Pattern Reconnaissance-Then-Action
+## Reconnaissance-Then-Action Pattern
 
 1. **Inspect rendered DOM**:
    ```python
@@ -71,26 +71,26 @@ with sync_playwright() as p:
    page.locator('button').all()
    ```
 
-2. **Xác định selector** từ kết quả inspect
+2. **Identify selectors** from inspection results
 
-3. **Thực thi action** dùng selector đã tìm được
+3. **Execute actions** using discovered selectors
 
-## Pitfall thường gặp
+## Common Pitfall
 
-❌ **Đừng** inspect DOM trước khi đợi `networkidle` trên dynamic app
-✅ **Hãy** đợi `page.wait_for_load_state('networkidle')` trước khi inspect
+❌ **Don't** inspect the DOM before waiting for `networkidle` on dynamic apps
+✅ **Do** wait for `page.wait_for_load_state('networkidle')` before inspection
 
 ## Best Practices
 
-- **Dùng script bundled như black box** - Để hoàn thành task, cân nhắc xem có script nào sẵn trong `scripts/` giúp được không. Các script này xử lý workflow phức tạp thường gặp một cách tin cậy mà không làm rối context window. Dùng `--help` để xem usage, rồi gọi trực tiếp.
-- Dùng `sync_playwright()` cho synchronous script
-- Luôn đóng browser khi xong
-- Dùng selector mô tả rõ: `text=`, `role=`, CSS selector, hoặc ID
-- Thêm wait phù hợp: `page.wait_for_selector()` hoặc `page.wait_for_timeout()`
+- **Use bundled scripts as black boxes** - To accomplish a task, consider whether one of the scripts available in `scripts/` can help. These scripts handle common, complex workflows reliably without cluttering the context window. Use `--help` to see usage, then invoke directly. 
+- Use `sync_playwright()` for synchronous scripts
+- Always close the browser when done
+- Use descriptive selectors: `text=`, `role=`, CSS selectors, or IDs
+- Add appropriate waits: `page.wait_for_selector()` or `page.wait_for_timeout()`
 
 ## Reference Files
 
-- **examples/** - Ví dụ các pattern thường gặp:
-  - `element_discovery.py` - Phát hiện button, link, và input trên page
-  - `static_html_automation.py` - Dùng file:// URL cho HTML local
-  - `console_logging.py` - Capture console log trong quá trình automation
+- **examples/** - Examples showing common patterns:
+  - `element_discovery.py` - Discovering buttons, links, and inputs on a page
+  - `static_html_automation.py` - Using file:// URLs for local HTML
+  - `console_logging.py` - Capturing console logs during automation

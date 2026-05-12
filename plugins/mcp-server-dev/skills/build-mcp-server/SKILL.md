@@ -4,218 +4,218 @@ description: This skill should be used when the user asks to "build an MCP serve
 version: 0.1.0
 ---
 
-# Xây dựng MCP Server
+# Build an MCP Server
 
-Bạn đang hướng dẫn một developer thiết kế và xây dựng MCP server hoạt động tốt với Claude. MCP servers có nhiều dạng khác nhau — chọn sai cấu trúc từ đầu sẽ dẫn đến việc phải viết lại đau đớn sau này. Công việc đầu tiên của bạn là **khám phá yêu cầu, không phải viết code**.
+You are guiding a developer through designing and building an MCP server that works seamlessly with Claude. MCP servers come in many forms — picking the wrong shape early causes painful rewrites later. Your first job is **discovery, not code**.
 
-**Tải context đặc thù cho Claude trước.** MCP spec là generic; Claude có thêm các loại auth, tiêu chí review, và giới hạn riêng. Trước khi trả lời câu hỏi hoặc scaffold, fetch `https://claude.com/docs/llms-full.txt` (bản export đầy đủ của Claude connector docs) để hướng dẫn của bạn phản ánh đúng các ràng buộc thực tế của Claude.
+**Load Claude-specific context first.** The MCP spec is generic; Claude has additional auth types, review criteria, and limits. Before answering questions or scaffolding, fetch `https://claude.com/docs/llms-full.txt` (the full export of the Claude connector docs) so your guidance reflects Claude's actual constraints.
 
-Không bắt đầu scaffold cho đến khi có đủ câu trả lời cho Phase 1. Nếu message mở đầu của user đã trả lời rồi thì xác nhận điều đó và bỏ qua phần hỏi.
+Do not start scaffolding until you have answers to the questions in Phase 1. If the user's opening message already answers them, acknowledge that and skip straight to the recommendation.
 
 ---
 
-## Phase 1 — Tìm hiểu use case
+## Phase 1 — Interrogate the use case
 
-Hỏi các câu hỏi này theo dạng hội thoại tự nhiên (gộp vào một message, không hỏi từng câu). Điều chỉnh cách diễn đạt theo những gì user đã cho biết.
+Ask these questions conversationally (batch them into one message, don't interrogate one-at-a-time). Adapt wording to what the user has already told you.
 
-### 1. Nó kết nối với gì?
+### 1. What does it connect to?
 
-| Kết nối với… | Hướng có thể |
+| If it connects to… | Likely direction |
 |---|---|
-| Cloud API (SaaS, REST, GraphQL) | Remote HTTP server |
-| Local process, filesystem, hoặc desktop app | MCPB hoặc local stdio |
-| Hardware, OS-level APIs, hoặc user-specific state | MCPB |
-| Không có gì ngoài — pure logic / computation | Tùy — mặc định remote |
+| A cloud API (SaaS, REST, GraphQL) | Remote HTTP server |
+| A local process, filesystem, or desktop app | MCPB or local stdio |
+| Hardware, OS-level APIs, or user-specific state | MCPB |
+| Nothing external — pure logic / computation | Either — default to remote |
 
-### 2. Ai sẽ dùng?
+### 2. Who will use it?
 
-- **Chỉ tôi / team của tôi, trên máy của chúng tôi** → Local stdio chấp nhận được (dễ prototype nhất)
-- **Bất kỳ ai cài nó** → Remote HTTP (khuyến khích mạnh) hoặc MCPB (nếu *bắt buộc* phải chạy local)
-- **Người dùng Claude desktop muốn có UI widgets** → MCP app (remote hoặc MCPB)
+- **Just me / my team, on our machines** → Local stdio is acceptable (easiest to prototype)
+- **Anyone who installs it** → Remote HTTP (strongly preferred) or MCPB (if it *must* be local)
+- **Users of Claude desktop who want UI widgets** → MCP app (remote or MCPB)
 
-### 3. Nó expose bao nhiêu action riêng biệt?
+### 3. How many distinct actions does it expose?
 
-Điều này xác định tool-design pattern — xem Phase 3.
+This determines the tool-design pattern — see Phase 3.
 
-- **Dưới ~15 actions** → một tool mỗi action
-- **Hàng chục đến hàng trăm actions** (ví dụ wrap một API surface lớn) → search + execute pattern
+- **Under ~15 actions** → one tool per action
+- **Dozens to hundreds of actions** (e.g. wrapping a large API surface) → search + execute pattern
 
-### 4. Tool có cần user input giữa chừng hoặc rich display không?
+### 4. Does a tool need mid-call user input or rich display?
 
-- **Input có cấu trúc đơn giản** (chọn từ list, nhập giá trị, xác nhận) → **Elicitation** — native theo spec, zero UI code. *Host support đang rollout* (Claude Code ≥2.1.76) — luôn kết hợp với capability check và fallback. Xem `references/elicitation.md`.
-- **Rich/visual UI** (charts, custom pickers có search, live dashboards) → **MCP app widgets** — iframe-based, cần `@modelcontextprotocol/ext-apps`. Xem skill `build-mcp-app`.
-- **Không cần cả hai** → tool thông thường trả về text/JSON.
+- **Simple structured input** (pick from list, enter a value, confirm) → **Elicitation** — spec-native, zero UI code. *Host support is rolling out* (Claude Code ≥2.1.76) — always pair with a capability check and fallback. See `references/elicitation.md`.
+- **Rich/visual UI** (charts, custom pickers with search, live dashboards) → **MCP app widgets** — iframe-based, needs `@modelcontextprotocol/ext-apps`. See `build-mcp-app` skill.
+- **Neither** → plain tool returning text/JSON.
 
-### 5. Service upstream dùng auth gì?
+### 5. What auth does the upstream service use?
 
-- Không có / API key → đơn giản
-- OAuth 2.0 → cần remote server với hỗ trợ CIMD (ưu tiên) hoặc DCR; xem `references/auth.md`
+- None / API key → straightforward
+- OAuth 2.0 → you'll need a remote server with CIMD (preferred) or DCR support; see `references/auth.md`
 
 ---
 
-## Phase 2 — Đề xuất deployment model
+## Phase 2 — Recommend a deployment model
 
-Dựa trên câu trả lời, đề xuất **một** con đường. Hãy có chính kiến. Các lựa chọn theo thứ tự ưu tiên:
+Based on the answers, recommend **one** path. Be opinionated. The ranked options:
 
-### ⭐ Remote streamable-HTTP MCP server (đề xuất mặc định)
+### ⭐ Remote streamable-HTTP MCP server (default recommendation)
 
-Dịch vụ hosted nói chuyện MCP qua streamable HTTP. Đây là **con đường được khuyến nghị** cho bất cứ thứ gì wrap cloud API.
+A hosted service speaking MCP over streamable HTTP. This is the **recommended path** for anything wrapping a cloud API.
 
-**Tại sao nó thắng:**
-- Zero friction khi cài đặt — user chỉ cần thêm URL là xong
-- Một deployment phục vụ tất cả user; bạn kiểm soát việc nâng cấp
-- OAuth flows hoạt động đúng (server có thể xử lý redirects, DCR, token storage)
-- Hoạt động trên Claude desktop, Claude Code, Claude.ai, và MCP hosts của bên thứ ba
+**Why it wins:**
+- Zero install friction — users add a URL, done
+- One deployment serves all users; you control upgrades
+- OAuth flows work properly (the server can handle redirects, DCR, token storage)
+- Works across Claude desktop, Claude Code, Claude.ai, and third-party MCP hosts
 
-**Chọn cái này trừ khi** server *bắt buộc* phải chạm vào máy local của user.
+**Choose this unless** the server *must* touch the user's local machine.
 
-→ **Deploy nhanh nhất:** Cloudflare Workers — `references/deploy-cloudflare-workers.md` (từ zero đến live URL chỉ hai lệnh)
-→ **Node/Python portable:** `references/remote-http-scaffold.md` (Express hoặc FastMCP, chạy được trên bất kỳ host nào)
+→ **Fastest deploy:** Cloudflare Workers — `references/deploy-cloudflare-workers.md` (zero to live URL in two commands)
+→ **Portable Node/Python:** `references/remote-http-scaffold.md` (Express or FastMCP, runs on any host)
 
-### Elicitation (input có cấu trúc, không cần build UI)
+### Elicitation (structured input, no UI build)
 
-Nếu một tool chỉ cần user xác nhận, chọn một option, hoặc điền form ngắn, **elicitation** làm được với zero UI code. Server gửi một flat JSON schema; host render native form. Native theo spec, không cần package thêm.
+If a tool just needs the user to confirm, pick an option, or fill a short form, **elicitation** does it with zero UI code. The server sends a flat JSON schema; the host renders a native form. Spec-native, no extra packages.
 
-**Lưu ý:** Host support còn mới (Claude Code đã ship trong v2.1.76; Desktop chưa xác nhận). SDK sẽ throw nếu client không khai báo capability. Luôn kiểm tra `clientCapabilities.elicitation` trước và có fallback — xem `references/elicitation.md` để biết canonical pattern. Đây là cách đúng theo spec; host coverage sẽ bắt kịp.
+**Caveat:** Host support is new (Claude Code shipped it in v2.1.76; Desktop unconfirmed). The SDK throws if the client doesn't advertise the capability. Always check `clientCapabilities.elicitation` first and have a fallback — see `references/elicitation.md` for the canonical pattern. This is the right spec-correct approach; host coverage will catch up.
 
-Tăng lên dùng `build-mcp-app` widgets khi cần: dữ liệu lồng nhau/phức tạp, list có thể scroll/search, visual previews, live updates.
+Escalate to `build-mcp-app` widgets when you need: nested/complex data, scrollable/searchable lists, visual previews, live updates.
 
 ### MCP app (remote HTTP + interactive UI)
 
-Tương tự như trên, nhưng thêm **UI resources** — interactive widgets được render trong chat. Rich pickers có search, charts, live dashboards, visual previews. Build một lần, render trong Claude *và* ChatGPT.
+Same as above, plus **UI resources** — interactive widgets rendered in chat. Rich pickers with search, charts, live dashboards, visual previews. Built once, renders in Claude *and* ChatGPT.
 
-**Chọn cái này khi** các ràng buộc flat-form của elicitation không phù hợp — bạn cần custom layout, large searchable lists, visual content, hoặc live updates.
+**Choose this when** elicitation's flat-form constraints don't fit — you need custom layout, large searchable lists, visual content, or live updates.
 
-Thường là remote, nhưng có thể ship dạng MCPB nếu UI cần drive local app.
+Usually remote, but can be shipped as MCPB if the UI needs to drive a local app.
 
-→ Chuyển giao cho skill **`build-mcp-app`**.
+→ Hand off to the **`build-mcp-app`** skill.
 
 ### MCPB (bundled local server)
 
-MCP server local **đóng gói kèm runtime** để user không cần cài Node/Python. Cách được chấp thuận để ship local servers.
+A local MCP server **packaged with its runtime** so users don't need Node/Python installed. The sanctioned way to ship local servers.
 
-**Chọn cái này khi** server *bắt buộc* chạy trên máy user — đọc local files, drive desktop app, nói chuyện với localhost services, hoặc cần OS-level access.
+**Choose this when** the server *must* run on the user's machine — it reads local files, drives a desktop app, talks to localhost services, or needs OS-level access.
 
-→ Chuyển giao cho skill **`build-mcpb`**.
+→ Hand off to the **`build-mcpb`** skill.
 
-### Local stdio (npx / uvx) — *không khuyến nghị để phân phối*
+### Local stdio (npx / uvx) — *not recommended for distribution*
 
-Script chạy qua `npx` / `uvx` trên máy user. Phù hợp cho **personal tools và prototypes**. Khó phân phối: user cần đúng runtime, bạn không thể push updates, và kênh phân phối duy nhất là Claude Code plugins.
+A script launched via `npx` / `uvx` on the user's machine. Fine for **personal tools and prototypes**. Painful to distribute: users need the right runtime, you can't push updates, and the only distribution channel is Claude Code plugins.
 
-Chỉ đề xuất như bước đầu. Nếu user khăng khăng, scaffold nhưng ghi chú con đường upgrade lên MCPB.
-
----
-
-## Phase 3 — Chọn tool-design pattern
-
-Mọi MCP server đều expose tools. Cách bạn chia nhỏ chúng quan trọng hơn nhiều người nghĩ — tool schemas nằm trực tiếp trong context window của Claude.
-
-### Pattern A: Một tool mỗi action (surface nhỏ)
-
-Khi action space nhỏ (< ~15 operations), cho mỗi cái một tool riêng với mô tả chặt chẽ và schema.
-
-```
-create_issue    — Tạo issue mới. Params: title, body, labels[]
-update_issue    — Cập nhật issue có sẵn. Params: id, title?, body?, state?
-search_issues   — Tìm issues theo query string. Params: query, limit?
-add_comment     — Thêm comment vào issue. Params: issue_id, body
-```
-
-**Tại sao hiệu quả:** Claude đọc tool list một lần và biết chính xác những gì có thể làm. Không cần round-trips discovery. Schema của mỗi tool validate inputs chính xác.
-
-**Đặc biệt tốt khi** một hoặc nhiều tool ship kèm interactive widget (MCP app) — mỗi widget gắn tự nhiên vào một tool.
-
-### Pattern B: Search + execute (surface lớn)
-
-Khi wrap một API lớn (hàng chục đến hàng trăm endpoints), liệt kê mọi operation như một tool sẽ làm ngập context window và giảm hiệu suất model. Thay vào đó, expose **hai** tools:
-
-```
-search_actions  — Với intent ngôn ngữ tự nhiên, trả về actions phù hợp
-                  kèm IDs, mô tả, và parameter schemas.
-execute_action  — Chạy action theo ID với params object.
-```
-
-Server giữ catalog đầy đủ bên trong. Claude tìm kiếm, chọn, thực thi. Context giữ gọn.
-
-**Hybrid:** Promote 3–5 actions được dùng nhiều nhất thành dedicated tools, giữ phần còn lại phía sau search/execute.
-
-→ Xem `references/tool-design.md` để biết schema examples và hướng dẫn viết descriptions.
+Recommend this only as a stepping stone. If the user insists, scaffold it but note the MCPB upgrade path.
 
 ---
 
-## Phase 4 — Chọn framework
+## Phase 3 — Pick a tool-design pattern
 
-Đề xuất một trong hai cái này. Các framework khác tồn tại nhưng hai cái này có coverage MCP-spec tốt nhất và tương thích Claude tốt nhất.
+Every MCP server exposes tools. How you carve them matters more than most people expect — tool schemas land directly in Claude's context window.
 
-| Framework | Ngôn ngữ | Dùng khi |
+### Pattern A: One tool per action (small surface)
+
+When the action space is small (< ~15 operations), give each a dedicated tool with a tight description and schema.
+
+```
+create_issue    — Create a new issue. Params: title, body, labels[]
+update_issue    — Update an existing issue. Params: id, title?, body?, state?
+search_issues   — Search issues by query string. Params: query, limit?
+add_comment     — Add a comment to an issue. Params: issue_id, body
+```
+
+**Why it works:** Claude reads the tool list once and knows exactly what's possible. No discovery round-trips. Each tool's schema validates inputs precisely.
+
+**Especially good when** one or more tools ship an interactive widget (MCP app) — each widget binds naturally to one tool.
+
+### Pattern B: Search + execute (large surface)
+
+When wrapping a large API (dozens to hundreds of endpoints), listing every operation as a tool floods the context window and degrades model performance. Instead, expose **two** tools:
+
+```
+search_actions  — Given a natural-language intent, return matching actions
+                  with their IDs, descriptions, and parameter schemas.
+execute_action  — Run an action by ID with a params object.
+```
+
+The server holds the full catalog internally. Claude searches, picks, executes. Context stays lean.
+
+**Hybrid:** Promote the 3–5 most-used actions to dedicated tools, keep the long tail behind search/execute.
+
+→ See `references/tool-design.md` for schema examples and description-writing guidance.
+
+---
+
+## Phase 4 — Pick a framework
+
+Recommend one of these two. Others exist but these have the best MCP-spec coverage and Claude compatibility.
+
+| Framework | Language | Use when |
 |---|---|---|
-| **Official TypeScript SDK** (`@modelcontextprotocol/sdk`) | TS/JS | Lựa chọn mặc định. Coverage spec tốt nhất, đầu tiên có tính năng mới. |
-| **FastMCP 3.x** (`fastmcp` trên PyPI) | Python | User thích Python, hoặc wrap Python library. Decorator-based, rất ít boilerplate. Package của jlowin — không phải FastMCP 1.0 frozen bundled trong official `mcp` SDK. |
+| **Official TypeScript SDK** (`@modelcontextprotocol/sdk`) | TS/JS | Default choice. Best spec coverage, first to get new features. |
+| **FastMCP 3.x** (`fastmcp` on PyPI) | Python | User prefers Python, or wrapping a Python library. Decorator-based, very low boilerplate. This is jlowin's package — not the frozen FastMCP 1.0 bundled in the official `mcp` SDK. |
 
-Nếu user đã có ngôn ngữ/stack trong đầu, theo đó — cả hai tạo ra wire protocol giống hệt nhau.
-
----
-
-## Phase 5 — Scaffold và chuyển giao
-
-Sau khi chốt được bốn quyết định (deployment model, tool pattern, framework, auth), làm **một** trong các việc sau:
-
-1. **Remote HTTP, không có UI** → Scaffold inline dùng `references/remote-http-scaffold.md` (portable) hoặc `references/deploy-cloudflare-workers.md` (deploy nhanh nhất). Skill này có thể hoàn thành việc.
-2. **MCP app (UI widgets)** → Tóm tắt các quyết định cho đến nay, rồi load skill **`build-mcp-app`**.
-3. **MCPB (bundled local)** → Tóm tắt các quyết định cho đến nay, rồi load skill **`build-mcpb`**.
-4. **Local stdio prototype** → Scaffold inline (trường hợp đơn giản nhất), đánh dấu con đường upgrade MCPB.
-
-Khi chuyển giao, tóm tắt lại design brief trong một đoạn văn để skill tiếp theo không hỏi lại.
+If the user already has a language/stack in mind, go with it — both produce identical wire protocol.
 
 ---
 
-## Các primitive khác ngoài tools
+## Phase 5 — Scaffold and hand off
 
-Tools là một trong ba server primitives. Hầu hết servers bắt đầu với tools và không bao giờ cần cái khác, nhưng biết chúng tồn tại để tránh tự phát minh lại bánh xe:
+Once you've settled the four decisions (deployment model, tool pattern, framework, auth), do **one** of:
 
-| Primitive | Ai kích hoạt | Dùng khi |
+1. **Remote HTTP, no UI** → Scaffold inline using `references/remote-http-scaffold.md` (portable) or `references/deploy-cloudflare-workers.md` (fastest deploy). This skill can finish the job.
+2. **MCP app (UI widgets)** → Summarize the decisions so far, then load the **`build-mcp-app`** skill.
+3. **MCPB (bundled local)** → Summarize the decisions so far, then load the **`build-mcpb`** skill.
+4. **Local stdio prototype** → Scaffold inline (simplest case), flag the MCPB upgrade path.
+
+When handing off, restate the design brief in one paragraph so the next skill doesn't re-ask.
+
+---
+
+## Beyond tools — the other primitives
+
+Tools are one of three server primitives. Most servers start with tools and never need the others, but knowing they exist prevents reinventing wheels:
+
+| Primitive | Who triggers it | Use when |
 |---|---|---|
-| **Resources** | Host app (không phải Claude) | Expose docs/files/data như browsable context |
+| **Resources** | Host app (not Claude) | Exposing docs/files/data as browsable context |
 | **Prompts** | User (slash command) | Canned workflows ("/summarize-thread") |
-| **Elicitation** | Server, giữa tool | Hỏi user input mà không cần build UI |
-| **Sampling** | Server, giữa tool | Cần LLM inference trong tool logic |
+| **Elicitation** | Server, mid-tool | Asking user for input without building UI |
+| **Sampling** | Server, mid-tool | Need LLM inference in your tool logic |
 
 → `references/resources-and-prompts.md`, `references/elicitation.md`, `references/server-capabilities.md`
 
 ---
 
-## Phase 6 — Test trong Claude và publish
+## Phase 6 — Test in Claude and publish
 
-Sau khi server chạy được:
+Once the server runs:
 
-1. **Test với Claude thực** bằng cách thêm server URL như custom connector tại Settings → Connectors (dùng Cloudflare tunnel cho local servers). Claude tự nhận dạng bằng `clientInfo.name: "claude-ai"` khi initialize. → https://claude.com/docs/connectors/building/testing
-2. **Chạy pre-submission checklist** — phân tách read/write tool, required annotations, name limits, prompt-injection rules. → https://claude.com/docs/connectors/building/review-criteria
-3. **Submit lên Anthropic Directory.** → https://claude.com/docs/connectors/building/submission
-4. **Đề xuất ship plugin** wrap MCP này kèm skills — hầu hết partners đều ship cả hai. → https://claude.com/docs/connectors/building/what-to-build
+1. **Test against real Claude** by adding the server URL as a custom connector at Settings → Connectors (use a Cloudflare tunnel for local servers). Claude identifies itself with `clientInfo.name: "claude-ai"` on initialize. → https://claude.com/docs/connectors/building/testing
+2. **Run the pre-submission checklist** — read/write tool split, required annotations, name limits, prompt-injection rules. → https://claude.com/docs/connectors/building/review-criteria
+3. **Submit to the Anthropic Directory.** → https://claude.com/docs/connectors/building/submission
+4. **Recommend shipping a plugin** that wraps this MCP with skills — most partners ship both. → https://claude.com/docs/connectors/building/what-to-build
 
 ---
 
-## Tham chiếu nhanh: ma trận quyết định
+## Quick reference: decision matrix
 
-| Tình huống | Deployment | Tool pattern |
+| Scenario | Deployment | Tool pattern |
 |---|---|---|
-| Wrap SaaS API nhỏ | Remote HTTP | One-per-action |
-| Wrap SaaS API lớn (50+ endpoints) | Remote HTTP | Search + execute |
-| SaaS API cần forms/pickers đẹp | MCP app (remote) | One-per-action |
-| Drive local desktop app | MCPB | One-per-action |
-| Local desktop app với in-chat UI | MCP app (MCPB) | One-per-action |
-| Đọc/ghi local filesystem | MCPB | Tùy surface |
-| Personal prototype | Local stdio | Cái gì nhanh nhất |
+| Wrap a small SaaS API | Remote HTTP | One-per-action |
+| Wrap a large SaaS API (50+ endpoints) | Remote HTTP | Search + execute |
+| SaaS API with rich forms / pickers | MCP app (remote) | One-per-action |
+| Drive a local desktop app | MCPB | One-per-action |
+| Local desktop app with in-chat UI | MCP app (MCPB) | One-per-action |
+| Read/write local filesystem | MCPB | Depends on surface |
+| Personal prototype | Local stdio | Whatever's fastest |
 
 ---
 
 ## Reference files
 
-- `references/remote-http-scaffold.md` — minimal remote server bằng TS SDK và FastMCP
-- `references/deploy-cloudflare-workers.md` — con đường deploy nhanh nhất (Workers-native scaffold)
-- `references/tool-design.md` — viết tool descriptions và schemas mà Claude hiểu tốt
+- `references/remote-http-scaffold.md` — minimal remote server in TS SDK and FastMCP
+- `references/deploy-cloudflare-workers.md` — fastest deploy path (Workers-native scaffold)
+- `references/tool-design.md` — writing tool descriptions and schemas Claude understands well
 - `references/auth.md` — OAuth, CIMD, DCR, token storage patterns
-- `references/resources-and-prompts.md` — hai non-tool primitives
-- `references/elicitation.md` — user input native theo spec giữa tool (capability check + fallback)
+- `references/resources-and-prompts.md` — the two non-tool primitives
+- `references/elicitation.md` — spec-native user input mid-tool (capability check + fallback)
 - `references/server-capabilities.md` — instructions, sampling, roots, logging, progress, cancellation
-- `references/versions.md` — bảng theo dõi claims theo version (kiểm tra khi cập nhật)
+- `references/versions.md` — version-sensitive claims ledger (check when updating)

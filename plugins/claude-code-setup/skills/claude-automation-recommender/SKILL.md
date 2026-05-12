@@ -6,51 +6,51 @@ tools: Read, Glob, Grep, Bash
 
 # Claude Automation Recommender
 
-Phân tích các pattern trong codebase để đề xuất các automation phù hợp trong Claude Code — bao gồm tất cả các tùy chọn mở rộng.
+Analyze codebase patterns to recommend tailored Claude Code automations across all extensibility options.
 
-**Skill này chỉ đọc, không ghi.** Skill phân tích codebase và xuất ra các đề xuất. Skill KHÔNG tạo hoặc sửa đổi file nào. Người dùng tự implement theo đề xuất hoặc nhờ Claude giúp xây dựng riêng.
+**This skill is read-only.** It analyzes the codebase and outputs recommendations. It does NOT create or modify any files. Users implement the recommendations themselves or ask Claude separately to help build them.
 
-## Hướng dẫn Output
+## Output Guidelines
 
-- **Đề xuất 1-2 loại mỗi category**: Không làm người dùng choáng ngợp — chỉ nêu 1-2 automation có giá trị nhất mỗi loại
-- **Nếu user hỏi loại cụ thể**: Tập trung vào loại đó và đưa ra nhiều tùy chọn hơn (3-5 đề xuất)
-- **Đi xa hơn danh sách tham chiếu**: Các reference file chứa các pattern phổ biến, nhưng hãy dùng web search để tìm đề xuất cụ thể cho tools, framework, và thư viện của codebase
-- **Báo user rằng có thể hỏi thêm**: Kết thúc bằng lưu ý rằng họ có thể yêu cầu thêm đề xuất cho bất kỳ category cụ thể nào
+- **Recommend 1-2 of each type**: Don't overwhelm - surface the top 1-2 most valuable automations per category
+- **If user asks for a specific type**: Focus only on that type and provide more options (3-5 recommendations)
+- **Go beyond the reference lists**: The reference files contain common patterns, but use web search to find recommendations specific to the codebase's tools, frameworks, and libraries
+- **Tell users they can ask for more**: End by noting they can request more recommendations for any specific category
 
-## Tổng quan các loại Automation
+## Automation Types Overview
 
-| Loại | Phù hợp nhất cho |
+| Type | Best For |
 |------|----------|
-| **Hooks** | Hành động tự động theo tool events (format khi save, lint, block edits) |
-| **Subagents** | Reviewer/analyzer chuyên biệt chạy song song |
-| **Skills** | Đóng gói expertise, workflows, và các task lặp lại (gọi bởi Claude hoặc user qua `/skill-name`) |
-| **Plugins** | Tập hợp các skill có thể cài đặt |
-| **MCP Servers** | Tích hợp tool ngoài (database, API, browser, docs) |
+| **Hooks** | Automatic actions on tool events (format on save, lint, block edits) |
+| **Subagents** | Specialized reviewers/analyzers that run in parallel |
+| **Skills** | Packaged expertise, workflows, and repeatable tasks (invoked by Claude or user via `/skill-name`) |
+| **Plugins** | Collections of skills that can be installed |
+| **MCP Servers** | External tool integrations (databases, APIs, browsers, docs) |
 
 ## Workflow
 
-### Phase 1: Phân tích Codebase
+### Phase 1: Codebase Analysis
 
-Thu thập thông tin context về project:
+Gather project context:
 
 ```bash
-# Xác định loại project và tools
+# Detect project type and tools
 ls -la package.json pyproject.toml Cargo.toml go.mod pom.xml 2>/dev/null
 cat package.json 2>/dev/null | head -50
 
-# Kiểm tra dependencies để đề xuất MCP server
+# Check dependencies for MCP server recommendations
 cat package.json 2>/dev/null | grep -E '"(react|vue|angular|next|express|fastapi|django|prisma|supabase|stripe)"'
 
-# Kiểm tra config Claude Code hiện có
+# Check for existing Claude Code config
 ls -la .claude/ CLAUDE.md 2>/dev/null
 
-# Phân tích cấu trúc project
+# Analyze project structure
 ls -la src/ app/ lib/ tests/ components/ pages/ api/ 2>/dev/null
 ```
 
-**Các chỉ số quan trọng cần ghi lại:**
+**Key Indicators to Capture:**
 
-| Category | Tìm gì | Thông tin cho |
+| Category | What to Look For | Informs Recommendations For |
 |----------|------------------|----------------------------|
 | Language/Framework | package.json, pyproject.toml, import patterns | Hooks, MCP servers |
 | Frontend stack | React, Vue, Angular, Next.js | Playwright MCP, frontend skills |
@@ -62,129 +62,129 @@ ls -la src/ app/ lib/ tests/ components/ pages/ api/ 2>/dev/null
 | Issue tracking | Linear, Jira references | Issue tracker MCP |
 | Docs patterns | OpenAPI, JSDoc, docstrings | Documentation skills |
 
-### Phase 2: Tạo Đề xuất
+### Phase 2: Generate Recommendations
 
-Dựa trên phân tích, tạo đề xuất theo tất cả các category:
+Based on analysis, generate recommendations across all categories:
 
-#### A. Đề xuất MCP Server
+#### A. MCP Server Recommendations
 
-Xem [references/mcp-servers.md](references/mcp-servers.md) để biết các pattern chi tiết.
+See [references/mcp-servers.md](references/mcp-servers.md) for detailed patterns.
 
-| Tín hiệu trong codebase | MCP Server đề xuất |
+| Codebase Signal | Recommended MCP Server |
 |-----------------|------------------------|
-| Dùng thư viện phổ biến (React, Express, ...) | **context7** - Tra cứu tài liệu trực tiếp |
-| Frontend cần test UI | **Playwright** - Browser automation/testing |
-| Dùng Supabase | **Supabase MCP** - Thao tác database trực tiếp |
-| Database PostgreSQL/MySQL | **Database MCP** - Query và schema tools |
+| Uses popular libraries (React, Express, etc.) | **context7** - Live documentation lookup |
+| Frontend with UI testing needs | **Playwright** - Browser automation/testing |
+| Uses Supabase | **Supabase MCP** - Direct database operations |
+| PostgreSQL/MySQL database | **Database MCP** - Query and schema tools |
 | GitHub repository | **GitHub MCP** - Issues, PRs, actions |
-| Dùng Linear để quản lý issues | **Linear MCP** - Issue management |
-| Hạ tầng AWS | **AWS MCP** - Cloud resource management |
+| Uses Linear for issues | **Linear MCP** - Issue management |
+| AWS infrastructure | **AWS MCP** - Cloud resource management |
 | Slack workspace | **Slack MCP** - Team notifications |
-| Cần lưu context xuyên session | **Memory MCP** - Cross-session memory |
-| Theo dõi lỗi bằng Sentry | **Sentry MCP** - Error investigation |
-| Container Docker | **Docker MCP** - Container management |
+| Memory/context persistence | **Memory MCP** - Cross-session memory |
+| Sentry error tracking | **Sentry MCP** - Error investigation |
+| Docker containers | **Docker MCP** - Container management |
 
-#### B. Đề xuất Skills
+#### B. Skills Recommendations
 
-Xem [references/skills-reference.md](references/skills-reference.md) để biết chi tiết.
+See [references/skills-reference.md](references/skills-reference.md) for details.
 
-Tạo skills trong `.claude/skills/<name>/SKILL.md`. Một số cũng có sẵn qua plugins:
+Create skills in `.claude/skills/<name>/SKILL.md`. Some are also available via plugins:
 
-| Tín hiệu trong codebase | Skill | Plugin |
+| Codebase Signal | Skill | Plugin |
 |-----------------|-------|--------|
-| Đang xây dựng plugins | skill-development | plugin-dev |
+| Building plugins | skill-development | plugin-dev |
 | Git commits | commit | commit-commands |
 | React/Vue/Angular | frontend-design | frontend-design |
 | Automation rules | writing-rules | hookify |
 | Feature planning | feature-dev | feature-dev |
 
-**Skills tùy chỉnh cần tạo** (kèm templates, scripts, examples):
+**Custom skills to create** (with templates, scripts, examples):
 
-| Tín hiệu trong codebase | Skill cần tạo | Cách gọi |
+| Codebase Signal | Skill to Create | Invocation |
 |-----------------|-----------------|------------|
-| API routes | **api-doc** (với OpenAPI template) | Cả hai |
-| Database project | **create-migration** (với validation script) | Chỉ user |
-| Test suite | **gen-test** (với example tests) | Chỉ user |
-| Component library | **new-component** (với templates) | Chỉ user |
-| PR workflow | **pr-check** (với checklist) | Chỉ user |
-| Releases | **release-notes** (với git context) | Chỉ user |
-| Code style | **project-conventions** | Chỉ Claude |
-| Onboarding | **setup-dev** (với prereq script) | Chỉ user |
+| API routes | **api-doc** (with OpenAPI template) | Both |
+| Database project | **create-migration** (with validation script) | User-only |
+| Test suite | **gen-test** (with example tests) | User-only |
+| Component library | **new-component** (with templates) | User-only |
+| PR workflow | **pr-check** (with checklist) | User-only |
+| Releases | **release-notes** (with git context) | User-only |
+| Code style | **project-conventions** | Claude-only |
+| Onboarding | **setup-dev** (with prereq script) | User-only |
 
-#### C. Đề xuất Hooks
+#### C. Hooks Recommendations
 
-Xem [references/hooks-patterns.md](references/hooks-patterns.md) để biết cấu hình.
+See [references/hooks-patterns.md](references/hooks-patterns.md) for configurations.
 
-| Tín hiệu trong codebase | Hook đề xuất |
+| Codebase Signal | Recommended Hook |
 |-----------------|------------------|
-| Cấu hình Prettier | PostToolUse: tự động format khi edit |
-| Cấu hình ESLint/Ruff | PostToolUse: tự động lint khi edit |
-| Project TypeScript | PostToolUse: type-check khi edit |
-| Có thư mục tests | PostToolUse: chạy test liên quan |
-| Có file `.env` | PreToolUse: block edit `.env` |
-| Có lock files | PreToolUse: block edit lock files |
-| Code nhạy cảm với security | PreToolUse: yêu cầu xác nhận |
+| Prettier configured | PostToolUse: auto-format on edit |
+| ESLint/Ruff configured | PostToolUse: auto-lint on edit |
+| TypeScript project | PostToolUse: type-check on edit |
+| Tests directory exists | PostToolUse: run related tests |
+| `.env` files present | PreToolUse: block `.env` edits |
+| Lock files present | PreToolUse: block lock file edits |
+| Security-sensitive code | PreToolUse: require confirmation |
 
-#### D. Đề xuất Subagents
+#### D. Subagent Recommendations
 
-Xem [references/subagent-templates.md](references/subagent-templates.md) để biết templates.
+See [references/subagent-templates.md](references/subagent-templates.md) for templates.
 
-| Tín hiệu trong codebase | Subagent đề xuất |
+| Codebase Signal | Recommended Subagent |
 |-----------------|---------------------|
-| Codebase lớn (>500 files) | **code-reviewer** - Code review song song |
-| Code auth/payments | **security-reviewer** - Security audits |
-| Project API | **api-documenter** - Tạo OpenAPI |
-| Performance critical | **performance-analyzer** - Phát hiện bottleneck |
-| Frontend nặng | **ui-reviewer** - Accessibility review |
-| Cần thêm tests | **test-writer** - Tạo tests |
+| Large codebase (>500 files) | **code-reviewer** - Parallel code review |
+| Auth/payments code | **security-reviewer** - Security audits |
+| API project | **api-documenter** - OpenAPI generation |
+| Performance critical | **performance-analyzer** - Bottleneck detection |
+| Frontend heavy | **ui-reviewer** - Accessibility review |
+| Needs more tests | **test-writer** - Test generation |
 
-#### E. Đề xuất Plugins
+#### E. Plugin Recommendations
 
-Xem [references/plugins-reference.md](references/plugins-reference.md) để biết các plugin có sẵn.
+See [references/plugins-reference.md](references/plugins-reference.md) for available plugins.
 
-| Tín hiệu trong codebase | Plugin đề xuất |
+| Codebase Signal | Recommended Plugin |
 |-----------------|-------------------|
-| Năng suất chung | **anthropic-agent-skills** - Gói skills cốt lõi |
-| Workflow với tài liệu | Cài skills docx, xlsx, pdf |
-| Phát triển frontend | Plugin **frontend-design** |
-| Xây dựng AI tools | **mcp-builder** cho phát triển MCP |
+| General productivity | **anthropic-agent-skills** - Core skills bundle |
+| Document workflows | Install docx, xlsx, pdf skills |
+| Frontend development | **frontend-design** plugin |
+| Building AI tools | **mcp-builder** for MCP development |
 
-### Phase 3: Xuất Báo cáo Đề xuất
+### Phase 3: Output Recommendations Report
 
-Format đề xuất rõ ràng. **Chỉ bao gồm 1-2 đề xuất mỗi category** — những cái có giá trị nhất cho codebase cụ thể này. Bỏ qua các category không liên quan.
+Format recommendations clearly. **Only include 1-2 recommendations per category** - the most valuable ones for this specific codebase. Skip categories that aren't relevant.
 
 ```markdown
-## Đề xuất Automation cho Claude Code
+## Claude Code Automation Recommendations
 
-Tôi đã phân tích codebase của bạn và xác định các automation hàng đầu cho mỗi category. Dưới đây là 1-2 đề xuất tốt nhất mỗi loại:
+I've analyzed your codebase and identified the top automations for each category. Here are my top 1-2 recommendations per type:
 
 ### Codebase Profile
-- **Loại**: [ngôn ngữ/runtime phát hiện được]
-- **Framework**: [framework phát hiện được]
-- **Thư viện chính**: [thư viện liên quan phát hiện được]
+- **Type**: [detected language/runtime]
+- **Framework**: [detected framework]
+- **Key Libraries**: [relevant libraries detected]
 
 ---
 
 ### 🔌 MCP Servers
 
 #### context7
-**Tại sao**: [lý do cụ thể dựa trên thư viện phát hiện được]
-**Cài đặt**: `claude mcp add context7`
+**Why**: [specific reason based on detected libraries]
+**Install**: `claude mcp add context7`
 
 ---
 
 ### 🎯 Skills
 
-#### [tên skill]
-**Tại sao**: [lý do cụ thể]
-**Tạo tại**: `.claude/skills/[name]/SKILL.md`
-**Cách gọi**: Chỉ user / Cả hai / Chỉ Claude
-**Cũng có trong**: plugin [plugin-name] (nếu có)
+#### [skill name]
+**Why**: [specific reason]
+**Create**: `.claude/skills/[name]/SKILL.md`
+**Invocation**: User-only / Both / Claude-only
+**Also available in**: [plugin-name] plugin (if applicable)
 ```yaml
 ---
 name: [skill-name]
-description: [mô tả skill làm gì]
-disable-model-invocation: true  # cho user-only
+description: [what it does]
+disable-model-invocation: true  # for user-only
 ---
 ```
 
@@ -192,92 +192,92 @@ disable-model-invocation: true  # cho user-only
 
 ### ⚡ Hooks
 
-#### [tên hook]
-**Tại sao**: [lý do cụ thể dựa trên config phát hiện được]
-**Tạo tại**: `.claude/settings.json`
+#### [hook name]
+**Why**: [specific reason based on detected config]
+**Where**: `.claude/settings.json`
 
 ---
 
 ### 🤖 Subagents
 
-#### [tên agent]
-**Tại sao**: [lý do cụ thể dựa trên patterns trong codebase]
-**Tạo tại**: `.claude/agents/[name].md`
+#### [agent name]
+**Why**: [specific reason based on codebase patterns]
+**Where**: `.claude/agents/[name].md`
 
 ---
 
-**Muốn thêm?** Hỏi thêm đề xuất cho bất kỳ category cụ thể nào (ví dụ: "cho tôi thêm tùy chọn MCP server" hoặc "còn hook nào khác hữu ích không?").
+**Want more?** Ask for additional recommendations for any specific category (e.g., "show me more MCP server options" or "what other hooks would help?").
 
-**Muốn được giúp triển khai?** Chỉ cần hỏi và tôi có thể giúp bạn thiết lập bất kỳ đề xuất nào ở trên.
+**Want help implementing any of these?** Just ask and I can help you set up any of the recommendations above.
 ```
 
-## Khung quyết định
+## Decision Framework
 
-### Khi nào nên đề xuất MCP Servers
-- Cần tích hợp external service (database, API)
-- Tra cứu tài liệu cho thư viện/SDK
-- Browser automation hoặc testing
-- Tích hợp team tools (GitHub, Linear, Slack)
-- Quản lý cloud infrastructure
+### When to Recommend MCP Servers
+- External service integration needed (databases, APIs)
+- Documentation lookup for libraries/SDKs
+- Browser automation or testing
+- Team tool integration (GitHub, Linear, Slack)
+- Cloud infrastructure management
 
-### Khi nào nên đề xuất Skills
+### When to Recommend Skills
 
-- Tạo tài liệu (docx, xlsx, pptx, pdf — cũng có trong plugins)
-- Các prompt hoặc workflow lặp lại thường xuyên
-- Task đặc thù của project có đối số
-- Áp dụng templates hoặc scripts cho tasks (skills có thể bundle các supporting files)
-- Quick actions gọi bằng `/skill-name`
-- Workflows nên chạy trong isolation (`context: fork`)
+- Document generation (docx, xlsx, pptx, pdf — also in plugins)
+- Frequently repeated prompts or workflows
+- Project-specific tasks with arguments
+- Applying templates or scripts to tasks (skills can bundle supporting files)
+- Quick actions invoked with `/skill-name`
+- Workflows that should run in isolation (`context: fork`)
 
-**Kiểm soát cách gọi:**
-- `disable-model-invocation: true` — Chỉ user (cho side effects: deploy, commit, gửi)
-- `user-invocable: false` — Chỉ Claude (cho background knowledge)
-- Mặc định (bỏ qua cả hai) — Cả hai đều có thể gọi
+**Invocation control:**
+- `disable-model-invocation: true` — User-only (for side effects: deploy, commit, send)
+- `user-invocable: false` — Claude-only (for background knowledge)
+- Default (omit both) — Both can invoke
 
-### Khi nào nên đề xuất Hooks
-- Hành động post-edit lặp lại (formatting, linting)
-- Quy tắc bảo vệ (block edit file nhạy cảm)
-- Kiểm tra validation (tests, type checks)
+### When to Recommend Hooks
+- Repetitive post-edit actions (formatting, linting)
+- Protection rules (block sensitive file edits)
+- Validation checks (tests, type checks)
 
-### Khi nào nên đề xuất Subagents
-- Cần expertise chuyên biệt (security, performance)
-- Workflow review song song
+### When to Recommend Subagents
+- Specialized expertise needed (security, performance)
+- Parallel review workflows
 - Background quality checks
 
-### Khi nào nên đề xuất Plugins
-- Cần nhiều skills liên quan
-- Muốn bundle automation được đóng gói sẵn
-- Chuẩn hóa trong toàn team
+### When to Recommend Plugins
+- Need multiple related skills
+- Want pre-packaged automation bundles
+- Team-wide standardization
 
 ---
 
-## Mẹo Cấu hình
+## Configuration Tips
 
-### Thiết lập MCP Server
+### MCP Server Setup
 
-**Chia sẻ trong team**: Commit `.mcp.json` vào repo để toàn team dùng chung MCP servers
+**Team sharing**: Check `.mcp.json` into repo so entire team gets same MCP servers
 
-**Debug**: Dùng flag `--mcp-debug` để xác định vấn đề cấu hình
+**Debugging**: Use `--mcp-debug` flag to identify configuration issues
 
-**Prerequisites nên đề xuất:**
-- GitHub CLI (`gh`) - kích hoạt các thao tác GitHub native
-- Puppeteer/Playwright CLI - cho browser MCP servers
+**Prerequisites to recommend:**
+- GitHub CLI (`gh`) - enables native GitHub operations
+- Puppeteer/Playwright CLI - for browser MCP servers
 
-### Headless Mode (cho CI/Automation)
+### Headless Mode (for CI/Automation)
 
-Đề xuất headless Claude cho automated pipelines:
+Recommend headless Claude for automated pipelines:
 
 ```bash
-# Ví dụ pre-commit hook
+# Pre-commit hook example
 claude -p "fix lint errors in src/" --allowedTools Edit,Write
 
-# CI pipeline với structured output
+# CI pipeline with structured output
 claude -p "<prompt>" --output-format stream-json | your_command
 ```
 
-### Permissions cho Hooks
+### Permissions for Hooks
 
-Cấu hình allowed tools trong `.claude/settings.json`:
+Configure allowed tools in `.claude/settings.json`:
 
 ```json
 {

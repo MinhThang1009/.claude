@@ -4,28 +4,28 @@ description: This skill should be used when the user wants to "package an MCP se
 version: 0.1.0
 ---
 
-# Xây dựng MCPB (Bundled Local MCP Server)
+# Build an MCPB (Bundled Local MCP Server)
 
-MCPB là MCP server local **đóng gói kèm runtime**. User cài một file; chạy mà không cần Node, Python, hoặc bất kỳ toolchain nào trên máy họ. Đây là cách được chấp thuận để phân phối local MCP servers.
+MCPB is a local MCP server **packaged with its runtime**. The user installs one file; it runs without needing Node, Python, or any toolchain on their machine. It's the sanctioned way to distribute local MCP servers.
 
-> MCPB là con đường phân phối **thứ cấp**. Anthropic khuyến nghị remote MCP servers để listing trong directory — xem https://claude.com/docs/connectors/building/what-to-build.
+> MCPB is the **secondary** distribution path. Anthropic recommends remote MCP servers for directory listing — see https://claude.com/docs/connectors/building/what-to-build.
 
-**Dùng MCPB khi server phải chạy trên máy user** — đọc local files, drive desktop app, nói chuyện với localhost services, OS-level APIs. Nếu server của bạn chỉ gọi cloud APIs, hầu như chắc chắn bạn muốn remote HTTP server thay vào đó (xem `build-mcp-server`). Đừng chịu thuế MCPB packaging cho thứ có thể là một URL.
+**Use MCPB when the server must run on the user's machine** — reading local files, driving a desktop app, talking to localhost services, OS-level APIs. If your server only hits cloud APIs, you almost certainly want a remote HTTP server instead (see `build-mcp-server`). Don't pay the MCPB packaging tax for something that could be a URL.
 
 ---
 
-## Bundle MCPB chứa gì
+## What an MCPB bundle contains
 
 ```
 my-server.mcpb              (zip archive)
 ├── manifest.json           ← identity, entry point, config schema, compatibility
-├── server/                 ← code MCP server của bạn
+├── server/                 ← your MCP server code
 │   ├── index.js
-│   └── node_modules/       ← dependencies bundled (hoặc vendored)
+│   └── node_modules/       ← bundled dependencies (or vendored)
 └── icon.png
 ```
 
-Host đọc `manifest.json`, chạy `server.mcp_config.command` như **stdio** MCP server, và pipe messages. Từ góc nhìn code của bạn, nó giống hệt local stdio server — sự khác biệt duy nhất là packaging.
+The host reads `manifest.json`, launches `server.mcp_config.command` as a **stdio** MCP server, and pipes messages. From your code's perspective it's identical to a local stdio server — the only difference is packaging.
 
 ---
 
@@ -66,17 +66,17 @@ Host đọc `manifest.json`, chạy `server.mcp_config.command` như **stdio** M
 }
 ```
 
-**`server.type`** — `node`, `python`, hoặc `binary`. Chỉ mang tính thông tin; lệnh thực tế đến từ `mcp_config`.
+**`server.type`** — `node`, `python`, or `binary`. Informational; the actual launch comes from `mcp_config`.
 
-**`server.mcp_config`** — lệnh/args/env literal để spawn. Dùng `${__dirname}` cho bundle-relative paths và `${user_config.<key>}` để substitute install-time config. **Không có auto-prefix** — tên env var mà server của bạn đọc là chính xác những gì bạn đặt trong `env`.
+**`server.mcp_config`** — the literal command/args/env to spawn. Use `${__dirname}` for bundle-relative paths and `${user_config.<key>}` to substitute install-time config. **There's no auto-prefix** — the env var names your server reads are exactly what you put in `env`.
 
-**`user_config`** — cài đặt install-time được surface trong UI của host. `type: "directory"` render native folder picker. `sensitive: true` lưu trong OS keychain. Xem `references/manifest-schema.md` để biết tất cả các fields.
+**`user_config`** — install-time settings surfaced in the host's UI. `type: "directory"` renders a native folder picker. `sensitive: true` stores in OS keychain. See `references/manifest-schema.md` for all fields.
 
 ---
 
-## Server code: giống local stdio
+## Server code: same as local stdio
 
-Bản thân server là stdio MCP server tiêu chuẩn. Không có gì đặc thù MCPB trong tool logic.
+The server itself is a standard stdio MCP server. Nothing MCPB-specific in the tool logic.
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -86,7 +86,7 @@ import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { homedir } from "node:os";
 
-// ROOT_DIR đến từ những gì bạn đặt trong server.mcp_config.env của manifest — không có auto-prefix
+// ROOT_DIR comes from what you put in manifest's server.mcp_config.env — no auto-prefix
 const ROOT = (process.env.ROOT_DIR ?? join(homedir(), "Documents"));
 
 const server = new McpServer({ name: "local-files", version: "0.1.0" });
@@ -122,9 +122,9 @@ const transport = new StdioServerTransport();
 await server.connect(transport);
 ```
 
-**Sandboxing hoàn toàn là trách nhiệm của bạn.** Không có sandbox ở cấp manifest — process chạy với full user privileges. Validate paths, từ chối escape khỏi `ROOT`, allowlist spawns. Xem `references/local-security.md`.
+**Sandboxing is entirely your job.** There is no manifest-level sandbox — the process runs with full user privileges. Validate paths, refuse to escape `ROOT`, allowlist spawns. See `references/local-security.md`.
 
-Trước khi hardcode `ROOT` từ config env var, kiểm tra xem host có hỗ trợ `roots/list` không — cách native theo spec để lấy user-approved directories. Xem `references/local-security.md` để biết pattern.
+Before hardcoding `ROOT` from a config env var, check if the host supports `roots/list` — the spec-native way to get user-approved directories. See `references/local-security.md` for the pattern.
 
 ---
 
@@ -135,11 +135,11 @@ Trước khi hardcode `ROOT` từ config env var, kiểm tra xem host có hỗ t
 ```bash
 npm install
 npx esbuild src/index.ts --bundle --platform=node --outfile=server/index.js
-# hoặc: copy node_modules wholesale nếu native deps khó bundle
+# or: copy node_modules wholesale if native deps resist bundling
 npx @anthropic-ai/mcpb pack
 ```
 
-`mcpb pack` zip directory và validate `manifest.json` theo schema.
+`mcpb pack` zips the directory and validates `manifest.json` against the schema.
 
 ### Python
 
@@ -148,52 +148,52 @@ pip install -t server/vendor -r requirements.txt
 npx @anthropic-ai/mcpb pack
 ```
 
-Vendor dependencies vào subdirectory và prepend vào `sys.path` trong entry script. Native extensions (numpy, v.v.) phải được build cho từng target platform — tránh native deps nếu có thể.
+Vendor dependencies into a subdirectory and prepend it to `sys.path` in your entry script. Native extensions (numpy, etc.) must be built for each target platform — avoid native deps if you can.
 
 ---
 
-## MCPB không có sandbox — security là trách nhiệm của bạn
+## MCPB has no sandbox — security is on you
 
-Khác với mobile app stores, MCPB KHÔNG enforce permissions. Manifest không có block `permissions` — server chạy với full user privileges. `references/local-security.md` là tài liệu phải đọc, không phải optional. Mọi path phải được validate, mọi spawn phải được allowlist, vì không có gì dừng bạn ở platform level.
+Unlike mobile app stores, MCPB does NOT enforce permissions. The manifest has no `permissions` block — the server runs with full user privileges. `references/local-security.md` is mandatory reading, not optional. Every path must be validated, every spawn must be allowlisted, because nothing stops you at the platform level.
 
-Nếu bạn đến đây kỳ vọng filesystem/network scoping từ manifest: nó không tồn tại. Tự build trong tool handlers.
+If you came here expecting filesystem/network scoping from the manifest: it doesn't exist. Build it yourself in tool handlers.
 
-Nếu công việc duy nhất của server là gọi cloud API, dừng lại — đó là remote server mặc áo MCPB. User không được lợi gì từ việc chạy nó local, và bạn đang chịu gánh nặng local-security vô lý do.
+If your server's only job is hitting a cloud API, stop — that's a remote server wearing an MCPB costume. The user gains nothing from running it locally, and you're taking on local-security burden for no reason.
 
 ---
 
 ## MCPB + UI widgets
 
-MCPB servers có thể phục vụ UI resources giống hệt remote MCP apps — widget mechanism là transport-agnostic. File picker local duyệt disk thực, dialog điều khiển native app, v.v.
+MCPB servers can serve UI resources exactly like remote MCP apps — the widget mechanism is transport-agnostic. A local file picker that browses the actual disk, a dialog that controls a native app, etc.
 
-Widget authoring được đề cập trong skill **`build-mcp-app`**; hoạt động tương tự ở đây. Sự khác biệt duy nhất là nơi server chạy.
+Widget authoring is covered in the **`build-mcp-app`** skill; it works the same here. The only difference is where the server runs.
 
 ---
 
 ## Testing
 
 ```bash
-# Tạo manifest tương tác (lần đầu)
+# Interactive manifest creation (first time)
 npx @anthropic-ai/mcpb init
 
-# Chạy server trực tiếp qua stdio, thử với inspector
+# Run the server directly over stdio, poke it with the inspector
 npx @modelcontextprotocol/inspector node server/index.js
 
-# Validate manifest theo schema, rồi pack
+# Validate manifest against schema, then pack
 npx @anthropic-ai/mcpb validate
 npx @anthropic-ai/mcpb pack
 
-# Ký để phân phối
+# Sign for distribution
 npx @anthropic-ai/mcpb sign dist/local-files.mcpb
 
-# Cài đặt: kéo file .mcpb vào Claude Desktop
+# Install: drag the .mcpb file onto Claude Desktop
 ```
 
-Test trên máy **không có** dev toolchain của bạn trước khi ship. Các lỗi "Works on my machine" trong MCPB hầu như luôn truy về một dependency không thực sự được bundled.
+Test on a machine **without** your dev toolchain before shipping. "Works on my machine" failures in MCPB almost always trace to a dependency that wasn't actually bundled.
 
 ---
 
 ## Reference files
 
-- `references/manifest-schema.md` — tham chiếu đầy đủ các field trong `manifest.json`
+- `references/manifest-schema.md` — full `manifest.json` field reference
 - `references/local-security.md` — path traversal, sandboxing, least privilege

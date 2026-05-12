@@ -4,67 +4,67 @@ description: This skill should be used when the user wants to build an "MCP app"
 version: 0.1.0
 ---
 
-# Xây dựng MCP App (Interactive UI Widgets)
+# Build an MCP App (Interactive UI Widgets)
 
-MCP app là MCP server tiêu chuẩn **cộng thêm UI resources** — các interactive component được render inline trong chat surface. Build một lần, chạy trong Claude *và* ChatGPT và bất kỳ host nào implement apps surface.
+An MCP app is a standard MCP server that **also serves UI resources** — interactive components rendered inline in the chat surface. Build once, runs in Claude *and* ChatGPT and any other host that implements the apps surface.
 
-UI layer là **bổ sung thêm**. Về cơ bản vẫn là tools, resources, và cùng wire protocol. Nếu bạn chưa build plain MCP server trước đây, skill `build-mcp-server` bao gồm base layer. Skill này thêm widgets lên trên.
+The UI layer is **additive**. Under the hood it's still tools, resources, and the same wire protocol. If you haven't built a plain MCP server before, the `build-mcp-server` skill covers the base layer. This skill adds widgets on top.
 
-> **Test trong Claude:** Thêm server như custom connector trên claude.ai (qua Cloudflare tunnel cho local dev) — điều này sẽ chạy thực tế iframe sandbox và `hostContext`. Xem https://claude.com/docs/connectors/building/testing.
+> **Testing in Claude:** Add the server as a custom connector in claude.ai (via a Cloudflare tunnel for local dev) — this exercises the real iframe sandbox and `hostContext`. See https://claude.com/docs/connectors/building/testing.
 
-## Các đặc điểm riêng của Claude host
+## Claude host specifics
 
-| `_meta.ui.*` key | Nơi dùng | Tác dụng |
+| `_meta.ui.*` key | Where | Effect |
 |---|---|---|
-| `resourceUri` | tool | UI resource `ui://` nào host render cho kết quả của tool này. |
-| `visibility: ["app"]` | tool | Ẩn widget-only helper tool (ví dụ geometry/image fetcher gọi qua `callServerTool`) khỏi tool list của Claude. |
-| `prefersBorder: false` | resource | Bỏ outer card border của host (mobile). |
-| `csp.{connectDomains, resourceDomains, baseUriDomains}` | resource | Khai báo external origins; mặc định là block-all. `frameDomains` hiện bị giới hạn trong Claude. |
+| `resourceUri` | tool | Which `ui://` resource the host renders for this tool's results. |
+| `visibility: ["app"]` | tool | Hide a widget-only helper tool (e.g. geometry/image fetcher called via `callServerTool`) from Claude's tool list. |
+| `prefersBorder: false` | resource | Drop the host's outer card border (mobile). |
+| `csp.{connectDomains, resourceDomains, baseUriDomains}` | resource | Declare external origins; default is block-all. `frameDomains` is currently restricted in Claude. |
 
-- `hostContext.safeAreaInsets: {top, right, bottom, left}` (px) — tuân thủ điều này cho notches và composer overlay.
-- Directory submission yêu cầu OAuth hoặc **authless** (`none`) — static bearer chỉ dùng private-deploy và bị block khi listing — cộng với tool `annotations` và 3–5 PNG screenshots; xem `references/directory-checklist.md`.
+- `hostContext.safeAreaInsets: {top, right, bottom, left}` (px) — honor these for notches and the composer overlay.
+- Directory submission requires OAuth or **authless** (`none`) — static bearer is private-deploy only and blocks listing — plus tool `annotations` and 3–5 PNG screenshots; see `references/directory-checklist.md`.
 
 ---
 
-## Khi nào widget tốt hơn plain text
+## When a widget beats plain text
 
-Đừng thêm UI chỉ vì có thể — hầu hết tools dùng text trả về là ổn. Thêm widget khi một trong các điều sau là đúng:
+Don't add UI for its own sake — most tools are fine returning text or JSON. Add a widget when one of these is true:
 
-| Tín hiệu | Loại widget |
+| Signal | Widget type |
 |---|---|
-| Tool cần structured input mà Claude không thể suy ra đáng tin cậy | Form |
-| User phải chọn từ list mà Claude không thể xếp hạng (files, contacts, records) | Picker / table |
-| Action destructive hoặc billable cần xác nhận rõ ràng | Confirm dialog |
-| Output là spatial hoặc visual (charts, maps, diffs, previews) | Display widget |
-| Job chạy lâu mà user muốn theo dõi | Progress / live status |
+| Tool needs structured input Claude can't reliably infer | Form |
+| User must pick from a list Claude can't rank (files, contacts, records) | Picker / table |
+| Destructive or billable action needs explicit confirmation | Confirm dialog |
+| Output is spatial or visual (charts, maps, diffs, previews) | Display widget |
+| Long-running job the user wants to watch | Progress / live status |
 
-Nếu không có điều nào áp dụng, bỏ qua widget. Text build nhanh hơn và nhanh hơn cho user.
+If none apply, skip the widget. Text is faster to build and faster for the user.
 
 ---
 
-## Widgets vs Elicitation — chọn đúng hướng
+## Widgets vs Elicitation — route correctly
 
-Trước khi build widget, kiểm tra xem **elicitation** có đáp ứng không. Elicitation là native theo spec, zero UI code, hoạt động trong bất kỳ compliant host nào.
+Before building a widget, check if **elicitation** covers it. Elicitation is spec-native, zero UI code, works in any compliant host.
 
-| Nhu cầu | Elicitation | Widget |
+| Need | Elicitation | Widget |
 |---|---|---|
-| Xác nhận yes/no | ✅ | overkill |
-| Chọn từ enum ngắn | ✅ | overkill |
-| Điền flat form (tên, email, ngày) | ✅ | overkill |
-| Chọn từ list lớn/có search | ❌ (không scroll/search) | ✅ |
-| Visual preview trước khi chọn | ❌ | ✅ |
+| Confirm yes/no | ✅ | overkill |
+| Pick from short enum | ✅ | overkill |
+| Fill a flat form (name, email, date) | ✅ | overkill |
+| Pick from a large/searchable list | ❌ (no scroll/search) | ✅ |
+| Visual preview before choosing | ❌ | ✅ |
 | Chart / map / diff view | ❌ | ✅ |
-| Progress live-updating | ❌ | ✅ |
+| Live-updating progress | ❌ | ✅ |
 
-Nếu elicitation đáp ứng được, dùng nó. Xem `../build-mcp-server/references/elicitation.md`.
+If elicitation covers it, use it. See `../build-mcp-server/references/elicitation.md`.
 
 ---
 
-## Kiến trúc: hai hình thức deployment
+## Architecture: two deployment shapes
 
-### Remote MCP app (phổ biến nhất)
+### Remote MCP app (most common)
 
-Hosted streamable-HTTP server. Widget templates được phục vụ như **resources**; kết quả tool tham chiếu đến chúng. Host fetch resource, render trong iframe sandbox, và broker messages giữa widget và Claude.
+Hosted streamable-HTTP server. Widget templates are served as **resources**; tool results reference them. The host fetches the resource, renders it in an iframe sandbox, and brokers messages between the widget and Claude.
 
 ```
 ┌──────────┐  tools/call   ┌────────────┐
@@ -83,20 +83,20 @@ Hosted streamable-HTTP server. Widget templates được phục vụ như **reso
 
 ### MCPB-packaged MCP app (local + UI)
 
-Cơ chế widget giống như trên, nhưng server chạy local trong MCPB bundle. Dùng khi widget cần drive **local** application — ví dụ file picker duyệt disk thực, dialog điều khiển desktop app.
+Same widget mechanism, but the server runs locally inside an MCPB bundle. Use this when the widget needs to drive a **local** application — e.g., a file picker that browses the actual local disk, a dialog that controls a desktop app.
 
-Về mechanics MCPB packaging, xem skill **`build-mcpb`**. Tất cả nội dung phía dưới áp dụng cho cả hai hình thức.
+For MCPB packaging mechanics, defer to the **`build-mcpb`** skill. Everything below applies to both shapes.
 
 ---
 
-## Widget gắn với tools như thế nào
+## How widgets attach to tools
 
-Widget-enabled tool có **hai đăng ký riêng biệt**:
+A widget-enabled tool has **two separate registrations**:
 
-1. **The tool** khai báo UI resource qua `_meta.ui.resourceUri`. Handler của nó trả về plain text/JSON — KHÔNG phải HTML.
-2. **The resource** được đăng ký riêng và phục vụ HTML.
+1. **The tool** declares a UI resource via `_meta.ui.resourceUri`. Its handler returns plain text/JSON — NOT the HTML.
+2. **The resource** is registered separately and serves the HTML.
 
-Khi Claude gọi tool, host thấy `_meta.ui.resourceUri`, fetch resource đó, render trong iframe, và pipe return value của tool vào iframe qua event `ontoolresult`.
+When Claude calls the tool, the host sees `_meta.ui.resourceUri`, fetches that resource, renders it in an iframe, and pipes the tool's return value into the iframe via the `ontoolresult` event.
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -106,7 +106,7 @@ import { z } from "zod";
 
 const server = new McpServer({ name: "contacts", version: "1.0.0" });
 
-// 1. The tool — trả về DATA, khai báo UI nào sẽ hiển thị
+// 1. The tool — returns DATA, declares which UI to show
 registerAppTool(server, "pick_contact", {
   description: "Open an interactive contact picker",
   annotations: { title: "Pick Contact", readOnlyHint: true },
@@ -114,11 +114,11 @@ registerAppTool(server, "pick_contact", {
   _meta: { ui: { resourceUri: "ui://widgets/contact-picker.html" } },
 }, async ({ filter }) => {
   const contacts = await db.contacts.search(filter);
-  // Plain JSON — widget nhận qua ontoolresult
+  // Plain JSON — the widget receives this via ontoolresult
   return { content: [{ type: "text", text: JSON.stringify(contacts) }] };
 });
 
-// 2. The resource — phục vụ HTML
+// 2. The resource — serves the HTML
 registerAppResource(
   server,
   "Contact Picker",
@@ -128,29 +128,29 @@ registerAppResource(
     contents: [{
       uri: "ui://widgets/contact-picker.html",
       mimeType: RESOURCE_MIME_TYPE,
-      text: pickerHtml,  // HTML string của bạn
+      text: pickerHtml,  // your HTML string
     }],
   }),
 );
 ```
 
-URI scheme `ui://` là quy ước. MIME type PHẢI là `RESOURCE_MIME_TYPE` (`"text/html;profile=mcp-app"`) — đây là cách host biết render nó như interactive iframe, không chỉ hiển thị source.
+The URI scheme `ui://` is convention. The mime type MUST be `RESOURCE_MIME_TYPE` (`"text/html;profile=mcp-app"`) — this is how the host knows to render it as an interactive iframe, not just display the source.
 
 ---
 
-## Widget runtime — class `App`
+## Widget runtime — the `App` class
 
-Trong iframe, script của bạn nói chuyện với host qua class `App` từ `@modelcontextprotocol/ext-apps`. Đây là **kết nối hai chiều liên tục** — widget giữ hoạt động chừng nào conversation còn active, nhận kết quả tool mới và gửi hành động của user.
+Inside the iframe, your script talks to the host via the `App` class from `@modelcontextprotocol/ext-apps`. This is a **persistent bidirectional connection** — the widget stays alive as long as the conversation is active, receiving new tool results and sending user actions.
 
 ```html
 <script type="module">
-  /* Bundle ext-apps inline lúc build time → globalThis.ExtApps */
+  /* ext-apps bundle inlined at build time → globalThis.ExtApps */
   /*__EXT_APPS_BUNDLE__*/
   const { App } = globalThis.ExtApps;
 
   const app = new App({ name: "ContactPicker", version: "1.0.0" }, {});
 
-  // Đặt handlers TRƯỚC khi connect
+  // Set handlers BEFORE connecting
   app.ontoolresult = ({ content }) => {
     const contacts = JSON.parse(content[0].text);
     render(contacts);
@@ -158,7 +158,7 @@ Trong iframe, script của bạn nói chuyện với host qua class `App` từ `
 
   await app.connect();
 
-  // Sau, khi user click:
+  // Later, when the user clicks something:
   function onPick(contact) {
     app.sendMessage({
       role: "user",
@@ -168,36 +168,36 @@ Trong iframe, script của bạn nói chuyện với host qua class `App` từ `
 </script>
 ```
 
-Placeholder `/*__EXT_APPS_BUNDLE__*/` được server thay bằng nội dung của `@modelcontextprotocol/ext-apps/app-with-deps` lúc startup — xem `references/iframe-sandbox.md` để biết tại sao cần làm vậy và đoạn code rewrite. **Không** dùng `import { App } from "https://esm.sh/..."` — CSP của iframe block các transitive dependency fetches và widget render trắng.
+The `/*__EXT_APPS_BUNDLE__*/` placeholder gets replaced by the server at startup with the contents of `@modelcontextprotocol/ext-apps/app-with-deps` — see `references/iframe-sandbox.md` for why this is necessary and the rewrite snippet. **Do not** `import { App } from "https://esm.sh/..."`; the iframe's CSP blocks the transitive dependency fetches and the widget renders blank.
 
-| Method | Hướng | Dùng cho |
+| Method | Direction | Use for |
 |---|---|---|
-| `app.ontoolresult = fn` | Host → widget | Nhận return value của tool |
-| `app.ontoolinput = fn` | Host → widget | Nhận input args của tool (Claude truyền vào) |
-| `app.sendMessage({...})` | Widget → host | Inject message vào conversation |
-| `app.updateModelContext({...})` | Widget → host | Cập nhật context im lặng (không có visible message) |
-| `app.callServerTool({name, arguments})` | Widget → server | Gọi tool khác trên server của bạn |
-| `app.openLink({url})` | Widget → host | Mở URL trong tab mới (sandbox block `window.open`) |
+| `app.ontoolresult = fn` | Host → widget | Receive the tool's return value |
+| `app.ontoolinput = fn` | Host → widget | Receive the tool's input args (what Claude passed) |
+| `app.sendMessage({...})` | Widget → host | Inject a message into the conversation |
+| `app.updateModelContext({...})` | Widget → host | Update context silently (no visible message) |
+| `app.callServerTool({name, arguments})` | Widget → server | Call another tool on your server |
+| `app.openLink({url})` | Widget → host | Open a URL in a new tab (sandbox blocks `window.open`) |
 | `app.getHostContext()` / `app.onhostcontextchanged` | Host → widget | Theme, host CSS vars, `containerDimensions`, `displayMode`, `deviceCapabilities` |
-| `app.requestDisplayMode({mode})` | Widget → host | Yêu cầu `inline` / `pip` / `fullscreen` |
-| `app.downloadFile({name, mimeType, content})` | Widget → host | Download qua host (base64 content) |
-| `new App(info, caps, {autoResize: true})` | — | Iframe height theo nội dung được render |
+| `app.requestDisplayMode({mode})` | Widget → host | Ask for `inline` / `pip` / `fullscreen` |
+| `app.downloadFile({name, mimeType, content})` | Widget → host | Host-mediated download (base64 content) |
+| `new App(info, caps, {autoResize: true})` | — | Iframe height tracks rendered content |
 
-`sendMessage` là con đường thông thường "user đã chọn gì đó, báo Claude". `updateModelContext` dùng cho state mà Claude nên biết nhưng không nên làm bẩn chat. `openLink` là **bắt buộc** cho bất kỳ outbound navigation nào — `window.open` và `<a target="_blank">` bị block bởi sandbox attribute.
+`sendMessage` is the typical "user picked something, tell Claude" path. `updateModelContext` is for state that Claude should know about but shouldn't clutter the chat. `openLink` is **required** for any outbound navigation — `window.open` and `<a target="_blank">` are blocked by the sandbox attribute.
 
-**Widgets không thể làm:**
-- Truy cập DOM, cookies, hoặc storage của host page
-- Thực hiện network calls đến arbitrary origins (CSP-restricted — route qua `callServerTool`)
-- Mở popups hoặc navigate trực tiếp — dùng `app.openLink({url})`
-- Load remote images đáng tin cậy — inline như `data:` URLs phía server
+**What widgets cannot do:**
+- Access the host page's DOM, cookies, or storage
+- Make network calls to arbitrary origins (CSP-restricted — route through `callServerTool`)
+- Open popups or navigate directly — use `app.openLink({url})`
+- Load remote images reliably — inline as `data:` URLs server-side
 
-Giữ widgets **nhỏ và single-purpose**. Một picker thì chọn. Một chart thì hiển thị. Đừng build cả sub-app trong iframe — tách thành nhiều tools với focused widgets.
+Keep widgets **small and single-purpose**. A picker picks. A chart displays. Don't build a whole sub-app inside the iframe — split it into multiple tools with focused widgets.
 
 ---
 
 ## Scaffold: minimal picker widget
 
-**Cài đặt:**
+**Install:**
 
 ```bash
 npm install @modelcontextprotocol/sdk @modelcontextprotocol/ext-apps zod express
@@ -218,8 +218,8 @@ import { z } from "zod";
 const require = createRequire(import.meta.url);
 const server = new McpServer({ name: "contact-picker", version: "1.0.0" });
 
-// Inline ext-apps browser bundle vào widget HTML.
-// CSP của iframe block CDN script fetches — bundling là bắt buộc.
+// Inline the ext-apps browser bundle into the widget HTML.
+// The iframe CSP blocks CDN script fetches — bundling is mandatory.
 const bundle = readFileSync(
   require.resolve("@modelcontextprotocol/ext-apps/app-with-deps"), "utf8",
 ).replace(/export\{([^}]+)\};?\s*$/, (_, body) =>
@@ -259,7 +259,7 @@ app.post("/mcp", async (req, res) => {
 app.listen(process.env.PORT ?? 3000);
 ```
 
-Cho widget apps chỉ local (drive desktop app, đọc local files), swap transport sang `StdioServerTransport` và đóng gói qua skill `build-mcpb`.
+For local-only widget apps (driving a desktop app, reading local files), swap the transport to `StdioServerTransport` and package via the `build-mcpb` skill.
 
 **Widget (`widgets/picker.html`):**
 
@@ -302,33 +302,33 @@ const { App } = globalThis.ExtApps;
 </script>
 ```
 
-Xem `references/widget-templates.md` để biết thêm các widget shapes.
+See `references/widget-templates.md` for more widget shapes.
 
 ---
 
-## Lưu ý thiết kế tránh phải viết lại
+## Design notes that save you a rewrite
 
-**Một widget mỗi tool.** Cưỡng lại cám dỗ build một mega-widget làm tất cả mọi thứ. Một tool → một focused widget → một result shape rõ ràng. Claude lý luận về những cái này tốt hơn nhiều.
+**One widget per tool.** Resist the urge to build one mega-widget that does everything. One tool → one focused widget → one clear result shape. Claude reasons about these far better.
 
-**Tool description phải đề cập widget.** Claude chỉ thấy tool description khi quyết định gọi cái gì. "Opens an interactive picker" trong description là thứ khiến Claude chọn nó thay vì đoán ID.
+**Tool description must mention the widget.** Claude only sees the tool description when deciding what to call. "Opens an interactive picker" in the description is what makes Claude reach for it instead of guessing an ID.
 
-**Widgets là optional khi runtime.** Hosts không hỗ trợ apps surface chỉ đơn giản bỏ qua `_meta.ui` và render text content của tool bình thường. Vì tool handler đã trả về text/JSON có nghĩa (dữ liệu của widget), degradation là tự động — Claude thấy dữ liệu trực tiếp thay vì qua widget.
+**Widgets are optional at runtime.** Hosts that don't support the apps surface simply ignore `_meta.ui` and render the tool's text content normally. Since your tool handler already returns meaningful text/JSON (the widget's data), degradation is automatic — Claude sees the data directly instead of via the widget.
 
-**Đừng block trên widget results cho read-only tools.** Widget chỉ *hiển thị* dữ liệu (chart, preview) không nên yêu cầu user action để hoàn thành. Trả về display widget *và* text summary trong cùng result để Claude có thể tiếp tục lý luận mà không cần chờ.
+**Don't block on widget results for read-only tools.** A widget that just *displays* data (chart, preview) shouldn't require a user action to complete. Return the display widget *and* a text summary in the same result so Claude can continue reasoning without waiting.
 
-**Phân chia layout theo số lượng item, không theo số tool.** Nếu một use case là "hiển thị một kết quả chi tiết" và cái khác là "hiển thị nhiều kết quả cạnh nhau", đừng tạo hai tools — tạo một tool nhận `items[]`, và để widget chọn layout: `items.length === 1` → detail view, `> 1` → carousel. Giữ server schema đơn giản và để Claude quyết định count tự nhiên.
+**Layout-fork by item count, not by tool count.** If one use case is "show one result in detail" and another is "show many results side-by-side", don't make two tools — make one tool that accepts `items[]`, and let the widget pick a layout: `items.length === 1` → detail view, `> 1` → carousel. Keeps the server schema simple and lets Claude decide count naturally.
 
-**Đặt reasoning của Claude trong payload.** Field `note` ngắn trên mỗi item (tại sao Claude chọn nó) render như callout trên card giúp user thấy reasoning inline với lựa chọn. Đề cập field này trong tool description để Claude điền vào.
+**Put Claude's reasoning in the payload.** A short `note` field on each item (why Claude picked it) rendered as a callout on the card gives users the reasoning inline with the choice. Mention this field in the tool description so Claude populates it.
 
-**Normalize image shapes phía server.** Nếu data source của bạn trả về images với aspect ratios rất khác nhau, rewrite về dạng biến thể có thể đoán trước (ví dụ square-bounded) *trước khi* fetch để data-URL inline. Sau đó đặt container image của widget có `aspect-ratio` cố định + `object-fit: contain` để mọi thứ ngồi ở giữa.
+**Normalize image shapes server-side.** If your data source returns images with wildly varying aspect ratios, rewrite to a predictable variant (e.g. square-bounded) *before* fetching for the data-URL inline. Then give the widget's image container a fixed `aspect-ratio` + `object-fit: contain` so everything sits centered.
 
-**Theo theme của host.** `app.getHostContext()?.theme` (sau `connect()`) cộng `app.onhostcontextchanged` cho live updates. Toggle class `.dark` trên `<html>`, giữ màu trong CSS custom props với override block `:root.dark {}`, đặt `color-scheme`. Tắt `mix-blend-mode: multiply` trong dark — nó làm ảnh biến mất.
+**Follow host theme.** `app.getHostContext()?.theme` (after `connect()`) plus `app.onhostcontextchanged` for live updates. Toggle a `.dark` class on `<html>`, keep colors in CSS custom props with a `:root.dark {}` override block, set `color-scheme`. Disable `mix-blend-mode: multiply` in dark — it makes images vanish.
 
 ---
 
 ## Testing
 
-**Claude Desktop** — các bản build hiện tại vẫn yêu cầu config shape `command`/`args` (không có `"type": "http"` native). Wrap bằng `mcp-remote` và force `http-only` transport để probe SSE không nuốt mất widget-capability negotiation:
+**Claude Desktop** — current builds still require the `command`/`args` config shape (no native `"type": "http"`). Wrap with `mcp-remote` and force `http-only` transport so the SSE probe doesn't swallow widget-capability negotiation:
 
 ```json
 {
@@ -342,12 +342,12 @@ Xem `references/widget-templates.md` để biết thêm các widget shapes.
 }
 ```
 
-Desktop cache UI resources tích cực. Sau khi edit widget HTML, **quit hoàn toàn** (⌘Q / Alt+F4, không phải đóng window) và relaunch để force cold resource re-fetch.
+Desktop caches UI resources aggressively. After editing widget HTML, **fully quit** (⌘Q / Alt+F4, not window-close) and relaunch to force a cold resource re-fetch.
 
-**Headless JSON-RPC loop** — iterate nhanh mà không cần click qua Desktop:
+**Headless JSON-RPC loop** — fast iteration without clicking through Desktop:
 
 ```bash
-# test.jsonl — một JSON-RPC message mỗi dòng
+# test.jsonl — one JSON-RPC message per line
 {"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"t","version":"0"}}}
 {"jsonrpc":"2.0","method":"notifications/initialized"}
 {"jsonrpc":"2.0","id":2,"method":"tools/list"}
@@ -356,9 +356,9 @@ Desktop cache UI resources tích cực. Sau khi edit widget HTML, **quit hoàn t
 (cat test.jsonl; sleep 10) | npx mcp-remote http://localhost:3000/mcp --allow-http
 ```
 
-`sleep` giữ stdin mở đủ lâu để thu thập tất cả responses. Parse jsonl output bằng `jq` hoặc Python one-liner.
+The `sleep` keeps stdin open long enough to collect all responses. Parse the jsonl output with `jq` or a Python one-liner.
 
-**Widget dev loop** — tránh hoàn toàn vòng lặp ⌘Q-relaunch bằng cách serve inlined widget HTML tại GET route đơn giản với fake `ExtApps` shim fire `ontoolresult` từ query param:
+**Widget dev loop** — avoid the ⌘Q-relaunch cycle entirely by serving the inlined widget HTML at a plain GET route with a fake `ExtApps` shim that fires `ontoolresult` from a query param:
 
 ```ts
 app.get("/widget-preview", (_req, res) => {
@@ -374,19 +374,19 @@ app.get("/widget-preview", (_req, res) => {
 });
 ```
 
-Mở `http://localhost:3000/widget-preview?payload={"rows":[...]}` trong browser tab bình thường và iterate với devtools thông thường.
+Open `http://localhost:3000/widget-preview?payload={"rows":[...]}` in a normal browser tab and iterate with ordinary devtools.
 
-**Host fallback** — dùng host không có apps surface (hoặc MCP Inspector) và xác nhận text content của tool degraded đúng cách.
+**Host fallback** — use a host without the apps surface (or MCP Inspector) and confirm the tool's text content degrades gracefully.
 
-**CSP debugging** — mở devtools console của chính iframe. CSP violations là lý do #1 tại sao widgets fail im lặng (hình chữ nhật trắng, không có lỗi trong main console). Xem `references/iframe-sandbox.md`.
+**CSP debugging** — open the iframe's own devtools console. CSP violations are the #1 reason widgets silently fail (blank rectangle, no error in the main console). See `references/iframe-sandbox.md`.
 
 ---
 
 ## Reference files
 
-- `references/iframe-sandbox.md` — CSP/sandbox constraints, bundle-inlining pattern, image handling, host theming
-- `references/widget-templates.md` — reusable HTML scaffolds cho picker / confirm / progress / display
-- `references/apps-sdk-messages.md` — App class API: widget ↔ host ↔ server messaging, lifecycle & supersession
-- `references/payload-budgeting.md` — giới hạn tool-result size của host, prune-then-truncate, heavy assets qua `callServerTool`
+- `references/iframe-sandbox.md` — CSP/sandbox constraints, the bundle-inlining pattern, image handling, host theming
+- `references/widget-templates.md` — reusable HTML scaffolds for picker / confirm / progress / display
+- `references/apps-sdk-messages.md` — the `App` class API: widget ↔ host ↔ server messaging, lifecycle & supersession
+- `references/payload-budgeting.md` — host tool-result size caps, prune-then-truncate, heavy assets via `callServerTool`
 - `references/abuse-protection.md` — Anthropic egress CIDRs, tiered rate limiting, `trust proxy`, response caching
-- `references/directory-checklist.md` — pre-flight cho connector-directory submission
+- `references/directory-checklist.md` — pre-flight for connector-directory submission

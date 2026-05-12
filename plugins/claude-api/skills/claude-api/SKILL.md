@@ -4,75 +4,75 @@ description: "Build, debug, and optimize Claude API / Anthropic SDK apps. Apps b
 license: Complete terms in LICENSE.txt
 ---
 
-# Xây dựng ứng dụng LLM với Claude
+# Building LLM-Powered Applications with Claude
 
-Skill này giúp bạn xây dựng ứng dụng LLM dựa trên Claude. Chọn surface phù hợp với nhu cầu, phát hiện ngôn ngữ project, sau đó đọc tài liệu language-specific tương ứng.
+This skill helps you build LLM-powered applications with Claude. Choose the right surface based on your needs, detect the project language, then read the relevant language-specific documentation.
 
-## Trước khi bắt đầu
+## Before You Start
 
-Scan file mục tiêu (hoặc nếu không có file mục tiêu, scan prompt và project) để tìm marker của non-Anthropic provider — `import openai`, `from openai`, `langchain_openai`, `OpenAI(`, `gpt-4`, `gpt-5`, tên file kiểu `agent-openai.py` hay `*-generic.py`, hoặc bất kỳ instruction tường minh nào yêu cầu giữ code provider-neutral. Nếu tìm thấy bất kỳ marker nào, dừng lại và nói với user rằng skill này produce code Claude/Anthropic SDK; hỏi xem họ muốn chuyển file sang Claude hay muốn implementation non-Claude. Không edit file non-Anthropic với call Anthropic SDK.
+Scan the target file (or, if no target file, the prompt and project) for non-Anthropic provider markers — `import openai`, `from openai`, `langchain_openai`, `OpenAI(`, `gpt-4`, `gpt-5`, file names like `agent-openai.py` or `*-generic.py`, or any explicit instruction to keep the code provider-neutral. If you find any, stop and tell the user that this skill produces Claude/Anthropic SDK code; ask whether they want to switch the file to Claude or want a non-Claude implementation. Do not edit a non-Anthropic file with Anthropic SDK calls.
 
-## Yêu cầu Output
+## Output Requirement
 
-Khi user yêu cầu thêm, sửa, hoặc implement một feature Claude, code của bạn phải gọi Claude qua một trong các cách:
+When the user asks you to add, modify, or implement a Claude feature, your code must call Claude through one of:
 
-1. **Official Anthropic SDK** cho ngôn ngữ của project (`anthropic`, `@anthropic-ai/sdk`, `com.anthropic.*`, v.v.). Đây là mặc định bất cứ khi nào SDK được support tồn tại cho project.
-2. **Raw HTTP** (`curl`, `requests`, `fetch`, `httpx`, v.v.) — chỉ khi user yêu cầu tường minh cURL/REST/raw HTTP, project là shell/cURL project, hoặc ngôn ngữ không có SDK chính thức.
+1. **The official Anthropic SDK** for the project's language (`anthropic`, `@anthropic-ai/sdk`, `com.anthropic.*`, etc.). This is the default whenever a supported SDK exists for the project.
+2. **Raw HTTP** (`curl`, `requests`, `fetch`, `httpx`, etc.) — only when the user explicitly asks for cURL/REST/raw HTTP, the project is a shell/cURL project, or the language has no official SDK.
 
-Không bao giờ trộn cả hai — đừng với tay tới `requests`/`fetch` trong Python hay TypeScript project chỉ vì nó có vẻ nhẹ hơn. Không bao giờ fall back sang OpenAI-compatible shim.
+Never mix the two — don't reach for `requests`/`fetch` in a Python or TypeScript project just because it feels lighter. Never fall back to OpenAI-compatible shims.
 
-**Không bao giờ đoán cách dùng SDK.** Tên function, tên class, namespace, method signature, và import path PHẢI đến từ tài liệu tường minh — hoặc từ file `{lang}/` trong skill này hoặc từ official SDK repo / link tài liệu liệt kê trong `shared/live-sources.md`. Nếu binding bạn cần không được document tường minh trong skill files, WebFetch SDK repo liên quan từ `shared/live-sources.md` trước khi viết code. Không suy đoán Ruby/Java/Go/PHP/C# API từ shape cURL hoặc từ SDK của ngôn ngữ khác.
+**Never guess SDK usage.** Function names, class names, namespaces, method signatures, and import paths must come from explicit documentation — either the `{lang}/` files in this skill or the official SDK repositories or documentation links listed in `shared/live-sources.md`. If the binding you need is not explicitly documented in the skill files, WebFetch the relevant SDK repo from `shared/live-sources.md` before writing code. Do not infer Ruby/Java/Go/PHP/C# APIs from cURL shapes or from another language's SDK.
 
-## Mặc định
+## Defaults
 
-Trừ khi user yêu cầu khác:
+Unless the user requests otherwise:
 
-Về Claude model version, hãy dùng Claude Opus 4.7, truy cập qua exact model string `claude-opus-4-7`. Mặc định dùng adaptive thinking (`thinking: {type: "adaptive"}`) cho bất cứ thứ gì hơi phức tạp. Và cuối cùng, mặc định stream cho bất kỳ request nào có thể có long input, long output, hoặc `max_tokens` cao — nó tránh bị HTTP request timeout. Dùng helper `.get_final_message()` / `.finalMessage()` của SDK để lấy complete response nếu bạn không cần handle individual stream event.
+For the Claude model version, please use Claude Opus 4.7, which you can access via the exact model string `claude-opus-4-7`. Please default to using adaptive thinking (`thinking: {type: "adaptive"}`) for anything remotely complicated. And finally, please default to streaming for any request that may involve long input, long output, or high `max_tokens` — it prevents hitting request timeouts. Use the SDK's `.get_final_message()` / `.finalMessage()` helper to get the complete response if you don't need to handle individual stream events
 
 ---
 
 ## Subcommands
 
-Nếu User Request ở cuối prompt này là một bare subcommand string (không có prose), search mọi bảng **Subcommands** trong document này — bao gồm cả bảng trong các section append phía dưới — và follow theo Action column tương ứng trực tiếp. Cách này cho user invoke flow cụ thể qua `/claude-api <subcommand>`. Nếu không bảng nào trong document match, treat request như prose thông thường.
+If the User Request at the bottom of this prompt is a bare subcommand string (no prose), search every **Subcommands** table in this document — including any in sections appended below — and follow the matching Action column directly. This lets users invoke specific flows via `/claude-api <subcommand>`. If no table in the document matches, treat the request as normal prose.
 
 
 ---
 
-## Phát hiện ngôn ngữ
+## Language Detection
 
-Trước khi đọc code example, xác định user đang work với ngôn ngữ nào:
+Before reading code examples, determine which language the user is working in:
 
-1. **Nhìn vào file của project** để infer ngôn ngữ:
+1. **Look at project files** to infer the language:
 
-   - `*.py`, `requirements.txt`, `pyproject.toml`, `setup.py`, `Pipfile` → **Python** — đọc từ `python/`
-   - `*.ts`, `*.tsx`, `package.json`, `tsconfig.json` → **TypeScript** — đọc từ `typescript/`
-   - `*.js`, `*.jsx` (không có file `.ts`) → **TypeScript** — JS dùng cùng SDK, đọc từ `typescript/`
-   - `*.java`, `pom.xml`, `build.gradle` → **Java** — đọc từ `java/`
-   - `*.kt`, `*.kts`, `build.gradle.kts` → **Java** — Kotlin dùng Java SDK, đọc từ `java/`
-   - `*.scala`, `build.sbt` → **Java** — Scala dùng Java SDK, đọc từ `java/`
-   - `*.go`, `go.mod` → **Go** — đọc từ `go/`
-   - `*.rb`, `Gemfile` → **Ruby** — đọc từ `ruby/`
-   - `*.cs`, `*.csproj` → **C#** — đọc từ `csharp/`
-   - `*.php`, `composer.json` → **PHP** — đọc từ `php/`
+   - `*.py`, `requirements.txt`, `pyproject.toml`, `setup.py`, `Pipfile` → **Python** — read from `python/`
+   - `*.ts`, `*.tsx`, `package.json`, `tsconfig.json` → **TypeScript** — read from `typescript/`
+   - `*.js`, `*.jsx` (no `.ts` files present) → **TypeScript** — JS uses the same SDK, read from `typescript/`
+   - `*.java`, `pom.xml`, `build.gradle` → **Java** — read from `java/`
+   - `*.kt`, `*.kts`, `build.gradle.kts` → **Java** — Kotlin uses the Java SDK, read from `java/`
+   - `*.scala`, `build.sbt` → **Java** — Scala uses the Java SDK, read from `java/`
+   - `*.go`, `go.mod` → **Go** — read from `go/`
+   - `*.rb`, `Gemfile` → **Ruby** — read from `ruby/`
+   - `*.cs`, `*.csproj` → **C#** — read from `csharp/`
+   - `*.php`, `composer.json` → **PHP** — read from `php/`
 
-2. **Nếu detect nhiều ngôn ngữ** (ví dụ: cả Python và TypeScript files):
+2. **If multiple languages detected** (e.g., both Python and TypeScript files):
 
-   - Kiểm tra file hoặc câu hỏi hiện tại của user liên quan tới ngôn ngữ nào
-   - Nếu vẫn ambiguous, hỏi: "I detected both Python and TypeScript files. Which language are you using for the Claude API integration?"
+   - Check which language the user's current file or question relates to
+   - If still ambiguous, ask: "I detected both Python and TypeScript files. Which language are you using for the Claude API integration?"
 
-3. **Nếu không infer được ngôn ngữ** (project rỗng, không có source file, hoặc unsupported language):
+3. **If language can't be inferred** (empty project, no source files, or unsupported language):
 
-   - Dùng AskUserQuestion với option: Python, TypeScript, Java, Go, Ruby, cURL/raw HTTP, C#, PHP
-   - Nếu AskUserQuestion không khả dụng, default sang Python example và lưu ý: "Showing Python examples. Let me know if you need a different language."
+   - Use AskUserQuestion with options: Python, TypeScript, Java, Go, Ruby, cURL/raw HTTP, C#, PHP
+   - If AskUserQuestion is unavailable, default to Python examples and note: "Showing Python examples. Let me know if you need a different language."
 
-4. **Nếu detect ngôn ngữ unsupported** (Rust, Swift, C++, Elixir, v.v.):
+4. **If unsupported language detected** (Rust, Swift, C++, Elixir, etc.):
 
-   - Đề xuất cURL/raw HTTP example từ `curl/` và lưu ý rằng community SDK có thể tồn tại
-   - Đề nghị show Python hoặc TypeScript example như reference implementation
+   - Suggest cURL/raw HTTP examples from `curl/` and note that community SDKs may exist
+   - Offer to show Python or TypeScript examples as reference implementations
 
-5. **Nếu user cần cURL/raw HTTP example**, đọc từ `curl/`.
+5. **If user needs cURL/raw HTTP examples**, read from `curl/`.
 
-### Hỗ trợ feature theo ngôn ngữ
+### Language-Specific Feature Support
 
 | Language   | Tool Runner | Managed Agents | Notes                                 |
 | ---------- | ----------- | -------------- | ------------------------------------- |
@@ -85,79 +85,79 @@ Trước khi đọc code example, xác định user đang work với ngôn ngữ
 | PHP        | Yes (beta)  | Yes (beta)     | `BetaRunnableTool` + `toolRunner()`   |
 | cURL       | N/A         | Yes (beta)     | Raw HTTP, no SDK features             |
 
-> **Managed Agents code examples**: README dedicated language-specific được cung cấp cho Python, TypeScript, Go, Ruby, PHP, Java, và cURL (`{lang}/managed-agents/README.md`, `curl/managed-agents.md`). Đọc README của ngôn ngữ bạn dùng cùng các file concept language-agnostic `shared/managed-agents-*.md`. **Agent là persistent — tạo một lần, reference bằng ID.** Lưu agent ID return từ `agents.create` và pass nó vào mọi `sessions.create` tiếp theo; không gọi `agents.create` trong request path. Anthropic CLI là một cách tiện lợi để tạo agent và environment từ YAML version-controlled — URL của nó nằm trong `shared/live-sources.md`. Nếu binding bạn cần không có trong README, WebFetch entry liên quan từ `shared/live-sources.md` thay vì đoán. C# hiện chưa support Managed Agents; dùng cURL-style raw HTTP request gọi vào API.
+> **Managed Agents code examples**: dedicated language-specific READMEs are provided for Python, TypeScript, Go, Ruby, PHP, Java, and cURL (`{lang}/managed-agents/README.md`, `curl/managed-agents.md`). Read your language's README plus the language-agnostic `shared/managed-agents-*.md` concept files. **Agents are persistent — create once, reference by ID.** Store the agent ID returned by `agents.create` and pass it to every subsequent `sessions.create`; do not call `agents.create` in the request path. The Anthropic CLI is one convenient way to create agents and environments from version-controlled YAML — its URL is in `shared/live-sources.md`. If a binding you need isn't shown in the README, WebFetch the relevant entry from `shared/live-sources.md` rather than guess. C# does not currently have Managed Agents support; use cURL-style raw HTTP requests against the API.
 
 ---
 
-## Nên dùng Surface nào?
+## Which Surface Should I Use?
 
-> **Bắt đầu đơn giản.** Mặc định dùng tier đơn giản nhất đáp ứng được nhu cầu. Single API call và workflow handle phần lớn use case — chỉ chọn agent khi task thực sự yêu cầu open-ended, model-driven exploration.
+> **Start simple.** Default to the simplest tier that meets your needs. Single API calls and workflows handle most use cases — only reach for agents when the task genuinely requires open-ended, model-driven exploration.
 
-| Use Case                                        | Tier            | Surface đề xuất           | Lý do                                                          |
+| Use Case                                        | Tier            | Recommended Surface       | Why                                                          |
 | ----------------------------------------------- | --------------- | ------------------------- | ------------------------------------------------------------ |
-| Classification, summarization, extraction, Q&A  | Single LLM call | **Claude API**            | Một request, một response                                    |
-| Batch processing hoặc embedding                  | Single LLM call | **Claude API**            | Endpoint chuyên dụng                                        |
-| Multi-step pipeline với code-controlled logic | Workflow        | **Claude API + tool use** | Bạn orchestrate loop                                     |
-| Custom agent với tool của riêng bạn                | Agent           | **Claude API + tool use** | Linh hoạt tối đa                                          |
-| Server-managed stateful agent với workspace    | Agent           | **Managed Agents**        | Anthropic chạy loop và host tool-execution sandbox |
-| Agent config persisted, versioned                 | Agent           | **Managed Agents**        | Agent là stored object; session pin vào version         |
-| Long-running multi-turn agent với file mount  | Agent           | **Managed Agents**        | Per-session container, SSE event stream, Skills + MCP       |
+| Classification, summarization, extraction, Q&A  | Single LLM call | **Claude API**            | One request, one response                                    |
+| Batch processing or embeddings                  | Single LLM call | **Claude API**            | Specialized endpoints                                        |
+| Multi-step pipelines with code-controlled logic | Workflow        | **Claude API + tool use** | You orchestrate the loop                                     |
+| Custom agent with your own tools                | Agent           | **Claude API + tool use** | Maximum flexibility                                          |
+| Server-managed stateful agent with workspace    | Agent           | **Managed Agents**        | Anthropic runs the loop and hosts the tool-execution sandbox |
+| Persisted, versioned agent configs              | Agent           | **Managed Agents**        | Agents are stored objects; sessions pin to a version         |
+| Long-running multi-turn agent with file mounts  | Agent           | **Managed Agents**        | Per-session containers, SSE event stream, Skills + MCP       |
 
-> **Lưu ý:** Managed Agents là lựa chọn đúng khi bạn muốn Anthropic chạy agent loop *và* host container nơi tool execute — file ops, bash, code execution đều chạy trong per-session workspace. Nếu bạn muốn tự host compute hoặc chạy custom tool runtime của riêng mình, Claude API + tool use là lựa chọn đúng — dùng tool runner để loop handling tự động, hoặc manual loop cho fine-grained control (approval gate, custom logging, conditional execution).
+> **Note:** Managed Agents is the right choice when you want Anthropic to run the agent loop *and* host the container where tools execute — file ops, bash, code execution all run in the per-session workspace. If you want to host the compute yourself or run your own custom tool runtime, Claude API + tool use is the right choice — use the tool runner for automatic loop handling, or the manual loop for fine-grained control (approval gates, custom logging, conditional execution).
 
-> **Third-party provider (Amazon Bedrock, Google Vertex AI, Microsoft Foundry):** Managed Agents **không khả dụng** trên Bedrock, Vertex, hay Foundry. Nếu bạn deploy qua bất kỳ third-party provider nào, dùng **Claude API + tool use** cho mọi use case — kể cả case mà Managed Agents lẽ ra là surface đề xuất.
+> **Third-party providers (Amazon Bedrock, Google Vertex AI, Microsoft Foundry):** Managed Agents is **not available** on Bedrock, Vertex, or Foundry. If you are deploying through any third-party provider, use **Claude API + tool use** for all use cases — including ones where Managed Agents would otherwise be the recommended surface.
 
 ### Decision Tree
 
 ```
-Ứng dụng của bạn cần gì?
+What does your application need?
 
-0. Bạn deploy qua Amazon Bedrock, Google Vertex AI, hoặc Microsoft Foundry?
-   └── Yes → Claude API (+ tool use cho agent) — Managed Agents chỉ 1P.
-   No → tiếp tục.
+0. Are you deploying through Amazon Bedrock, Google Vertex AI, or Microsoft Foundry?
+   └── Yes → Claude API (+ tool use for agents) — Managed Agents is 1P only.
+   No → continue.
 
 1. Single LLM call (classification, summarization, extraction, Q&A)
-   └── Claude API — một request, một response
+   └── Claude API — one request, one response
 
-2. Bạn muốn Anthropic chạy agent loop và host per-session
-   container nơi Claude execute tool (bash, file ops, code)?
-   └── Yes → Managed Agents — server-managed session, agent config persisted,
-       SSE event stream, Skills + MCP, file mount.
-       Ví dụ: "stateful coding agent với workspace per task",
-                 "long-running research agent stream event lên UI",
-                 "agent với config persisted, versioned dùng across many session"
+2. Do you want Anthropic to run the agent loop and host a per-session
+   container where Claude executes tools (bash, file ops, code)?
+   └── Yes → Managed Agents — server-managed sessions, persisted agent configs,
+       SSE event stream, Skills + MCP, file mounts.
+       Examples: "stateful coding agent with a workspace per task",
+                 "long-running research agent that streams events to a UI",
+                 "agent with persisted, versioned config used across many sessions"
 
-3. Workflow (multi-step, code-orchestrated, với tool của riêng bạn)
-   └── Claude API với tool use — bạn control loop
+3. Workflow (multi-step, code-orchestrated, with your own tools)
+   └── Claude API with tool use — you control the loop
 
-4. Open-ended agent (model tự quyết định trajectory, tool riêng, bạn host compute)
-   └── Claude API agentic loop (linh hoạt tối đa)
+4. Open-ended agent (model decides its own trajectory, your own tools, you host the compute)
+   └── Claude API agentic loop (maximum flexibility)
 ```
 
-### Có nên build Agent không?
+### Should I Build an Agent?
 
-Trước khi chọn agent tier, check cả 4 tiêu chí:
+Before choosing the agent tier, check all four criteria:
 
-- **Complexity** — Task có multi-step và khó specify đầy đủ trước không? (vd: "turn this design doc into a PR" vs. "extract the title from this PDF")
-- **Value** — Outcome có justify được higher cost và latency không?
-- **Viability** — Claude có capable với task type này không?
-- **Cost of error** — Lỗi có catch và recover được không? (test, review, rollback)
+- **Complexity** — Is the task multi-step and hard to fully specify in advance? (e.g., "turn this design doc into a PR" vs. "extract the title from this PDF")
+- **Value** — Does the outcome justify higher cost and latency?
+- **Viability** — Is Claude capable at this task type?
+- **Cost of error** — Can errors be caught and recovered from? (tests, review, rollback)
 
-Nếu trả lời "no" cho bất kỳ tiêu chí nào, ở lại tier đơn giản hơn (single call hoặc workflow).
+If the answer is "no" to any of these, stay at a simpler tier (single call or workflow).
 
 ---
 
 ## Architecture
 
-Mọi thứ đi qua `POST /v1/messages`. Tool và output constraint là feature của single endpoint này — không phải API riêng.
+Everything goes through `POST /v1/messages`. Tools and output constraints are features of this single endpoint — not separate APIs.
 
-**User-defined tools** — Bạn define tool (qua decorator, Zod schema, hoặc raw JSON), và tool runner của SDK handle việc gọi API, execute function của bạn, và loop cho tới khi Claude xong. Để full control, bạn có thể viết loop bằng tay.
+**User-defined tools** — You define tools (via decorators, Zod schemas, or raw JSON), and the SDK's tool runner handles calling the API, executing your functions, and looping until Claude is done. For full control, you can write the loop manually.
 
-**Server-side tools** — Tool Anthropic-hosted chạy trên infrastructure của Anthropic. Code execution là fully server-side (declare nó trong `tools`, Claude tự chạy code). Computer use có thể server-hosted hoặc self-hosted.
+**Server-side tools** — Anthropic-hosted tools that run on Anthropic's infrastructure. Code execution is fully server-side (declare it in `tools`, Claude runs code automatically). Computer use can be server-hosted or self-hosted.
 
-**Structured outputs** — Constrain format response của Messages API (`output_config.format`) và/hoặc tool parameter validation (`strict: true`). Approach đề xuất là `client.messages.parse()` — tự động validate response theo schema của bạn. Lưu ý: parameter `output_format` cũ đã deprecated; dùng `output_config: {format: {...}}` trên `messages.create()`.
+**Structured outputs** — Constrains the Messages API response format (`output_config.format`) and/or tool parameter validation (`strict: true`). The recommended approach is `client.messages.parse()` which validates responses against your schema automatically. Note: the old `output_format` parameter is deprecated; use `output_config: {format: {...}}` on `messages.create()`.
 
-**Supporting endpoint** — Batches (`POST /v1/messages/batches`), Files (`POST /v1/files`), Token Counting, và Models (`GET /v1/models`, `GET /v1/models/{id}` — live capability/context-window discovery) feed vào hoặc support Messages API request.
+**Supporting endpoints** — Batches (`POST /v1/messages/batches`), Files (`POST /v1/files`), Token Counting, and Models (`GET /v1/models`, `GET /v1/models/{id}` — live capability/context-window discovery) feed into or support Messages API requests.
 
 ---
 
@@ -170,155 +170,155 @@ Mọi thứ đi qua `POST /v1/messages`. Tool và output constraint là feature 
 | Claude Sonnet 4.6 | `claude-sonnet-4-6` | 1M             | $3.00      | $15.00      |
 | Claude Haiku 4.5  | `claude-haiku-4-5`  | 200K           | $1.00      | $5.00       |
 
-**LUÔN dùng `claude-opus-4-7` trừ khi user explicit chỉ định model khác.** Đây là điều không thương lượng. Đừng dùng `claude-sonnet-4-6`, `claude-sonnet-4-5`, hay model nào khác trừ khi user literally nói "use sonnet" hoặc "use haiku". Đừng downgrade vì cost — đó là quyết định của user, không phải của bạn.
+**ALWAYS use `claude-opus-4-7` unless the user explicitly names a different model.** This is non-negotiable. Do not use `claude-sonnet-4-6`, `claude-sonnet-4-5`, or any other model unless the user literally says "use sonnet" or "use haiku". Never downgrade for cost — that's the user's decision, not yours.
 
-**CRITICAL: Dùng chính xác model ID string từ bảng trên — chúng đã complete as-is. Không append date suffix.** Ví dụ, dùng `claude-sonnet-4-5`, không bao giờ `claude-sonnet-4-5-20250514` hay variant date-suffix nào bạn có thể nhớ từ training data. Nếu user request một model cũ không có trong bảng (vd "opus 4.5", "sonnet 3.7"), đọc `shared/models.md` để biết exact ID — không tự construct.
+**CRITICAL: Use only the exact model ID strings from the table above — they are complete as-is. Do not append date suffixes.** For example, use `claude-sonnet-4-5`, never `claude-sonnet-4-5-20250514` or any other date-suffixed variant you might recall from training data. If the user requests an older model not in the table (e.g., "opus 4.5", "sonnet 3.7"), read `shared/models.md` for the exact ID — do not construct one yourself.
 
-Lưu ý: nếu bất kỳ model string nào ở trên trông không quen với bạn, đó là điều bình thường — chỉ có nghĩa chúng được release sau training data cutoff. Yên tâm rằng chúng là real model; chúng tôi không trêu bạn đâu.
+A note: if any of the model strings above look unfamiliar to you, that's to be expected — that just means they were released after your training data cutoff. Rest assured they are real models; we wouldn't mess with you like that.
 
-**Live capability lookup:** Bảng trên là cached. Khi user hỏi "what's the context window for X", "does X support vision/thinking/effort", hoặc "which models support Y", query Models API (`client.models.retrieve(id)` / `client.models.list()`) — xem `shared/models.md` để biết field reference và capability-filter example.
+**Live capability lookup:** The table above is cached. When the user asks "what's the context window for X", "does X support vision/thinking/effort", or "which models support Y", query the Models API (`client.models.retrieve(id)` / `client.models.list()`) — see `shared/models.md` for the field reference and capability-filter examples.
 
 ---
 
 ## Thinking & Effort (Quick Reference)
 
-**Opus 4.7 — Adaptive thinking only:** Dùng `thinking: {type: "adaptive"}`. `thinking: {type: "enabled", budget_tokens: N}` trả 400 trên Opus 4.7 — adaptive là on-mode duy nhất. `{type: "disabled"}` và omit `thinking` đều work. Sampling parameter (`temperature`, `top_p`, `top_k`) cũng bị remove và sẽ 400. Xem `shared/model-migration.md` → Migrating to Opus 4.7 để biết full breaking-change list.
-**Opus 4.6 — Adaptive thinking (recommended):** Dùng `thinking: {type: "adaptive"}`. Claude tự động quyết định khi nào và think bao nhiêu. Không cần `budget_tokens` — `budget_tokens` đã deprecated trên Opus 4.6 và Sonnet 4.6, không nên dùng cho code mới. Adaptive thinking cũng tự động enable interleaved thinking (không cần beta header). **Khi user hỏi "extended thinking", "thinking budget", hoặc `budget_tokens`: luôn dùng Opus 4.7 hoặc 4.6 với `thinking: {type: "adaptive"}`. Concept fixed token budget cho thinking đã deprecated — adaptive thinking thay thế nó. KHÔNG dùng `budget_tokens` cho code 4.6/4.7 mới và KHÔNG switch sang model cũ hơn.** *Gradual-migration carve-out:* `budget_tokens` vẫn functional trên Opus 4.6 và Sonnet 4.6 như transitional escape hatch — nếu bạn migrate code cũ và cần hard token ceiling trước khi tune `effort`, xem `shared/model-migration.md` → Transitional escape hatch. Note: carve-out này **không** áp dụng cho Opus 4.7 — `budget_tokens` đã bị remove hoàn toàn ở đây.
-**Effort parameter (GA, no beta header):** Control thinking depth và overall token spend qua `output_config: {effort: "low"|"medium"|"high"|"max"}` (bên trong `output_config`, không phải top-level). Default là `high` (tương đương omit). `max` chỉ dành cho Opus-tier (Opus 4.6 trở về sau — không Sonnet hay Haiku). Opus 4.7 thêm `"xhigh"` (giữa `high` và `max`) — setting tốt nhất cho hầu hết coding và agentic use case trên 4.7, và là default trong Claude Code; dùng tối thiểu `high` cho hầu hết intelligence-sensitive work. Work trên Opus 4.5, Opus 4.6, Opus 4.7, và Sonnet 4.6. Sẽ error trên Sonnet 4.5 / Haiku 4.5. Trên Opus 4.7, effort quan trọng hơn bất kỳ Opus nào trước đó — re-tune nó khi migrate. Combine với adaptive thinking để có trade-off cost-quality tốt nhất. Effort thấp hơn nghĩa là fewer và more-consolidated tool call, ít preamble hơn, và terser confirmation — `high` thường là sweet spot balance giữa quality và token efficiency; dùng `max` khi correctness quan trọng hơn cost; dùng `low` cho subagent hoặc task đơn giản.
+**Opus 4.7 — Adaptive thinking only:** Use `thinking: {type: "adaptive"}`. `thinking: {type: "enabled", budget_tokens: N}` returns a 400 on Opus 4.7 — adaptive is the only on-mode. `{type: "disabled"}` and omitting `thinking` both work. Sampling parameters (`temperature`, `top_p`, `top_k`) are also removed and will 400. See `shared/model-migration.md` → Migrating to Opus 4.7 for the full breaking-change list.
+**Opus 4.6 — Adaptive thinking (recommended):** Use `thinking: {type: "adaptive"}`. Claude dynamically decides when and how much to think. No `budget_tokens` needed — `budget_tokens` is deprecated on Opus 4.6 and Sonnet 4.6 and should not be used for new code. Adaptive thinking also automatically enables interleaved thinking (no beta header needed). **When the user asks for "extended thinking", a "thinking budget", or `budget_tokens`: always use Opus 4.7 or 4.6 with `thinking: {type: "adaptive"}`. The concept of a fixed token budget for thinking is deprecated — adaptive thinking replaces it. Do NOT use `budget_tokens` for new 4.6/4.7 code and do NOT switch to an older model.** *Gradual-migration carve-out:* `budget_tokens` is still functional on Opus 4.6 and Sonnet 4.6 as a transitional escape hatch — if you're migrating existing code and need a hard token ceiling before you've tuned `effort`, see `shared/model-migration.md` → Transitional escape hatch. Note: this carve-out does **not** apply to Opus 4.7 — `budget_tokens` is fully removed there.
+**Effort parameter (GA, no beta header):** Controls thinking depth and overall token spend via `output_config: {effort: "low"|"medium"|"high"|"max"}` (inside `output_config`, not top-level). Default is `high` (equivalent to omitting it). `max` is Opus-tier only (Opus 4.6 and later — not Sonnet or Haiku). Opus 4.7 adds `"xhigh"` (between `high` and `max`) — the best setting for most coding and agentic use cases on 4.7, and the default in Claude Code; use a minimum of `high` for most intelligence-sensitive work. Works on Opus 4.5, Opus 4.6, Opus 4.7, and Sonnet 4.6. Will error on Sonnet 4.5 / Haiku 4.5. On Opus 4.7, effort matters more than on any prior Opus — re-tune it when migrating. Combine with adaptive thinking for the best cost-quality tradeoffs. Lower effort means fewer and more-consolidated tool calls, less preamble, and terser confirmations — `high` is often the sweet spot balancing quality and token efficiency; use `max` when correctness matters more than cost; use `low` for subagents or simple tasks.
 
-**Opus 4.7 — thinking content omit by default:** Block `thinking` vẫn stream nhưng text của nó rỗng trừ khi bạn opt in với `thinking: {type: "adaptive", display: "summarized"}` (default là `"omitted"`). Silent change — không error. Nếu bạn stream reasoning tới user, default sẽ trông như long pause trước output; set `"summarized"` để restore visible progress.
+**Opus 4.7 — thinking content omitted by default:** `thinking` blocks still stream but their text is empty unless you opt in with `thinking: {type: "adaptive", display: "summarized"}` (default is `"omitted"`). Silent change — no error. If you stream reasoning to users, the default looks like a long pause before output; set `"summarized"` to restore visible progress.
 
-**Task Budgets (beta, Opus 4.7):** `output_config: {task_budget: {type: "tokens", total: N}}` cho model biết nó có bao nhiêu token cho full agentic loop — nó thấy running countdown và tự self-moderate (minimum 20,000; beta header `task-budgets-2026-03-13`). Khác với `max_tokens`, là enforced per-response ceiling mà model không aware. Xem `shared/model-migration.md` → Task Budgets.
+**Task Budgets (beta, Opus 4.7):** `output_config: {task_budget: {type: "tokens", total: N}}` tells the model how many tokens it has for a full agentic loop — it sees a running countdown and self-moderates (minimum 20,000; beta header `task-budgets-2026-03-13`). Distinct from `max_tokens`, which is an enforced per-response ceiling the model is not aware of. See `shared/model-migration.md` → Task Budgets.
 
-**Sonnet 4.6:** Support adaptive thinking (`thinking: {type: "adaptive"}`). `budget_tokens` đã deprecated trên Sonnet 4.6 — dùng adaptive thinking thay thế.
+**Sonnet 4.6:** Supports adaptive thinking (`thinking: {type: "adaptive"}`). `budget_tokens` is deprecated on Sonnet 4.6 — use adaptive thinking instead.
 
-**Older models (chỉ khi explicit request):** Nếu user request cụ thể Sonnet 4.5 hoặc model cũ khác, dùng `thinking: {type: "enabled", budget_tokens: N}`. `budget_tokens` phải nhỏ hơn `max_tokens` (minimum 1024). Đừng bao giờ chọn model cũ chỉ vì user nhắc `budget_tokens` — dùng Opus 4.7 với adaptive thinking thay thế.
+**Older models (only if explicitly requested):** If the user specifically asks for Sonnet 4.5 or another older model, use `thinking: {type: "enabled", budget_tokens: N}`. `budget_tokens` must be less than `max_tokens` (minimum 1024). Never choose an older model just because the user mentions `budget_tokens` — use Opus 4.7 with adaptive thinking instead.
 
 ---
 
 ## Compaction (Quick Reference)
 
-**Beta, Opus 4.7, Opus 4.6, và Sonnet 4.6.** Cho long-running conversation có thể vượt quá 1M context window, enable server-side compaction. API tự động summarize earlier context khi approach trigger threshold (default: 150K token). Cần beta header `compact-2026-01-12`.
+**Beta, Opus 4.7, Opus 4.6, and Sonnet 4.6.** For long-running conversations that may exceed the 1M context window, enable server-side compaction. The API automatically summarizes earlier context when it approaches the trigger threshold (default: 150K tokens). Requires beta header `compact-2026-01-12`.
 
-**Critical:** Append `response.content` (không chỉ text) back vào messages mỗi turn. Compaction block trong response phải được preserve — API dùng chúng để thay thế compacted history trên request tiếp theo. Extract chỉ text string và append cái đó sẽ silently lose compaction state.
+**Critical:** Append `response.content` (not just the text) back to your messages on every turn. Compaction blocks in the response must be preserved — the API uses them to replace the compacted history on the next request. Extracting only the text string and appending that will silently lose the compaction state.
 
-Xem `{lang}/claude-api/README.md` (Compaction section) để có code example. Full docs qua WebFetch trong `shared/live-sources.md`.
+See `{lang}/claude-api/README.md` (Compaction section) for code examples. Full docs via WebFetch in `shared/live-sources.md`.
 
 ---
 
 ## Prompt Caching (Quick Reference)
 
-**Prefix match.** Bất kỳ byte change nào ở prefix sẽ invalidate mọi thứ sau nó. Render order là `tools` → `system` → `messages`. Giữ stable content đầu tiên (frozen system prompt, deterministic tool list), đặt volatile content (timestamp, per-request ID, varying question) sau `cache_control` breakpoint cuối.
+**Prefix match.** Any byte change anywhere in the prefix invalidates everything after it. Render order is `tools` → `system` → `messages`. Keep stable content first (frozen system prompt, deterministic tool list), put volatile content (timestamps, per-request IDs, varying questions) after the last `cache_control` breakpoint.
 
-**Top-level auto-caching** (`cache_control: {type: "ephemeral"}` trên `messages.create()`) là option đơn giản nhất khi bạn không cần fine-grained placement. Max 4 breakpoint per request. Minimum cacheable prefix là ~1024 token — prefix ngắn hơn silently không cache.
+**Top-level auto-caching** (`cache_control: {type: "ephemeral"}` on `messages.create()`) is the simplest option when you don't need fine-grained placement. Max 4 breakpoints per request. Minimum cacheable prefix is ~1024 tokens — shorter prefixes silently won't cache.
 
-**Verify với `usage.cache_read_input_tokens`** — nếu nó zero qua nhiều request lặp lại, có silent invalidator đang hoạt động (`datetime.now()` trong system prompt, unsorted JSON, tool set thay đổi).
+**Verify with `usage.cache_read_input_tokens`** — if it's zero across repeated requests, a silent invalidator is at work (`datetime.now()` in system prompt, unsorted JSON, varying tool set).
 
-Để biết placement pattern, architectural guidance, và silent-invalidator audit checklist: đọc `shared/prompt-caching.md`. Language-specific syntax: `{lang}/claude-api/README.md` (Prompt Caching section).
+For placement patterns, architectural guidance, and the silent-invalidator audit checklist: read `shared/prompt-caching.md`. Language-specific syntax: `{lang}/claude-api/README.md` (Prompt Caching section).
 
 ---
 
 ## Managed Agents (Beta)
 
-**Managed Agents** là surface thứ ba: server-managed stateful agent với Anthropic-hosted tool execution. Bạn tạo Agent config persisted, versioned (`POST /v1/agents`), sau đó start Session reference nó. Mỗi session provision một container như workspace của agent — bash, file ops, và code execution chạy ở đó; agent loop tự chạy trên orchestration layer của Anthropic và act lên container qua tool. Session stream event; bạn gửi message và tool result back.
+**Managed Agents** is a third surface: server-managed stateful agents with Anthropic-hosted tool execution. You create a persisted, versioned Agent config (`POST /v1/agents`), then start Sessions that reference it. Each session provisions a container as the agent's workspace — bash, file ops, and code execution run there; the agent loop itself runs on Anthropic's orchestration layer and acts on the container via tools. The session streams events; you send messages and tool results back.
 
-**Managed Agents là first-party only.** Không khả dụng trên Amazon Bedrock, Google Vertex AI, hay Microsoft Foundry. Cho agent trên third-party provider, dùng Claude API + tool use.
+**Managed Agents is first-party only.** It is not available on Amazon Bedrock, Google Vertex AI, or Microsoft Foundry. For agents on third-party providers, use Claude API + tool use.
 
-**Mandatory flow:** Agent (một lần) → Session (mỗi run). `model`/`system`/`tools` ở trên agent, không bao giờ trên session. Xem `shared/managed-agents-overview.md` để có full reading guide, beta header, và pitfall.
+**Mandatory flow:** Agent (once) → Session (every run). `model`/`system`/`tools` live on the agent, never the session. See `shared/managed-agents-overview.md` for the full reading guide, beta headers, and pitfalls.
 
-**Beta header:** `managed-agents-2026-04-01` — SDK set nó tự động cho mọi call `client.beta.{agents,environments,sessions,vaults,memory_stores}.*`. Skills API dùng `skills-2025-10-02` và Files API dùng `files-api-2025-04-14`, nhưng bạn không cần explicit pass chúng cho endpoint khác `/v1/skills` và `/v1/files`.
+**Beta headers:** `managed-agents-2026-04-01` — the SDK sets this automatically for all `client.beta.{agents,environments,sessions,vaults,memory_stores}.*` calls. Skills API uses `skills-2025-10-02` and Files API uses `files-api-2025-04-14`, but you don't need to explicitly pass those in for endpoints other than `/v1/skills` and `/v1/files`.
 
-**Subcommands** — invoke trực tiếp với `/claude-api <subcommand>`:
+**Subcommands** — invoke directly with `/claude-api <subcommand>`:
 
 | Subcommand | Action |
 |---|---|
-| `managed-agents-onboard` | Walk user qua việc setup Managed Agent từ đầu. **Đọc `shared/managed-agents-onboarding.md` ngay lập tức** và follow interview script của nó: mental model → know-or-explore branch → template config → session setup → emit code. Không summarize — chạy interview. |
+| `managed-agents-onboard` | Walk the user through setting up a Managed Agent from scratch. **Read `shared/managed-agents-onboarding.md` immediately** and follow its interview script: mental model → know-or-explore branch → template config → session setup → emit code. Do not summarize — run the interview. |
 
-**Reading guide:** Bắt đầu với `shared/managed-agents-overview.md`, sau đó các file `shared/managed-agents-*.md` theo chủ đề (core, environments, tools, events, outcomes, multiagent, webhooks, memory, client-patterns, onboarding, api-reference). Cho Python, TypeScript, Go, Ruby, PHP, và Java, đọc `{lang}/managed-agents/README.md` để có code example. Cho cURL, đọc `curl/managed-agents.md`. **Agent là persistent — tạo một lần, reference bằng ID.** Lưu agent ID return từ `agents.create` và pass nó vào mọi `sessions.create` tiếp theo; không gọi `agents.create` trong request path. Anthropic CLI là một cách tiện lợi để tạo agent và environment từ YAML version-controlled (URL trong `shared/live-sources.md`). Nếu binding bạn cần không có trong language README, WebFetch entry liên quan từ `shared/live-sources.md` thay vì đoán. C# hiện chưa support Managed Agents; dùng raw HTTP từ `curl/managed-agents.md` như reference.
+**Reading guide:** Start with `shared/managed-agents-overview.md`, then the topical `shared/managed-agents-*.md` files (core, environments, tools, events, outcomes, multiagent, webhooks, memory, client-patterns, onboarding, api-reference). For Python, TypeScript, Go, Ruby, PHP, and Java, read `{lang}/managed-agents/README.md` for code examples. For cURL, read `curl/managed-agents.md`. **Agents are persistent — create once, reference by ID.** Store the agent ID returned by `agents.create` and pass it to every subsequent `sessions.create`; do not call `agents.create` in the request path. The Anthropic CLI is one convenient way to create agents and environments from version-controlled YAML (URL in `shared/live-sources.md`). If a binding you need isn't shown in the language README, WebFetch the relevant entry from `shared/live-sources.md` rather than guess. C# does not currently have Managed Agents support; use raw HTTP from `curl/managed-agents.md` as a reference.
 
-**Khi user muốn setup Managed Agent từ đầu** (vd "how do I get started", "walk me through creating one", "set up a new agent"): đọc `shared/managed-agents-onboarding.md` và chạy interview của nó — cùng flow với subcommand `managed-agents-onboard`.
+**When the user wants to set up a Managed Agent from scratch** (e.g. "how do I get started", "walk me through creating one", "set up a new agent"): read `shared/managed-agents-onboarding.md` and run its interview — same flow as the `managed-agents-onboard` subcommand.
 
-**Khi user hỏi "how do I write the client code for X":** với tay tới `shared/managed-agents-client-patterns.md` — cover lossless stream reconnect, `processed_at` queued/processed gate, interrupt, `tool_confirmation` round-trip, idle/terminated break gate đúng, post-idle status race, stream-first ordering, file-mount gotcha, giữ credential host-side qua custom tool, v.v.
+**When the user asks "how do I write the client code for X":** reach for `shared/managed-agents-client-patterns.md` — covers lossless stream reconnect, `processed_at` queued/processed gate, interrupt, `tool_confirmation` round-trip, the correct idle/terminated break gate, post-idle status race, stream-first ordering, file-mount gotchas, keeping credentials host-side via custom tools, etc.
 
 ---
 
 ## Reading Guide
 
-Sau khi detect ngôn ngữ, đọc các file liên quan tùy theo nhu cầu user:
+After detecting the language, read the relevant files based on what the user needs:
 
 ### Quick Task Reference
 
 **Single text classification/summarization/extraction/Q&A:**
-→ Chỉ đọc `{lang}/claude-api/README.md`
+→ Read only `{lang}/claude-api/README.md`
 
-**Chat UI hoặc real-time response display:**
-→ Đọc `{lang}/claude-api/README.md` + `{lang}/claude-api/streaming.md`
+**Chat UI or real-time response display:**
+→ Read `{lang}/claude-api/README.md` + `{lang}/claude-api/streaming.md`
 
-**Long-running conversation (có thể vượt context window):**
-→ Đọc `{lang}/claude-api/README.md` — xem Compaction section
-**Migrate sang newer model (Opus 4.7 / Opus 4.6 / Sonnet 4.6) hoặc thay retired model:**
-→ Đọc `shared/model-migration.md`
+**Long-running conversations (may exceed context window):**
+→ Read `{lang}/claude-api/README.md` — see Compaction section
+**Migrating to a newer model (Opus 4.7 / Opus 4.6 / Sonnet 4.6) or replacing a retired model:**
+→ Read `shared/model-migration.md`
 **Prompt caching / optimize caching / "why is my cache hit rate low":**
-→ Đọc `shared/prompt-caching.md` + `{lang}/claude-api/README.md` (Prompt Caching section)
+→ Read `shared/prompt-caching.md` + `{lang}/claude-api/README.md` (Prompt Caching section)
 
-**Function calling / tool use / agent:**
-→ Đọc `{lang}/claude-api/README.md` + `shared/tool-use-concepts.md` + `{lang}/claude-api/tool-use.md`
+**Function calling / tool use / agents:**
+→ Read `{lang}/claude-api/README.md` + `shared/tool-use-concepts.md` + `{lang}/claude-api/tool-use.md`
 
 **Agent design (tool surface, context management, caching strategy):**
-→ Đọc `shared/agent-design.md`
+→ Read `shared/agent-design.md`
 
 **Batch processing (non-latency-sensitive):**
-→ Đọc `{lang}/claude-api/README.md` + `{lang}/claude-api/batches.md`
+→ Read `{lang}/claude-api/README.md` + `{lang}/claude-api/batches.md`
 
-**File upload across multiple request:**
-→ Đọc `{lang}/claude-api/README.md` + `{lang}/claude-api/files-api.md`
+**File uploads across multiple requests:**
+→ Read `{lang}/claude-api/README.md` + `{lang}/claude-api/files-api.md`
 
-**Managed Agents (server-managed stateful agent với workspace):**
-→ Đọc `shared/managed-agents-overview.md` + các file `shared/managed-agents-*.md` còn lại. Cho Python, TypeScript, Go, Ruby, PHP, và Java, đọc `{lang}/managed-agents/README.md` để có code example. Cho cURL, đọc `curl/managed-agents.md`. **Agent là persistent — tạo một lần, reference bằng ID.** Lưu agent ID return từ `agents.create` và pass nó vào mọi `sessions.create` tiếp theo; không gọi `agents.create` trong request path. Anthropic CLI là cách tiện lợi để tạo agent và environment từ YAML version-controlled (URL trong `shared/live-sources.md`). Nếu binding bạn cần không có trong language README, WebFetch entry liên quan từ `shared/live-sources.md` thay vì đoán. C# hiện chưa support Managed Agents — dùng raw HTTP từ `curl/managed-agents.md` như reference.
+**Managed Agents (server-managed stateful agents with workspace):**
+→ Read `shared/managed-agents-overview.md` + the rest of the `shared/managed-agents-*.md` files. For Python, TypeScript, Go, Ruby, PHP, and Java, read `{lang}/managed-agents/README.md` for code examples. For cURL, read `curl/managed-agents.md`. **Agents are persistent — create once, reference by ID.** Store the agent ID returned by `agents.create` and pass it to every subsequent `sessions.create`; do not call `agents.create` in the request path. The Anthropic CLI is one convenient way to create agents and environments from version-controlled YAML (URL in `shared/live-sources.md`). If a binding you need isn't shown in the language README, WebFetch the relevant entry from `shared/live-sources.md` rather than guess. C# does not currently support Managed Agents — use raw HTTP from `curl/managed-agents.md` as a reference.
 
 ### Claude API (Full File Reference)
 
-Đọc **language-specific Claude API folder** (`{language}/claude-api/`):
+Read the **language-specific Claude API folder** (`{language}/claude-api/`):
 
-1. **`{language}/claude-api/README.md`** — **Đọc cái này trước.** Installation, quick start, common pattern, error handling.
-2. **`shared/tool-use-concepts.md`** — Đọc khi user cần function calling, code execution, memory, hoặc structured output. Cover conceptual foundation.
-3. **`shared/agent-design.md`** — Đọc khi design agent: bash vs. dedicated tool, programmatic tool calling, tool search/skills, context editing vs. compaction vs. memory, caching principle.
-4. **`{language}/claude-api/tool-use.md`** — Đọc cho language-specific tool use code example (tool runner, manual loop, code execution, memory, structured output).
-5. **`{language}/claude-api/streaming.md`** — Đọc khi build chat UI hoặc interface display response incremental.
-6. **`{language}/claude-api/batches.md`** — Đọc khi process nhiều request offline (không latency-sensitive). Chạy asynchronously với 50% cost.
-7. **`{language}/claude-api/files-api.md`** — Đọc khi gửi cùng file across multiple request mà không re-upload.
-8. **`shared/prompt-caching.md`** — Đọc khi thêm hoặc optimize prompt caching. Cover prefix-stability design, breakpoint placement, và anti-pattern silently invalidate cache.
-9. **`shared/error-codes.md`** — Đọc khi debug HTTP error hoặc implement error handling.
-10. **`shared/model-migration.md`** — Đọc khi upgrade sang model mới hơn, thay retired model, hoặc translate pattern `budget_tokens` / prefill sang API hiện tại.
-11. **`shared/live-sources.md`** — URL WebFetch để fetch official documentation mới nhất.
+1. **`{language}/claude-api/README.md`** — **Read this first.** Installation, quick start, common patterns, error handling.
+2. **`shared/tool-use-concepts.md`** — Read when the user needs function calling, code execution, memory, or structured outputs. Covers conceptual foundations.
+3. **`shared/agent-design.md`** — Read when designing an agent: bash vs. dedicated tools, programmatic tool calling, tool search/skills, context editing vs. compaction vs. memory, caching principles.
+4. **`{language}/claude-api/tool-use.md`** — Read for language-specific tool use code examples (tool runner, manual loop, code execution, memory, structured outputs).
+5. **`{language}/claude-api/streaming.md`** — Read when building chat UIs or interfaces that display responses incrementally.
+6. **`{language}/claude-api/batches.md`** — Read when processing many requests offline (not latency-sensitive). Runs asynchronously at 50% cost.
+7. **`{language}/claude-api/files-api.md`** — Read when sending the same file across multiple requests without re-uploading.
+8. **`shared/prompt-caching.md`** — Read when adding or optimizing prompt caching. Covers prefix-stability design, breakpoint placement, and anti-patterns that silently invalidate cache.
+9. **`shared/error-codes.md`** — Read when debugging HTTP errors or implementing error handling.
+10. **`shared/model-migration.md`** — Read when upgrading to newer models, replacing retired models, or translating `budget_tokens` / prefill patterns to the current API.
+11. **`shared/live-sources.md`** — WebFetch URLs for fetching the latest official documentation.
 
-> **Lưu ý:** Cho Java, Go, Ruby, C#, PHP, và cURL — mỗi cái có một file cover hết basic. Đọc file đó cộng với `shared/tool-use-concepts.md` và `shared/error-codes.md` khi cần.
+> **Note:** For Java, Go, Ruby, C#, PHP, and cURL — these have a single file each covering all basics. Read that file plus `shared/tool-use-concepts.md` and `shared/error-codes.md` as needed.
 
-> **Lưu ý:** Để có Managed Agents file reference, xem section `## Managed Agents (Beta)` ở trên — nó liệt kê mọi file `shared/managed-agents-*.md` và language-specific README.
+> **Note:** For the Managed Agents file reference, see the `## Managed Agents (Beta)` section above — it lists every `shared/managed-agents-*.md` file and the language-specific READMEs.
 
 ---
 
-## Khi nào dùng WebFetch
+## When to Use WebFetch
 
-Dùng WebFetch để lấy documentation mới nhất khi:
+Use WebFetch to get the latest documentation when:
 
-- User hỏi "latest" hoặc "current" information
-- Cached data có vẻ không chính xác
-- User hỏi về feature chưa được cover ở đây
+- User asks for "latest" or "current" information
+- Cached data seems incorrect
+- User asks about features not covered here
 
-URL documentation live nằm trong `shared/live-sources.md`.
+Live documentation URLs are in `shared/live-sources.md`.
 
 ## Common Pitfalls
 
-- Đừng truncate input khi pass file hoặc content vào API. Nếu content quá dài để fit vào context window, notify user và discuss option (chunking, summarization, v.v.) thay vì silently truncate.
-- **Opus 4.7 thinking:** Adaptive only. `thinking: {type: "enabled", budget_tokens: N}` trả 400 trên Opus 4.7 — `budget_tokens` bị remove hoàn toàn ở đây (cùng với `temperature`, `top_p`, `top_k`). Dùng `thinking: {type: "adaptive"}`.
-- **Opus 4.6 / Sonnet 4.6 thinking:** Dùng `thinking: {type: "adaptive"}` — KHÔNG dùng `budget_tokens` cho code 4.6 mới (deprecated trên cả Opus 4.6 và Sonnet 4.6; để migrate dần code hiện có, xem transitional escape hatch trong `shared/model-migration.md` — note carve-out này không áp dụng cho Opus 4.7). Cho model cũ hơn, `budget_tokens` phải nhỏ hơn `max_tokens` (minimum 1024). Sẽ throw error nếu sai.
-- **4.6/4.7 family prefill removed:** Assistant message prefill (last-assistant-turn prefill) trả 400 error trên Opus 4.6, Opus 4.7, và Sonnet 4.6. Dùng structured output (`output_config.format`) hoặc system prompt instruction để control response format thay vì prefill.
-- **Confirm migration scope trước khi edit:** Khi user yêu cầu migrate code sang newer Claude model mà không name một file, directory, hay file list cụ thể, **hỏi scope nào áp dụng trước** — toàn bộ working directory, subdirectory cụ thể, hay set file cụ thể. Đừng start edit cho tới khi user confirm. Phrase imperative kiểu "migrate my codebase", "move my project to X", "upgrade to Sonnet 4.6", hoặc bare "migrate to Opus 4.7" **vẫn ambiguous** — chúng nói bạn làm gì nhưng không nói ở đâu, nên hỏi. Proceed mà không hỏi chỉ khi prompt name một file cụ thể, directory cụ thể, hay file list tường minh ("migrate `app.py`", "migrate everything under `services/`", "update `a.py` and `b.py`"). Xem `shared/model-migration.md` Step 0.
-- **`max_tokens` defaults:** Đừng lowball `max_tokens` — hit cap sẽ truncate output mid-thought và cần retry. Cho non-streaming request, default `~16000` (giữ response dưới SDK HTTP timeout). Cho streaming request, default `~64000` (timeout không phải concern, cho model room). Chỉ đi thấp hơn khi bạn có hard reason: classification (`~256`), cost cap, hoặc output ngắn có chủ đích.
-- **128K output token:** Opus 4.6 và Opus 4.7 support tới 128K `max_tokens`, nhưng SDK require streaming cho value lớn vậy để tránh HTTP timeout. Dùng `.stream()` với `.get_final_message()` / `.finalMessage()`.
-- **Tool call JSON parsing (4.6/4.7 family):** Opus 4.6, Opus 4.7, và Sonnet 4.6 có thể produce JSON string escaping khác nhau trong tool call `input` field (vd Unicode hoặc forward-slash escaping). Luôn parse tool input với `json.loads()` / `JSON.parse()` — đừng raw string matching trên serialized input.
-- **Structured outputs (mọi model):** Dùng `output_config: {format: {...}}` thay vì parameter `output_format` deprecated trên `messages.create()`. Đây là general API change, không 4.6-specific.
-- **Đừng reimplement SDK functionality:** SDK provide high-level helper — dùng chúng thay vì build từ đầu. Cụ thể: dùng `stream.finalMessage()` thay vì wrap `.on()` event trong `new Promise()`; dùng typed exception class (`Anthropic.RateLimitError`, v.v.) thay vì string-matching error message; dùng SDK type (`Anthropic.MessageParam`, `Anthropic.Tool`, `Anthropic.Message`, v.v.) thay vì redefine equivalent interface.
-- **Đừng define custom type cho SDK data structure:** SDK export type cho mọi API object. Dùng `Anthropic.MessageParam` cho message, `Anthropic.Tool` cho tool definition, `Anthropic.ToolUseBlock` / `Anthropic.ToolResultBlockParam` cho tool result, `Anthropic.Message` cho response. Define `interface ChatMessage { role: string; content: unknown }` của riêng bạn duplicate cái SDK đã provide và lose type safety.
-- **Report và document output:** Cho task produce report, document, hoặc visualization, code execution sandbox có `python-docx`, `python-pptx`, `matplotlib`, `pillow`, và `pypdf` pre-install. Claude có thể generate formatted file (DOCX, PDF, chart) và return chúng qua Files API — consider cái này cho "report" hoặc "document" type request thay vì plain stdout text.
+- Don't truncate inputs when passing files or content to the API. If the content is too long to fit in the context window, notify the user and discuss options (chunking, summarization, etc.) rather than silently truncating.
+- **Opus 4.7 thinking:** Adaptive only. `thinking: {type: "enabled", budget_tokens: N}` returns 400 on Opus 4.7 — `budget_tokens` is fully removed there (along with `temperature`, `top_p`, `top_k`). Use `thinking: {type: "adaptive"}`.
+- **Opus 4.6 / Sonnet 4.6 thinking:** Use `thinking: {type: "adaptive"}` — do NOT use `budget_tokens` for new 4.6 code (deprecated on both Opus 4.6 and Sonnet 4.6; for gradual migration of existing code, see the transitional escape hatch in `shared/model-migration.md` — note this carve-out does not apply to Opus 4.7). For older models, `budget_tokens` must be less than `max_tokens` (minimum 1024). This will throw an error if you get it wrong.
+- **4.6/4.7 family prefill removed:** Assistant message prefills (last-assistant-turn prefills) return a 400 error on Opus 4.6, Opus 4.7, and Sonnet 4.6. Use structured outputs (`output_config.format`) or system prompt instructions to control response format instead.
+- **Confirm migration scope before editing:** When a user asks to migrate code to a newer Claude model without naming a specific file, directory, or file list, **ask which scope to apply first** — the entire working directory, a specific subdirectory, or a specific set of files. Do not start editing until the user confirms. Imperative phrasings like "migrate my codebase", "move my project to X", "upgrade to Sonnet 4.6", or bare "migrate to Opus 4.7" are **still ambiguous** — they tell you what to do but not where, so ask. Proceed without asking only when the prompt names an exact file, a specific directory, or an explicit file list ("migrate `app.py`", "migrate everything under `services/`", "update `a.py` and `b.py`"). See `shared/model-migration.md` Step 0.
+- **`max_tokens` defaults:** Don't lowball `max_tokens` — hitting the cap truncates output mid-thought and requires a retry. For non-streaming requests, default to `~16000` (keeps responses under SDK HTTP timeouts). For streaming requests, default to `~64000` (timeouts aren't a concern, so give the model room). Only go lower when you have a hard reason: classification (`~256`), cost caps, or deliberately short outputs.
+- **128K output tokens:** Opus 4.6 and Opus 4.7 support up to 128K `max_tokens`, but the SDKs require streaming for values that large to avoid HTTP timeouts. Use `.stream()` with `.get_final_message()` / `.finalMessage()`.
+- **Tool call JSON parsing (4.6/4.7 family):** Opus 4.6, Opus 4.7, and Sonnet 4.6 may produce different JSON string escaping in tool call `input` fields (e.g., Unicode or forward-slash escaping). Always parse tool inputs with `json.loads()` / `JSON.parse()` — never do raw string matching on the serialized input.
+- **Structured outputs (all models):** Use `output_config: {format: {...}}` instead of the deprecated `output_format` parameter on `messages.create()`. This is a general API change, not 4.6-specific.
+- **Don't reimplement SDK functionality:** The SDK provides high-level helpers — use them instead of building from scratch. Specifically: use `stream.finalMessage()` instead of wrapping `.on()` events in `new Promise()`; use typed exception classes (`Anthropic.RateLimitError`, etc.) instead of string-matching error messages; use SDK types (`Anthropic.MessageParam`, `Anthropic.Tool`, `Anthropic.Message`, etc.) instead of redefining equivalent interfaces.
+- **Don't define custom types for SDK data structures:** The SDK exports types for all API objects. Use `Anthropic.MessageParam` for messages, `Anthropic.Tool` for tool definitions, `Anthropic.ToolUseBlock` / `Anthropic.ToolResultBlockParam` for tool results, `Anthropic.Message` for responses. Defining your own `interface ChatMessage { role: string; content: unknown }` duplicates what the SDK already provides and loses type safety.
+- **Report and document output:** For tasks that produce reports, documents, or visualizations, the code execution sandbox has `python-docx`, `python-pptx`, `matplotlib`, `pillow`, and `pypdf` pre-installed. Claude can generate formatted files (DOCX, PDF, charts) and return them via the Files API — consider this for "report" or "document" type requests instead of plain stdout text.

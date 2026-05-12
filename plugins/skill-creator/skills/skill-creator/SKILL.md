@@ -5,97 +5,99 @@ description: Create new skills, modify and improve existing skills, and measure 
 
 # Skill Creator
 
-Một skill để tạo mới và cải thiện các skills một cách iterative.
+A skill for creating new skills and iteratively improving them.
 
-Nhìn ở cấp cao, quá trình tạo skill diễn ra như sau:
+At a high level, the process of creating a skill goes like this:
 
-- Quyết định skill sẽ làm gì và sơ bộ sẽ làm như thế nào
-- Viết draft đầu tiên của skill
-- Tạo vài test prompts và chạy claude-với-skill trên chúng
-- Giúp user đánh giá kết quả cả về chất lượng và định lượng
-  - Trong khi các runs đang diễn ra ở background, draft một số quantitative evals nếu chưa có (nếu đã có, dùng hoặc chỉnh sửa nếu cần thay đổi gì). Sau đó giải thích chúng cho user (hoặc nếu đã có sẵn, giải thích các evals hiện có)
-  - Dùng script `eval-viewer/generate_review.py` để hiển thị kết quả cho user xem, và cũng cho họ xem các quantitative metrics
-- Viết lại skill dựa trên feedback từ việc user đánh giá kết quả (và nếu có lỗi rõ ràng từ quantitative benchmarks)
-- Lặp lại cho đến khi hài lòng
-- Mở rộng test set và thử lại ở quy mô lớn hơn
+- Decide what you want the skill to do and roughly how it should do it
+- Write a draft of the skill
+- Create a few test prompts and run claude-with-access-to-the-skill on them
+- Help the user evaluate the results both qualitatively and quantitatively
+  - While the runs happen in the background, draft some quantitative evals if there aren't any (if there are some, you can either use as is or modify if you feel something needs to change about them). Then explain them to the user (or if they already existed, explain the ones that already exist)
+  - Use the `eval-viewer/generate_review.py` script to show the user the results for them to look at, and also let them look at the quantitative metrics
+- Rewrite the skill based on feedback from the user's evaluation of the results (and also if there are any glaring flaws that become apparent from the quantitative benchmarks)
+- Repeat until you're satisfied
+- Expand the test set and try again at larger scale
 
-Khi dùng skill này, công việc của bạn là xác định user đang ở đâu trong quy trình này rồi nhảy vào giúp họ tiến qua các giai đoạn. Ví dụ, có thể họ nói "Tôi muốn tạo skill cho X". Bạn có thể giúp thu hẹp ý họ muốn, viết draft, viết test cases, tìm cách đánh giá, chạy tất cả prompts, và lặp lại.
+Your job when using this skill is to figure out where the user is in this process and then jump in and help them progress through these stages. So for instance, maybe they're like "I want to make a skill for X". You can help narrow down what they mean, write a draft, write the test cases, figure out how they want to evaluate, run all the prompts, and repeat.
 
-Hoặc có thể họ đã có draft của skill. Trong trường hợp này bạn có thể đi thẳng vào phần eval/iterate.
+On the other hand, maybe they already have a draft of the skill. In this case you can go straight to the eval/iterate part of the loop.
 
-Tất nhiên, hãy linh hoạt — nếu user nói "Tôi không cần chạy nhiều evaluations, cứ vibe với tôi", bạn có thể làm vậy.
+Of course, you should always be flexible and if the user is like "I don't need to run a bunch of evaluations, just vibe with me", you can do that instead.
 
-Sau khi skill hoàn thành (thứ tự linh hoạt), bạn cũng có thể chạy skill description improver — chúng ta có script riêng cho việc đó — để tối ưu triggering của skill.
+Then after the skill is done (but again, the order is flexible), you can also run the skill description improver, which we have a whole separate script for, to optimize the triggering of the skill.
 
-## Giao tiếp với user
+Cool? Cool.
 
-Skill creator có thể được dùng bởi người có nhiều mức độ quen thuộc khác nhau với jargon kỹ thuật. Hiện có xu hướng sức mạnh của Claude đang truyền cảm hứng cho thợ ống nước mở terminal, cha mẹ và ông bà google "how to install npm". Mặt khác, phần lớn users có thể khá thành thạo máy tính.
+## Communicating with the user
 
-Vì vậy hãy chú ý đến context cues để hiểu cách diễn đạt! Để bạn có khái niệm mặc định:
+The skill creator is liable to be used by people across a wide range of familiarity with coding jargon. If you haven't heard (and how could you, it's only very recently that it started), there's a trend now where the power of Claude is inspiring plumbers to open up their terminals, parents and grandparents to google "how to install npm". On the other hand, the bulk of users are probably fairly computer-literate.
 
-- "evaluation" và "benchmark" là borderline, nhưng OK
-- Với "JSON" và "assertion", bạn cần thấy cues nghiêm túc từ user rằng họ hiểu những khái niệm đó trước khi dùng mà không giải thích
+So please pay attention to context cues to understand how to phrase your communication! In the default case, just to give you some idea:
 
-OK để giải thích thuật ngữ ngắn gọn nếu bạn không chắc, và hãy làm rõ với định nghĩa ngắn nếu bạn nghi ngờ user không hiểu.
+- "evaluation" and "benchmark" are borderline, but OK
+- for "JSON" and "assertion" you want to see serious cues from the user that they know what those things are before using them without explaining them
+
+It's OK to briefly explain terms if you're in doubt, and feel free to clarify terms with a short definition if you're unsure if the user will get it.
 
 ---
 
-## Tạo skill
+## Creating a skill
 
-### Thu thập Intent
+### Capture Intent
 
-Bắt đầu bằng cách hiểu intent của user. Conversation hiện tại có thể đã chứa workflow mà user muốn capture (ví dụ họ nói "biến cái này thành skill"). Nếu vậy, trích xuất câu trả lời từ conversation history trước — tools được dùng, trình tự các bước, corrections user đã thực hiện, input/output formats quan sát được. User có thể cần điền các gaps, và nên xác nhận trước khi tiếp tục bước tiếp theo.
+Start by understanding the user's intent. The current conversation might already contain a workflow the user wants to capture (e.g., they say "turn this into a skill"). If so, extract answers from the conversation history first — the tools used, the sequence of steps, corrections the user made, input/output formats observed. The user may need to fill the gaps, and should confirm before proceeding to the next step.
 
-1. Skill này nên cho phép Claude làm gì?
-2. Khi nào skill này nên trigger? (các phrases/contexts của user)
-3. Format output mong đợi là gì?
-4. Chúng ta có nên thiết lập test cases để verify skill hoạt động không? Skills với outputs có thể verify khách quan (file transforms, data extraction, code generation, fixed workflow steps) được hưởng lợi từ test cases. Skills với outputs chủ quan (phong cách viết, nghệ thuật) thường không cần. Đề xuất mặc định phù hợp dựa trên loại skill, nhưng để user quyết định.
+1. What should this skill enable Claude to do?
+2. When should this skill trigger? (what user phrases/contexts)
+3. What's the expected output format?
+4. Should we set up test cases to verify the skill works? Skills with objectively verifiable outputs (file transforms, data extraction, code generation, fixed workflow steps) benefit from test cases. Skills with subjective outputs (writing style, art) often don't need them. Suggest the appropriate default based on the skill type, but let the user decide.
 
-### Phỏng vấn và Nghiên cứu
+### Interview and Research
 
-Chủ động hỏi về edge cases, input/output formats, example files, success criteria, và dependencies. Đợi viết test prompts cho đến khi bạn đã rõ phần này.
+Proactively ask questions about edge cases, input/output formats, example files, success criteria, and dependencies. Wait to write test prompts until you've got this part ironed out.
 
-Kiểm tra các MCPs có sẵn — nếu hữu ích để nghiên cứu (tìm kiếm docs, tìm skills tương tự, tra cứu best practices), nghiên cứu song song qua subagents nếu có, nếu không thì inline. Chuẩn bị context đầy đủ để giảm gánh nặng cho user.
+Check available MCPs - if useful for research (searching docs, finding similar skills, looking up best practices), research in parallel via subagents if available, otherwise inline. Come prepared with context to reduce burden on the user.
 
-### Viết SKILL.md
+### Write the SKILL.md
 
-Dựa trên phỏng vấn user, điền các components này:
+Based on the user interview, fill in these components:
 
 - **name**: Skill identifier
-- **description**: Khi nào trigger, làm gì. Đây là primary triggering mechanism — bao gồm cả "skill làm gì" VÀ "contexts cụ thể khi nào dùng". Tất cả thông tin "khi nào dùng" đặt ở đây, không đặt trong body. Lưu ý: Claude hiện có xu hướng "undertrigger" skills — không dùng khi đáng lẽ nên dùng. Để khắc phục, hãy làm cho descriptions của skill hơi "pushy". Ví dụ thay vì "Cách build dashboard đơn giản nhanh để hiển thị data nội bộ Anthropic.", bạn có thể viết "Cách build dashboard đơn giản nhanh để hiển thị data nội bộ Anthropic. Nhớ dùng skill này bất cứ khi nào user đề cập dashboards, data visualization, internal metrics, hoặc muốn hiển thị bất kỳ loại company data nào, kể cả khi họ không yêu cầu rõ 'dashboard'."
-- **compatibility**: Tools cần thiết, dependencies (optional, hiếm khi cần)
-- **phần còn lại của skill :)**
+- **description**: When to trigger, what it does. This is the primary triggering mechanism - include both what the skill does AND specific contexts for when to use it. All "when to use" info goes here, not in the body. Note: currently Claude has a tendency to "undertrigger" skills -- to not use them when they'd be useful. To combat this, please make the skill descriptions a little bit "pushy". So for instance, instead of "How to build a simple fast dashboard to display internal Anthropic data.", you might write "How to build a simple fast dashboard to display internal Anthropic data. Make sure to use this skill whenever the user mentions dashboards, data visualization, internal metrics, or wants to display any kind of company data, even if they don't explicitly ask for a 'dashboard.'"
+- **compatibility**: Required tools, dependencies (optional, rarely needed)
+- **the rest of the skill :)**
 
-### Hướng dẫn Viết Skill
+### Skill Writing Guide
 
-#### Cấu trúc của một Skill
+#### Anatomy of a Skill
 
 ```
 skill-name/
-├── SKILL.md (bắt buộc)
-│   ├── YAML frontmatter (name, description bắt buộc)
-│   └── Hướng dẫn Markdown
-└── Bundled Resources (tùy chọn)
-    ├── scripts/    - Executable code cho các task deterministic/lặp lại
-    ├── references/ - Docs được load vào context khi cần
-    └── assets/     - Files dùng trong output (templates, icons, fonts)
+├── SKILL.md (required)
+│   ├── YAML frontmatter (name, description required)
+│   └── Markdown instructions
+└── Bundled Resources (optional)
+    ├── scripts/    - Executable code for deterministic/repetitive tasks
+    ├── references/ - Docs loaded into context as needed
+    └── assets/     - Files used in output (templates, icons, fonts)
 ```
 
 #### Progressive Disclosure
 
-Skills dùng hệ thống loading ba cấp:
-1. **Metadata** (name + description) - Luôn trong context (~100 words)
-2. **SKILL.md body** - Trong context khi skill trigger (<500 dòng lý tưởng)
-3. **Bundled resources** - Khi cần (không giới hạn, scripts có thể execute mà không cần load)
+Skills use a three-level loading system:
+1. **Metadata** (name + description) - Always in context (~100 words)
+2. **SKILL.md body** - In context whenever skill triggers (<500 lines ideal)
+3. **Bundled resources** - As needed (unlimited, scripts can execute without loading)
 
-Các word counts này là approximate, bạn có thể viết dài hơn nếu cần.
+These word counts are approximate and you can feel free to go longer if needed.
 
-**Các pattern chính:**
-- Giữ SKILL.md dưới 500 dòng; nếu đang tiến gần giới hạn này, thêm layer hierarchy bổ sung kèm con trỏ rõ ràng về nơi model dùng skill nên đến tiếp theo.
-- Tham chiếu files rõ ràng từ SKILL.md với hướng dẫn khi nào nên đọc chúng
-- Với reference files lớn (>300 dòng), bao gồm mục lục
+**Key patterns:**
+- Keep SKILL.md under 500 lines; if you're approaching this limit, add an additional layer of hierarchy along with clear pointers about where the model using the skill should go next to follow up.
+- Reference files clearly from SKILL.md with guidance on when to read them
+- For large reference files (>300 lines), include a table of contents
 
-**Tổ chức theo domain**: Khi skill hỗ trợ nhiều domains/frameworks, tổ chức theo variant:
+**Domain organization**: When a skill supports multiple domains/frameworks, organize by variant:
 ```
 cloud-deploy/
 ├── SKILL.md (workflow + selection)
@@ -104,43 +106,43 @@ cloud-deploy/
     ├── gcp.md
     └── azure.md
 ```
-Claude chỉ đọc reference file liên quan.
+Claude reads only the relevant reference file.
 
-#### Nguyên tắc Không Bất Ngờ
+#### Principle of Lack of Surprise
 
-Skills không được chứa malware, exploit code, hoặc bất kỳ content nào có thể ảnh hưởng đến system security. Nội dung của skill không nên làm user bất ngờ về intent nếu được mô tả. Đừng làm theo yêu cầu tạo misleading skills hoặc skills được thiết kế để hỗ trợ unauthorized access, data exfiltration, hoặc hoạt động độc hại khác. Tuy nhiên "roleplay as an XYZ" là OK.
+This goes without saying, but skills must not contain malware, exploit code, or any content that could compromise system security. A skill's contents should not surprise the user in their intent if described. Don't go along with requests to create misleading skills or skills designed to facilitate unauthorized access, data exfiltration, or other malicious activities. Things like a "roleplay as an XYZ" are OK though.
 
-#### Các Pattern Viết
+#### Writing Patterns
 
-Ưu tiên dùng dạng imperative trong instructions.
+Prefer using the imperative form in instructions.
 
-**Định nghĩa output formats** — Bạn có thể làm như này:
+**Defining output formats** - You can do it like this:
 ```markdown
-## Cấu trúc Report
-LUÔN dùng template chính xác này:
+## Report structure
+ALWAYS use this exact template:
 # [Title]
 ## Executive summary
 ## Key findings
 ## Recommendations
 ```
 
-**Pattern Examples** — Hữu ích khi bao gồm examples. Bạn có thể format như này (nhưng nếu "Input" và "Output" có trong examples, bạn có thể muốn thay đổi một chút):
+**Examples pattern** - It's useful to include examples. You can format them like this (but if "Input" and "Output" are in the examples you might want to deviate a little):
 ```markdown
-## Format commit message
+## Commit message format
 **Example 1:**
 Input: Added user authentication with JWT tokens
 Output: feat(auth): implement JWT-based authentication
 ```
 
-### Phong cách Viết
+### Writing Style
 
-Cố gắng giải thích cho model tại sao mọi thứ quan trọng thay vì dùng MUST nặng tay. Dùng theory of mind và cố gắng làm skill chung chung, không cực kỳ hẹp với các ví dụ cụ thể. Bắt đầu bằng cách viết draft rồi nhìn lại với con mắt mới và cải thiện.
+Try to explain to the model why things are important in lieu of heavy-handed musty MUSTs. Use theory of mind and try to make the skill general and not super-narrow to specific examples. Start by writing a draft and then look at it with fresh eyes and improve it.
 
 ### Test Cases
 
-Sau khi viết skill draft, nghĩ ra 2-3 test prompts thực tế — loại mà user thực sự sẽ nói. Chia sẻ với user: "Đây là vài test cases tôi muốn thử. Trông có vẻ đúng không, hay bạn muốn thêm?" Rồi chạy chúng.
+After writing the skill draft, come up with 2-3 realistic test prompts — the kind of thing a real user would actually say. Share them with the user: [you don't have to use this exact language] "Here are a few test cases I'd like to try. Do these look right, or do you want to add more?" Then run them.
 
-Lưu test cases vào `evals/evals.json`. Chưa cần viết assertions — chỉ cần prompts. Bạn sẽ draft assertions ở bước tiếp theo trong khi runs đang chạy.
+Save test cases to `evals/evals.json`. Don't write assertions yet — just the prompts. You'll draft assertions in the next step while the runs are in progress.
 
 ```json
 {
@@ -156,34 +158,34 @@ Lưu test cases vào `evals/evals.json`. Chưa cần viết assertions — chỉ
 }
 ```
 
-Xem `references/schemas.md` để biết full schema (bao gồm field `assertions`, sẽ thêm sau).
+See `references/schemas.md` for the full schema (including the `assertions` field, which you'll add later).
 
-## Chạy và đánh giá test cases
+## Running and evaluating test cases
 
-Section này là một chuỗi liên tục — không dừng giữa chừng. KHÔNG dùng `/skill-test` hoặc skill testing nào khác.
+This section is one continuous sequence — don't stop partway through. Do NOT use `/skill-test` or any other testing skill.
 
-Đặt kết quả vào `<skill-name>-workspace/` như sibling với skill directory. Trong workspace, tổ chức kết quả theo iteration (`iteration-1/`, `iteration-2/`, v.v.) và trong đó, mỗi test case có directory riêng (`eval-0/`, `eval-1/`, v.v.). Đừng tạo tất cả upfront — chỉ tạo directories khi cần.
+Put results in `<skill-name>-workspace/` as a sibling to the skill directory. Within the workspace, organize results by iteration (`iteration-1/`, `iteration-2/`, etc.) and within that, each test case gets a directory (`eval-0/`, `eval-1/`, etc.). Don't create all of this upfront — just create directories as you go.
 
-### Bước 1: Spawn tất cả runs (with-skill VÀ baseline) trong cùng một turn
+### Step 1: Spawn all runs (with-skill AND baseline) in the same turn
 
-Cho mỗi test case, spawn hai subagents trong cùng turn — một với skill, một không. Quan trọng: đừng spawn with-skill runs trước rồi quay lại để lấy baselines sau. Launch tất cả cùng lúc để tất cả hoàn thành gần cùng thời điểm.
+For each test case, spawn two subagents in the same turn — one with the skill, one without. This is important: don't spawn the with-skill runs first and then come back for baselines later. Launch everything at once so it all finishes around the same time.
 
 **With-skill run:**
 
 ```
-Thực hiện task này:
+Execute this task:
 - Skill path: <path-to-skill>
 - Task: <eval prompt>
-- Input files: <eval files nếu có, hoặc "none">
-- Lưu outputs vào: <workspace>/iteration-<N>/eval-<ID>/with_skill/outputs/
-- Outputs cần lưu: <những gì user quan tâm — ví dụ "file .docx", "CSV cuối cùng">
+- Input files: <eval files if any, or "none">
+- Save outputs to: <workspace>/iteration-<N>/eval-<ID>/with_skill/outputs/
+- Outputs to save: <what the user cares about — e.g., "the .docx file", "the final CSV">
 ```
 
-**Baseline run** (cùng prompt, nhưng baseline phụ thuộc vào context):
-- **Tạo skill mới**: không có skill nào cả. Cùng prompt, không có skill path, lưu vào `without_skill/outputs/`.
-- **Cải thiện skill có sẵn**: version cũ. Trước khi edit, snapshot skill (`cp -r <skill-path> <workspace>/skill-snapshot/`), rồi chỉ baseline subagent đến snapshot. Lưu vào `old_skill/outputs/`.
+**Baseline run** (same prompt, but the baseline depends on context):
+- **Creating a new skill**: no skill at all. Same prompt, no skill path, save to `without_skill/outputs/`.
+- **Improving an existing skill**: the old version. Before editing, snapshot the skill (`cp -r <skill-path> <workspace>/skill-snapshot/`), then point the baseline subagent at the snapshot. Save to `old_skill/outputs/`.
 
-Viết `eval_metadata.json` cho mỗi test case (assertions có thể để trống cho bây giờ). Đặt tên mô tả cho mỗi eval dựa trên những gì nó đang test — không chỉ "eval-0". Dùng tên này cho directory cũng vậy. Nếu iteration này dùng eval prompts mới hoặc được sửa đổi, tạo các files này cho mỗi eval directory mới — đừng giả định chúng carryover từ iteration trước.
+Write an `eval_metadata.json` for each test case (assertions can be empty for now). Give each eval a descriptive name based on what it's testing — not just "eval-0". Use this name for the directory too. If this iteration uses new or modified eval prompts, create these files for each new eval directory — don't assume they carry over from previous iterations.
 
 ```json
 {
@@ -194,17 +196,17 @@ Viết `eval_metadata.json` cho mỗi test case (assertions có thể để tr�
 }
 ```
 
-### Bước 2: Trong khi runs đang chạy, draft assertions
+### Step 2: While runs are in progress, draft assertions
 
-Đừng chỉ ngồi chờ runs hoàn thành — bạn có thể dùng thời gian này hiệu quả. Draft quantitative assertions cho mỗi test case và giải thích chúng cho user. Nếu assertions đã tồn tại trong `evals/evals.json`, review và giải thích chúng kiểm tra gì.
+Don't just wait for the runs to finish — you can use this time productively. Draft quantitative assertions for each test case and explain them to the user. If assertions already exist in `evals/evals.json`, review them and explain what they check.
 
-Assertions tốt có thể verify khách quan và có tên mô tả — nên đọc rõ ràng trong benchmark viewer để ai nhìn thoáng qua kết quả cũng hiểu ngay mỗi assertion kiểm tra gì. Skills chủ quan (phong cách viết, chất lượng thiết kế) tốt hơn nên đánh giá định tính — đừng ép assertions vào những thứ cần phán đoán của con người.
+Good assertions are objectively verifiable and have descriptive names — they should read clearly in the benchmark viewer so someone glancing at the results immediately understands what each one checks. Subjective skills (writing style, design quality) are better evaluated qualitatively — don't force assertions onto things that need human judgment.
 
-Cập nhật files `eval_metadata.json` và `evals/evals.json` với assertions sau khi draft. Cũng giải thích cho user những gì họ sẽ thấy trong viewer — cả qualitative outputs và quantitative benchmark.
+Update the `eval_metadata.json` files and `evals/evals.json` with the assertions once drafted. Also explain to the user what they'll see in the viewer — both the qualitative outputs and the quantitative benchmark.
 
-### Bước 3: Khi runs hoàn thành, capture timing data
+### Step 3: As runs complete, capture timing data
 
-Khi mỗi subagent task hoàn thành, bạn nhận notification chứa `total_tokens` và `duration_ms`. Lưu data này ngay vào `timing.json` trong run directory:
+When each subagent task completes, you receive a notification containing `total_tokens` and `duration_ms`. Save this data immediately to `timing.json` in the run directory:
 
 ```json
 {
@@ -214,24 +216,24 @@ Khi mỗi subagent task hoàn thành, bạn nhận notification chứa `total_to
 }
 ```
 
-Đây là cơ hội duy nhất để capture data này — nó đến qua task notification và không được persist ở nơi khác. Xử lý mỗi notification khi nó đến thay vì cố gắng batch chúng.
+This is the only opportunity to capture this data — it comes through the task notification and isn't persisted elsewhere. Process each notification as it arrives rather than trying to batch them.
 
-### Bước 4: Grade, aggregate, và launch viewer
+### Step 4: Grade, aggregate, and launch the viewer
 
-Sau khi tất cả runs xong:
+Once all runs are done:
 
-1. **Grade mỗi run** — spawn grader subagent (hoặc grade inline) đọc `agents/grader.md` và đánh giá mỗi assertion theo outputs. Lưu kết quả vào `grading.json` trong mỗi run directory. Mảng expectations trong grading.json phải dùng các field `text`, `passed`, và `evidence` (không phải `name`/`met`/`details` hoặc variants khác) — viewer phụ thuộc vào tên field chính xác này. Với assertions có thể kiểm tra theo chương trình, viết và chạy script thay vì eyeballing — scripts nhanh hơn, đáng tin cậy hơn, và có thể tái sử dụng qua các iterations.
+1. **Grade each run** — spawn a grader subagent (or grade inline) that reads `agents/grader.md` and evaluates each assertion against the outputs. Save results to `grading.json` in each run directory. The grading.json expectations array must use the fields `text`, `passed`, and `evidence` (not `name`/`met`/`details` or other variants) — the viewer depends on these exact field names. For assertions that can be checked programmatically, write and run a script rather than eyeballing it — scripts are faster, more reliable, and can be reused across iterations.
 
-2. **Aggregate vào benchmark** — chạy aggregation script từ skill-creator directory:
+2. **Aggregate into benchmark** — run the aggregation script from the skill-creator directory:
    ```bash
    python -m scripts.aggregate_benchmark <workspace>/iteration-N --skill-name <name>
    ```
-   Tạo ra `benchmark.json` và `benchmark.md` với pass_rate, time, và tokens cho mỗi configuration, kèm mean ± stddev và delta. Nếu tạo benchmark.json thủ công, xem `references/schemas.md` để biết schema chính xác mà viewer mong đợi.
-   Đặt mỗi phiên bản with_skill trước baseline counterpart của nó.
+   This produces `benchmark.json` and `benchmark.md` with pass_rate, time, and tokens for each configuration, with mean ± stddev and the delta. If generating benchmark.json manually, see `references/schemas.md` for the exact schema the viewer expects.
+Put each with_skill version before its baseline counterpart.
 
-3. **Thực hiện analyst pass** — đọc benchmark data và nêu bật các patterns mà aggregate stats có thể ẩn. Xem `agents/analyzer.md` (section "Analyzing Benchmark Results") để biết cần tìm gì — những thứ như assertions luôn pass bất kể skill (non-discriminating), evals có variance cao (có thể flaky), và time/token tradeoffs.
+3. **Do an analyst pass** — read the benchmark data and surface patterns the aggregate stats might hide. See `agents/analyzer.md` (the "Analyzing Benchmark Results" section) for what to look for — things like assertions that always pass regardless of skill (non-discriminating), high-variance evals (possibly flaky), and time/token tradeoffs.
 
-4. **Launch viewer** với cả qualitative outputs và quantitative data:
+4. **Launch the viewer** with both qualitative outputs and quantitative data:
    ```bash
    nohup python <skill-creator-path>/eval-viewer/generate_review.py \
      <workspace>/iteration-N \
@@ -240,31 +242,31 @@ Sau khi tất cả runs xong:
      > /dev/null 2>&1 &
    VIEWER_PID=$!
    ```
-   Với iteration 2+, cũng truyền `--previous-workspace <workspace>/iteration-<N-1>`.
+   For iteration 2+, also pass `--previous-workspace <workspace>/iteration-<N-1>`.
 
-   **Môi trường Cowork / headless:** Nếu `webbrowser.open()` không có hoặc môi trường không có display, dùng `--static <output_path>` để viết standalone HTML file thay vì start server. Feedback sẽ được download như file `feedback.json` khi user click "Submit All Reviews". Sau khi download, copy `feedback.json` vào workspace directory để iteration tiếp theo sử dụng.
+   **Cowork / headless environments:** If `webbrowser.open()` is not available or the environment has no display, use `--static <output_path>` to write a standalone HTML file instead of starting a server. Feedback will be downloaded as a `feedback.json` file when the user clicks "Submit All Reviews". After download, copy `feedback.json` into the workspace directory for the next iteration to pick up.
 
-   Lưu ý: hãy dùng generate_review.py để tạo viewer; không cần viết custom HTML.
+Note: please use generate_review.py to create the viewer; there's no need to write custom HTML.
 
-5. **Báo user** điều gì đó như: "Tôi đã mở kết quả trong browser của bạn. Có hai tabs — 'Outputs' cho phép bạn click qua mỗi test case và để lại feedback, 'Benchmark' hiển thị so sánh định lượng. Khi xong, quay lại đây và cho tôi biết."
+5. **Tell the user** something like: "I've opened the results in your browser. There are two tabs — 'Outputs' lets you click through each test case and leave feedback, 'Benchmark' shows the quantitative comparison. When you're done, come back here and let me know."
 
-### User thấy gì trong viewer
+### What the user sees in the viewer
 
-Tab "Outputs" hiển thị từng test case một:
-- **Prompt**: task đã được giao
-- **Output**: files skill tạo ra, render inline khi có thể
-- **Previous Output** (iteration 2+): section thu gọn hiển thị output của iteration trước
-- **Formal Grades** (nếu grading đã chạy): section thu gọn hiển thị assertion pass/fail
-- **Feedback**: textbox tự lưu khi họ gõ
-- **Previous Feedback** (iteration 2+): bình luận của họ lần trước, hiển thị bên dưới textbox
+The "Outputs" tab shows one test case at a time:
+- **Prompt**: the task that was given
+- **Output**: the files the skill produced, rendered inline where possible
+- **Previous Output** (iteration 2+): collapsed section showing last iteration's output
+- **Formal Grades** (if grading was run): collapsed section showing assertion pass/fail
+- **Feedback**: a textbox that auto-saves as they type
+- **Previous Feedback** (iteration 2+): their comments from last time, shown below the textbox
 
-Tab "Benchmark" hiển thị stats summary: pass rates, timing, và token usage cho mỗi configuration, với per-eval breakdowns và analyst observations.
+The "Benchmark" tab shows the stats summary: pass rates, timing, and token usage for each configuration, with per-eval breakdowns and analyst observations.
 
-Điều hướng qua nút prev/next hoặc phím mũi tên. Khi xong, họ click "Submit All Reviews" sẽ lưu tất cả feedback vào `feedback.json`.
+Navigation is via prev/next buttons or arrow keys. When done, they click "Submit All Reviews" which saves all feedback to `feedback.json`.
 
-### Bước 5: Đọc feedback
+### Step 5: Read the feedback
 
-Khi user báo xong, đọc `feedback.json`:
+When the user tells you they're done, read `feedback.json`:
 
 ```json
 {
@@ -277,9 +279,9 @@ Khi user báo xong, đọc `feedback.json`:
 }
 ```
 
-Feedback rỗng nghĩa là user thấy ổn. Tập trung cải thiện vào các test cases mà user có complaints cụ thể.
+Empty feedback means the user thought it was fine. Focus your improvements on the test cases where the user had specific complaints.
 
-Kill viewer server khi xong:
+Kill the viewer server when you're done with it:
 
 ```bash
 kill $VIEWER_PID 2>/dev/null
@@ -287,54 +289,54 @@ kill $VIEWER_PID 2>/dev/null
 
 ---
 
-## Cải thiện skill
+## Improving the skill
 
-Đây là trái tim của vòng lặp. Bạn đã chạy test cases, user đã review kết quả, và bây giờ bạn cần làm skill tốt hơn dựa trên feedback của họ.
+This is the heart of the loop. You've run the test cases, the user has reviewed the results, and now you need to make the skill better based on their feedback.
 
-### Cách nghĩ về cải thiện
+### How to think about improvements
 
-1. **Tổng quát hóa từ feedback.** Điều quan trọng ở đây là chúng ta đang cố tạo skills có thể dùng hàng triệu lần (có thể thực sự là vậy, thậm chí hơn thế ai biết được) trên nhiều prompts khác nhau. Ở đây bạn và user đang iterate chỉ trên vài examples liên tục vì nó giúp tiến nhanh hơn. User biết rõ các examples này và có thể đánh giá outputs mới nhanh chóng. Nhưng nếu skill bạn và user đang cộng tác phát triển chỉ hoạt động cho các examples đó, nó vô dụng. Thay vì thực hiện các thay đổi fiddly overfitty, hoặc MUSTs cực kỳ hạn chế, nếu có vấn đề cứng đầu, bạn có thể thử phân nhánh và dùng các metaphors khác nhau, hoặc khuyến nghị các patterns làm việc khác. Tương đối rẻ để thử và có thể bạn sẽ tìm ra thứ gì đó tuyệt vời.
+1. **Generalize from the feedback.** The big picture thing that's happening here is that we're trying to create skills that can be used a million times (maybe literally, maybe even more who knows) across many different prompts. Here you and the user are iterating on only a few examples over and over again because it helps move faster. The user knows these examples in and out and it's quick for them to assess new outputs. But if the skill you and the user are codeveloping works only for those examples, it's useless. Rather than put in fiddly overfitty changes, or oppressively constrictive MUSTs, if there's some stubborn issue, you might try branching out and using different metaphors, or recommending different patterns of working. It's relatively cheap to try and maybe you'll land on something great.
 
-2. **Giữ prompt gọn.** Loại bỏ những thứ không đóng góp. Nhớ đọc transcripts, không chỉ final outputs — nếu có vẻ như skill đang khiến model lãng phí nhiều thời gian làm những thứ không hiệu quả, bạn có thể thử loại bỏ các phần của skill đang gây ra điều đó và xem điều gì xảy ra.
+2. **Keep the prompt lean.** Remove things that aren't pulling their weight. Make sure to read the transcripts, not just the final outputs — if it looks like the skill is making the model waste a bunch of time doing things that are unproductive, you can try getting rid of the parts of the skill that are making it do that and seeing what happens.
 
-3. **Giải thích lý do.** Cố gắng thực sự giải thích **tại sao** đằng sau mọi thứ bạn yêu cầu model làm. LLMs ngày nay *thông minh*. Họ có good theory of mind và khi được trao harness tốt có thể vượt ra ngoài instructions thô và thực sự làm mọi thứ xảy ra. Kể cả khi feedback từ user ngắn gọn hay tức giận, hãy cố gắng thực sự hiểu task và lý do tại sao user viết những gì họ viết, và những gì họ thực sự viết, rồi truyền sự hiểu biết này vào instructions. Nếu thấy mình viết ALWAYS hoặc NEVER chữ hoa, hoặc dùng cấu trúc cứng nhắc siêu rigid, đó là yellow flag — nếu có thể, diễn đạt lại và giải thích lý do để model hiểu tại sao thứ bạn yêu cầu quan trọng. Đó là cách tiếp cận humane, powerful, và hiệu quả hơn.
+3. **Explain the why.** Try hard to explain the **why** behind everything you're asking the model to do. Today's LLMs are *smart*. They have good theory of mind and when given a good harness can go beyond rote instructions and really make things happen. Even if the feedback from the user is terse or frustrated, try to actually understand the task and why the user is writing what they wrote, and what they actually wrote, and then transmit this understanding into the instructions. If you find yourself writing ALWAYS or NEVER in all caps, or using super rigid structures, that's a yellow flag — if possible, reframe and explain the reasoning so that the model understands why the thing you're asking for is important. That's a more humane, powerful, and effective approach.
 
-4. **Tìm repeated work qua các test cases.** Đọc transcripts từ test runs và chú ý nếu tất cả subagents đều độc lập viết các helper scripts tương tự hoặc thực hiện cùng cách tiếp cận nhiều bước cho thứ gì đó. Nếu cả 3 test cases đều dẫn đến subagent viết `create_docx.py` hoặc `build_chart.py`, đó là signal mạnh rằng skill nên bundle script đó. Viết một lần, đặt trong `scripts/`, và bảo skill dùng nó. Điều này tiết kiệm mọi invocation trong tương lai phải tái phát minh bánh xe.
+4. **Look for repeated work across test cases.** Read the transcripts from the test runs and notice if the subagents all independently wrote similar helper scripts or took the same multi-step approach to something. If all 3 test cases resulted in the subagent writing a `create_docx.py` or a `build_chart.py`, that's a strong signal the skill should bundle that script. Write it once, put it in `scripts/`, and tell the skill to use it. This saves every future invocation from reinventing the wheel.
 
-Task này khá quan trọng và thinking time của bạn không phải bottleneck; hãy dành thời gian và suy nghĩ thật kỹ. Tôi đề xuất viết draft revision rồi nhìn lại mới và cải thiện. Thực sự cố gắng đặt mình vào đầu user và hiểu họ muốn và cần gì.
+This task is pretty important (we are trying to create billions a year in economic value here!) and your thinking time is not the blocker; take your time and really mull things over. I'd suggest writing a draft revision and then looking at it anew and making improvements. Really do your best to get into the head of the user and understand what they want and need.
 
-### Vòng lặp iteration
+### The iteration loop
 
-Sau khi cải thiện skill:
+After improving the skill:
 
-1. Áp dụng cải thiện vào skill
-2. Chạy lại tất cả test cases vào directory `iteration-<N+1>/` mới, bao gồm baseline runs. Nếu tạo skill mới, baseline luôn là `without_skill` (không có skill) — điều đó giữ nguyên qua các iterations. Nếu cải thiện skill hiện có, dùng phán đoán của bạn về điều gì hợp lý làm baseline: version gốc user đến với, hoặc iteration trước.
-3. Launch reviewer với `--previous-workspace` chỉ đến iteration trước
-4. Đợi user review và báo xong
-5. Đọc feedback mới, cải thiện lại, lặp lại
+1. Apply your improvements to the skill
+2. Rerun all test cases into a new `iteration-<N+1>/` directory, including baseline runs. If you're creating a new skill, the baseline is always `without_skill` (no skill) — that stays the same across iterations. If you're improving an existing skill, use your judgment on what makes sense as the baseline: the original version the user came in with, or the previous iteration.
+3. Launch the reviewer with `--previous-workspace` pointing at the previous iteration
+4. Wait for the user to review and tell you they're done
+5. Read the new feedback, improve again, repeat
 
-Tiếp tục cho đến khi:
-- User nói họ hài lòng
-- Feedback đều rỗng (mọi thứ trông tốt)
-- Bạn không tạo ra tiến bộ có ý nghĩa
-
----
-
-## Nâng cao: Blind comparison
-
-Với các tình huống bạn muốn so sánh nghiêm ngặt hơn giữa hai versions của skill (ví dụ user hỏi "version mới có thực sự tốt hơn không?"), có blind comparison system. Đọc `agents/comparator.md` và `agents/analyzer.md` để biết chi tiết. Ý tưởng cơ bản: đưa hai outputs cho independent agent mà không nói cái nào của skill nào, và để nó phán đoán chất lượng. Sau đó phân tích tại sao bên thắng thắng.
-
-Đây là tùy chọn, yêu cầu subagents, và hầu hết users sẽ không cần. Human review loop thường đủ rồi.
+Keep going until:
+- The user says they're happy
+- The feedback is all empty (everything looks good)
+- You're not making meaningful progress
 
 ---
 
-## Tối ưu hóa Description
+## Advanced: Blind comparison
 
-Field description trong SKILL.md frontmatter là cơ chế primary xác định Claude có invoke skill hay không. Sau khi tạo hoặc cải thiện skill, đề nghị tối ưu description để tăng độ chính xác triggering.
+For situations where you want a more rigorous comparison between two versions of a skill (e.g., the user asks "is the new version actually better?"), there's a blind comparison system. Read `agents/comparator.md` and `agents/analyzer.md` for the details. The basic idea is: give two outputs to an independent agent without telling it which is which, and let it judge quality. Then analyze why the winner won.
 
-### Bước 1: Tạo trigger eval queries
+This is optional, requires subagents, and most users won't need it. The human review loop is usually sufficient.
 
-Tạo 20 eval queries — mix giữa should-trigger và should-not-trigger. Lưu dạng JSON:
+---
+
+## Description Optimization
+
+The description field in SKILL.md frontmatter is the primary mechanism that determines whether Claude invokes a skill. After creating or improving a skill, offer to optimize the description for better triggering accuracy.
+
+### Step 1: Generate trigger eval queries
+
+Create 20 eval queries — a mix of should-trigger and should-not-trigger. Save as JSON:
 
 ```json
 [
@@ -343,38 +345,38 @@ Tạo 20 eval queries — mix giữa should-trigger và should-not-trigger. Lưu
 ]
 ```
 
-Các queries phải thực tế và là thứ Claude Code hoặc Claude.ai user thực sự gõ. Không phải requests abstract, mà là requests cụ thể chi tiết. Ví dụ, file paths, personal context về công việc hoặc tình huống của user, column names và values, tên công ty, URLs. Một chút backstory. Một số có thể lowercase hoặc chứa abbreviations hoặc typos hoặc casual speech. Dùng mix độ dài khác nhau, và tập trung vào edge cases thay vì làm chúng rõ ràng quá.
+The queries must be realistic and something a Claude Code or Claude.ai user would actually type. Not abstract requests, but requests that are concrete and specific and have a good amount of detail. For instance, file paths, personal context about the user's job or situation, column names and values, company names, URLs. A little bit of backstory. Some might be in lowercase or contain abbreviations or typos or casual speech. Use a mix of different lengths, and focus on edge cases rather than making them clear-cut (the user will get a chance to sign off on them).
 
-Không tốt: `"Format this data"`, `"Extract text from PDF"`, `"Create a chart"`
+Bad: `"Format this data"`, `"Extract text from PDF"`, `"Create a chart"`
 
-Tốt: `"ok so sếp tôi vừa gửi file xlsx này (trong Downloads, tên gì đó như 'Q4 sales final FINAL v2.xlsx') và cô ấy muốn tôi thêm cột hiển thị profit margin dưới dạng phần trăm. Revenue ở cột C và costs ở cột D tôi nghĩ vậy"`
+Good: `"ok so my boss just sent me this xlsx file (its in my downloads, called something like 'Q4 sales final FINAL v2.xlsx') and she wants me to add a column that shows the profit margin as a percentage. The revenue is in column C and costs are in column D i think"`
 
-Với **should-trigger** queries (8-10), nghĩ về coverage. Bạn muốn các cách diễn đạt khác nhau của cùng intent — một số formal, một số casual. Bao gồm các trường hợp user không đặt tên skill hay file type rõ ràng nhưng rõ ràng cần nó. Thêm một số use cases không phổ biến và cases nơi skill này cạnh tranh với skill khác nhưng nên thắng.
+For the **should-trigger** queries (8-10), think about coverage. You want different phrasings of the same intent — some formal, some casual. Include cases where the user doesn't explicitly name the skill or file type but clearly needs it. Throw in some uncommon use cases and cases where this skill competes with another but should win.
 
-Với **should-not-trigger** queries (8-10), những cái có giá trị nhất là near-misses — queries chia sẻ keywords hoặc concepts với skill nhưng thực ra cần thứ khác. Nghĩ về adjacent domains, phrasing mơ hồ nơi keyword match naive sẽ trigger nhưng không nên, và cases nơi query chạm vào thứ skill làm nhưng trong context nơi tool khác phù hợp hơn.
+For the **should-not-trigger** queries (8-10), the most valuable ones are the near-misses — queries that share keywords or concepts with the skill but actually need something different. Think adjacent domains, ambiguous phrasing where a naive keyword match would trigger but shouldn't, and cases where the query touches on something the skill does but in a context where another tool is more appropriate.
 
-Điều quan trọng cần tránh: đừng làm should-not-trigger queries quá rõ ràng không liên quan. "Write a fibonacci function" như negative test cho PDF skill quá dễ — nó không test gì cả. Các cases negative nên thực sự tricky.
+The key thing to avoid: don't make should-not-trigger queries obviously irrelevant. "Write a fibonacci function" as a negative test for a PDF skill is too easy — it doesn't test anything. The negative cases should be genuinely tricky.
 
-### Bước 2: Review với user
+### Step 2: Review with user
 
-Trình bày eval set cho user review bằng HTML template:
+Present the eval set to the user for review using the HTML template:
 
-1. Đọc template từ `assets/eval_review.html`
-2. Thay thế các placeholders:
-   - `__EVAL_DATA_PLACEHOLDER__` → mảng JSON của eval items (không có quotes xung quanh — đó là JS variable assignment)
-   - `__SKILL_NAME_PLACEHOLDER__` → tên của skill
-   - `__SKILL_DESCRIPTION_PLACEHOLDER__` → description hiện tại của skill
-3. Ghi vào temp file (ví dụ `/tmp/eval_review_<skill-name>.html`) và mở nó: `open /tmp/eval_review_<skill-name>.html`
-4. User có thể edit queries, toggle should-trigger, thêm/xóa entries, rồi click "Export Eval Set"
-5. File download về `~/Downloads/eval_set.json` — kiểm tra Downloads folder để tìm version mới nhất trong trường hợp có nhiều (ví dụ `eval_set (1).json`)
+1. Read the template from `assets/eval_review.html`
+2. Replace the placeholders:
+   - `__EVAL_DATA_PLACEHOLDER__` → the JSON array of eval items (no quotes around it — it's a JS variable assignment)
+   - `__SKILL_NAME_PLACEHOLDER__` → the skill's name
+   - `__SKILL_DESCRIPTION_PLACEHOLDER__` → the skill's current description
+3. Write to a temp file (e.g., `/tmp/eval_review_<skill-name>.html`) and open it: `open /tmp/eval_review_<skill-name>.html`
+4. The user can edit queries, toggle should-trigger, add/remove entries, then click "Export Eval Set"
+5. The file downloads to `~/Downloads/eval_set.json` — check the Downloads folder for the most recent version in case there are multiple (e.g., `eval_set (1).json`)
 
-Bước này quan trọng — eval queries kém dẫn đến descriptions kém.
+This step matters — bad eval queries lead to bad descriptions.
 
-### Bước 3: Chạy optimization loop
+### Step 3: Run the optimization loop
 
-Báo user: "Sẽ mất một chút thời gian — tôi sẽ chạy optimization loop ở background và kiểm tra định kỳ."
+Tell the user: "This will take some time — I'll run the optimization loop in the background and check on it periodically."
 
-Lưu eval set vào workspace, rồi chạy ở background:
+Save the eval set to the workspace, then run in the background:
 
 ```bash
 python -m scripts.run_loop \
@@ -385,99 +387,99 @@ python -m scripts.run_loop \
   --verbose
 ```
 
-Dùng model ID từ system prompt (cái đang cấp nguồn cho session hiện tại) để triggering test khớp với những gì user thực sự trải nghiệm.
+Use the model ID from your system prompt (the one powering the current session) so the triggering test matches what the user actually experiences.
 
-Trong khi chạy, định kỳ tail output để cập nhật cho user về iteration đang ở đâu và scores trông như thế nào.
+While it runs, periodically tail the output to give the user updates on which iteration it's on and what the scores look like.
 
-Cái này xử lý toàn bộ optimization loop tự động. Nó chia eval set thành 60% train và 40% held-out test, đánh giá description hiện tại (chạy mỗi query 3 lần để có trigger rate đáng tin cậy), rồi gọi Claude để đề xuất cải thiện dựa trên những gì failed. Nó đánh giá lại mỗi description mới trên cả train và test, iterate tối đa 5 lần. Khi xong, mở HTML report trong browser hiển thị kết quả mỗi iteration và trả về JSON với `best_description` — được chọn theo test score thay vì train score để tránh overfitting.
+This handles the full optimization loop automatically. It splits the eval set into 60% train and 40% held-out test, evaluates the current description (running each query 3 times to get a reliable trigger rate), then calls Claude to propose improvements based on what failed. It re-evaluates each new description on both train and test, iterating up to 5 times. When it's done, it opens an HTML report in the browser showing the results per iteration and returns JSON with `best_description` — selected by test score rather than train score to avoid overfitting.
 
-### Cách skill triggering hoạt động
+### How skill triggering works
 
-Hiểu triggering mechanism giúp thiết kế eval queries tốt hơn. Skills xuất hiện trong danh sách `available_skills` của Claude với name + description, và Claude quyết định có consult skill không dựa trên description đó. Điều quan trọng cần biết là Claude chỉ consult skills cho các tasks mà nó không thể xử lý dễ dàng bằng chính mình — simple, one-step queries như "đọc PDF này" có thể không trigger skill kể cả khi description match hoàn hảo, vì Claude có thể xử lý chúng trực tiếp với basic tools. Các queries phức tạp, multi-step, hoặc chuyên biệt trigger skills đáng tin cậy khi description match.
+Understanding the triggering mechanism helps design better eval queries. Skills appear in Claude's `available_skills` list with their name + description, and Claude decides whether to consult a skill based on that description. The important thing to know is that Claude only consults skills for tasks it can't easily handle on its own — simple, one-step queries like "read this PDF" may not trigger a skill even if the description matches perfectly, because Claude can handle them directly with basic tools. Complex, multi-step, or specialized queries reliably trigger skills when the description matches.
 
-Điều này có nghĩa eval queries của bạn phải có đủ thực chất để Claude thực sự được hưởng lợi khi consult skill. Các queries đơn giản như "read file X" là test cases kém — chúng sẽ không trigger skills bất kể chất lượng description.
+This means your eval queries should be substantive enough that Claude would actually benefit from consulting a skill. Simple queries like "read file X" are poor test cases — they won't trigger skills regardless of description quality.
 
-### Bước 4: Áp dụng kết quả
+### Step 4: Apply the result
 
-Lấy `best_description` từ JSON output và cập nhật SKILL.md frontmatter của skill. Hiển thị before/after cho user và báo cáo scores.
+Take `best_description` from the JSON output and update the skill's SKILL.md frontmatter. Show the user before/after and report the scores.
 
 ---
 
-### Đóng gói và Trình bày (chỉ khi có tool `present_files`)
+### Package and Present (only if `present_files` tool is available)
 
-Kiểm tra xem bạn có quyền truy cập tool `present_files` không. Nếu không, bỏ qua bước này. Nếu có, đóng gói skill và trình bày file .skill cho user:
+Check whether you have access to the `present_files` tool. If you don't, skip this step. If you do, package the skill and present the .skill file to the user:
 
 ```bash
 python -m scripts.package_skill <path/to/skill-folder>
 ```
 
-Sau khi đóng gói, hướng user đến đường dẫn file `.skill` kết quả để họ có thể cài đặt nó.
+After packaging, direct the user to the resulting `.skill` file path so they can install it.
 
 ---
 
-## Hướng dẫn đặc thù cho Claude.ai
+## Claude.ai-specific instructions
 
-Trong Claude.ai, quy trình cốt lõi giống nhau (draft → test → review → improve → repeat), nhưng vì Claude.ai không có subagents nên một số mechanics thay đổi. Đây là những gì cần điều chỉnh:
+In Claude.ai, the core workflow is the same (draft → test → review → improve → repeat), but because Claude.ai doesn't have subagents, some mechanics change. Here's what to adapt:
 
-**Chạy test cases**: Không có subagents nghĩa là không có parallel execution. Cho mỗi test case, đọc SKILL.md của skill, rồi làm theo instructions để hoàn thành test prompt. Làm từng cái một. Điều này kém nghiêm ngặt hơn independent subagents (bạn viết skill và cũng chạy nó, nên bạn có full context), nhưng là sanity check hữu ích — và human review step bù đắp. Bỏ qua baseline runs — chỉ dùng skill để hoàn thành task như được yêu cầu.
+**Running test cases**: No subagents means no parallel execution. For each test case, read the skill's SKILL.md, then follow its instructions to accomplish the test prompt yourself. Do them one at a time. This is less rigorous than independent subagents (you wrote the skill and you're also running it, so you have full context), but it's a useful sanity check — and the human review step compensates. Skip the baseline runs — just use the skill to complete the task as requested.
 
-**Review kết quả**: Nếu bạn không thể mở browser (ví dụ VM của Claude.ai không có display, hoặc bạn đang trên remote server), bỏ qua browser reviewer hoàn toàn. Thay vào đó, trình bày kết quả trực tiếp trong conversation. Cho mỗi test case, hiển thị prompt và output. Nếu output là file user cần thấy (như .docx hoặc .xlsx), lưu vào filesystem và báo họ chỗ nào để download và kiểm tra. Hỏi feedback inline: "Cái này trông thế nào? Bạn muốn thay đổi gì không?"
+**Reviewing results**: If you can't open a browser (e.g., Claude.ai's VM has no display, or you're on a remote server), skip the browser reviewer entirely. Instead, present results directly in the conversation. For each test case, show the prompt and the output. If the output is a file the user needs to see (like a .docx or .xlsx), save it to the filesystem and tell them where it is so they can download and inspect it. Ask for feedback inline: "How does this look? Anything you'd change?"
 
-**Benchmarking**: Bỏ qua quantitative benchmarking — nó dựa trên baseline comparisons không có ý nghĩa nếu không có subagents. Tập trung vào qualitative feedback từ user.
+**Benchmarking**: Skip the quantitative benchmarking — it relies on baseline comparisons which aren't meaningful without subagents. Focus on qualitative feedback from the user.
 
-**Vòng lặp iteration**: Giống như trước — cải thiện skill, rerun test cases, hỏi feedback — chỉ không có browser reviewer ở giữa. Bạn vẫn có thể tổ chức kết quả vào iteration directories trên filesystem nếu có.
+**The iteration loop**: Same as before — improve the skill, rerun the test cases, ask for feedback — just without the browser reviewer in the middle. You can still organize results into iteration directories on the filesystem if you have one.
 
-**Description optimization**: Section này yêu cầu tool `claude` CLI (cụ thể `claude -p`) chỉ có trong Claude Code. Bỏ qua nếu đang trên Claude.ai.
+**Description optimization**: This section requires the `claude` CLI tool (specifically `claude -p`) which is only available in Claude Code. Skip it if you're on Claude.ai.
 
-**Blind comparison**: Yêu cầu subagents. Bỏ qua.
+**Blind comparison**: Requires subagents. Skip it.
 
-**Packaging**: Script `package_skill.py` hoạt động bất cứ đâu có Python và filesystem. Trên Claude.ai, bạn có thể chạy nó và user có thể download file `.skill` kết quả.
+**Packaging**: The `package_skill.py` script works anywhere with Python and a filesystem. On Claude.ai, you can run it and the user can download the resulting `.skill` file.
 
-**Cập nhật skill có sẵn**: User có thể yêu cầu bạn cập nhật skill có sẵn, không phải tạo mới. Trong trường hợp này:
-- **Giữ nguyên tên gốc.** Chú ý directory name và `name` frontmatter field của skill -- dùng chúng không thay đổi. Ví dụ nếu skill được cài là `research-helper`, output `research-helper.skill` (không phải `research-helper-v2`).
-- **Copy đến nơi có thể ghi trước khi edit.** Đường dẫn skill được cài có thể read-only. Copy sang `/tmp/skill-name/`, edit ở đó, và đóng gói từ bản copy.
-- **Nếu đóng gói thủ công, stage trong `/tmp/` trước**, rồi copy sang output directory -- ghi trực tiếp có thể fail do permissions.
+**Updating an existing skill**: The user might be asking you to update an existing skill, not create a new one. In this case:
+- **Preserve the original name.** Note the skill's directory name and `name` frontmatter field -- use them unchanged. E.g., if the installed skill is `research-helper`, output `research-helper.skill` (not `research-helper-v2`).
+- **Copy to a writeable location before editing.** The installed skill path may be read-only. Copy to `/tmp/skill-name/`, edit there, and package from the copy.
+- **If packaging manually, stage in `/tmp/` first**, then copy to the output directory -- direct writes may fail due to permissions.
 
 ---
 
-## Hướng dẫn đặc thù cho Cowork
+## Cowork-Specific Instructions
 
-Nếu bạn đang trong Cowork, những điều chính cần biết là:
+If you're in Cowork, the main things to know are:
 
-- Bạn có subagents, nên quy trình chính (spawn test cases song song, chạy baselines, grade, v.v.) đều hoạt động. (Tuy nhiên nếu gặp vấn đề nghiêm trọng với timeouts, OK để chạy test prompts nối tiếp thay vì song song.)
-- Bạn không có browser hoặc display, nên khi generate eval viewer, dùng `--static <output_path>` để viết standalone HTML file thay vì start server. Sau đó đưa link cho user click để mở HTML trong browser của họ.
-- Vì lý do nào đó, setup Cowork có vẻ discourage Claude khỏi việc generate eval viewer sau khi chạy tests, nên nhắc lại: dù đang trong Cowork hay Claude Code, sau khi chạy tests, bạn phải luôn generate eval viewer cho human xem examples trước khi tự sửa skill và cố sửa lỗi, dùng `generate_review.py` (không viết boutique html code tùy chỉnh). Xin lỗi trước nhưng tôi sẽ viết hoa ở đây: HÃY GENERATE EVAL VIEWER *TRƯỚC KHI* tự đánh giá inputs. Bạn muốn đưa chúng đến tay human sớm nhất có thể!
-- Feedback hoạt động khác: vì không có running server, nút "Submit All Reviews" của viewer sẽ download `feedback.json` như file. Sau đó bạn có thể đọc từ đó (có thể cần request access trước).
-- Packaging hoạt động — `package_skill.py` chỉ cần Python và filesystem.
-- Description optimization (`run_loop.py` / `run_eval.py`) nên hoạt động trong Cowork vì nó dùng `claude -p` qua subprocess, không phải browser, nhưng hãy để dành cho đến khi bạn hoàn toàn hoàn thiện skill và user đồng ý nó đã ổn.
-- **Cập nhật skill có sẵn**: User có thể yêu cầu bạn cập nhật skill có sẵn, không phải tạo mới. Làm theo hướng dẫn update trong section claude.ai ở trên.
+- You have subagents, so the main workflow (spawn test cases in parallel, run baselines, grade, etc.) all works. (However, if you run into severe problems with timeouts, it's OK to run the test prompts in series rather than parallel.)
+- You don't have a browser or display, so when generating the eval viewer, use `--static <output_path>` to write a standalone HTML file instead of starting a server. Then proffer a link that the user can click to open the HTML in their browser.
+- For whatever reason, the Cowork setup seems to disincline Claude from generating the eval viewer after running the tests, so just to reiterate: whether you're in Cowork or in Claude Code, after running tests, you should always generate the eval viewer for the human to look at examples before revising the skill yourself and trying to make corrections, using `generate_review.py` (not writing your own boutique html code). Sorry in advance but I'm gonna go all caps here: GENERATE THE EVAL VIEWER *BEFORE* evaluating inputs yourself. You want to get them in front of the human ASAP!
+- Feedback works differently: since there's no running server, the viewer's "Submit All Reviews" button will download `feedback.json` as a file. You can then read it from there (you may have to request access first).
+- Packaging works — `package_skill.py` just needs Python and a filesystem.
+- Description optimization (`run_loop.py` / `run_eval.py`) should work in Cowork just fine since it uses `claude -p` via subprocess, not a browser, but please save it until you've fully finished making the skill and the user agrees it's in good shape.
+- **Updating an existing skill**: The user might be asking you to update an existing skill, not create a new one. Follow the update guidance in the claude.ai section above.
 
 ---
 
 ## Reference files
 
-Thư mục `agents/` chứa instructions cho các specialized subagents. Đọc chúng khi cần spawn subagent liên quan.
+The agents/ directory contains instructions for specialized subagents. Read them when you need to spawn the relevant subagent.
 
-- `agents/grader.md` — Cách đánh giá assertions theo outputs
-- `agents/comparator.md` — Cách thực hiện blind A/B comparison giữa hai outputs
-- `agents/analyzer.md` — Cách phân tích tại sao một version thắng version khác
+- `agents/grader.md` — How to evaluate assertions against outputs
+- `agents/comparator.md` — How to do blind A/B comparison between two outputs
+- `agents/analyzer.md` — How to analyze why one version beat another
 
-Thư mục `references/` có tài liệu bổ sung:
-- `references/schemas.md` — Cấu trúc JSON cho evals.json, grading.json, v.v.
+The references/ directory has additional documentation:
+- `references/schemas.md` — JSON structures for evals.json, grading.json, etc.
 
 ---
 
-Nhắc lại một lần nữa vòng lặp cốt lõi ở đây để nhấn mạnh:
+Repeating one more time the core loop here for emphasis:
 
-- Tìm hiểu skill là về cái gì
-- Draft hoặc edit skill
-- Chạy claude-với-skill trên test prompts
-- Cùng user đánh giá outputs:
-  - Tạo benchmark.json và chạy `eval-viewer/generate_review.py` để giúp user review chúng
-  - Chạy quantitative evals
-- Lặp lại cho đến khi bạn và user hài lòng
-- Đóng gói skill cuối cùng và trả về cho user.
+- Figure out what the skill is about
+- Draft or edit the skill
+- Run claude-with-access-to-the-skill on test prompts
+- With the user, evaluate the outputs:
+  - Create benchmark.json and run `eval-viewer/generate_review.py` to help the user review them
+  - Run quantitative evals
+- Repeat until you and the user are satisfied
+- Package the final skill and return it to the user.
 
-Hãy thêm các bước vào TodoList của bạn, nếu bạn có cái đó, để đảm bảo bạn không quên. Nếu đang trong Cowork, hãy đặc biệt đặt "Tạo evals JSON và chạy `eval-viewer/generate_review.py` để human có thể review test cases" vào TodoList để đảm bảo nó xảy ra.
+Please add steps to your TodoList, if you have such a thing, to make sure you don't forget. If you're in Cowork, please specifically put "Create evals JSON and run `eval-viewer/generate_review.py` so human can review test cases" in your TodoList to make sure it happens.
 
-Chúc may mắn!
+Good luck!

@@ -4,74 +4,74 @@ description: Guide for creating high-quality MCP (Model Context Protocol) server
 license: Complete terms in LICENSE.txt
 ---
 
-# Hướng dẫn phát triển MCP Server
+# MCP Server Development Guide
 
-## Tổng quan
+## Overview
 
-Tạo MCP (Model Context Protocol) server để LLM tương tác với external service qua các tool được thiết kế tốt. Chất lượng của một MCP server được đo bằng việc nó cho phép LLM hoàn thành real-world task tốt đến mức nào.
+Create MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. The quality of an MCP server is measured by how well it enables LLMs to accomplish real-world tasks.
 
 ---
 
-# Quy trình
+# Process
 
-## High-Level Workflow
+## 🚀 High-Level Workflow
 
-Tạo MCP server chất lượng cao gồm bốn phase chính:
+Creating a high-quality MCP server involves four main phases:
 
-### Phase 1: Nghiên cứu sâu và lập plan
+### Phase 1: Deep Research and Planning
 
-#### 1.1 Hiểu thiết kế MCP hiện đại
+#### 1.1 Understand Modern MCP Design
 
 **API Coverage vs. Workflow Tools:**
-Cân bằng giữa comprehensive API endpoint coverage và specialized workflow tool. Workflow tool có thể tiện hơn cho task cụ thể, trong khi comprehensive coverage cho agent flexibility để compose operation. Performance khác nhau theo client — một số client benefit từ code execution kết hợp các basic tool, trong khi client khác work tốt hơn với workflow cấp cao hơn. Khi không chắc, ưu tiên comprehensive API coverage.
+Balance comprehensive API endpoint coverage with specialized workflow tools. Workflow tools can be more convenient for specific tasks, while comprehensive coverage gives agents flexibility to compose operations. Performance varies by client—some clients benefit from code execution that combines basic tools, while others work better with higher-level workflows. When uncertain, prioritize comprehensive API coverage.
 
-**Tool Naming và Discoverability:**
-Tên tool rõ ràng, descriptive giúp agent tìm đúng tool nhanh. Dùng prefix nhất quán (vd `github_create_issue`, `github_list_repos`) và action-oriented naming.
+**Tool Naming and Discoverability:**
+Clear, descriptive tool names help agents find the right tools quickly. Use consistent prefixes (e.g., `github_create_issue`, `github_list_repos`) and action-oriented naming.
 
 **Context Management:**
-Agent benefit từ tool description ngắn gọn và khả năng filter/paginate result. Thiết kế tool return data focused, relevant. Một số client support code execution có thể giúp agent filter và process data hiệu quả.
+Agents benefit from concise tool descriptions and the ability to filter/paginate results. Design tools that return focused, relevant data. Some clients support code execution which can help agents filter and process data efficiently.
 
 **Actionable Error Messages:**
-Error message phải hướng dẫn agent tới solution với suggestion cụ thể và next step.
+Error messages should guide agents toward solutions with specific suggestions and next steps.
 
 #### 1.2 Study MCP Protocol Documentation
 
-**Navigate MCP specification:**
+**Navigate the MCP specification:**
 
-Bắt đầu với sitemap để tìm page liên quan: `https://modelcontextprotocol.io/sitemap.xml`
+Start with the sitemap to find relevant pages: `https://modelcontextprotocol.io/sitemap.xml`
 
-Sau đó fetch page cụ thể với suffix `.md` cho markdown format (vd `https://modelcontextprotocol.io/specification/draft.md`).
+Then fetch specific pages with `.md` suffix for markdown format (e.g., `https://modelcontextprotocol.io/specification/draft.md`).
 
-Page chính cần review:
-- Specification overview và architecture
-- Transport mechanism (streamable HTTP, stdio)
-- Tool, resource, và prompt definition
+Key pages to review:
+- Specification overview and architecture
+- Transport mechanisms (streamable HTTP, stdio)
+- Tool, resource, and prompt definitions
 
 #### 1.3 Study Framework Documentation
 
 **Recommended stack:**
-- **Language**: TypeScript (SDK support chất lượng cao và compatibility tốt trong nhiều execution environment vd MCPB. Cộng thêm AI model viết TypeScript tốt, benefit từ broad usage, static typing và linting tool tốt)
-- **Transport**: Streamable HTTP cho remote server, dùng stateless JSON (đơn giản hơn để scale và maintain, opposite của stateful session và streaming response). stdio cho local server.
+- **Language**: TypeScript (high-quality SDK support and good compatibility in many execution environments e.g. MCPB. Plus AI models are good at generating TypeScript code, benefiting from its broad usage, static typing and good linting tools)
+- **Transport**: Streamable HTTP for remote servers, using stateless JSON (simpler to scale and maintain, as opposed to stateful sessions and streaming responses). stdio for local servers.
 
 **Load framework documentation:**
 
-- **MCP Best Practices**: [View Best Practices](./reference/mcp_best_practices.md) - Core guideline
+- **MCP Best Practices**: [📋 View Best Practices](./reference/mcp_best_practices.md) - Core guidelines
 
-**Cho TypeScript (recommended):**
-- **TypeScript SDK**: Dùng WebFetch để load `https://raw.githubusercontent.com/modelcontextprotocol/typescript-sdk/main/README.md`
-- [TypeScript Guide](./reference/node_mcp_server.md) - Pattern và example TypeScript
+**For TypeScript (recommended):**
+- **TypeScript SDK**: Use WebFetch to load `https://raw.githubusercontent.com/modelcontextprotocol/typescript-sdk/main/README.md`
+- [⚡ TypeScript Guide](./reference/node_mcp_server.md) - TypeScript patterns and examples
 
-**Cho Python:**
-- **Python SDK**: Dùng WebFetch để load `https://raw.githubusercontent.com/modelcontextprotocol/python-sdk/main/README.md`
-- [Python Guide](./reference/python_mcp_server.md) - Pattern và example Python
+**For Python:**
+- **Python SDK**: Use WebFetch to load `https://raw.githubusercontent.com/modelcontextprotocol/python-sdk/main/README.md`
+- [🐍 Python Guide](./reference/python_mcp_server.md) - Python patterns and examples
 
-#### 1.4 Plan Implementation
+#### 1.4 Plan Your Implementation
 
-**Hiểu API:**
-Review API documentation của service để identify endpoint chính, authentication requirement, và data model. Dùng web search và WebFetch khi cần.
+**Understand the API:**
+Review the service's API documentation to identify key endpoints, authentication requirements, and data models. Use web search and WebFetch as needed.
 
 **Tool Selection:**
-Ưu tiên comprehensive API coverage. List endpoint sẽ implement, bắt đầu với operation phổ biến nhất.
+Prioritize comprehensive API coverage. List endpoints to implement, starting with the most common operations.
 
 ---
 
@@ -79,42 +79,42 @@ Review API documentation của service để identify endpoint chính, authentic
 
 #### 2.1 Set Up Project Structure
 
-Xem language-specific guide để biết project setup:
-- [TypeScript Guide](./reference/node_mcp_server.md) - Project structure, package.json, tsconfig.json
-- [Python Guide](./reference/python_mcp_server.md) - Module organization, dependency
+See language-specific guides for project setup:
+- [⚡ TypeScript Guide](./reference/node_mcp_server.md) - Project structure, package.json, tsconfig.json
+- [🐍 Python Guide](./reference/python_mcp_server.md) - Module organization, dependencies
 
 #### 2.2 Implement Core Infrastructure
 
-Tạo shared utility:
-- API client với authentication
-- Error handling helper
+Create shared utilities:
+- API client with authentication
+- Error handling helpers
 - Response formatting (JSON/Markdown)
 - Pagination support
 
 #### 2.3 Implement Tools
 
-Cho mỗi tool:
+For each tool:
 
 **Input Schema:**
-- Dùng Zod (TypeScript) hoặc Pydantic (Python)
-- Include constraint và description rõ ràng
-- Add example trong field description
+- Use Zod (TypeScript) or Pydantic (Python)
+- Include constraints and clear descriptions
+- Add examples in field descriptions
 
 **Output Schema:**
-- Define `outputSchema` khi có thể cho structured data
-- Dùng `structuredContent` trong tool response (TypeScript SDK feature)
-- Giúp client hiểu và process tool output
+- Define `outputSchema` where possible for structured data
+- Use `structuredContent` in tool responses (TypeScript SDK feature)
+- Helps clients understand and process tool outputs
 
 **Tool Description:**
-- Summary ngắn gọn về functionality
-- Mô tả parameter
+- Concise summary of functionality
+- Parameter descriptions
 - Return type schema
 
 **Implementation:**
-- Async/await cho I/O operation
-- Error handling đúng với message actionable
-- Support pagination khi applicable
-- Return cả text content và structured data khi dùng SDK hiện đại
+- Async/await for I/O operations
+- Proper error handling with actionable messages
+- Support pagination where applicable
+- Return both text content and structured data when using modern SDKs
 
 **Annotations:**
 - `readOnlyHint`: true/false
@@ -124,62 +124,62 @@ Cho mỗi tool:
 
 ---
 
-### Phase 3: Review và Test
+### Phase 3: Review and Test
 
 #### 3.1 Code Quality
 
-Review:
-- Không duplicate code (DRY principle)
-- Error handling nhất quán
+Review for:
+- No duplicated code (DRY principle)
+- Consistent error handling
 - Full type coverage
-- Tool description rõ ràng
+- Clear tool descriptions
 
-#### 3.2 Build và Test
+#### 3.2 Build and Test
 
 **TypeScript:**
-- Chạy `npm run build` để verify compilation
-- Test với MCP Inspector: `npx @modelcontextprotocol/inspector`
+- Run `npm run build` to verify compilation
+- Test with MCP Inspector: `npx @modelcontextprotocol/inspector`
 
 **Python:**
 - Verify syntax: `python -m py_compile your_server.py`
-- Test với MCP Inspector
+- Test with MCP Inspector
 
-Xem language-specific guide để biết testing approach chi tiết và quality checklist.
+See language-specific guides for detailed testing approaches and quality checklists.
 
 ---
 
 ### Phase 4: Create Evaluations
 
-Sau khi implement MCP server, tạo evaluation comprehensive để test effectiveness.
+After implementing your MCP server, create comprehensive evaluations to test its effectiveness.
 
-**Load [Evaluation Guide](./reference/evaluation.md) để có complete evaluation guideline.**
+**Load [✅ Evaluation Guide](./reference/evaluation.md) for complete evaluation guidelines.**
 
-#### 4.1 Hiểu mục đích Evaluation
+#### 4.1 Understand Evaluation Purpose
 
-Dùng evaluation để test xem LLM có thể dùng MCP server của bạn hiệu quả để trả lời câu hỏi realistic, complex hay không.
+Use evaluations to test whether LLMs can effectively use your MCP server to answer realistic, complex questions.
 
-#### 4.2 Tạo 10 Evaluation Question
+#### 4.2 Create 10 Evaluation Questions
 
-Để tạo evaluation hiệu quả, follow process trong evaluation guide:
+To create effective evaluations, follow the process outlined in the evaluation guide:
 
-1. **Tool Inspection**: List tool có sẵn và hiểu capability của chúng
-2. **Content Exploration**: Dùng operation READ-ONLY để explore data có sẵn
-3. **Question Generation**: Tạo 10 câu hỏi complex, realistic
-4. **Answer Verification**: Tự giải mỗi câu hỏi để verify answer
+1. **Tool Inspection**: List available tools and understand their capabilities
+2. **Content Exploration**: Use READ-ONLY operations to explore available data
+3. **Question Generation**: Create 10 complex, realistic questions
+4. **Answer Verification**: Solve each question yourself to verify answers
 
 #### 4.3 Evaluation Requirements
 
-Đảm bảo mỗi câu hỏi:
-- **Independent**: Không depend vào câu hỏi khác
-- **Read-only**: Chỉ cần operation non-destructive
-- **Complex**: Cần multiple tool call và deep exploration
-- **Realistic**: Dựa trên real use case mà human care
-- **Verifiable**: Single, clear answer có thể verify bằng string comparison
-- **Stable**: Answer không đổi theo thời gian
+Ensure each question is:
+- **Independent**: Not dependent on other questions
+- **Read-only**: Only non-destructive operations required
+- **Complex**: Requiring multiple tool calls and deep exploration
+- **Realistic**: Based on real use cases humans would care about
+- **Verifiable**: Single, clear answer that can be verified by string comparison
+- **Stable**: Answer won't change over time
 
 #### 4.4 Output Format
 
-Tạo file XML với structure:
+Create an XML file with this structure:
 
 ```xml
 <evaluation>
@@ -195,42 +195,42 @@ Tạo file XML với structure:
 
 # Reference Files
 
-## Documentation Library
+## 📚 Documentation Library
 
-Load các resource này khi cần trong development:
+Load these resources as needed during development:
 
 ### Core MCP Documentation (Load First)
-- **MCP Protocol**: Bắt đầu với sitemap tại `https://modelcontextprotocol.io/sitemap.xml`, sau đó fetch page cụ thể với suffix `.md`
-- [MCP Best Practices](./reference/mcp_best_practices.md) - Universal MCP guideline bao gồm:
-  - Convention naming server và tool
-  - Guideline response format (JSON vs Markdown)
-  - Best practice pagination
+- **MCP Protocol**: Start with sitemap at `https://modelcontextprotocol.io/sitemap.xml`, then fetch specific pages with `.md` suffix
+- [📋 MCP Best Practices](./reference/mcp_best_practices.md) - Universal MCP guidelines including:
+  - Server and tool naming conventions
+  - Response format guidelines (JSON vs Markdown)
+  - Pagination best practices
   - Transport selection (streamable HTTP vs stdio)
-  - Standard security và error handling
+  - Security and error handling standards
 
 ### SDK Documentation (Load During Phase 1/2)
-- **Python SDK**: Fetch từ `https://raw.githubusercontent.com/modelcontextprotocol/python-sdk/main/README.md`
-- **TypeScript SDK**: Fetch từ `https://raw.githubusercontent.com/modelcontextprotocol/typescript-sdk/main/README.md`
+- **Python SDK**: Fetch from `https://raw.githubusercontent.com/modelcontextprotocol/python-sdk/main/README.md`
+- **TypeScript SDK**: Fetch from `https://raw.githubusercontent.com/modelcontextprotocol/typescript-sdk/main/README.md`
 
 ### Language-Specific Implementation Guides (Load During Phase 2)
-- [Python Implementation Guide](./reference/python_mcp_server.md) - Complete Python/FastMCP guide với:
-  - Pattern server initialization
-  - Example Pydantic model
-  - Tool registration với `@mcp.tool`
-  - Working example hoàn chỉnh
+- [🐍 Python Implementation Guide](./reference/python_mcp_server.md) - Complete Python/FastMCP guide with:
+  - Server initialization patterns
+  - Pydantic model examples
+  - Tool registration with `@mcp.tool`
+  - Complete working examples
   - Quality checklist
 
-- [TypeScript Implementation Guide](./reference/node_mcp_server.md) - Complete TypeScript guide với:
+- [⚡ TypeScript Implementation Guide](./reference/node_mcp_server.md) - Complete TypeScript guide with:
   - Project structure
-  - Pattern Zod schema
-  - Tool registration với `server.registerTool`
-  - Working example hoàn chỉnh
+  - Zod schema patterns
+  - Tool registration with `server.registerTool`
+  - Complete working examples
   - Quality checklist
 
 ### Evaluation Guide (Load During Phase 4)
-- [Evaluation Guide](./reference/evaluation.md) - Complete evaluation creation guide với:
-  - Guideline tạo question
-  - Strategy verify answer
-  - XML format specification
-  - Example question và answer
-  - Chạy evaluation với script được cung cấp
+- [✅ Evaluation Guide](./reference/evaluation.md) - Complete evaluation creation guide with:
+  - Question creation guidelines
+  - Answer verification strategies
+  - XML format specifications
+  - Example questions and answers
+  - Running an evaluation with the provided scripts
