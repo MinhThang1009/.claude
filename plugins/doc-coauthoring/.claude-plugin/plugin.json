@@ -1,0 +1,5 @@
+{
+  "name": "doc-coauthoring",
+  "description": "Guide users through a structured workflow for co-authoring documentation, proposals, technical specs, and decision docs.",
+  "author": { "name": "Minh Thang" }
+}

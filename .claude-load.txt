@@ -52,3 +52,7 @@ claude-md-management
 # pdf                      # PDF manipulation
 # pptx                     # PowerPoint creation/editing
 # xlsx                     # Spreadsheet creation/editing
+# theme-factory            # Apply themes to slides/docs/HTML (10 presets)
+# doc-coauthoring          # Co-authoring workflow cho docs/proposals/specs
+# explanatory-output-style # Giải thích implementation choices khi code
+# learning-output-style    # Interactive learning mode tại decision points
