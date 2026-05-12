@@ -52,3 +52,21 @@ Get-ChildItem "$src\plugins" -Directory | ForEach-Object {
     }
 }
 Write-Host "OK skills: $((Get-ChildItem $skillsDir).Count) dirs"
+
+# --- commands/: collect từ plugins/*/commands/*.md → flat symlinks ---
+$commandsDir = "$dst\commands"
+if (-not (Test-Path $commandsDir)) {
+    New-Item -ItemType Directory -Force $commandsDir | Out-Null
+}
+Get-ChildItem "$src\plugins" -Directory | ForEach-Object {
+    $d = "$($_.FullName)\commands"
+    if (Test-Path $d) {
+        Get-ChildItem $d -Filter "*.md" | ForEach-Object {
+            $link = "$commandsDir\$($_.Name)"
+            if (-not (Test-Path $link)) {
+                & cmd.exe /c "mklink `"$link`" `"$($_.FullName)`"" | Out-Null
+            }
+        }
+    }
+}
+Write-Host "OK commands: $((Get-ChildItem $commandsDir -Filter '*.md').Count) files"
