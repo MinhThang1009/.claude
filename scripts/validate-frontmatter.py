@@ -30,6 +30,7 @@ SCHEMAS = {
         "allowed": {
             "name",
             "description",
+            "version",
             "when_to_use",
             "argument-hint",
             "arguments",
