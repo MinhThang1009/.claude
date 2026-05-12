@@ -6,16 +6,16 @@ description: Commit, push và mở pull request
 
 ## Context
 
-- Current git status: !`git status`
-- Current git diff (staged and unstaged changes): !`git diff HEAD`
-- Current branch: !`git branch --show-current`
+- Trạng thái git hiện tại: !`git status`
+- Git diff hiện tại (thay đổi staged và unstaged): !`git diff HEAD`
+- Branch hiện tại: !`git branch --show-current`
 
 ## Your task
 
-Based on the above changes:
+Dựa trên các thay đổi ở trên:
 
-1. Create a new branch if on main
-2. Create a single commit with an appropriate message
-3. Push the branch to origin
-4. Create a pull request using `gh pr create`
-5. You have the capability to call multiple tools in a single response. You MUST do all of the above in a single message. Do not use any other tools or do anything else. Do not send any other text or messages besides these tool calls.
+1. Tạo branch mới nếu đang ở main
+2. Tạo một commit duy nhất với message phù hợp
+3. Push branch lên origin
+4. Tạo pull request bằng `gh pr create`
+5. Bạn có khả năng gọi nhiều tool trong một response. Bạn PHẢI thực hiện tất cả các bước trên trong một message duy nhất. Không dùng tool khác hoặc làm bất cứ điều gì khác. Không gửi bất kỳ text hay message nào khác ngoài các tool call này.

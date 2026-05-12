@@ -3,24 +3,24 @@ name: Hook Development
 description: This skill should be used when the user asks to "create a hook", "add a PreToolUse/PostToolUse/Stop hook", "validate tool use", "implement prompt-based hooks", "use ${CLAUDE_PLUGIN_ROOT}", "set up event-driven automation", "block dangerous commands", or mentions hook events (PreToolUse, PostToolUse, Stop, SubagentStop, SessionStart, SessionEnd, UserPromptSubmit, PreCompact, Notification). Provides comprehensive guidance for creating and implementing Claude Code plugin hooks with focus on advanced prompt-based hooks API.
 ---
 
-# Hook Development for Claude Code Plugins
+# Phát triển Hook cho Claude Code Plugins
 
-## Overview
+## Tổng quan
 
-Hooks are event-driven automation scripts that execute in response to Claude Code events. Use hooks to validate operations, enforce policies, add context, and integrate external tools into workflows.
+Hook là các script tự động hóa theo sự kiện, thực thi khi có sự kiện Claude Code xảy ra. Dùng hook để xác thực thao tác, áp dụng chính sách, bổ sung ngữ cảnh, và tích hợp công cụ bên ngoài vào quy trình làm việc.
 
-**Key capabilities:**
-- Validate tool calls before execution (PreToolUse)
-- React to tool results (PostToolUse)
-- Enforce completion standards (Stop, SubagentStop)
-- Load project context (SessionStart)
-- Automate workflows across the development lifecycle
+**Khả năng chính:**
+- Xác thực lệnh gọi tool trước khi thực thi (PreToolUse)
+- Phản ứng với kết quả tool (PostToolUse)
+- Áp dụng tiêu chuẩn hoàn thành (Stop, SubagentStop)
+- Tải ngữ cảnh dự án (SessionStart)
+- Tự động hóa quy trình xuyên suốt vòng đời phát triển
 
-## Hook Types
+## Loại Hook
 
-### Prompt-Based Hooks (Recommended)
+### Hook Dựa trên Prompt (Khuyến nghị)
 
-Use LLM-driven decision making for context-aware validation:
+Dùng khả năng ra quyết định của LLM cho việc xác thực nhận biết ngữ cảnh:
 
 ```json
 {
@@ -30,17 +30,17 @@ Use LLM-driven decision making for context-aware validation:
 }
 ```
 
-**Supported events:** Stop, SubagentStop, UserPromptSubmit, PreToolUse
+**Sự kiện được hỗ trợ:** Stop, SubagentStop, UserPromptSubmit, PreToolUse
 
-**Benefits:**
-- Context-aware decisions based on natural language reasoning
-- Flexible evaluation logic without bash scripting
-- Better edge case handling
-- Easier to maintain and extend
+**Lợi ích:**
+- Ra quyết định nhận biết ngữ cảnh dựa trên lý luận ngôn ngữ tự nhiên
+- Logic đánh giá linh hoạt không cần viết bash script
+- Xử lý edge case tốt hơn
+- Dễ bảo trì và mở rộng
 
-### Command Hooks
+### Hook Lệnh (Command)
 
-Execute bash commands for deterministic checks:
+Thực thi lệnh bash cho các kiểm tra xác định:
 
 ```json
 {
@@ -50,21 +50,21 @@ Execute bash commands for deterministic checks:
 }
 ```
 
-**Use for:**
-- Fast deterministic validations
-- File system operations
-- External tool integrations
-- Performance-critical checks
+**Dùng cho:**
+- Xác thực xác định nhanh
+- Thao tác hệ thống file
+- Tích hợp công cụ bên ngoài
+- Kiểm tra quan trọng về hiệu năng
 
-## Hook Configuration Formats
+## Định dạng Cấu hình Hook
 
-### Plugin hooks.json Format
+### Định dạng hooks.json của Plugin
 
-**For plugin hooks** in `hooks/hooks.json`, use wrapper format:
+**Dành cho hook plugin** trong `hooks/hooks.json`, dùng định dạng wrapper:
 
 ```json
 {
-  "description": "Brief explanation of hooks (optional)",
+  "description": "Mô tả ngắn về các hook (tùy chọn)",
   "hooks": {
     "PreToolUse": [...],
     "Stop": [...],
@@ -73,12 +73,12 @@ Execute bash commands for deterministic checks:
 }
 ```
 
-**Key points:**
-- `description` field is optional
-- `hooks` field is required wrapper containing actual hook events
-- This is the **plugin-specific format**
+**Điểm quan trọng:**
+- Trường `description` là tùy chọn
+- Trường `hooks` là wrapper bắt buộc chứa các sự kiện hook thực tế
+- Đây là **định dạng dành riêng cho plugin**
 
-**Example:**
+**Ví dụ:**
 ```json
 {
   "description": "Validation hooks for code quality",
@@ -98,9 +98,9 @@ Execute bash commands for deterministic checks:
 }
 ```
 
-### Settings Format (Direct)
+### Định dạng Settings (Trực tiếp)
 
-**For user settings** in `.claude/settings.json`, use direct format:
+**Dành cho cài đặt người dùng** trong `.claude/settings.json`, dùng định dạng trực tiếp:
 
 ```json
 {
@@ -110,20 +110,20 @@ Execute bash commands for deterministic checks:
 }
 ```
 
-**Key points:**
-- No wrapper - events directly at top level
-- No description field
-- This is the **settings format**
+**Điểm quan trọng:**
+- Không có wrapper — sự kiện đặt trực tiếp ở cấp cao nhất
+- Không có trường description
+- Đây là **định dạng settings**
 
-**Important:** The examples below show the hook event structure that goes inside either format. For plugin hooks.json, wrap these in `{"hooks": {...}}`.
+**Lưu ý quan trọng:** Các ví dụ dưới đây hiển thị cấu trúc sự kiện hook đặt bên trong một trong hai định dạng. Với hooks.json của plugin, bọc chúng trong `{"hooks": {...}}`.
 
-## Hook Events
+## Sự kiện Hook
 
 ### PreToolUse
 
-Execute before any tool runs. Use to approve, deny, or modify tool calls.
+Thực thi trước khi bất kỳ tool nào chạy. Dùng để phê duyệt, từ chối, hoặc chỉnh sửa lệnh gọi tool.
 
-**Example (prompt-based):**
+**Ví dụ (dựa trên prompt):**
 ```json
 {
   "PreToolUse": [
@@ -140,7 +140,7 @@ Execute before any tool runs. Use to approve, deny, or modify tool calls.
 }
 ```
 
-**Output for PreToolUse:**
+**Output cho PreToolUse:**
 ```json
 {
   "hookSpecificOutput": {
@@ -153,9 +153,9 @@ Execute before any tool runs. Use to approve, deny, or modify tool calls.
 
 ### PostToolUse
 
-Execute after tool completes. Use to react to results, provide feedback, or log.
+Thực thi sau khi tool hoàn thành. Dùng để phản ứng với kết quả, cung cấp phản hồi, hoặc ghi log.
 
-**Example:**
+**Ví dụ:**
 ```json
 {
   "PostToolUse": [
@@ -172,16 +172,16 @@ Execute after tool completes. Use to react to results, provide feedback, or log.
 }
 ```
 
-**Output behavior:**
-- Exit 0: stdout shown in transcript
-- Exit 2: stderr fed back to Claude
-- systemMessage included in context
+**Hành vi output:**
+- Exit 0: stdout hiển thị trong transcript
+- Exit 2: stderr được phản hồi lại cho Claude
+- systemMessage được đưa vào ngữ cảnh
 
 ### Stop
 
-Execute when main agent considers stopping. Use to validate completeness.
+Thực thi khi agent chính cân nhắc dừng. Dùng để xác thực tính hoàn chỉnh.
 
-**Example:**
+**Ví dụ:**
 ```json
 {
   "Stop": [
@@ -198,7 +198,7 @@ Execute when main agent considers stopping. Use to validate completeness.
 }
 ```
 
-**Decision output:**
+**Output quyết định:**
 ```json
 {
   "decision": "approve|block",
@@ -209,15 +209,15 @@ Execute when main agent considers stopping. Use to validate completeness.
 
 ### SubagentStop
 
-Execute when subagent considers stopping. Use to ensure subagent completed its task.
+Thực thi khi subagent cân nhắc dừng. Dùng để đảm bảo subagent đã hoàn thành nhiệm vụ.
 
-Similar to Stop hook, but for subagents.
+Tương tự hook Stop, nhưng dành cho subagent.
 
 ### UserPromptSubmit
 
-Execute when user submits a prompt. Use to add context, validate, or block prompts.
+Thực thi khi người dùng gửi prompt. Dùng để thêm ngữ cảnh, xác thực, hoặc chặn prompt.
 
-**Example:**
+**Ví dụ:**
 ```json
 {
   "UserPromptSubmit": [
@@ -236,9 +236,9 @@ Execute when user submits a prompt. Use to add context, validate, or block promp
 
 ### SessionStart
 
-Execute when Claude Code session begins. Use to load context and set environment.
+Thực thi khi phiên Claude Code bắt đầu. Dùng để tải ngữ cảnh và thiết lập môi trường.
 
-**Example:**
+**Ví dụ:**
 ```json
 {
   "SessionStart": [
@@ -255,28 +255,28 @@ Execute when Claude Code session begins. Use to load context and set environment
 }
 ```
 
-**Special capability:** Persist environment variables using `$CLAUDE_ENV_FILE`:
+**Khả năng đặc biệt:** Duy trì biến môi trường bằng `$CLAUDE_ENV_FILE`:
 ```bash
 echo "export PROJECT_TYPE=nodejs" >> "$CLAUDE_ENV_FILE"
 ```
 
-See `examples/load-context.sh` for complete example.
+Xem `examples/load-context.sh` để biết ví dụ đầy đủ.
 
 ### SessionEnd
 
-Execute when session ends. Use for cleanup, logging, and state preservation.
+Thực thi khi phiên kết thúc. Dùng để dọn dẹp, ghi log, và lưu trạng thái.
 
 ### PreCompact
 
-Execute before context compaction. Use to add critical information to preserve.
+Thực thi trước khi nén ngữ cảnh. Dùng để thêm thông tin quan trọng cần giữ lại.
 
 ### Notification
 
-Execute when Claude sends notifications. Use to react to user notifications.
+Thực thi khi Claude gửi thông báo. Dùng để phản ứng với thông báo người dùng.
 
-## Hook Output Format
+## Định dạng Output của Hook
 
-### Standard Output (All Hooks)
+### Output Chuẩn (Tất cả Hook)
 
 ```json
 {
@@ -286,19 +286,19 @@ Execute when Claude sends notifications. Use to react to user notifications.
 }
 ```
 
-- `continue`: If false, halt processing (default true)
-- `suppressOutput`: Hide output from transcript (default false)
-- `systemMessage`: Message shown to Claude
+- `continue`: Nếu false, dừng xử lý (mặc định true)
+- `suppressOutput`: Ẩn output khỏi transcript (mặc định false)
+- `systemMessage`: Thông điệp hiển thị cho Claude
 
-### Exit Codes
+### Exit Code
 
-- `0` - Success (stdout shown in transcript)
-- `2` - Blocking error (stderr fed back to Claude)
-- Other - Non-blocking error
+- `0` - Thành công (stdout hiển thị trong transcript)
+- `2` - Lỗi chặn (stderr phản hồi lại cho Claude)
+- Khác - Lỗi không chặn
 
-## Hook Input Format
+## Định dạng Input của Hook
 
-All hooks receive JSON via stdin with common fields:
+Tất cả hook nhận JSON qua stdin với các trường chung:
 
 ```json
 {
@@ -310,24 +310,24 @@ All hooks receive JSON via stdin with common fields:
 }
 ```
 
-**Event-specific fields:**
+**Trường dành riêng cho từng sự kiện:**
 
 - **PreToolUse/PostToolUse:** `tool_name`, `tool_input`, `tool_result`
 - **UserPromptSubmit:** `user_prompt`
 - **Stop/SubagentStop:** `reason`
 
-Access fields in prompts using `$TOOL_INPUT`, `$TOOL_RESULT`, `$USER_PROMPT`, etc.
+Truy cập các trường trong prompt bằng `$TOOL_INPUT`, `$TOOL_RESULT`, `$USER_PROMPT`, v.v.
 
-## Environment Variables
+## Biến Môi trường
 
-Available in all command hooks:
+Có sẵn trong tất cả hook lệnh:
 
-- `$CLAUDE_PROJECT_DIR` - Project root path
-- `$CLAUDE_PLUGIN_ROOT` - Plugin directory (use for portable paths)
-- `$CLAUDE_ENV_FILE` - SessionStart only: persist env vars here
-- `$CLAUDE_CODE_REMOTE` - Set if running in remote context
+- `$CLAUDE_PROJECT_DIR` - Đường dẫn gốc dự án
+- `$CLAUDE_PLUGIN_ROOT` - Thư mục plugin (dùng cho path di động)
+- `$CLAUDE_ENV_FILE` - Chỉ SessionStart: duy trì biến môi trường tại đây
+- `$CLAUDE_CODE_REMOTE` - Được đặt nếu chạy trong ngữ cảnh remote
 
-**Always use ${CLAUDE_PLUGIN_ROOT} in hook commands for portability:**
+**Luôn dùng ${CLAUDE_PLUGIN_ROOT} trong lệnh hook để đảm bảo tính di động:**
 
 ```json
 {
@@ -336,9 +336,9 @@ Available in all command hooks:
 }
 ```
 
-## Plugin Hook Configuration
+## Cấu hình Hook Plugin
 
-In plugins, define hooks in `hooks/hooks.json`:
+Trong plugin, định nghĩa hook trong `hooks/hooks.json`:
 
 ```json
 {
@@ -379,55 +379,55 @@ In plugins, define hooks in `hooks/hooks.json`:
 }
 ```
 
-Plugin hooks merge with user's hooks and run in parallel.
+Hook plugin được hợp nhất với hook của người dùng và chạy song song.
 
-## Matchers
+## Matcher
 
-### Tool Name Matching
+### Khớp Tên Tool
 
-**Exact match:**
+**Khớp chính xác:**
 ```json
 "matcher": "Write"
 ```
 
-**Multiple tools:**
+**Nhiều tool:**
 ```json
 "matcher": "Read|Write|Edit"
 ```
 
-**Wildcard (all tools):**
+**Wildcard (tất cả tool):**
 ```json
 "matcher": "*"
 ```
 
-**Regex patterns:**
+**Regex pattern:**
 ```json
-"matcher": "mcp__.*__delete.*"  // All MCP delete tools
+"matcher": "mcp__.*__delete.*"  // Tất cả MCP delete tool
 ```
 
-**Note:** Matchers are case-sensitive.
+**Lưu ý:** Matcher phân biệt chữ hoa/thường.
 
-### Common Patterns
+### Các Pattern Phổ biến
 
 ```json
-// All MCP tools
+// Tất cả MCP tool
 "matcher": "mcp__.*"
 
-// Specific plugin's MCP tools
+// MCP tool của một plugin cụ thể
 "matcher": "mcp__plugin_asana_.*"
 
-// All file operations
+// Tất cả thao tác file
 "matcher": "Read|Write|Edit"
 
-// Bash commands only
+// Chỉ lệnh Bash
 "matcher": "Bash"
 ```
 
-## Security Best Practices
+## Thực hành Bảo mật Tốt nhất
 
-### Input Validation
+### Xác thực Input
 
-Always validate inputs in command hooks:
+Luôn xác thực input trong hook lệnh:
 
 ```bash
 #!/bin/bash
@@ -436,48 +436,48 @@ set -euo pipefail
 input=$(cat)
 tool_name=$(echo "$input" | jq -r '.tool_name')
 
-# Validate tool name format
+# Xác thực định dạng tên tool
 if [[ ! "$tool_name" =~ ^[a-zA-Z0-9_]+$ ]]; then
   echo '{"decision": "deny", "reason": "Invalid tool name"}' >&2
   exit 2
 fi
 ```
 
-### Path Safety
+### An toàn Path
 
-Check for path traversal and sensitive files:
+Kiểm tra path traversal và file nhạy cảm:
 
 ```bash
 file_path=$(echo "$input" | jq -r '.tool_input.file_path')
 
-# Deny path traversal
+# Từ chối path traversal
 if [[ "$file_path" == *".."* ]]; then
   echo '{"decision": "deny", "reason": "Path traversal detected"}' >&2
   exit 2
 fi
 
-# Deny sensitive files
+# Từ chối file nhạy cảm
 if [[ "$file_path" == *".env"* ]]; then
   echo '{"decision": "deny", "reason": "Sensitive file"}' >&2
   exit 2
 fi
 ```
 
-See `examples/validate-write.sh` and `examples/validate-bash.sh` for complete examples.
+Xem `examples/validate-write.sh` và `examples/validate-bash.sh` để biết ví dụ đầy đủ.
 
-### Quote All Variables
+### Đặt Nháy Tất cả Biến
 
 ```bash
-# GOOD: Quoted
+# TỐT: Có nháy
 echo "$file_path"
 cd "$CLAUDE_PROJECT_DIR"
 
-# BAD: Unquoted (injection risk)
+# XẤU: Không nháy (nguy cơ injection)
 echo $file_path
 cd $CLAUDE_PROJECT_DIR
 ```
 
-### Set Appropriate Timeouts
+### Đặt Timeout Phù hợp
 
 ```json
 {
@@ -487,13 +487,13 @@ cd $CLAUDE_PROJECT_DIR
 }
 ```
 
-**Defaults:** Command hooks (60s), Prompt hooks (30s)
+**Mặc định:** Hook lệnh (60s), Hook prompt (30s)
 
-## Performance Considerations
+## Cân nhắc về Hiệu năng
 
-### Parallel Execution
+### Thực thi Song song
 
-All matching hooks run **in parallel**:
+Tất cả hook khớp chạy **song song**:
 
 ```json
 {
@@ -501,114 +501,114 @@ All matching hooks run **in parallel**:
     {
       "matcher": "Write",
       "hooks": [
-        {"type": "command", "command": "check1.sh"},  // Parallel
-        {"type": "command", "command": "check2.sh"},  // Parallel
-        {"type": "prompt", "prompt": "Validate..."}   // Parallel
+        {"type": "command", "command": "check1.sh"},  // Song song
+        {"type": "command", "command": "check2.sh"},  // Song song
+        {"type": "prompt", "prompt": "Validate..."}   // Song song
       ]
     }
   ]
 }
 ```
 
-**Design implications:**
-- Hooks don't see each other's output
-- Non-deterministic ordering
-- Design for independence
+**Hàm ý thiết kế:**
+- Các hook không thấy output của nhau
+- Thứ tự không xác định
+- Thiết kế để độc lập
 
-### Optimization
+### Tối ưu hóa
 
-1. Use command hooks for quick deterministic checks
-2. Use prompt hooks for complex reasoning
-3. Cache validation results in temp files
-4. Minimize I/O in hot paths
+1. Dùng hook lệnh cho kiểm tra xác định nhanh
+2. Dùng hook prompt cho lý luận phức tạp
+3. Cache kết quả xác thực trong file tạm
+4. Giảm thiểu I/O trong đường dẫn hot path
 
-## Temporarily Active Hooks
+## Hook Kích hoạt Tạm thời
 
-Create hooks that activate conditionally by checking for a flag file or configuration:
+Tạo hook kích hoạt có điều kiện bằng cách kiểm tra flag file hoặc cấu hình:
 
-**Pattern: Flag file activation**
+**Pattern: Kích hoạt bằng flag file**
 ```bash
 #!/bin/bash
-# Only active when flag file exists
+# Chỉ kích hoạt khi flag file tồn tại
 FLAG_FILE="$CLAUDE_PROJECT_DIR/.enable-strict-validation"
 
 if [ ! -f "$FLAG_FILE" ]; then
-  # Flag not present, skip validation
+  # Flag không có, bỏ qua xác thực
   exit 0
 fi
 
-# Flag present, run validation
+# Flag có, chạy xác thực
 input=$(cat)
-# ... validation logic ...
+# ... logic xác thực ...
 ```
 
-**Pattern: Configuration-based activation**
+**Pattern: Kích hoạt dựa trên cấu hình**
 ```bash
 #!/bin/bash
-# Check configuration for activation
+# Kiểm tra cấu hình để kích hoạt
 CONFIG_FILE="$CLAUDE_PROJECT_DIR/.claude/plugin-config.json"
 
 if [ -f "$CONFIG_FILE" ]; then
   enabled=$(jq -r '.strictMode // false' "$CONFIG_FILE")
   if [ "$enabled" != "true" ]; then
-    exit 0  # Not enabled, skip
+    exit 0  # Chưa bật, bỏ qua
   fi
 fi
 
-# Enabled, run hook logic
+# Đã bật, chạy logic hook
 input=$(cat)
-# ... hook logic ...
+# ... logic hook ...
 ```
 
-**Use cases:**
-- Enable strict validation only when needed
-- Temporary debugging hooks
-- Project-specific hook behavior
-- Feature flags for hooks
+**Trường hợp dùng:**
+- Bật xác thực nghiêm ngặt chỉ khi cần
+- Hook debug tạm thời
+- Hành vi hook dành riêng cho dự án
+- Feature flag cho hook
 
-**Best practice:** Document activation mechanism in plugin README so users know how to enable/disable temporary hooks.
+**Thực hành tốt nhất:** Ghi lại cơ chế kích hoạt trong README của plugin để người dùng biết cách bật/tắt hook tạm thời.
 
-## Hook Lifecycle and Limitations
+## Vòng đời và Giới hạn của Hook
 
-### Hooks Load at Session Start
+### Hook Được Tải Khi Bắt đầu Phiên
 
-**Important:** Hooks are loaded when Claude Code session starts. Changes to hook configuration require restarting Claude Code.
+**Quan trọng:** Hook được tải khi phiên Claude Code bắt đầu. Thay đổi cấu hình hook yêu cầu khởi động lại Claude Code.
 
-**Cannot hot-swap hooks:**
-- Editing `hooks/hooks.json` won't affect current session
-- Adding new hook scripts won't be recognized
-- Changing hook commands/prompts won't update
-- Must restart Claude Code: exit and run `claude` again
+**Không thể hot-swap hook:**
+- Chỉnh sửa `hooks/hooks.json` sẽ không ảnh hưởng đến phiên hiện tại
+- Thêm script hook mới sẽ không được nhận ra
+- Thay đổi lệnh/prompt hook sẽ không cập nhật
+- Phải khởi động lại Claude Code: thoát và chạy `claude` lại
 
-**To test hook changes:**
-1. Edit hook configuration or scripts
-2. Exit Claude Code session
-3. Restart: `claude` or `cc`
-4. New hook configuration loads
-5. Test hooks with `claude --debug`
+**Để kiểm tra thay đổi hook:**
+1. Chỉnh sửa cấu hình hoặc script hook
+2. Thoát phiên Claude Code
+3. Khởi động lại: `claude` hoặc `cc`
+4. Cấu hình hook mới được tải
+5. Kiểm tra hook với `claude --debug`
 
-### Hook Validation at Startup
+### Xác thực Hook Khi Khởi động
 
-Hooks are validated when Claude Code starts:
-- Invalid JSON in hooks.json causes loading failure
-- Missing scripts cause warnings
-- Syntax errors reported in debug mode
+Hook được xác thực khi Claude Code khởi động:
+- JSON không hợp lệ trong hooks.json gây lỗi tải
+- Script thiếu gây ra cảnh báo
+- Lỗi cú pháp được báo cáo trong chế độ debug
 
-Use `/hooks` command to review loaded hooks in current session.
+Dùng lệnh `/hooks` để xem các hook đã tải trong phiên hiện tại.
 
-## Debugging Hooks
+## Debug Hook
 
-### Enable Debug Mode
+### Bật Chế độ Debug
 
 ```bash
 claude --debug
 ```
 
-Look for hook registration, execution logs, input/output JSON, and timing information.
+Tìm kiếm đăng ký hook, log thực thi, JSON input/output, và thông tin thời gian.
 
-### Test Hook Scripts
+### Kiểm tra Script Hook
 
-Test command hooks directly:
+Kiểm tra hook lệnh trực tiếp:
 
 ```bash
 echo '{"tool_name": "Write", "tool_input": {"file_path": "/test"}}' | \
@@ -617,95 +617,95 @@ echo '{"tool_name": "Write", "tool_input": {"file_path": "/test"}}' | \
 echo "Exit code: $?"
 ```
 
-### Validate JSON Output
+### Xác thực JSON Output
 
-Ensure hooks output valid JSON:
+Đảm bảo hook xuất ra JSON hợp lệ:
 
 ```bash
 output=$(./your-hook.sh < test-input.json)
 echo "$output" | jq .
 ```
 
-## Quick Reference
+## Tham chiếu Nhanh
 
-### Hook Events Summary
+### Tóm tắt Sự kiện Hook
 
-| Event | When | Use For |
-|-------|------|---------|
-| PreToolUse | Before tool | Validation, modification |
-| PostToolUse | After tool | Feedback, logging |
-| UserPromptSubmit | User input | Context, validation |
-| Stop | Agent stopping | Completeness check |
-| SubagentStop | Subagent done | Task validation |
-| SessionStart | Session begins | Context loading |
-| SessionEnd | Session ends | Cleanup, logging |
-| PreCompact | Before compact | Preserve context |
-| Notification | User notified | Logging, reactions |
+| Sự kiện | Khi nào | Dùng cho |
+|---------|---------|----------|
+| PreToolUse | Trước tool | Xác thực, chỉnh sửa |
+| PostToolUse | Sau tool | Phản hồi, ghi log |
+| UserPromptSubmit | Input người dùng | Ngữ cảnh, xác thực |
+| Stop | Agent dừng | Kiểm tra tính hoàn chỉnh |
+| SubagentStop | Subagent xong | Xác thực nhiệm vụ |
+| SessionStart | Phiên bắt đầu | Tải ngữ cảnh |
+| SessionEnd | Phiên kết thúc | Dọn dẹp, ghi log |
+| PreCompact | Trước compact | Giữ lại ngữ cảnh |
+| Notification | Người dùng được thông báo | Ghi log, phản ứng |
 
-### Best Practices
+### Thực hành Tốt nhất
 
-**DO:**
-- ✅ Use prompt-based hooks for complex logic
-- ✅ Use ${CLAUDE_PLUGIN_ROOT} for portability
-- ✅ Validate all inputs in command hooks
-- ✅ Quote all bash variables
-- ✅ Set appropriate timeouts
-- ✅ Return structured JSON output
-- ✅ Test hooks thoroughly
+**NÊN:**
+- ✅ Dùng hook dựa trên prompt cho logic phức tạp
+- ✅ Dùng ${CLAUDE_PLUGIN_ROOT} để đảm bảo tính di động
+- ✅ Xác thực tất cả input trong hook lệnh
+- ✅ Đặt nháy tất cả biến bash
+- ✅ Đặt timeout phù hợp
+- ✅ Trả về JSON output có cấu trúc
+- ✅ Kiểm tra hook kỹ lưỡng
 
-**DON'T:**
-- ❌ Use hardcoded paths
-- ❌ Trust user input without validation
-- ❌ Create long-running hooks
-- ❌ Rely on hook execution order
-- ❌ Modify global state unpredictably
-- ❌ Log sensitive information
+**KHÔNG NÊN:**
+- ❌ Dùng đường dẫn hardcoded
+- ❌ Tin tưởng input người dùng mà không xác thực
+- ❌ Tạo hook chạy lâu
+- ❌ Dựa vào thứ tự thực thi hook
+- ❌ Chỉnh sửa trạng thái toàn cục một cách không thể đoán trước
+- ❌ Ghi log thông tin nhạy cảm
 
-## Additional Resources
+## Tài nguyên Bổ sung
 
-### Reference Files
+### File Tham chiếu
 
-For detailed patterns and advanced techniques, consult:
+Để biết pattern chi tiết và kỹ thuật nâng cao, tham khảo:
 
-- **`references/patterns.md`** - Common hook patterns (8+ proven patterns)
-- **`references/migration.md`** - Migrating from basic to advanced hooks
-- **`references/advanced.md`** - Advanced use cases and techniques
+- **`references/patterns.md`** - Các pattern hook phổ biến (8+ pattern đã được chứng minh)
+- **`references/migration.md`** - Chuyển từ hook cơ bản sang nâng cao
+- **`references/advanced.md`** - Trường hợp dùng nâng cao và kỹ thuật
 
-### Example Hook Scripts
+### Script Hook Ví dụ
 
-Working examples in `examples/`:
+Ví dụ hoạt động trong `examples/`:
 
-- **`validate-write.sh`** - File write validation example
-- **`validate-bash.sh`** - Bash command validation example
-- **`load-context.sh`** - SessionStart context loading example
+- **`validate-write.sh`** - Ví dụ xác thực ghi file
+- **`validate-bash.sh`** - Ví dụ xác thực lệnh Bash
+- **`load-context.sh`** - Ví dụ tải ngữ cảnh SessionStart
 
-### Utility Scripts
+### Script Tiện ích
 
-Development tools in `scripts/`:
+Công cụ phát triển trong `scripts/`:
 
-- **`validate-hook-schema.sh`** - Validate hooks.json structure and syntax
-- **`test-hook.sh`** - Test hooks with sample input before deployment
-- **`hook-linter.sh`** - Check hook scripts for common issues and best practices
+- **`validate-hook-schema.sh`** - Xác thực cấu trúc và cú pháp hooks.json
+- **`test-hook.sh`** - Kiểm tra hook với input mẫu trước khi triển khai
+- **`hook-linter.sh`** - Kiểm tra script hook về vấn đề phổ biến và thực hành tốt nhất
 
-### External Resources
+### Tài nguyên Bên ngoài
 
-- **Official Docs**: <https://docs.claude.com/en/docs/claude-code/hooks>
-- **Examples**: See security-guidance plugin in marketplace
-- **Testing**: Use `claude --debug` for detailed logs
-- **Validation**: Use `jq` to validate hook JSON output
+- **Tài liệu chính thức**: <https://docs.claude.com/en/docs/claude-code/hooks>
+- **Ví dụ**: Xem plugin security-guidance trong marketplace
+- **Kiểm tra**: Dùng `claude --debug` để xem log chi tiết
+- **Xác thực**: Dùng `jq` để xác thực JSON output của hook
 
-## Implementation Workflow
+## Quy trình Triển khai
 
-To implement hooks in a plugin:
+Để triển khai hook trong một plugin:
 
-1. Identify events to hook into (PreToolUse, Stop, SessionStart, etc.)
-2. Decide between prompt-based (flexible) or command (deterministic) hooks
-3. Write hook configuration in `hooks/hooks.json`
-4. For command hooks, create hook scripts
-5. Use ${CLAUDE_PLUGIN_ROOT} for all file references
-6. Validate configuration with `scripts/validate-hook-schema.sh hooks/hooks.json`
-7. Test hooks with `scripts/test-hook.sh` before deployment
-8. Test in Claude Code with `claude --debug`
-9. Document hooks in plugin README
+1. Xác định các sự kiện cần hook vào (PreToolUse, Stop, SessionStart, v.v.)
+2. Quyết định giữa hook dựa trên prompt (linh hoạt) hay hook lệnh (xác định)
+3. Viết cấu hình hook trong `hooks/hooks.json`
+4. Với hook lệnh, tạo script hook
+5. Dùng ${CLAUDE_PLUGIN_ROOT} cho tất cả tham chiếu file
+6. Xác thực cấu hình với `scripts/validate-hook-schema.sh hooks/hooks.json`
+7. Kiểm tra hook với `scripts/test-hook.sh` trước khi triển khai
+8. Kiểm tra trong Claude Code với `claude --debug`
+9. Ghi lại hook trong README của plugin
 
-Focus on prompt-based hooks for most use cases. Reserve command hooks for performance-critical or deterministic checks.
+Ưu tiên hook dựa trên prompt cho hầu hết trường hợp. Dành hook lệnh cho kiểm tra quan trọng về hiệu năng hoặc xác định.

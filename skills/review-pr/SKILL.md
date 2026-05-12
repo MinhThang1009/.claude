@@ -7,65 +7,65 @@ allowed-tools: ["Bash", "Glob", "Grep", "Read", "Task"]
 
 # Comprehensive PR Review
 
-Run a comprehensive pull request review using multiple specialized agents, each focusing on a different aspect of code quality.
+Chạy review pull request toàn diện bằng nhiều agent chuyên biệt, mỗi agent tập trung vào một khía cạnh khác nhau của chất lượng code.
 
-**Review Aspects (optional):** "$ARGUMENTS"
+**Review Aspects (tùy chọn):** "$ARGUMENTS"
 
 ## Review Workflow
 
-1. **Determine Review Scope**
-   - Check git status to identify changed files
-   - Parse arguments to see if user requested specific review aspects
-   - Default: Run all applicable reviews
+1. **Xác định phạm vi Review**
+   - Kiểm tra git status để xác định các file đã thay đổi
+   - Parse arguments để xem user yêu cầu các khía cạnh review cụ thể nào
+   - Mặc định: Chạy tất cả các review phù hợp
 
-2. **Available Review Aspects:**
+2. **Các Review Aspect có sẵn:**
 
-   - **comments** - Analyze code comment accuracy and maintainability
-   - **tests** - Review test coverage quality and completeness
-   - **errors** - Check error handling for silent failures
-   - **types** - Analyze type design and invariants (if new types added)
-   - **code** - General code review for project guidelines
-   - **simplify** - Simplify code for clarity and maintainability
-   - **all** - Run all applicable reviews (default)
+   - **comments** - Phân tích độ chính xác và tính maintainability của comment trong code
+   - **tests** - Review chất lượng và độ đầy đủ của test coverage
+   - **errors** - Kiểm tra error handling có silent failure không
+   - **types** - Phân tích thiết kế type và invariant (nếu có type mới được thêm)
+   - **code** - Review code tổng quát theo project guideline
+   - **simplify** - Đơn giản hóa code để tăng sự rõ ràng và maintainability
+   - **all** - Chạy tất cả review phù hợp (mặc định)
 
-3. **Identify Changed Files**
-   - Run `git diff --name-only` to see modified files
-   - Check if PR already exists: `gh pr view`
-   - Identify file types and what reviews apply
+3. **Xác định các file đã thay đổi**
+   - Chạy `git diff --name-only` để xem file đã chỉnh sửa
+   - Kiểm tra PR đã tồn tại chưa: `gh pr view`
+   - Xác định loại file và review nào phù hợp
 
-4. **Determine Applicable Reviews**
+4. **Xác định các Review phù hợp**
 
-   Based on changes:
-   - **Always applicable**: code-reviewer (general quality)
-   - **If test files changed**: pr-test-analyzer
-   - **If comments/docs added**: comment-analyzer
-   - **If error handling changed**: silent-failure-hunter
-   - **If types added/modified**: type-design-analyzer
-   - **After passing review**: code-simplifier (polish and refine)
+   Dựa trên thay đổi:
+   - **Luôn phù hợp**: code-reviewer (chất lượng tổng quát)
+   - **Nếu file test thay đổi**: pr-test-analyzer
+   - **Nếu comment/docs được thêm**: comment-analyzer
+   - **Nếu error handling thay đổi**: silent-failure-hunter
+   - **Nếu type được thêm/chỉnh sửa**: type-design-analyzer
+   - **Sau khi vượt review**: code-simplifier (hoàn thiện và tinh chỉnh)
 
-5. **Launch Review Agents**
+5. **Khởi chạy Review Agent**
 
-   **Sequential approach** (one at a time):
-   - Easier to understand and act on
-   - Each report is complete before next
-   - Good for interactive review
+   **Cách tiếp cận tuần tự** (từng cái một):
+   - Dễ hiểu và dễ hành động hơn
+   - Mỗi report hoàn chỉnh trước khi sang cái tiếp theo
+   - Tốt cho review tương tác
 
-   **Parallel approach** (user can request):
-   - Launch all agents simultaneously
-   - Faster for comprehensive review
-   - Results come back together
+   **Cách tiếp cận song song** (user có thể yêu cầu):
+   - Khởi chạy tất cả agent đồng thời
+   - Nhanh hơn cho review toàn diện
+   - Kết quả trả về cùng lúc
 
-6. **Aggregate Results**
+6. **Tổng hợp kết quả**
 
-   After agents complete, summarize:
-   - **Critical Issues** (must fix before merge)
-   - **Important Issues** (should fix)
-   - **Suggestions** (nice to have)
-   - **Positive Observations** (what's good)
+   Sau khi agent hoàn thành, tóm tắt:
+   - **Critical Issues** (phải sửa trước khi merge)
+   - **Important Issues** (nên sửa)
+   - **Suggestions** (nên có)
+   - **Positive Observations** (điểm tốt)
 
-7. **Provide Action Plan**
+7. **Cung cấp Action Plan**
 
-   Organize findings:
+   Tổ chức findings:
    ```markdown
    # PR Review Summary
 
@@ -79,112 +79,112 @@ Run a comprehensive pull request review using multiple specialized agents, each 
    - [agent-name]: Suggestion [file:line]
 
    ## Strengths
-   - What's well-done in this PR
+   - Điểm làm tốt trong PR này
 
    ## Recommended Action
-   1. Fix critical issues first
-   2. Address important issues
-   3. Consider suggestions
-   4. Re-run review after fixes
+   1. Sửa critical issue trước
+   2. Xử lý important issue
+   3. Cân nhắc suggestion
+   4. Chạy lại review sau khi sửa
    ```
 
 ## Usage Examples
 
-**Full review (default):**
+**Full review (mặc định):**
 ```
 /pr-review-toolkit:review-pr
 ```
 
-**Specific aspects:**
+**Các khía cạnh cụ thể:**
 ```
 /pr-review-toolkit:review-pr tests errors
-# Reviews only test coverage and error handling
+# Chỉ review test coverage và error handling
 
 /pr-review-toolkit:review-pr comments
-# Reviews only code comments
+# Chỉ review code comment
 
 /pr-review-toolkit:review-pr simplify
-# Simplifies code after passing review
+# Đơn giản hóa code sau khi đã vượt review
 ```
 
-**Parallel review:**
+**Review song song:**
 ```
 /pr-review-toolkit:review-pr all parallel
-# Launches all agents in parallel
+# Khởi chạy tất cả agent song song
 ```
 
 ## Agent Descriptions
 
 **comment-analyzer**:
-- Verifies comment accuracy vs code
-- Identifies comment rot
-- Checks documentation completeness
+- Xác minh độ chính xác của comment so với code
+- Xác định comment rot
+- Kiểm tra độ đầy đủ của documentation
 
 **pr-test-analyzer**:
-- Reviews behavioral test coverage
-- Identifies critical gaps
-- Evaluates test quality
+- Review behavioral test coverage
+- Xác định các gap quan trọng
+- Đánh giá chất lượng test
 
 **silent-failure-hunter**:
-- Finds silent failures
-- Reviews catch blocks
-- Checks error logging
+- Tìm silent failure
+- Review các catch block
+- Kiểm tra error logging
 
 **type-design-analyzer**:
-- Analyzes type encapsulation
-- Reviews invariant expression
-- Rates type design quality
+- Phân tích type encapsulation
+- Review cách biểu diễn invariant
+- Đánh giá chất lượng thiết kế type
 
 **code-reviewer**:
-- Checks CLAUDE.md compliance
-- Detects bugs and issues
-- Reviews general code quality
+- Kiểm tra tuân thủ CLAUDE.md
+- Phát hiện bug và vấn đề
+- Review chất lượng code tổng quát
 
 **code-simplifier**:
-- Simplifies complex code
-- Improves clarity and readability
-- Applies project standards
-- Preserves functionality
+- Đơn giản hóa code phức tạp
+- Cải thiện sự rõ ràng và dễ đọc
+- Áp dụng chuẩn project
+- Giữ nguyên functionality
 
 ## Tips
 
-- **Run early**: Before creating PR, not after
-- **Focus on changes**: Agents analyze git diff by default
-- **Address critical first**: Fix high-priority issues before lower priority
-- **Re-run after fixes**: Verify issues are resolved
-- **Use specific reviews**: Target specific aspects when you know the concern
+- **Chạy sớm**: Trước khi tạo PR, không phải sau
+- **Tập trung vào thay đổi**: Agent phân tích git diff theo mặc định
+- **Xử lý critical trước**: Sửa vấn đề ưu tiên cao trước khi xử lý ưu tiên thấp hơn
+- **Chạy lại sau khi sửa**: Xác minh các vấn đề đã được giải quyết
+- **Dùng review cụ thể**: Nhắm vào khía cạnh cụ thể khi bạn biết vấn đề nằm ở đâu
 
 ## Workflow Integration
 
-**Before committing:**
+**Trước khi commit:**
 ```
-1. Write code
-2. Run: /pr-review-toolkit:review-pr code errors
-3. Fix any critical issues
+1. Viết code
+2. Chạy: /pr-review-toolkit:review-pr code errors
+3. Sửa các critical issue
 4. Commit
 ```
 
-**Before creating PR:**
+**Trước khi tạo PR:**
 ```
-1. Stage all changes
-2. Run: /pr-review-toolkit:review-pr all
-3. Address all critical and important issues
-4. Run specific reviews again to verify
-5. Create PR
+1. Stage tất cả thay đổi
+2. Chạy: /pr-review-toolkit:review-pr all
+3. Xử lý tất cả critical và important issue
+4. Chạy lại review cụ thể để xác minh
+5. Tạo PR
 ```
 
-**After PR feedback:**
+**Sau khi nhận phản hồi PR:**
 ```
-1. Make requested changes
-2. Run targeted reviews based on feedback
-3. Verify issues are resolved
-4. Push updates
+1. Thực hiện các thay đổi được yêu cầu
+2. Chạy review có mục tiêu dựa trên phản hồi
+3. Xác minh các vấn đề đã được giải quyết
+4. Push update
 ```
 
 ## Notes
 
-- Agents run autonomously and return detailed reports
-- Each agent focuses on its specialty for deep analysis
-- Results are actionable with specific file:line references
-- Agents use appropriate models for their complexity
-- All agents available in `/agents` list
+- Agent chạy tự động và trả về báo cáo chi tiết
+- Mỗi agent tập trung vào chuyên môn của mình để phân tích sâu
+- Kết quả có thể hành động được với tham chiếu file:line cụ thể
+- Agent dùng model phù hợp với độ phức tạp của chúng
+- Tất cả agent có trong danh sách `/agents`
