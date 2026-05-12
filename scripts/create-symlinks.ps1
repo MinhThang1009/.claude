@@ -1,12 +1,19 @@
-$src = "C:\Users\Admin\dotclaude"
-$dst = "C:\Users\Admin\.claude"
+# $src = repo root (thư mục chứa script này)
+$src = Split-Path -Parent $PSScriptRoot
+# $dst = ~/.claude
+$dst = Join-Path $env:USERPROFILE ".claude"
+
+Write-Host "Source: $src"
+Write-Host "Target: $dst"
+New-Item -ItemType Directory -Force $dst | Out-Null
 
 # --- Dirs symlinked as whole ---
 $dirs = @(".claude-plugin", "docs", "hooks", "output-styles", "rules", "templates")
 foreach ($d in $dirs) {
     $dstPath = "$dst\$d"
     $srcPath = "$src\$d"
-    if (Test-Path $dstPath) { Remove-Item $dstPath -Recurse -Force }
+    $item = Get-Item $dstPath -ErrorAction SilentlyContinue
+    if ($item) { $item.Delete() }
     & cmd.exe /c "mklink /D `"$dstPath`" `"$srcPath`"" | Out-Null
     Write-Host "OK dir: $d"
 }
@@ -55,18 +62,19 @@ Write-Host "OK skills: $((Get-ChildItem $skillsDir).Count) dirs"
 
 # --- commands/: collect từ plugins/*/commands/*.md → flat symlinks ---
 $commandsDir = "$dst\commands"
-if (-not (Test-Path $commandsDir)) {
-    New-Item -ItemType Directory -Force $commandsDir | Out-Null
-}
+$c = Get-Item $commandsDir -ErrorAction SilentlyContinue
+if ($c) { $c.Delete() }
+New-Item -ItemType Directory -Force $commandsDir | Out-Null
 Get-ChildItem "$src\plugins" -Directory | ForEach-Object {
     $d = "$($_.FullName)\commands"
     if (Test-Path $d) {
         Get-ChildItem $d -Filter "*.md" | ForEach-Object {
             $link = "$commandsDir\$($_.Name)"
-            if (-not (Test-Path $link)) {
-                & cmd.exe /c "mklink `"$link`" `"$($_.FullName)`"" | Out-Null
-            }
+            & cmd.exe /c "mklink `"$link`" `"$($_.FullName)`"" | Out-Null
         }
     }
 }
 Write-Host "OK commands: $((Get-ChildItem $commandsDir -Filter '*.md').Count) files"
+
+Write-Host ""
+Write-Host "Done! Restart Claude Code để apply changes."
