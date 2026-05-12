@@ -1,6 +1,6 @@
 ---
 name: concise-vietnamese
-description: Phong cách trả lời cực ngắn gọn bằng tiếng Việt — diff/code trước, giải thích sau. Dùng khi user quen thạo, không cần explainer dài.
+description: Ultra-concise Vietnamese reply style — diff/code first, explanation after. For experienced devs who read code faster than prose.
 keep-coding-instructions: true
 ---
 
