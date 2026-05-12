@@ -148,8 +148,8 @@ Lưu test cases vào `evals/evals.json`. Chưa cần viết assertions — chỉ
   "evals": [
     {
       "id": 1,
-      "prompt": "Task prompt của user",
-      "expected_output": "Mô tả kết quả mong đợi",
+      "prompt": "User's task prompt",
+      "expected_output": "Description of expected result",
       "files": []
     }
   ]
@@ -188,8 +188,8 @@ Viết `eval_metadata.json` cho mỗi test case (assertions có thể để tr�
 ```json
 {
   "eval_id": 0,
-  "eval_name": "tên-mô-tả-ở-đây",
-  "prompt": "Task prompt của user",
+  "eval_name": "descriptive-name-here",
+  "prompt": "The user's task prompt",
   "assertions": []
 }
 ```
@@ -269,9 +269,9 @@ Khi user báo xong, đọc `feedback.json`:
 ```json
 {
   "reviews": [
-    {"run_id": "eval-0-with_skill", "feedback": "chart thiếu nhãn trục", "timestamp": "..."},
+    {"run_id": "eval-0-with_skill", "feedback": "the chart is missing axis labels", "timestamp": "..."},
     {"run_id": "eval-1-with_skill", "feedback": "", "timestamp": "..."},
-    {"run_id": "eval-2-with_skill", "feedback": "hoàn hảo, tôi thích cái này", "timestamp": "..."}
+    {"run_id": "eval-2-with_skill", "feedback": "perfect, love this", "timestamp": "..."}
   ],
   "status": "complete"
 }
@@ -338,8 +338,8 @@ Tạo 20 eval queries — mix giữa should-trigger và should-not-trigger. Lưu
 
 ```json
 [
-  {"query": "prompt của user", "should_trigger": true},
-  {"query": "prompt khác", "should_trigger": false}
+  {"query": "the user prompt", "should_trigger": true},
+  {"query": "another prompt", "should_trigger": false}
 ]
 ```
 

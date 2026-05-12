@@ -53,8 +53,8 @@ coordinator_session: team-leader
 
 # Plugin Configuration
 
-Plugin này được cấu hình cho standard validation mode.
-Liên hệ @team-lead nếu có câu hỏi.
+This plugin is configured for standard validation mode.
+Contact @team-lead with questions.
 ```
 
 ## Đọc Settings Files
@@ -67,29 +67,29 @@ Liên hệ @team-lead nếu có câu hỏi.
 #!/bin/bash
 set -euo pipefail
 
-# Định nghĩa state file path
+# Define state file path
 STATE_FILE=".claude/my-plugin.local.md"
 
-# Thoát nhanh nếu file không tồn tại
+# Quick exit if file doesn't exist
 if [[ ! -f "$STATE_FILE" ]]; then
-  exit 0  # Plugin chưa được cấu hình, bỏ qua
+  exit 0  # Plugin not configured, skip
 fi
 
-# Parse YAML frontmatter (giữa các marker ---)
+# Parse YAML frontmatter (between --- markers)
 FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$STATE_FILE")
 
-# Extract từng field
+# Extract individual fields
 ENABLED=$(echo "$FRONTMATTER" | grep '^enabled:' | sed 's/enabled: *//' | sed 's/^"\(.*\)"$/\1/')
 STRICT_MODE=$(echo "$FRONTMATTER" | grep '^strict_mode:' | sed 's/strict_mode: *//' | sed 's/^"\(.*\)"$/\1/')
 
-# Kiểm tra nếu enabled
+# Check if enabled
 if [[ "$ENABLED" != "true" ]]; then
-  exit 0  # Đã disabled
+  exit 0  # Disabled
 fi
 
-# Dùng configuration trong hook logic
+# Use configuration in hook logic
 if [[ "$STRICT_MODE" == "true" ]]; then
-  # Áp dụng strict validation
+  # Apply strict validation
   # ...
 fi
 ```
@@ -108,12 +108,12 @@ allowed-tools: ["Read", "Bash"]
 
 # Process Command
 
-Các bước:
-1. Kiểm tra settings tồn tại tại `.claude/my-plugin.local.md`
-2. Đọc configuration dùng Read tool
-3. Parse YAML frontmatter để extract settings
-4. Áp dụng settings vào processing logic
-5. Execute với configured behavior
+Steps:
+1. Check if settings exist at `.claude/my-plugin.local.md`
+2. Read configuration using Read tool
+3. Parse YAML frontmatter to extract settings
+4. Apply settings to processing logic
+5. Execute with configured behavior
 ```
 
 ### Từ Agents
