@@ -2,7 +2,7 @@ $src = "C:\Users\Admin\dotclaude"
 $dst = "C:\Users\Admin\.claude"
 
 # --- Dirs symlinked as whole ---
-$dirs = @("docs", "hooks", "output-styles", "rules", "templates")
+$dirs = @(".claude-plugin", "docs", "hooks", "output-styles", "rules", "templates")
 foreach ($d in $dirs) {
     $dstPath = "$dst\$d"
     $srcPath = "$src\$d"
