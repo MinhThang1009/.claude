@@ -33,6 +33,8 @@ Hiển thị scope đã chọn cho user trước khi tiếp tục.
 - Đọc file liên quan trong diff để hiểu đầy đủ context (không chỉ đọc hunk).
 - Đọc file test tương ứng (nếu có).
 - Kiểm tra commit message và PR description (nếu có) để hiểu intent.
+- **Git history**: `git blame` cho các dòng thay đổi — hiểu ai viết, khi nào, commit nào. Nếu có `gh` → check PR comments/reviews cũ trên file đó (`gh pr list --search "file:path" --state merged --limit 3`).
+- **CLAUDE.md + REVIEW.md**: đọc nếu tồn tại — dùng làm baseline cho compliance check ở Bước 3.
 
 ## Bước 3: Review theo 6 góc nhìn
 
@@ -65,8 +67,14 @@ Theo thứ tự ưu tiên:
 - Function có quá dài không? (Reference: [`coding-standards.md` dòng 11](../../references/coding-standards.md) — <50 lý tưởng, >100 đề xuất tách)
 - Code có duplicate đoạn nào trong codebase không (gợi ý: dùng Grep tìm pattern)?
 - Comment giải thích WHY hay chỉ lặp lại WHAT?
+- **Code comments compliance**: đọc comments trong files bị sửa — verify thay đổi không contradict guidance trong existing comments (vd: comment nói "must be called before X" nhưng diff bỏ call đó).
 
-### 6. Style (Low)
+### 6. CLAUDE.md / REVIEW.md Compliance (Low)
+- Nếu CLAUDE.md hoặc REVIEW.md có quy tắc cụ thể → kiểm tra diff có vi phạm không.
+- Chỉ flag khi guideline **explicitly mention** issue đó (không suy diễn rộng).
+- Vi phạm compliance → severity 🟡 (non-blocking), trừ khi guideline nói rõ là blocking.
+
+### 7. Style (Low)
 - Theo convention codebase?
 - Format đúng (formatter của project)?
 - Lint pass?
@@ -95,8 +103,13 @@ Format chuẩn:
 
 Quy tắc:
 - Mỗi finding phải có **vị trí cụ thể** (file:line) và **gợi ý fix**.
+- **Confidence scoring**: chỉ report finding có confidence ≥80%. Tự đánh giá theo rubric: 100 = chắc chắn bug/vulnerability, 75 = rất có thể sai, 50 = có thể sai nhưng cần context thêm, 25 = chỉ là gợi ý style, 0 = không chắc. Finding <80% → bỏ hoặc gộp vào 🟢 Gợi ý.
 - KHÔNG nitpick style nếu có formatter — formatter chạy tự động xử lý.
 - KHÔNG đề xuất rewrite kiểu "làm khác đi" nếu chỉ là preference.
+- KHÔNG flag pre-existing issues (code cũ không nằm trong diff) trừ khi diff làm nó trở thành vấn đề.
+- KHÔNG flag issues mà linter/typecheck sẽ bắt (đã có CI).
+- KHÔNG flag intentional behavior changes đã giải thích trong commit message/PR description.
+- KHÔNG flag code có lint-ignore comment (đã được acknowledge).
 - Nếu mọi thứ ổn → nói rõ "Không có vấn đề blocking, có thể merge". Đừng bịa lỗi.
 
 ## Bước 5: Hỏi tiếp

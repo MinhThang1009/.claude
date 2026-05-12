@@ -160,6 +160,28 @@ rm /tmp/commit-msg.txt
 - Không chắc type giữa `feat` vs `fix` → nghĩ "Hành vi user thấy có khác trước không?". Có → `feat`/`fix`. Không → `refactor`/`chore`.
 - Không chắc scope → bỏ scope.
 
+## Chế độ mở rộng
+
+### `/commit push-pr` — Commit + Push + Tạo PR
+
+Khi `$ARGUMENTS` chứa `push-pr` hoặc `push pr`:
+
+1. Chạy Bước 1→5 như trên (commit bình thường).
+2. Nếu đang ở `main`/`master`/`develop` → tạo branch mới trước: `git checkout -b <type>/<scope>-<short-desc>`.
+3. `git push -u origin HEAD`.
+4. Tạo PR bằng `gh pr create --fill` (yêu cầu GitHub CLI). Nếu `gh` không có → hướng dẫn cài + dừng.
+5. Hiển thị PR URL cho user.
+
+### `/commit clean` — Dọn branch stale
+
+Khi `$ARGUMENTS` chứa `clean` hoặc `clean-gone`:
+
+1. `git fetch --prune`
+2. Tìm branch có upstream `[gone]`: `git branch -vv | grep ': gone]'`
+3. Nếu branch linked với worktree → `git worktree remove <path>` trước.
+4. Liệt kê branch sẽ xóa, **hỏi user xác nhận**.
+5. `git branch -d <branch>` cho từng branch (dùng `-d` không dùng `-D` — an toàn hơn, fail nếu chưa merge).
+
 ## $ARGUMENTS
 
 Nếu user đưa argument (ví dụ `/commit gộp tất cả thành 1 commit duy nhất`), tuân theo. Mặc định: tự đề xuất grouping.

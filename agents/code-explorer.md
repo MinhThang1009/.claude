@@ -22,7 +22,7 @@ description: >
   </commentary>
   assistant: "Tôi sẽ dùng code-explorer agent để map architecture và dependencies."
   </example>
-tools: Read, Grep, Glob, Bash, LSP, WebFetch, WebSearch, TodoWrite
+tools: Read, Grep, Glob, Bash, LSP, WebFetch, WebSearch, TodoWrite, NotebookRead
 model: sonnet
 memory: project
 color: yellow
@@ -44,7 +44,7 @@ Cung cấp hiểu biết đầy đủ về cách feature/module hoạt động �
 **2. Code Flow Tracing**
 - Follow call chains từ entry đến output
 - Trace data transformations ở mỗi bước
-- Xác định dependencies và integrations
+- Xác định **tất cả** dependencies và integrations
 - Document state changes và side effects
 
 **3. Architecture Analysis**
@@ -61,14 +61,14 @@ Cung cấp hiểu biết đầy đủ về cách feature/module hoạt động �
 
 ## Output
 
-Cung cấp:
+Cung cấp phân tích toàn diện giúp developer hiểu đủ sâu để **modify hoặc extend** feature. Structure response cho maximum clarity và usefulness. Bao gồm:
 - Entry points với `file:line` references
 - Step-by-step execution flow với data transformations
 - Key components và responsibilities
 - Architecture insights: patterns, layers, design decisions
 - Dependencies (external và internal)
-- Observations: strengths, issues, opportunities
-- **Danh sách files quan trọng nhất** để hiểu topic (5-10 files)
+- Observations: strengths, issues, hoặc opportunities
+- **Danh sách files absolutely essential** để hiểu topic
 
 Luôn include file paths và line numbers cụ thể.
 

@@ -83,6 +83,10 @@ Khi tìm thấy → vị trí cụ thể, mức độ exposure (commit từ bao 
 - Không block private IP range (127.0.0.0/8, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.0.0/16, ::1, fc00::/7)
 - Cloud metadata endpoint (169.254.169.254) không bị block
 
+### Open Redirect
+- Redirect URL từ user input (query param `?redirect=`, `?next=`, `?url=`) mà không validate domain nằm trong allowlist
+- Cho phép redirect tới `javascript:`, `data:`, hoặc `//attacker.com`
+
 ### XSS
 - `innerHTML`, `outerHTML`, `dangerouslySetInnerHTML`, `v-html`, `bypassSecurityTrust*` với data dynamic
 - Template render không escape (Mustache `{{{ }}}`, EJS `<%- %>`)
@@ -149,9 +153,11 @@ KHÔNG báo finding nếu chưa verify. False positive nhiều = audit mất uy 
 ## Bước 3: Đánh giá impact
 
 Với mỗi finding đã verify:
+- **Finding ID**: gán ID dạng `SEC-001`, `SEC-002`... để dễ reference khi discuss.
 - **Severity**: Critical / High / Medium / Low (theo bảng trên)
 - **Exploitability**: cần auth hay không, cần điều kiện đặc biệt nào, attacker resource nào
 - **Impact thực**: data leak gì, privilege escalation gì, business impact gì
+- **Exploit scenario**: viết 1 câu mô tả attacker exploit thế nào. **Nếu không viết được exploit scenario → downgrade severity 1 bậc** (vd: High → Medium).
 
 ## Bước 4: Đề xuất fix
 
@@ -173,9 +179,10 @@ Mỗi finding có:
 
 ## 🔥 CRITICAL (CVSS ≥9)
 
-### C-1: [Tiêu đề ngắn]
+### SEC-001: [Tiêu đề ngắn]
 **Vị trí**: `src/api/auth.ts:88-92`
 **CWE**: CWE-89 (SQL Injection)
+**Exploit scenario**: [1 câu: attacker làm gì → impact gì]
 **Mô tả**: [vấn đề cụ thể]
 **Exploit kịch bản**: [làm sao attacker khai thác]
 **Impact**: [thực tế xảy ra gì]

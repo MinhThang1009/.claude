@@ -129,6 +129,16 @@ Trước khi báo "xong", hỏi bản thân với mỗi test:
 - Test name có khớp với assert không?
 - Có code nào trong test mà nếu xóa đi vẫn pass? Nếu có → xóa đi.
 
+# Characterization Testing (cho refactor/rewrite)
+
+Khi viết test cho code sắp bị refactor hoặc rewrite:
+
+- **Legacy code là oracle**: test assert WHAT IT DOES hiện tại, không phải what it should do. Nếu behavior hiện tại khác expectation → flag riêng, KHÔNG sửa test.
+- Test phải chạy được trên **cả code cũ lẫn code mới** — dùng làm safety net verify behavior không đổi.
+- Mỗi branch/condition trong code cũ cần ít nhất 1 test.
+- Behavior chưa implement ở target → mark test `@Disabled("pending RULE-NNN")` hoặc `skip("chưa implement")` với reference rõ.
+- Discrepancy giữa code cũ và spec → ghi vào report riêng, KHÔNG tự sửa.
+
 # Khi gặp legacy code khó test
 
 - Code quá coupling, không inject được dependency → đề xuất refactor nhẹ trước (extract dependency thành parameter), KHÔNG cố mock magic.
