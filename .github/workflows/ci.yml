@@ -194,7 +194,7 @@ jobs:
           [ "$count" -eq 18 ] || { echo "Expected 18, got $count"; exit 1; }
       - name: Verify skills (20 dirs)
         run: |
-          count=$(find ~/.claude/skills -maxdepth 1 -mindepth 1 -type d | wc -l)
+          count=$(find -L ~/.claude/skills -maxdepth 1 -mindepth 1 -type d | wc -l)
           echo "skills: $count"
           [ "$count" -eq 20 ] || { echo "Expected 20, got $count"; exit 1; }
       - name: Verify commands (12 files)

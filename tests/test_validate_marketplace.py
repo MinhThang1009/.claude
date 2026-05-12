@@ -125,6 +125,62 @@ class TestMarketplaceValid:
         assert self._run() == 1
         assert "thiếu field" in capsys.readouterr().err
 
+    def test_source_without_dot_slash(self, capsys):
+        # Source không bắt đầu bằng "./" — branch else trong validate()
+        self._make_plugin("bare-plugin")
+        self._write_mp(
+            [
+                {
+                    "name": "bare-plugin",
+                    "description": "d",
+                    "author": {"name": "T"},
+                    "source": "plugins/bare-plugin",
+                    "category": "development",
+                }
+            ]
+        )
+        assert self._run() == 0
+
+    def test_plugin_json_missing_name_field(self, capsys):
+        p = self._make_plugin("p", has_plugin_json=False)
+        (p / ".claude-plugin").mkdir()
+        (p / ".claude-plugin" / "plugin.json").write_text(
+            json.dumps({"description": "no name"}), encoding="utf-8"
+        )
+        self._write_mp(
+            [
+                {
+                    "name": "p",
+                    "description": "d",
+                    "author": {"name": "T"},
+                    "source": "./plugins/p",
+                    "category": "development",
+                }
+            ]
+        )
+        assert self._run() == 1
+        assert "name" in capsys.readouterr().err
+
+    def test_plugin_json_invalid_json(self, capsys):
+        p = self._make_plugin("p", has_plugin_json=False)
+        (p / ".claude-plugin").mkdir()
+        (p / ".claude-plugin" / "plugin.json").write_text(
+            "{invalid json}", encoding="utf-8"
+        )
+        self._write_mp(
+            [
+                {
+                    "name": "p",
+                    "description": "d",
+                    "author": {"name": "T"},
+                    "source": "./plugins/p",
+                    "category": "development",
+                }
+            ]
+        )
+        assert self._run() == 1
+        assert "parse lỗi" in capsys.readouterr().err
+
     def test_empty_plugins_fails(self, capsys):
         self._write_mp([])
         assert self._run() == 1
