@@ -56,3 +56,4 @@ claude-md-management
 # doc-coauthoring          # Co-authoring workflow cho docs/proposals/specs
 # explanatory-output-style # Giải thích implementation choices khi code
 # learning-output-style    # Interactive learning mode tại decision points
+# playwright               # Browser automation MCP (Microsoft) — cần npx
