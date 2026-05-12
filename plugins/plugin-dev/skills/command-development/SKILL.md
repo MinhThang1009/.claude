@@ -1,5 +1,5 @@
 ---
-name: Command Development
+name: command-development
 description: This skill should be used when the user asks to "create a slash command", "add a command", "write a custom command", "define command arguments", "use command frontmatter", "organize commands", "create command with file references", "interactive command", "use AskUserQuestion in command", or needs guidance on slash command structure, YAML frontmatter fields, dynamic arguments, bash execution in commands, user interaction patterns, or command development best practices for Claude Code.
 version: 0.2.0
 ---
@@ -392,8 +392,8 @@ argument-hint: [pr-number]
 ---
 
 $IF($1,
-  Review PR #$1,
-  Please provide a PR number. Usage: /review-pr [number]
+Review PR #$1,
+Please provide a PR number. Usage: /review-pr [number]
 )
 ```
 
@@ -554,16 +554,16 @@ Review results and report findings.
 **Các pattern phổ biến:**
 
 ```markdown
-# Thực thi script plugin
+# Execute plugin script
 !`bash ${CLAUDE_PLUGIN_ROOT}/scripts/script.sh`
 
-# Tải cấu hình plugin
+# Load plugin configuration
 @${CLAUDE_PLUGIN_ROOT}/config/settings.json
 
-# Dùng template plugin
+# Use plugin template
 @${CLAUDE_PLUGIN_ROOT}/templates/report.md
 
-# Truy cập tài nguyên plugin
+# Access plugin resources
 @${CLAUDE_PLUGIN_ROOT}/docs/reference.md
 ```
 
