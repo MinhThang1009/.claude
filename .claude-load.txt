@@ -6,15 +6,14 @@
 #   plugin-name:commands → chỉ load commands
 # Dòng bắt đầu bằng # là comment. Nếu file trống → load TẤT CẢ.
 
-# === AGENTS từ pr-review-toolkit (không cần skills vì đã có commands) ===
-pr-review-toolkit:agents
-pr-review-toolkit:commands
+# === PR REVIEW TOOLKIT (agents + skills + commands) ===
+pr-review-toolkit
 
 # === FEATURE DEV ===
 feature-dev
 
 # === GIT WORKFLOW ===
-commit-commands
+commit-commands:skills
 
 # === DEBUG ===
 debug
@@ -33,6 +32,10 @@ code-simplifier:skills
 frontend-design:skills
 claude-md-management
 
+# === TEST & PERFORMANCE ===
+test-toolkit
+performance
+
 # === OPTIONAL: bỏ comment để enable ===
 # mcp-server-dev           # Build MCP servers (remote HTTP, MCPB, UI widgets)
 # mcp-builder              # Build MCP servers (FastMCP/SDK)
@@ -40,9 +43,7 @@ claude-md-management
 # skill-creator            # Tạo/eval skills
 # code-modernization       # Migrate legacy code
 # documentation            # docs + Next.js agents
-# performance              # profiling + dependency audit
 # claude-code-setup        # Recommend automations
-# test-toolkit             # test-writer, test-analyzer
 # claude-api               # Claude API/SDK development
 # webapp-testing           # Test web apps với Playwright
 # web-artifacts-builder    # Build HTML artifacts (React, Tailwind)
