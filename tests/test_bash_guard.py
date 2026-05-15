@@ -12,16 +12,17 @@ import pytest
 
 
 class TestSensitivePathAccess:
-    def test_block_cat_env(self, bash_guard):
-        assert bash_guard.is_sensitive_path_access("cat .env") is True
+    def test_allow_cat_env(self, bash_guard):
+        # .env patterns DISABLED trong config hiện tại (cho phép đọc/ghi .env trong project)
+        assert bash_guard.is_sensitive_path_access("cat .env") is False
 
-    def test_block_redirect_to_env(self, bash_guard):
-        # Bug class: 'echo $SECRET > .env' phải bị chặn — split tại '>'
-        assert bash_guard.is_sensitive_path_access("echo $SECRET > .env") is True
+    def test_allow_redirect_to_env(self, bash_guard):
+        # .env patterns DISABLED — redirect tới .env được cho qua
+        assert bash_guard.is_sensitive_path_access("echo $SECRET > .env") is False
 
-    def test_block_ifs_obfuscation(self, bash_guard):
-        # 'cat$IFS.env' bypass attempt phải bị chặn (IFS expand thành space)
-        assert bash_guard.is_sensitive_path_access("cat$IFS.env") is True
+    def test_allow_ifs_obfuscation_env(self, bash_guard):
+        # .env patterns DISABLED — IFS obfuscation cũng được cho qua
+        assert bash_guard.is_sensitive_path_access("cat$IFS.env") is False
 
     def test_block_ssh_key_read(self, bash_guard):
         assert bash_guard.is_sensitive_path_access("cat ~/.ssh/id_rsa") is True
@@ -200,10 +201,10 @@ class TestCheckCommand:
         assert blocked is True
         assert reason is not None and len(reason) > 0
 
-    def test_sensitive_path_via_check_command(self, bash_guard):
-        # .env trong SENSITIVE_PATH_PATTERNS — block via sensitive_path check
+    def test_env_allowed_via_check_command(self, bash_guard):
+        # .env patterns DISABLED — cat .env được cho qua
         blocked, reason = bash_guard.check_command("cat .env")
-        assert blocked is True
+        assert blocked is False
 
 
 # ---------- main() JSON parsing ----------

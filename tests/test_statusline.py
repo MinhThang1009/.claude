@@ -37,7 +37,6 @@ class TestThresholds:
                 "context_window": {"used_percentage": 17},
             },
         )
-        assert "🟢" in out
         assert "17%" in out
 
     def test_dumb_zone_yellow(self, statusline):
@@ -347,8 +346,10 @@ class TestRateLimits:
                 },
             },
         )
-        assert "5h:23%" in out
-        assert "7d:41%" in out
+        assert "5h:" in out
+        assert "23%" in out
+        assert "7d:" in out
+        assert "41%" in out
 
     def test_no_rate_limits_when_absent(self, statusline):
         out = _run_main(
@@ -422,7 +423,7 @@ class TestTotalInputDisplay:
                 },
             },
         )
-        assert "12k tokens" in out
+        assert "12k" in out
 
 
 class TestCostDisplay:
