@@ -10,8 +10,9 @@ FILE_PATH=$(echo "$INPUT" | sed -n 's/.*"file_path"[[:space:]]*:[[:space:]]*"\([
 [ -z "$FILE_PATH" ] && exit 0
 
 # Chuẩn hoá dấu \ thành / (tương thích Windows)
-FILE_PATH=$(echo "$FILE_PATH" | tr '\\' '/')
-GLOBAL_PLANS=$(echo "$HOME/.claude/plans" | tr '\\' '/')
+FILE_PATH="${FILE_PATH//\\//}"
+GLOBAL_PLANS="${HOME}/.claude/plans"
+GLOBAL_PLANS="${GLOBAL_PLANS//\\//}"
 
 # So sánh không phân biệt hoa thường (Windows path không phân biệt)
 NORM_FILE=$(echo "$FILE_PATH" | tr '[:upper:]' '[:lower:]')
