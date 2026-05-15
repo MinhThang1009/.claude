@@ -190,6 +190,9 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     steps:
       - uses: actions/checkout@v6
+      - name: Install Bash 4+ (macOS)
+        if: runner.os == 'macOS'
+        run: brew install bash
       - name: Run create-symlinks.sh (load all plugins)
         run: |
           # CI: clear .claude-load.txt để load tất cả plugins → verify full count

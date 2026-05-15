@@ -84,7 +84,6 @@ def main() -> None:
         window_part = " 1M"
     else:
         window_part = ""
-    effort_label = f"⚡ effort: {effort}" if effort else ""
     cwd_short = os.path.basename(cwd) if cwd else ""
 
     # Line 1: model + cwd + git
@@ -115,7 +114,9 @@ def main() -> None:
     if duration_ms > 0:
         total_secs = duration_ms // 1000
         if total_secs >= 3600:
-            line2.append(f"⏱️ {L}session:{RESET} {total_secs // 3600}h {(total_secs % 3600) // 60}m")
+            line2.append(
+                f"⏱️ {L}session:{RESET} {total_secs // 3600}h {(total_secs % 3600) // 60}m"
+            )
         elif total_secs >= 60:
             line2.append(f"⏱️ {L}session:{RESET} {total_secs // 60}m {total_secs % 60}s")
         else:
