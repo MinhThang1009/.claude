@@ -39,6 +39,7 @@ file-history/
 sessions/
 session-env/
 .claude/
+!.claude/skills/
 
 # Auto-generated
 policy-limits.json

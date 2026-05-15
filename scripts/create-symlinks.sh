@@ -82,6 +82,13 @@ echo "OK agents: $(ls "$DST/agents" | wc -l | tr -d ' ') files"
 
 # --- skills/ ---
 rm -rf "$DST/skills"; mkdir -p "$DST/skills"
+# Copy project-level skills (.claude/skills/) trước — không bị ghi đè bởi plugin symlinks
+if [ -d "$SRC/.claude/skills" ]; then
+    for skill_dir in "$SRC/.claude/skills"/*/; do
+        [ -d "$skill_dir" ] || continue
+        cp -r "$skill_dir" "$DST/skills/$(basename "$skill_dir")"
+    done
+fi
 for plugin_dir in "$SRC"/plugins/*/; do
     plugin_name=$(basename "$plugin_dir")
     should_load_type "$plugin_name" "skills" || continue
