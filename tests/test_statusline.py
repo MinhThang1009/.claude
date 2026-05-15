@@ -39,6 +39,19 @@ class TestThresholds:
         )
         assert "17%" in out
 
+    def test_newcomer_zone_green(self, statusline):
+        out = _run_main(
+            statusline,
+            {
+                "session_id": "t1b",
+                "model": {"display_name": "Opus"},
+                "workspace": {"current_dir": "/tmp"},
+                "context_window": {"used_percentage": 35},
+            },
+        )
+        assert "🟢" in out
+        assert "35%" in out
+
     def test_dumb_zone_yellow(self, statusline):
         out = _run_main(
             statusline,

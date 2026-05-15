@@ -6,6 +6,23 @@ Format theo [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/), tuâ
 
 ## [Unreleased]
 
+### Changed (2026-05-16 — v2.1.142 compatibility + cross-platform)
+
+- **REFERENCE.md** cập nhật cho Claude Code v2.1.142: `/goal`, `/bg`, `claude agents` flags, hook `args` exec form, `terminalSequence`, `worktree.baseRef`, `autoMode.hard_deny`, reactive compaction, skill budget settings, env vars mới
+- **CLI-COMMANDS.md**: fast mode Opus 4.7 default (từ v2.1.142), thêm `/goal`, `/background`
+- **README.md**: verify date → 2026-05-16 vs v2.1.142
+- **settings.example.json**: thêm `CLAUDE_CODE_MAX_OUTPUT_TOKENS`, `plan-auto-move.sh` hook
+- **create-symlinks.sh/ps1**: deploy `settings.json` từ example khi clone mới (fix clone-readiness)
+- **create-symlinks.sh**: thêm bash 4+ version check (fix macOS stock bash 3.2)
+- **.gitattributes**: thêm `*.py text eol=lf`
+- **accept_changes.py**: `/tmp/` → `tempfile.gettempdir()` (cross-platform)
+- **bundle-artifact.sh, init-artifact.sh**: shebang `#!/usr/bin/env bash` (portable)
+- **Tests**: cập nhật theo .env patterns disabled + statusline output format mới
+
+### Added (2026-05-16)
+
+- **hooks/plan-auto-move.sh**: hook mới auto-move plan từ default mode sang Plan Mode
+
 ### Added (2026-05-10 — agent expansion + content updates)
 
 - **5 agents mới** mở rộng coverage cho fullstack JS web/app workflow:
