@@ -3,7 +3,6 @@ name: test-writer
 description: "Writes tests for existing code. Analyzes functions/modules, writes tests covering happy path, edge cases, and error paths, following the project's test framework. Use when adding tests for untested code or supplementing edge cases. Examples: <example>Context: User just implemented a new function\nuser: \"Write tests for this function\"\nassistant: \"I'll use the test-writer agent to analyze the function and write comprehensive tests.\"\n<commentary>Explicit test request — trigger test-writer agent.</commentary></example>"
 tools: Read, Grep, Glob, Bash, Write, Edit, TodoWrite
 model: sonnet
-memory: project
 color: green
 ---
 

@@ -21,7 +21,9 @@
 | `/plan` | Chuyển plan mode — explore trước khi edit |
 | `/model` | Đổi model (left/right arrows chỉnh effort) |
 | `/effort` | Chỉnh effort level ([docs](https://code.claude.com/docs/en/model-config#adjust-effort-level)) (`low`/`medium`/`high`/`xhigh` (Opus 4.7 only, khác fallback → `high`)/`max`). `/effort auto` reset về model default (không phải level). |
-| `/fast` | Toggle fast mode (Opus 4.6 output nhanh hơn) |
+| `/fast` | Toggle fast mode (Opus 4.7 default từ v2.1.142; pin Opus 4.6 bằng `CLAUDE_CODE_OPUS_4_6_FAST_MODE_OVERRIDE=1`) |
+| `/goal` | Set completion condition — Claude tiếp tục cho đến khi thỏa (v2.1.139+) |
+| `/background` | Detach session thành background agent. Alias `/bg` |
 | `/context` | Visualize context usage — grid + optimization suggestions |
 | `/compact` | Compact context, optional focus: `/compact Focus on API changes` |
 | `/btw` | Side question — không vào history, không tốn context |

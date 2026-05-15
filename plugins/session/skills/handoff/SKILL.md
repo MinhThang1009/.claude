@@ -1,38 +1,33 @@
 ---
-name: handoff
 description: "Creates a handoff brief to compact the current session OR transition to a new session. Use when session shows signs of high context usage or before clearing history."
-allowed-tools: Read Write Bash(git status:*) Bash(git log:*) Bash(git diff:*)
+disable-model-invocation: false
+allowed-tools: Read Write Bash(git *) Bash(find *)
 argument-hint: "[--save | --inject]"
-model: inherit
 ---
 
-# Skill: Handoff between sessions
+Generate a concise handoff brief for session continuity or context compaction. Per Anthropic guidance ([session management blog](https://claude.com/blog/using-claude-code-session-management-and-1m-context)): **brief-injection into a new session is often better than resuming** — resuming drags in stale data whereas a brief carries only decisions and current state.
 
-Per guidance from Anthropic ([Using Claude Code session management and 1M context](https://claude.com/blog/using-claude-code-session-management-and-1m-context)) and community experience: **resuming a long session is often worse than brief-injection into a new session** — because resuming drags in stale environment data (old tool output, old file content) whereas a brief carries only decisions and current state.
+## When to use
 
-## When to apply
+| Situation | Action |
+| --------- | ------ |
+| About to `/compact` (context 60-77%) | `/handoff` then `/compact <instructions>` |
+| About to `/clear` — need to remember things | `/handoff --save` then `/clear` |
+| Starting a new session after a break | Open new session, paste handoff into first prompt |
+| After crash / session error | `claude --continue` → `/handoff` to check state |
 
-| Situation                                                  | Action                                             |
-| ---------------------------------------------------------- | -------------------------------------------------- |
-| About to `/compact` (context 60-77% wrap-up zone) — continuing the same task | `/handoff` then `/compact <instructions>` |
-| About to `/clear` — switching to a new task but need to remember a few things | `/handoff --save` then `/clear` |
-| Starting a new session after a break                        | Open new session, paste handoff into first prompt  |
-| After crash / session error                                 | `claude --continue` → `/handoff` to check state    |
+## Instructions
 
-## Process
+When invoked, follow these steps every time:
 
-### Step 1 — Check current context
+1. **Examine current git state** (skip if not a git repo): run `git status --short`, `git log --oneline -5`, `git diff --stat HEAD`.
+2. **Draft the brief** using the template below. Keep it ≤300 words (not counting headings). Omit sections that don't apply. The brief must be self-contained without requiring session history.
+3. **Deliver based on flag**:
+   - **No flag** → print the brief to chat. User will copy it or follow up with `/compact <brief>`.
+   - **`--save`** → write `HANDOFF.md` to every project root in the workspace. Find projects via `find . -maxdepth 3 -name ".git" -type d -not -path "*/node_modules/*" -not -path "*/.git/modules/*"`, take parent dir of each `.git/`. Fallback to cwd if none found. For each project: write `HANDOFF.md` (not inside `.claude/`), ensure `.gitignore` has a `HANDOFF.md` entry. Report: `Saved HANDOFF.md to: <list>`.
+   - **`--inject`** → print a single paste-ready line: `Continuing from handoff: [5-7 line inline brief]. Main files: <list>. Next step: <action>.`
 
-```bash
-# User checks via /context themselves. I (Claude) read git to know code state (skip if not a git repo):
-!`git rev-parse --git-dir >/dev/null 2>&1 && git status --short || echo "(not a git repo — skip git context)"`
-!`git rev-parse --git-dir >/dev/null 2>&1 && git log --oneline -5 || true`
-!`git rev-parse --git-dir >/dev/null 2>&1 && git diff --stat HEAD || true`
-```
-
-### Step 2 — Draft the handoff brief
-
-I write a **SHORT** brief (≤300 words of content, not counting headings) in the format below. Omit any section that does not apply. The brief must be self-contained without requiring the session history.
+## Brief template
 
 ```markdown
 # Handoff — <task name> — <YYYY-MM-DD HH:MM>
@@ -42,15 +37,13 @@ I write a **SHORT** brief (≤300 words of content, not counting headings) in th
 
 ## Done
 - <short bullet — what was accomplished, with file path if applicable>
-- ...
 
 ## In progress
 - <work in progress, where it stopped>
 - File being edited: `path/to/file.ts:120` — <note>
 
 ## Decisions made (with 1-sentence rationale)
-- <Decision 1>: <rationale>
-- <Decision 2>: <rationale>
+- <Decision>: <rationale>
 
 ## Constraints / things to remember
 - <perf, compat, security, business rule>
@@ -68,39 +61,24 @@ I write a **SHORT** brief (≤300 words of content, not counting headings) in th
 - Lint: `<command>`
 ```
 
-### Step 3 — Save or inject
-
-**If user runs `/handoff` without a flag** → print the brief to chat. User will:
-- Copy it manually into a new session, OR
-- I continue with `/compact <brief>` to maintain continuity.
-
-**If user runs `/handoff --save`** → write brief to `<project>/HANDOFF.md` (project root, not `.claude/` — `.claude/` is a config directory). Before writing: check `.gitignore` for a `HANDOFF.md` entry — if absent, add it (avoid committing internal notes).
-- New session will read it when user says "read HANDOFF.md".
-
-**If user runs `/handoff --inject`** → print 1 paste-ready line for user to paste into a new session:
-```text
-Continuing from handoff: [inline brief 5-7 lines]. Main files: <list>. Next step: <action>.
-```
-
 ## Rules for writing the brief
 
-- **Decisions, not process**: write "Decided to use JWT RS256 because legal requires it", NOT "Tried HS256, then tried RS256, then discussed...".
-- **Closed paths = skip** unless it is important for the next session to know NOT to try them again.
+- **Decisions, not process**: "Decided JWT RS256 because legal requires it", NOT "Tried HS256, then RS256, then discussed…".
+- **Closed paths = skip** unless the next session must know NOT to try them again.
 - **Absolute paths or repo-root-relative paths** for files. Not "that other file".
 - **Exact commands** — copy-paste ready, not "run the build command".
-- **Skip long tool output** (build logs, detailed test results). Keep only the result: pass/fail/skip.
+- **Skip long tool output** (build logs, test results). Keep only the result: pass/fail/skip.
 
 ## Integration with `/compact`
 
-After drafting the brief, user can run:
+After the brief is drafted, user can run:
 ```text
 /compact Keep the brief just drafted, drop debugging history and old tool output.
 ```
-This guided compact instruction helps Claude compact with direction, giving the brief a higher chance of surviving auto-summary.
 
-## Anti-patterns — Do NOT
+## Anti-patterns
 
-- Do NOT paste entire modified code into the brief. Just write path + summary.
-- Do NOT write a brief longer than 1 terminal screen. Too long → becomes noise.
-- Do NOT include secrets/tokens/keys in the brief.
+- Do NOT paste entire modified code. Just write path + summary.
+- Do NOT write a brief longer than 1 terminal screen.
+- Do NOT include secrets/tokens/keys.
 - Do NOT guess next steps when direction is unclear. Write "Needs user confirmation on direction".

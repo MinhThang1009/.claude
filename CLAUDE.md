@@ -10,7 +10,7 @@
 
 ## Phong cách làm việc
 
-- Sắp sửa **>3 file có thay đổi logic** hoặc đụng **kiến trúc** (thêm module, đổi DB schema, refactor public API, đổi pattern xuyên codebase) → **lập plan, đợi tôi duyệt**. Batch trivial (format, rename, version bump) thì làm luôn dù nhiều file. Fix nhỏ (typo, đổi tên biến, thêm log, sửa 1-2 file isolated) cũng làm luôn.
+- Sắp sửa **>3 file có thay đổi logic** hoặc đụng **kiến trúc** (thêm module, đổi DB schema, refactor public API, đổi pattern xuyên codebase) → **lập plan, đợi tôi duyệt**. Plan mỗi bước có dạng: `[Step] → verify: [check]`. Batch trivial (format, rename, version bump) thì làm luôn dù nhiều file. Fix nhỏ (typo, đổi tên biến, thêm log, sửa 1-2 file isolated) cũng làm luôn.
 - Không chắc intent → **HỎI**, đừng đoán. Một câu hỏi tốt hơn 10 phút sửa sai.
 - Sau khi sửa → **TỰ KIỂM TRA** test/lint/typecheck nếu có. Đừng báo "xong" khi chưa verify.
 - Tôi nói "ultrathink" → keyword chính thức, Claude Code thêm in-context instruction request deeper reasoning cho turn đó (effort level KHÔNG đổi). Các cụm "think"/"think hard"/"think more" KHÔNG phải keyword — đối xử như plain text.
@@ -22,20 +22,12 @@
 
 ## Code
 
-- **Đọc trước khi viết** — ưu tiên đọc **cả function** chứa change; nếu function >100 dòng thì 30 dòng xung quanh + signature/return là đủ. Fix nhỏ (1-2 dòng) thì context narrow hơn OK. Tạo file mới → scan file tương tự để theo pattern có sẵn.
-- **Theo convention codebase**, không phải convention "general best practice".
-- **Không thêm dependency** mà không hỏi.
-- **Không catch-and-ignore** exception chỉ để code chạy.
-- Comment: chỉ comment WHY (tiếng Việt), không comment WHAT.
-- Chi tiết tại [`coding-standards.md`](rules/coding-standards.md).
+- Chi tiết tại [`coding-standards.md`](rules/coding-standards.md). Tóm tắt: đọc trước khi viết, theo convention codebase, YAGNI, surgical changes, không thêm dependency mà không hỏi.
 
 ## Git
 
 - KHÔNG `git commit`/`git push` trừ khi tôi yêu cầu rõ — phải có động từ explicit: `commit`, `push`, `ship`, `merge`, hoặc gọi [`/commit`](plugins/commit-commands/skills/commit/SKILL.md). Câu mơ hồ như "save it", "looks good", "done" → KHÔNG đủ, hỏi lại.
-- KHÔNG `git add .` — add từng file cụ thể.
-- KHÔNG `--force` trần. KHÔNG `git reset --hard` trên work của tôi.
-- KHÔNG thêm `Co-Authored-By: Claude` hay tagline `🤖 Generated with Claude Code` vào commit (đã tắt qua `attribution.commit: ""`).
-- Chi tiết tại [`git-workflow.md`](rules/git-workflow.md).
+- Chi tiết (add, force, reset, attribution, branch) tại [`git-workflow.md`](rules/git-workflow.md).
 
 ## Bảo mật
 
@@ -46,7 +38,7 @@
 - Khi cần plan (theo rule ["Phong cách làm việc"](#phong-cách-làm-việc) ở trên) → ưu tiên đề xuất Plan Mode (`Shift+Tab×2 từ default mode`) hoặc `/plan` thay vì viết plan inline trong response.
 - Investigate codebase rộng → đề xuất subagent ("use a subagent to investigate ...") để giữ context chính sạch. Nếu không dùng subagent → scope narrow (chỉ đọc file/dir cần thiết, không explore toàn bộ).
 - Refactor lớn → tách commit nhỏ revert được độc lập.
-- Bug khó → reproduce trước, viết failing test, mới fix.
+- Bug khó → reproduce trước, viết failing test, mới fix (chi tiết tại coding-standards.md §Test, §Verification khi refactor).
 
 ## Khi gặp lỗi
 
@@ -73,6 +65,4 @@ Khi `/compact` chạy (manual hoặc auto), summary PHẢI giữ lại:
 
 ## Tham chiếu rule mở rộng
 
-> `~/.claude/rules/` (communication.md, security.md, verification.md) auto-load mọi session — không cần `@import`.
->
-> `rules/coding-standards.md` và `rules/git-workflow.md` auto-load cùng các rules khác.
+> Tất cả file trong `~/.claude/rules/` (coding-standards.md, communication.md, git-workflow.md, security.md, verification.md) auto-load mọi session — không cần `@import`.

@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 # Tạo symlinks từ dotclaude sang ~/.claude
 
+if ((BASH_VERSINFO[0] < 4)); then
+    echo "ERROR: Cần Bash 4+ (hiện tại: $BASH_VERSION). macOS: brew install bash" >&2
+    exit 1
+fi
+
 SRC="$(cd "$(dirname "$0")/.." && pwd)"
 DST="$HOME/.claude"
 
@@ -11,7 +16,7 @@ mkdir -p "$DST"
 # --- Parse .claude-load.txt ---
 # Format: "plugin" | "plugin:agents" | "plugin:skills" | "plugin:commands"
 LOAD_FILE="$SRC/.claude-load.txt"
-declare -A LOAD_MAP  # plugin -> comma-separated types
+declare -A LOAD_MAP  # plugin -> comma-separated types (bash 4+)
 
 if [ -f "$LOAD_FILE" ]; then
     while IFS= read -r line; do
@@ -100,5 +105,13 @@ for plugin_dir in "$SRC"/plugins/*/; do
 done
 echo "OK commands: $(ls "$DST/commands" | wc -l | tr -d ' ') files"
 
+# --- settings.json (copy nếu chưa có, không ghi đè config hiện tại) ---
+if [ ! -f "$DST/settings.json" ]; then
+    cp "$SRC/settings.example.json" "$DST/settings.json"
+    echo "OK settings: copied settings.example.json → settings.json"
+else
+    echo "SKIP settings: settings.json đã tồn tại (giữ nguyên config hiện tại)"
+fi
+
 echo ""
-echo "Done! Restart Claude Code de apply changes."
+echo "Done! Restart Claude Code để apply changes."

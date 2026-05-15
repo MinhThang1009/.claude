@@ -99,5 +99,14 @@ Get-ChildItem "$src\plugins" -Directory | Where-Object { Should-Load-Type $_.Nam
 }
 Write-Host "OK commands: $((Get-ChildItem $commandsDir -Filter '*.md').Count) files"
 
+# --- settings.json (copy nếu chưa có) ---
+$settingsDst = Join-Path $dst "settings.json"
+if (-not (Test-Path $settingsDst)) {
+    Copy-Item (Join-Path $src "settings.example.json") $settingsDst
+    Write-Host "OK settings: copied settings.example.json -> settings.json"
+} else {
+    Write-Host "SKIP settings: settings.json da ton tai (giu nguyen config hien tai)"
+}
+
 Write-Host ""
 Write-Host "Done! Restart Claude Code de apply changes."

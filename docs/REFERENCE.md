@@ -4,7 +4,7 @@
 >
 > Tổng hợp từ docs chính thức [code.claude.com/docs](https://code.claude.com/docs) (2026), blog [claude.com](https://www.claude.com/blog), [MindStudio](https://www.mindstudio.ai/blog), [ClaudeFast](https://claudefa.st/blog), GitHub [anthropics/claude-code](https://github.com/anthropics/claude-code). Cập nhật cho Claude Code v2.1.x trở lên.
 >
-> 📅 **Đã verify**: 2026-05-09 vs Claude Code v2.1.138 + Opus 4.7. Phát hiện sai sót → [CONTRIBUTING.md](../.github/CONTRIBUTING.md).
+> 📅 **Đã verify**: 2026-05-16 vs Claude Code v2.1.142 + Opus 4.7. Phát hiện sai sót → [CONTRIBUTING.md](../.github/CONTRIBUTING.md).
 
 ## Mục lục
 
@@ -155,7 +155,8 @@
 | `claude auth login`                          | Đăng nhập (`--email`, `--sso`, `--console`)                                                    |
 | `claude auth logout`                         | Đăng xuất                                                                                      |
 | `claude auth status`                         | Trạng thái auth (JSON; `--text` cho human-readable)                                            |
-| `claude agents`                              | List subagent đã cấu hình                                                                      |
+| `claude agents`                              | Agent view — list mọi session (running/blocked/done). Flags: `--cwd <path>`, `--add-dir`, `--settings`, `--mcp-config`, `--plugin-dir`, `--permission-mode`, `--model`, `--effort`, `--dangerously-skip-permissions` (v2.1.139+) |
+| `claude plugin details <name>`               | Component inventory + per-session token cost của plugin (v2.1.139+)                            |
 | `claude auto-mode defaults`                  | Print built-in rules auto-mode classifier (JSON)                                               |
 | `claude auto-mode config`                    | Print effective config (với settings đã apply)                                                 |
 | `claude auto-mode critique`                  | AI feedback trên custom allow/soft_deny rules                                                  |
@@ -366,7 +367,7 @@
 | `/clear`                  | XÓA HẲN context, reset session. Aliases: `/reset`, `/new`                                                    |
 | `/compact [instructions]` | Nén context. VD: `/compact giữ phần API change, drop test debug`                                             |
 | `/context`                | Visualize context usage + tối ưu suggestion                                                                  |
-| `/rewind`                 | Rollback conversation/code, hoặc "Summarize from here". Aliases: `/checkpoint`, `/undo`. Phím tắt: `Esc Esc` |
+| `/rewind`                 | Rollback conversation/code, hoặc "Summarize up to here" (v2.1.141: nén context trước điểm chọn, giữ turns gần). Aliases: `/checkpoint`, `/undo`. Phím tắt: `Esc Esc` |
 | `/branch [name]`          | Phân nhánh session (giữ nguyên session cũ). Alias `/fork`                                                    |
 | `/btw <question>`         | Hỏi nhanh không vào history (overlay dismissible)                                                            |
 | `/resume [session]`       | Resume theo ID/name. Alias `/continue`                                                                       |
@@ -400,7 +401,7 @@
 | `/theme`                  | Đổi color theme                                                                                       |
 | `/color [name\|default]`  | Set màu prompt bar — 8 màu: `red`/`blue`/`green`/`yellow`/`purple`/`orange`/`pink`/`cyan`. Không arg = random |
 | `/statusline`             | Cấu hình status line                                                                                  |
-| `/fast [on\|off]`         | Toggle fast mode (chỉ Opus 4.6, [docs](https://code.claude.com/docs/en/fast-mode): tốc độ 2.5×, giá $30/$150 per MTok)           |
+| `/fast [on\|off]`         | Toggle fast mode (Opus 4.7 default từ v2.1.142; pin Opus 4.6 bằng `CLAUDE_CODE_OPUS_4_6_FAST_MODE_OVERRIDE=1`. [docs](https://code.claude.com/docs/en/fast-mode): tốc độ 2.5×, giá $30/$150 per MTok) |
 | `/voice [hold\|tap\|off]` | Toggle voice dictation, hoặc enable theo mode. Requires Claude.ai account                             |
 | `/privacy-settings`       | View/update privacy (Pro/Max)                                                                         |
 
@@ -436,13 +437,16 @@
 | `/setup-vertex`           | Cấu hình Google Vertex AI                                |
 
 ### 3.7 Tasks & monitoring
-| Lệnh        | Mục đích                                                                             |
-| ----------- | ------------------------------------------------------------------------------------ |
-| `/tasks`    | List/manage background tasks. Alias `/bashes`                                        |
-| `/diff`     | Interactive diff viewer (uncommitted + per-turn)                                     |
-| `/usage`    | Session cost, plan limits, activity stats. Aliases: `/cost`, `/stats` (mở Stats tab) |
-| `/status`   | Settings (Status tab)                                                                |
-| `/insights` | Report sessions, friction patterns                                                   |
+| Lệnh                  | Mục đích                                                                             |
+| --------------------- | ------------------------------------------------------------------------------------ |
+| `/tasks`              | List/manage background tasks. Alias `/bashes`                                        |
+| `/background [prompt]`| Detach session thành background agent. Alias `/bg`. Cũng dùng `←←` shortcut (v2.1.141: giữ permission mode hiện tại) |
+| `/goal [condition]`   | Set completion condition — Claude tiếp tục cho đến khi condition thỏa. Live overlay: elapsed/turns/tokens (v2.1.139+) |
+| `/diff`               | Interactive diff viewer (uncommitted + per-turn)                                     |
+| `/usage`              | Session cost, plan limits, activity stats. Aliases: `/cost`, `/stats` (mở Stats tab) |
+| `/status`             | Settings (Status tab)                                                                |
+| `/insights`           | Report sessions, friction patterns                                                   |
+| `/scroll-speed`       | Điều chỉnh tốc độ cuộn mouse, live preview (v2.1.139+)                               |
 
 ### 3.8 Plugin
 | Lệnh              | Mục đích                    |
@@ -925,6 +929,8 @@ force-for-plugin: false               # Plugin only: true → auto-apply khi plu
     "legacy-context": "name-only",       // "on" | "name-only" | "user-invocable-only" | "off"
     "deploy": "off"
   },
+  "skillListingBudgetFraction": 0.01,    // Fraction context window cho skill listing (default 0.01 = 1%). Tăng nếu nhiều skill bị truncate
+  "maxSkillDescriptionChars": 1536,      // Cap ký tự mô tả mỗi skill (default 1536). Skill dài hơn bị cắt
 
   // MCP project
   "enableAllProjectMcpServers": true,
@@ -984,7 +990,8 @@ force-for-plugin: false               # Plugin only: true → auto-apply khi plu
   "autoMode": {
     "environment": ["$defaults", "Source control: github.com/my-org"],
     "allow": ["$defaults"],            // Override block rules
-    "soft_deny": ["$defaults"]         // Override allow rules
+    "soft_deny": ["$defaults"],        // Override allow rules
+    "hard_deny": ["pattern"]           // (v2.1.136+) unconditional block — KHÔNG thể override bằng allow
   },
 
   // Fast mode
@@ -994,6 +1001,11 @@ force-for-plugin: false               # Plugin only: true → auto-apply khi plu
   // Auth lock (managed) — enforce login method/org
   "forceLoginMethod": "claudeai",      // (managed) "claudeai" | "console" | "bedrock" | "vertex" | "foundry"
   "forceLoginOrgUUID": "<org-uuid>",   // (managed) chỉ allow login vào org này
+
+  // Managed/enterprise — admin-only keys
+  "parentSettingsBehavior": "first-wins", // (v2.1.133+ managed) SDK managedSettings merge: "first-wins" | "merge"
+  "policyHelper": "/path/to/script",   // (v2.1.136+ managed) Executable trả về policy JSON — dynamic managed settings
+  "disableAgentView": false,           // (managed) true = tắt `claude agents` agent view + background agents
 
   // Editor & UI
   "editorMode": "normal",             // "normal" | "vim"
@@ -1036,8 +1048,9 @@ force-for-plugin: false               # Plugin only: true → auto-apply khi plu
 
   // Worktree
   "worktree": {
+    "baseRef": "fresh",                                // (v2.1.133+) "fresh" = branch từ origin/default, "head" = branch từ local HEAD (giữ unpushed commits)
     "symlinkDirectories": ["node_modules", ".cache"],  // Symlink thay vì copy
-    "sparsePaths": ["src/", "tests/"]  // Sparse checkout cho monorepo
+    "sparsePaths": ["src/", "tests/"]                  // Sparse checkout cho monorepo
   },
 
   // Proxy & network
@@ -1105,7 +1118,7 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 
 **Permission required** (Yes = cần allow/ask): `Bash`, `Edit`, `Write`, `MultiEdit`, `NotebookEdit`, `WebFetch`, `WebSearch`, `Monitor`, `PowerShell`, `ExitPlanMode`, `Skill`, `ShareOnboardingGuide`
 
-**No permission** (auto-allow): `Read`, `Glob`, `Grep`, `Agent`, `AskUserQuestion`, `LSP`, `EnterPlanMode`, `EnterWorktree`, `ExitWorktree`, `CronCreate`/`CronDelete`/`CronList`, `TaskCreate`/`TaskGet`/`TaskList`/`TaskUpdate`/`TaskStop`, `TeamCreate`/`TeamDelete`, `SendMessage`, `ListMcpResourcesTool`/`ReadMcpResourceTool`, `ToolSearch`, `TodoWrite`
+**No permission** (auto-allow): `Read`, `Glob`, `Grep`, `Agent`, `AskUserQuestion`, `LSP`, `EnterPlanMode`, `EnterWorktree`, `ExitWorktree`, `CronCreate`/`CronDelete`/`CronList`, `TaskCreate`/`TaskGet`/`TaskList`/`TaskUpdate`/`TaskStop`/`TaskOutput`, `TeamCreate`/`TeamDelete`, `SendMessage`, `PushNotification`, `RemoteTrigger`, `ListMcpResourcesTool`/`ReadMcpResourceTool`, `ToolSearch`, `TodoWrite` (deprecated)
 
 **Tool nổi bật**:
 - `LSP` — code intelligence (jump-to-def, find refs, type errors). Cần [code intelligence plugin](https://code.claude.com/docs/en/discover-plugins#code-intelligence)
@@ -1210,6 +1223,7 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `CLAUDE_CODE_CLIENT_CERT`                  | Path tới mTLS client certificate                                                                                                               |
 | `CLAUDE_CODE_CLIENT_KEY`                   | Path tới mTLS client key                                                                                                                       |
 | `CLAUDE_CODE_DISABLE_FAST_MODE`            | `1` = tắt fast mode hoàn toàn                                                                                                                  |
+| `CLAUDE_CODE_OPUS_4_6_FAST_MODE_OVERRIDE`  | `1` = pin fast mode về Opus 4.6 (default từ v2.1.142 là Opus 4.7)                                                                              |
 | `CLAUDE_CODE_DISABLE_1M_CONTEXT`           | `1` = tắt 1M context window                                                                                                                    |
 | `CLAUDE_CODE_SIMPLE_SYSTEM_PROMPT`         | `1` = system prompt ngắn hơn (Opus 4.7)                                                                                                        |
 | `CLAUDE_CODE_SKIP_PROMPT_HISTORY`          | `1` = không lưu transcript ra disk                                                                                                             |
@@ -1222,6 +1236,11 @@ Compound commands (`&&`, `||`) được split — mỗi phần match riêng. Pro
 | `CLAUDE_CODE_DISABLE_ATTACHMENTS`          | `1` = tắt file attachment processing (image paste, file drag)                                                                                  |
 | `CLAUDE_CODE_DISABLE_CLAUDE_MDS`           | `1` = KHÔNG load CLAUDE.md (debug/test isolation)                                                                                              |
 | `CLAUDE_CODE_FORK_SUBAGENT`                | `1` = bật forked subagents (subagent có thể fork từ parent context)                                                                            |
+| `CLAUDE_CODE_PLUGIN_PREFER_HTTPS`          | `1` = clone plugin qua HTTPS thay SSH (v2.1.141+)                                                                                             |
+| `ANTHROPIC_WORKSPACE_ID`                   | Workspace ID cho workload identity federation (v2.1.141+)                                                                                      |
+| `CLAUDE_CODE_ENABLE_FEEDBACK_SURVEY_FOR_OTEL` | `1` = bật feedback survey cho enterprise dùng OpenTelemetry (v2.1.136+)                                                                     |
+| `AI_AGENT`                                 | Set `1` trong spawned subprocesses — dùng để detect Claude env (cũng set bởi `CLAUDECODE`; v2.1.120+)                                          |
+| `CLAUDE_CODE_ENABLE_TASKS`                 | `1` = bật interactive task UI trong `-p` print mode (default chỉ có trong interactive)                                                          |
 | `CLAUDE_CODE_DISABLE_VIRTUAL_SCROLL`       | `1` = render mọi message (fix blank regions trong fullscreen)                                                                                  |
 | `CLAUDE_CODE_DISABLE_TERMINAL_TITLE`       | `1` = KHÔNG update terminal title bar                                                                                                          |
 | `CLAUDE_CODE_USE_BEDROCK`                  | `1` = route requests qua Amazon Bedrock                                                                                                        |
@@ -1368,9 +1387,11 @@ Trong hook handler, dùng `if` (permission rule syntax):
           {
             "type": "command",
             "command": "/path/to/handler.sh",
+            "args": ["--check", "strict"],  // (v2.1.139+) exec form — spawn trực tiếp KHÔNG qua shell (bỏ "command", dùng "args")
             "timeout": 30,                // default 600s
             "async": false,               // chạy background không block
             "asyncRewake": false,         // background + wake Claude khi exit 2
+            "continueOnBlock": false,     // (v2.1.139+ PostToolUse) tiếp tục sau block thay vì dừng
             "shell": "bash"               // hoặc "powershell" trên Windows
           },
           // Type 2: http — POST request
@@ -1429,6 +1450,7 @@ cmd="$CLAUDE_TOOL_INPUT_COMMAND"  # → empty, hook silently no-op
 - `CLAUDE_PROJECT_DIR` — path project root
 - `CLAUDE_PLUGIN_ROOT` / `CLAUDE_PLUGIN_DATA` — plugin paths
 - `CLAUDE_ENV_FILE` — chỉ trong `SessionStart`/`Setup`/`CwdChanged`/`FileChanged`
+- `CLAUDE_EFFORT` — effort level hiện tại (v2.1.133+). Cũng có trong stdin JSON: `effort.level`
 - `CLAUDE_CODE_REMOTE` — set trong web session
 
 **Setup jq** (KHÔNG pre-installed trên Windows/macOS/Linux mặc định — hook silently no-op nếu thiếu):
@@ -1472,7 +1494,8 @@ Exit `0` = OK. Exit `2` = block tool, stderr → Claude. Stdout JSON cho control
     "permissionDecision": "deny",          // "allow" | "deny" | "defer" (defer: với `-p` non-interactive → exit `deferred_tool_use` payload, resume bằng `--resume`)
     "permissionDecisionReason": "...",
     "updatedToolOutput": "..."          // (PostToolUse v2.1.121+) replace tool output text trước khi vào context
-  }
+  },
+  "terminalSequence": "\\033]9;Notification text\\a"  // (v2.1.141+) OSC escape cho desktop notification. Cho phép: OSC 0/1/2/9/99/777, BEL. Chặn: CSI, OSC palette/hyperlinks/clipboard/iTerm
 }
 ```
 
@@ -1579,14 +1602,14 @@ Mọi best practice xoay quanh 1 ràng buộc: **context window đầy nhanh, pe
 
 > Ngưỡng dưới đây là **community best-practice từ multi-author** (Dex Horthy, Thariq Shihipar, Boris Cherny). Xem table source ở §16 đầu mục.
 
-| % context (200k window)     | Trạng thái                          | Hành động                                                                              | Source |
-| --------------------------- | ----------------------------------- | -------------------------------------------------------------------------------------- | ------ |
-| `<30%`                      | 🟢 Aggressive zone                  | Mục tiêu cho experienced users — "aggressively keep it below 30%, push 60% chỉ task đơn giản" | Dex   |
-| `30-40%`                    | 🟢 Sweet spot                       | Mục tiêu cho newcomer — "shoot to keep it under 40%"                                   | Dex   |
-| `40-60%`                    | 🟡 "Dumb zone" bắt đầu              | Performance degrade rõ rệt — plan wrap-up, finalize phase hiện tại                     | Dex   |
-| `60-77%`                    | 🟠 Wrap up actively                 | "If you get up to 60%, think about wrapping it up" → `/compact` hoặc `/handoff + /clear` | Dex   |
-| `~77%` (155k tokens)        | 🔴 Auto-compact firing              | Claude Code tự động compact để giữ buffer — chất lượng đã giảm rồi                     | Boris X |
-| `>90%`                      | ⛔ Hard limit                        | Có thể stop processing, phải `/clear` thủ công                                          | qualitative |
+| %        | Tokens   | Trạng thái              | Hành động                                                          | Source      |
+|----------|----------|-------------------------|--------------------------------------------------------------------|-------------|
+| `<30%`   | <60k     | 🔵 Aggressive zone      | Experienced users target — "aggressively keep it below 30%"        | Dex         |
+| `30-40%` | 60-80k   | 🟢 Sweet spot            | Newcomer target — "shoot to keep it under 40%"                     | Dex         |
+| `40-60%` | 80-120k  | 🟡 Dumb zone bắt đầu    | Performance degrade — plan wrap-up, finalize phase hiện tại        | Dex         |
+| `60-77%` | 120-155k | 🟠 Wrap up actively      | "Think about wrapping it up" → `/compact` hoặc `/handoff + /clear` | Dex         |
+| `~77%`   | ~155k    | 🔴 Auto-compact firing   | Claude Code tự động compact — chất lượng đã giảm                   | Boris       |
+| `>90%`   | >180k    | ⛔ Hard limit             | Có thể stop processing, phải `/clear` thủ công                     | qualitative |
 
 ### 16.3 Compact threshold theo task complexity
 
@@ -1600,10 +1623,37 @@ Mọi best practice xoay quanh 1 ràng buộc: **context window đầy nhanh, pe
 ### 16.4 Ngưỡng cho 1M context window (Opus 4.7/4.6, Sonnet 4.6 với 1M mode)
 
 > Source: [Thariq via howborisusesclaudecode.com](https://howborisusesclaudecode.com/) — "context rot kicks in around ~300-400k tokens on the 1M context model".
+> Boris Cherny dùng 1M exclusively và recommend `CLAUDE_CODE_AUTO_COMPACT_WINDOW` để custom — [tweet](https://x.com/bcherny/status/2032514809418109438).
+> Community report: ở 60% capacity (600k tokens), model lặp lại và bỏ qua constraints — [Albert Sikkema](https://albertsikkema.com/ai/development/tools/2026/04/23/smaller-context-window-better-claude-code.html).
+> 1 in 4 multi-needle retrievals fail ở 1M — [GitHub issue #35296](https://github.com/anthropics/claude-code/issues/35296).
 
-- **Vùng "context rot"**: 300-400k tokens (30-40% của 1M) — đừng để session drift quá ngưỡng này cho intelligence-sensitive work.
-- **Recommended override**: `CLAUDE_CODE_AUTO_COMPACT_WINDOW=400000` (Thariq's compromise, reshare bởi Boris).
-- **Tỷ lệ % không đổi**: vẫn target <40% kể cả với 1M model. Window lớn không nghĩa quality scale linearly — xem [Justin Smith on LinkedIn](https://www.linkedin.com/pulse/40-rule-beating-claudes-dumb-zone-large-codebases-justin-smith-jlffc) reaffirm độc lập.
+**Ngưỡng % KHÔNG ĐỔI** — áp dụng cả 200k lẫn 1M vì vấn đề là attention model, không phải dung lượng:
+
+| %        | Tokens   | Trạng thái              | Hành động                                                          | Source      |
+|----------|----------|-------------------------|--------------------------------------------------------------------|-------------|
+| `<30%`   | <300k    | 🔵 Aggressive zone      | Chất lượng tốt nhất — experienced users target đây                 | Dex         |
+| `30-40%` | 300-400k | 🟢 Context rot bắt đầu  | "Context rot kicks in" (Thariq). Compact nếu task phức tạp         | Thariq      |
+| `40-60%` | 400-600k | 🟡 Dumb zone            | Như 200k — performance degrade rõ rệt                              | Dex         |
+| `60-77%` | 600-770k | 🟠 Wrap up              | Model lặp lại, bỏ qua constraints                                 | Albert      |
+| `>77%`   | >770k    | 🔴 Nên compact           | Auto-compact mặc định KHÔNG fire ở 77% trên 1M (xem dưới)         | Boris       |
+| `>90%`   | >900k    | ⛔ Hard limit             | `/clear` thủ công                                                  | qualitative |
+
+**Auto-compact trên 1M — KHÁC với 200k:**
+
+| Window | Auto-compact mặc định | Tokens | Vấn đề |
+|--------|----------------------|--------|--------|
+| 200k | ~77% (155k tokens) | 155k | OK — fire trước khi quality quá tệ |
+| 1M | ~95% (950k tokens) | 950k | **Quá trễ** — quality đã giảm từ 40% (400k) |
+
+**Recommended override cho 1M:**
+```bash
+# Trong .claude/settings.json hoặc terminal
+CLAUDE_CODE_AUTO_COMPACT_WINDOW=400000  # Compact ở 400k thay vì 950k
+# Hoặc
+CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=40      # Compact ở 40% = 400k tokens
+```
+
+**Hoặc chiến lược Albert Sikkema**: thu nhỏ window về 200k (`CLAUDE_CODE_MAX_CONTEXT_TOKENS=200000`) — compact chạy thường xuyên hơn nhưng summary chất lượng hơn vì ít context hơn để nén.
 
 ### 16.5 `/compact` vs `/clear`
 
@@ -1628,6 +1678,8 @@ Bỏ: tool output dài, dead-end debugging.
 ```
 
 Hoặc gọi runtime: `/compact tập trung phần auth, drop test debugging`.
+
+**Reactive compaction** (v2.1.142): khi context overflow, Claude Code tính toán lượng token cần giải phóng dựa trên request gốc → compact 1 lần đủ, không cần retry near-full-context.
 
 ### 16.7 Giảm baseline (token cố định mỗi session)
 
@@ -1825,6 +1877,7 @@ Cách xử lý:
 | Tắt deep link handler           | `disableDeepLinkRegistration: "disable"` trong settings  |
 | Plugin dependency với version   | `dependencies` trong `.claude-plugin/plugin.json`: `[{ "name": "x", "version": "~2.1.0", "marketplace": "y" }]`. Cross-marketplace cần `allowCrossMarketplaceDependenciesOn` trong `marketplace.json` (key chưa thấy trong CHANGELOG public, verify với plugin docs trước khi rely on) |
 | Plugin executable trên Bash PATH | Đặt binary vào `bin/` ở plugin root → auto add vào PATH khi plugin enabled. Claude gọi binary như bare command từ Bash tool. v2.1.91+ |
+| Plugin root-level SKILL.md       | Plugin có `SKILL.md` ở root (không cần `skills/` subdir) sẽ được surface thành skill. v2.1.142+ |
 
 ---
 

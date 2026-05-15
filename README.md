@@ -17,7 +17,7 @@
 
 > 👉 Lần đầu xem repo? Đọc [**INTRODUCTION.md**](docs/INTRODUCTION.md) cho overview ngắn 1 phút.
 
-> 📅 **Đã verify**: 2026-05-09 vs Claude Code v2.1.138 + Opus 4.7. Model ID, version-gating, env var, slash command, hook event đã cross-check với [docs Anthropic](https://code.claude.com/docs) + [raw CHANGELOG](https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md).
+> 📅 **Đã verify**: 2026-05-16 vs Claude Code v2.1.142 + Opus 4.7. Model ID, version-gating, env var, slash command, hook event đã cross-check với [docs Anthropic](https://code.claude.com/docs) + [raw CHANGELOG](https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md).
 >
 > ⚠️ **Một số nội dung có thể outdated** khi Anthropic ship version mới hoặc deprecate model. Phát hiện sai sót → submit issue/PR tại [github.com/MinhThang1009/dotclaude/issues](https://github.com/MinhThang1009/dotclaude/issues). Xem [CONTRIBUTING.md](.github/CONTRIBUTING.md) cho quy trình. Lịch sử thay đổi: [CHANGELOG.md](CHANGELOG.md).
 

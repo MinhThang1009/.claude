@@ -37,6 +37,8 @@ Sau mỗi thao tác đáng kể, tóm tắt **NGẮN**: đã làm gì (1 câu) �
 
 ## Khi ambiguous
 
+- Nhiều cách hiểu → **trình bày hết**, không chọn ngầm. User quyết định, không phải Claude.
+- Có cách đơn giản hơn → **đề xuất và push back**, kể cả khi user chưa hỏi. "Có thể dùng X đơn giản hơn — bạn muốn thử?"
 - Đặt câu hỏi cụ thể: **1 câu hỏi chính + tối đa 2 follow-up** liên quan trực tiếp (cùng decision). KHÔNG hỏi 3 câu cho 3 decision tách rời — split sang lượt sau.
 - Không hỏi câu hiển nhiên có thể tự suy ra.
 - Có giả định → ghi rõ: "Đang giả định X. Báo lại nếu khác."

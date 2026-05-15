@@ -7,9 +7,21 @@
 - **Đọc trước khi viết**: ưu tiên đọc cả function chứa change; function >100 dòng thì 30 dòng xung quanh + signature/return là đủ. Fix nhỏ (1-2 dòng) thì context narrow hơn OK. File mới → scan file tương tự để theo pattern.
 - **Convention codebase trước, "best practice" sau**. Snake_case nếu codebase snake_case. Tab nếu codebase tab.
 - **Đúng > đẹp > nhanh**. Code chạy đúng quan trọng hơn pattern fancy.
-- **Không over-engineer**. YAGNI. Generic abstraction sinh trong nhu cầu thật, không "phòng xa".
+- **Không over-engineer**. YAGNI. Generic abstraction sinh trong nhu cầu thật, không "phòng xa". Viết 200 dòng mà 50 dòng giải quyết được → viết lại.
 - **Function < 50 dòng** lý tưởng. >100 dòng → xem xét tách (trừ khi logic có kết dính trên toàn bộ). Nesting >3 level → có thể flatten.
 - **Đặt tên rõ ràng**. `getUserById` thay `getUser`. `isEmailVerified` thay `verified`. Tránh `data`, `info`, `obj` trừ khi context rõ.
+
+## Surgical Changes
+
+- **Chỉ sửa đúng thứ được yêu cầu**. Mọi dòng thay đổi phải trace trực tiếp về request của user.
+- KHÔNG "cải thiện" code, comment, formatting xung quanh khi đang sửa thứ khác. KHÔNG refactor thứ chưa hỏng.
+- Orphan do chính mình tạo ra (import, biến, function không còn dùng SAU khi sửa) → **xóa luôn**. Dead code có sẵn từ trước → **đề cập, không xóa** trừ khi user yêu cầu.
+- Self-check: "Senior engineer có thấy diff này phức tạp quá không?" Nếu có → đơn giản lại.
+
+## Verification khi refactor
+
+- Refactor → **chạy test TRƯỚC khi sửa** (xác nhận baseline pass), sửa, **chạy test SAU** (xác nhận không regression).
+- Nếu task mơ hồ ("make it work", "clean up") → transform thành tiêu chí verify cụ thể trước khi bắt đầu. Tiêu chí yếu → hỏi user thay vì đoán.
 
 ## Comment
 
@@ -66,6 +78,10 @@ limiter = RateLimiter(...)
 - Format theo formatter project (`prettier`, `black`, `gofmt`, `rustfmt`...). Không tự ý đổi style.
 - Lint pass trước khi báo "xong". `eslint`, `ruff`, `clippy`, `golangci-lint`...
 - Import order: theo formatter quy định, không thủ công.
+
+## Tool usage
+
+- Sửa **1 file** → **dùng Edit tool**, không viết Python script `open(file, 'w')` (tránh truncate). Batch op (rename N file, mass refactor) → script OK nhưng PHẢI: (1) preview list file affected, (2) backup hoặc git stash trước, (3) dry-run flag nếu có.
 
 ## Cờ đỏ DỪNG-HỎI
 

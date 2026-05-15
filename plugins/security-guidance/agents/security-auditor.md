@@ -3,7 +3,6 @@ name: security-auditor
 description: Adversarial security reviewer — OWASP Top 10, CWE, dependency CVEs, secrets, injection. Use for security debt scanning and pre-modernization hardening.
 tools: Read, Grep, Glob, Bash, LSP, WebFetch, TodoWrite
 model: opus
-memory: user
 effort: high
 color: red
 ---

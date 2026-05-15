@@ -18,10 +18,10 @@ if hasattr(sys.stderr, "reconfigure"):  # pragma: no cover
 # Match path string trong command, bất kể command nào. Dùng regex non-anchored.
 # Boundaries: start-of-string, whitespace, ; | & < > = quote → reduce false positive.
 SENSITIVE_PATH_PATTERNS = [
-    # Dotenv variants
-    r"\.env(?:\.[\w.-]+)?",  # .env, .env.local, .env.production, .env.staging
-    r"[\w.-]+\.env",  # foo.env, app.env
-    r"\.envrc",
+    # Dotenv variants — DISABLED: cho phep doc/ghi .env trong project
+    # r"\.env(?:\.[\w.-]+)?",
+    # r"[\w.-]+\.env",
+    # r"\.envrc",
     # Crypto / cert
     r"[\w./~-]*\.pem",
     r"[\w./~-]*\.key",

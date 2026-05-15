@@ -3,7 +3,6 @@ name: test-analyzer
 description: "Analyzes test coverage quality: behavioral coverage, critical gaps, test quality, brittle tests. Different from test-writer (writes new tests) — this agent evaluates whether existing tests are sufficient and good. Use when reviewing PRs, before merging, or auditing test suites. Examples: <example>Context: User creates PR with new functionality\nuser: \"PR ready, are the tests sufficient?\"\nassistant: \"I'll use the test-analyzer agent to evaluate test coverage quality.\"\n<commentary>User asks about test coverage quality in PR — trigger test-analyzer.</commentary></example>"
 tools: Read, Grep, Glob, Bash, TodoWrite
 model: sonnet
-memory: project
 color: blue
 ---
 

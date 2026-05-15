@@ -6,10 +6,12 @@ Hiển thị 2 dòng:
 - Line 2: icon + progress bar + ctx% (tokens) | 💰 cost | ⏱️ duration | 5h/7d rate limits
 
 Ngưỡng icon (multi-author, xem docs/REFERENCE.md §16):
-- <40%   🟢 sweet spot (Dex Horthy)
+- <30%   🔵 aggressive zone — chất lượng tốt nhất (experienced: giữ dưới mức này)
+- 30-40% 🟢 sweet spot (newcomer OK, experienced nên compact sớm)
 - 40-60% 🟡 dumb zone bắt đầu
-- 60-80% 🟠 wrap up actively
-- >80%   🔴 PHẢI act (gần auto-compact ~77%)
+- 60-77% 🟠 wrap up actively
+- 77-90% 🔴 auto-compact firing
+- >90%   ⛔ hard limit — DỪNG task lớn
 
 JSON input từ stdin theo doc: https://code.claude.com/docs/en/statusline
 Git status cached 5s qua session_id (theo doc dòng 790).
@@ -30,7 +32,11 @@ YELLOW = "\033[33m"
 ORANGE = "\033[91m"
 RED = "\033[31m"
 DIM = "\033[2m"
+BLUE = "\033[34m"
 RESET = "\033[0m"
+
+# Label color — dùng cho "model:", "effort:", "tokens:", etc.
+L = BLUE
 
 
 def main() -> None:
@@ -68,24 +74,28 @@ def main() -> None:
         icon, bar_color = "🟠", ORANGE  # Wrap up actively
     elif pct >= 40:
         icon, bar_color = "🟡", YELLOW  # "Dumb zone" bắt đầu
+    elif pct >= 30:
+        icon, bar_color = "🟢", GREEN  # Newcomer OK, experienced nên compact sớm
     else:
-        icon, bar_color = "🟢", GREEN  # Sweet spot / Aggressive zone
+        icon, bar_color = "🔵", CYAN  # Aggressive zone — chất lượng tốt nhất
 
     # Skip window label nếu model display_name đã chứa (vd "Opus 4.7 (1M context)")
     if window_size >= 1_000_000 and "1m" not in model.lower():
         window_part = " 1M"
     else:
         window_part = ""
-    effort_label = f" ⚡ {effort}" if effort else ""
+    effort_label = f"⚡ effort: {effort}" if effort else ""
     cwd_short = os.path.basename(cwd) if cwd else ""
 
     # Line 1: model + cwd + git
     branch, staged, modified = _git_info_cached(session_id, cwd)
-    line1 = [f"{CYAN}[{model}{window_part}{effort_label}]{RESET}"]
+    line1 = [f"✦ {L}model:{RESET} {CYAN}{model}{window_part}{RESET}"]
+    if effort:
+        line1.append(f"⚡ {L}effort:{RESET} {effort}")
     if cwd_short:
-        line1.append(f"📁 {cwd_short}")
+        line1.append(f"📁 {L}folder:{RESET} {cwd_short}")
     if branch:
-        git_status = f"🌿 {branch}"
+        git_status = f"🌿 {L}branch:{RESET} {branch}"
         if staged:
             git_status += f" {GREEN}+{staged}{RESET}"
         if modified:
@@ -99,21 +109,23 @@ def main() -> None:
     bar = "▰" * filled + "▱" * (10 - filled)
     line2 = [f"{icon} {bar_color}{bar}{RESET} {pct}%"]
     if total_input:
-        line2.append(f"{DIM}{total_input // 1000}k tokens{RESET}")
+        line2.append(f"{L}tokens:{RESET} {total_input // 1000}k")
     if cost_usd > 0:
-        line2.append(f"💰 ${cost_usd:.2f}")
+        line2.append(f"💰 {L}cost:{RESET} ${cost_usd:.2f}")
     if duration_ms > 0:
         total_secs = duration_ms // 1000
         if total_secs >= 3600:
-            line2.append(f"⏱️ {total_secs // 3600}h{(total_secs % 3600) // 60}m")
+            line2.append(f"⏱️ {L}session:{RESET} {total_secs // 3600}h {(total_secs % 3600) // 60}m")
         elif total_secs >= 60:
-            line2.append(f"⏱️ {total_secs // 60}m {total_secs % 60}s")
+            line2.append(f"⏱️ {L}session:{RESET} {total_secs // 60}m {total_secs % 60}s")
         else:
-            line2.append(f"⏱️ {total_secs}s")
+            line2.append(f"⏱️ {L}session:{RESET} {total_secs}s")
     if five_h is not None:
-        line2.append(f"5h:{five_h:.0f}%")
+        r5_icon = "🔴" if five_h >= 80 else "🟡" if five_h >= 50 else "🟢"
+        line2.append(f"{r5_icon} {L}5h:{RESET} {five_h:.0f}%")
     if seven_d is not None:
-        line2.append(f"7d:{seven_d:.0f}%")
+        r7_icon = "🔴" if seven_d >= 80 else "🟡" if seven_d >= 50 else "🟢"
+        line2.append(f"{r7_icon} {L}7d:{RESET} {seven_d:.0f}%")
     print(" | ".join(line2))
 
 
