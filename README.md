@@ -35,7 +35,7 @@
 │   ├── verification.md             # ✅ Auto-import (verify & avoid past mistakes)
 │   ├── coding-standards.md         # ✅ Auto-import (coding conventions)
 │   └── git-workflow.md             # ✅ Auto-import (git workflow)
-├── plugins/                        # 33 plugins (mỗi plugin có agents/ và/hoặc skills/ bên trong)
+├── plugins/                        # 34 plugins (mỗi plugin có agents/ và/hoặc skills/ bên trong)
 │   ├── pr-review-toolkit/          # PR review: code-reviewer, silent-failure-hunter, type-design-analyzer...
 │   │   ├── .claude-plugin/
 │   │   ├── agents/                 # code-reviewer.md, code-simplifier.md, comment-analyzer.md...
@@ -60,7 +60,7 @@
 │   ├── claude-md-management/       # Audit CLAUDE.md: /claude-md-management skill
 │   └── plugin-dev/                 # Phát triển plugin: 5 skills (agent/skill/hook/mcp/command)
 ├── .claude-plugin/
-│   └── marketplace.json            # Marketplace manifest (33 plugins)
+│   └── marketplace.json            # Marketplace manifest (34 plugins)
 ├── output-styles/
 │   └── concise-vietnamese.md       # Style tiếng Việt ngắn gọn
 ├── hooks/                          # Hook scripts (gọi từ settings.json)
@@ -473,10 +473,10 @@ Sau đó install plugin muốn dùng:
 claude plugin install pr-review-toolkit
 claude plugin install feature-dev
 claude plugin install commit-commands
-# ... hoặc bất kỳ plugin nào trong 33 plugins
+# ... hoặc bất kỳ plugin nào trong 34 plugins
 ```
 
-**33 plugins hiện có** (xem `.claude-plugin/marketplace.json` để đầy đủ, hoặc `.claude-load.txt` để chọn plugins load):
+**34 plugins hiện có** (xem `.claude-plugin/marketplace.json` để đầy đủ, hoặc `.claude-load.txt` để chọn plugins load):
 
 | Plugin | Loại | Mô tả ngắn |
 | --- | --- | --- |
