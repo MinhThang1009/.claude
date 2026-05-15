@@ -36,6 +36,9 @@ claude-md-management
 test-toolkit
 performance
 
+# === PLAN AUDIT ===
+audit-plan
+
 # === OPTIONAL: bỏ comment để enable ===
 # mcp-server-dev           # Build MCP servers (remote HTTP, MCPB, UI widgets)
 # mcp-builder              # Build MCP servers (FastMCP/SDK)

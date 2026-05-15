@@ -1,0 +1,7 @@
+{
+  "name": "audit-plan",
+  "description": "Audit plan files against codebase — gap detection, dead code verification, test coverage checks",
+  "author": {
+    "name": "Minh Thang"
+  }
+}

@@ -235,6 +235,13 @@
       "author": { "name": "Microsoft" },
       "source": "./plugins/playwright",
       "category": "development"
+    },
+    {
+      "name": "audit-plan",
+      "description": "Audit plan files against codebase — gap detection, dead code verification, test coverage checks. Sub-commands: gaps, verify, tests.",
+      "author": { "name": "Minh Thang" },
+      "source": "./plugins/audit-plan",
+      "category": "development"
     }
   ]
 }
