@@ -217,7 +217,7 @@
       }
     ]
   },
-  "model": "opus[1m]",
+  "model": "opus",
   "effortLevel": "xhigh",
   "autoUpdatesChannel": "latest",
   "autoMemoryEnabled": true,
