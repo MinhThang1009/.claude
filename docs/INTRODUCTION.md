@@ -12,7 +12,7 @@ Cấu hình global ready-to-use cho Claude Code. Tiếng Việt cho comment/comm
 - **Statusline real-time** ([`hooks/statusline.py`](../hooks/statusline.py)): hiển thị model + window mode (1M/200k) + ⚡ effort + 📁 cwd + 🌿 git branch + context % + tokens + 💰 cost + ⏱ duration + rate limits 5h/7d. 5 threshold zones theo context usage (🟢 sweet spot <40% → ⛔ hard limit ≥90%)
 - **Permission rules** deny secrets (`.env`, `*.key`, `*.pem`) và lệnh nguy hiểm
 - **6 template** project sẵn dùng ([`CLAUDE.md`](../templates/project-CLAUDE.md), [`settings.json`](../templates/project-settings.json), [`.mcp.json`](../templates/project-mcp.json), [`HANDOFF.md`](../templates/HANDOFF.md), [`CLAUDE.local.md`](../templates/project-CLAUDE.local.md), [`skill-evals.json`](../templates/skill-evals.json))
-- [**REFERENCE.md**](REFERENCE.md) cheatsheet ~2092 dòng tổng hợp slash command, hook, env var
+- [**REFERENCE.md**](REFERENCE.md) cheatsheet ~2145 dòng tổng hợp slash command, hook, env var
 
 ## 🛠️ Cài đặt (3 bước)
 

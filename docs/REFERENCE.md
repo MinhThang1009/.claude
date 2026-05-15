@@ -1,6 +1,6 @@
 # REFERENCE — Cheatsheet Claude Code
 
-> ⚠️ **CẢNH BÁO TOKEN**: File này dài **~2092 dòng / ~164KB / ~57k tokens** (Vietnamese mix ~2.9 chars/token). KHÔNG `@-import` vào CLAUDE.md, KHÔNG paste full vào prompt — sẽ ăn ~28% context Sonnet 200k hoặc ~5.5% context Opus 1M ngay session start. Cách dùng đúng: mở trên trình duyệt / màn hình thứ 2 / editor để **NGƯỜI** tra cứu khi cần. Nếu cần Claude tham khảo 1 phần, copy đoạn cụ thể vào prompt thay vì import cả file.
+> ⚠️ **CẢNH BÁO TOKEN**: File này dài **~2145 dòng / ~166KB / ~57k tokens** (Vietnamese mix ~3 chars/token). KHÔNG `@-import` vào CLAUDE.md, KHÔNG paste full vào prompt — sẽ ăn ~28% context Sonnet 200k hoặc ~5.7% context Opus 1M ngay session start. Cách dùng đúng: mở trên trình duyệt / màn hình thứ 2 / editor để **NGƯỜI** tra cứu khi cần. Nếu cần Claude tham khảo 1 phần, copy đoạn cụ thể vào prompt thay vì import cả file.
 >
 > Tổng hợp từ docs chính thức [code.claude.com/docs](https://code.claude.com/docs) (2026), blog [claude.com](https://www.claude.com/blog), [MindStudio](https://www.mindstudio.ai/blog), [ClaudeFast](https://claudefa.st/blog), GitHub [anthropics/claude-code](https://github.com/anthropics/claude-code). Cập nhật cho Claude Code v2.1.x trở lên.
 >
