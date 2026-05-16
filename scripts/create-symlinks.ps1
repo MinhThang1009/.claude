@@ -63,8 +63,9 @@ $agentsDir = "$dst\agents"
 if (Test-Path $agentsDir) { Remove-Item $agentsDir -Recurse -Force }
 New-Item -ItemType Directory -Force $agentsDir | Out-Null
 Get-ChildItem "$src\plugins" -Directory | Where-Object { Should-Load-Type $_.Name "agents" } | ForEach-Object {
-    Get-ChildItem $_.FullName -Recurse -Filter "agents" -Directory | ForEach-Object {
-        Get-ChildItem $_.FullName -Filter "*.md" | ForEach-Object {
+    $pluginAgentsDir = Join-Path $_.FullName "agents"
+    if (Test-Path $pluginAgentsDir) {
+        Get-ChildItem $pluginAgentsDir -Filter "*.md" | ForEach-Object {
             & cmd.exe /c "mklink `"$agentsDir\$($_.Name)`" `"$($_.FullName)`"" | Out-Null
         }
     }

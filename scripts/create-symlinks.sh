@@ -75,8 +75,8 @@ for plugin_dir in "$SRC"/plugins/*/; do
     should_load_type "$plugin_name" "agents" || continue
     while IFS= read -r agent; do
         [ -f "$agent" ] || continue
-        ln -s "$agent" "$DST/agents/$(basename "$agent")"
-    done < <(find "$plugin_dir" -path "*/agents/*.md")
+        ln -sf "$agent" "$DST/agents/$(basename "$agent")"
+    done < <(find "$plugin_dir/agents" -maxdepth 1 -name "*.md" 2>/dev/null)
 done
 echo "OK agents: $(ls "$DST/agents" | wc -l | tr -d ' ') files"
 
