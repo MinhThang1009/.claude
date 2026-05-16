@@ -58,7 +58,7 @@
 │   ├── frontend-design/            # UI: /frontend-design skill
 │   ├── session/                    # Session: /context-check, /handoff
 │   ├── claude-md-management/       # Audit CLAUDE.md: /claude-md-management skill
-│   └── plugin-dev/                 # Phát triển plugin: 5 skills (agent/skill/hook/mcp/command)
+│   └── plugin-dev/                 # Phát triển plugin: 7 skills (agent/skill/hook/mcp/command/structure/settings)
 ├── .claude-plugin/
 │   └── marketplace.json            # Marketplace manifest (34 plugins)
 ├── output-styles/
