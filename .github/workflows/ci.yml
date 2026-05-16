@@ -208,11 +208,11 @@ jobs:
           count=$(find -L ~/.claude/skills -maxdepth 1 -mindepth 1 -type d | wc -l)
           echo "skills: $count"
           [ "$count" -eq 41 ] || { echo "Expected 41, got $count"; exit 1; }
-      - name: Verify commands (19 files)
+      - name: Verify commands (22 files)
         run: |
           count=$(find ~/.claude/commands -maxdepth 1 -name "*.md" | wc -l)
           echo "commands: $count"
-          [ "$count" -eq 19 ] || { echo "Expected 19, got $count"; exit 1; }
+          [ "$count" -eq 22 ] || { echo "Expected 22, got $count"; exit 1; }
 
   symlinks-test-windows:
     name: Test create-symlinks.ps1 (Windows)
@@ -237,9 +237,9 @@ jobs:
           $count = (Get-ChildItem "$env:USERPROFILE\.claude\skills" -ErrorAction SilentlyContinue).Count
           Write-Host "skills: $count"
           if ($count -ne 41) { Write-Error "Expected 41, got $count"; exit 1 }
-      - name: Verify commands (19 files)
+      - name: Verify commands (22 files)
         shell: pwsh
         run: |
           $count = (Get-ChildItem "$env:USERPROFILE\.claude\commands" -Filter "*.md" -ErrorAction SilentlyContinue).Count
           Write-Host "commands: $count"
-          if ($count -ne 19) { Write-Error "Expected 19, got $count"; exit 1 }
+          if ($count -ne 22) { Write-Error "Expected 22, got $count"; exit 1 }
