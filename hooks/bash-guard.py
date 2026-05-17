@@ -24,7 +24,7 @@ SENSITIVE_PATH_PATTERNS = [
     # r"\.envrc",
     # Crypto / cert
     r"[\w./~-]*\.pem",
-    r"[\w./~-]*\.key",
+    r"[\w./~-]+[/\\][\w.-]*\.key",
     r"[\w./~-]*\.p12",
     r"[\w./~-]*\.jks",
     r"[\w./~-]*\.pfx",
