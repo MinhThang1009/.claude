@@ -19,6 +19,7 @@ Git status cached 5s qua session_id (theo doc dòng 790).
 
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -133,7 +134,8 @@ def main() -> None:
 def _git_info_cached(session_id: str, cwd: str) -> tuple[str, int, int]:
     """Cache git info 5s qua session_id (doc dòng 790: stable per session, unique cross sessions)."""
     cache_dir = os.environ.get("TEMP") or os.environ.get("TMPDIR") or "/tmp"
-    cache_file = os.path.join(cache_dir, f"claude-statusline-git-{session_id}")
+    safe_id = re.sub(r"[^a-zA-Z0-9_-]", "_", session_id)
+    cache_file = os.path.join(cache_dir, f"claude-statusline-git-{safe_id}")
 
     if os.path.exists(cache_file):
         if time.time() - os.path.getmtime(cache_file) <= CACHE_MAX_AGE:

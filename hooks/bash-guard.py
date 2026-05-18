@@ -110,7 +110,7 @@ def is_curl_wget_exfil(cmd: str) -> bool:
             r"--upload-file\b|"  # luôn upload file
             r"--post-file\b|"  # wget post file
             r"\s-T\s+\S+|"  # -T file → upload
-            r"--data(?:-binary|-raw|-urlencode)?\s+@|"  # --data @file
+            r"--data(?:-binary|-raw|-urlencode)?(?:\s+|=)@|"  # --data @file hoặc --data=@file
             r"\s-d\s+@|"  # -d @file
             r"\s-F\s+[\w.-]+=@"  # -F name=@file
             r")",
@@ -155,7 +155,9 @@ def is_dangerous_rm(cmd: str) -> bool:
         r"/(?:\*)?|"  # /, /*
         r"~(?:/(?:\*)?)?|"  # ~, ~/, ~/*
         r"\$\{?HOME\}?(?:/(?:\*)?)?|"  # $HOME, ${HOME}, $HOME/, ${HOME}/, $HOME/*, ${HOME}/*
-        r"\.{1,2}(?:/(?:\*)?)?"  # ., .., ./, ../, ./*, ../*
+        r"\.{1,2}(?:/(?:\*)?)?|"  # ., .., ./, ../, ./*, ../*
+        r"\$\{?PWD\}?(?:/(?:\*)?)?|"  # $PWD, ${PWD}, $PWD/, $PWD/*
+        r"\$\(pwd\)(?:/(?:\*)?)?"  # $(pwd), $(pwd)/, $(pwd)/*
         r")"
     )
     target_boundary = rf"{targets}(?=[\s;|&]|$)"

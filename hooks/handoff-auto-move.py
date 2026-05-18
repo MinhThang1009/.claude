@@ -22,6 +22,8 @@ def move_to_claude(file_path: Path, project_dir: Path) -> None:
         pass
     try:
         target.parent.mkdir(parents=True, exist_ok=True)
+        if target.exists():
+            print(f"[handoff-auto-move] Ghi đè handoff.md cũ tại {target}")
         shutil.move(str(file_path), str(target))
         print(f"Đã tự động chuyển handoff.md -> {target}")
     except (OSError, shutil.Error) as e:
