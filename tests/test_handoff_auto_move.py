@@ -187,6 +187,30 @@ class TestStreamReconfigure:
         assert result is None
 
 
+class TestSessionStart:
+    def test_moves_handoff_when_no_file_path(self, handoff_auto_move, tmp_path):
+        """SessionStart: không có file_path → scan project root."""
+        src = tmp_path / "HANDOFF.md"
+        src.write_text("session brief")
+        result = run_main(
+            handoff_auto_move,
+            {},
+            env={"CLAUDE_PROJECT_DIR": str(tmp_path)},
+        )
+        assert result == 0
+        assert not src.exists()
+        assert (tmp_path / ".claude" / "handoff.md").read_text() == "session brief"
+
+    def test_no_handoff_at_root_exits_0(self, handoff_auto_move, tmp_path):
+        """SessionStart: không có HANDOFF.md ở root → exit 0 yên lặng."""
+        result = run_main(
+            handoff_auto_move,
+            {},
+            env={"CLAUDE_PROJECT_DIR": str(tmp_path)},
+        )
+        assert result == 0
+
+
 class TestResolveOSError:
     def test_oserror_during_resolve_continues(self, handoff_auto_move, tmp_path):
         src = tmp_path / "handoff.md"

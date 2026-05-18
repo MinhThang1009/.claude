@@ -24,7 +24,7 @@ When invoked, follow these steps every time:
 2. **Draft the brief** using the template below. Keep it ≤300 words (not counting headings). Omit sections that don't apply. The brief must be self-contained without requiring session history.
 3. **Deliver based on flag**:
    - **No flag** → print the brief to chat. User will copy it or follow up with `/compact <brief>`.
-   - **`--save`** → write `HANDOFF.md` to every project root in the workspace. Find projects via `find . -maxdepth 3 -name ".git" -type d -not -path "*/node_modules/*" -not -path "*/.git/modules/*"`, take parent dir of each `.git/`. Fallback to cwd if none found. For each project: write `HANDOFF.md` (not inside `.claude/`), ensure `.gitignore` has a `HANDOFF.md` entry. Report: `Saved HANDOFF.md to: <list>`.
+   - **`--save`** → write `HANDOFF.md` to every project root in the workspace. Find projects via `find . -maxdepth 3 -name ".git" -type d -not -path "*/node_modules/*" -not -path "*/.git/modules/*"`, take parent dir of each `.git/`. Fallback to cwd if none found. For each project: write `HANDOFF.md` (not inside `.claude/`), ensure `.gitignore` has a `HANDOFF.md` entry. Report: `Saved HANDOFF.md to: <list>`. **IMPORTANT: use the `Write` tool to write the file — never use Bash (`cat >`, `echo >`, `tee`). The Write tool triggers a PostToolUse hook that automatically moves the file to `.claude/handoff.md`.**
    - **`--inject`** → print a single paste-ready line: `Continuing from handoff: [5-7 line inline brief]. Main files: <list>. Next step: <action>.`
 
 ## Brief template
