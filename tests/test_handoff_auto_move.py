@@ -5,6 +5,7 @@ from __future__ import annotations
 import io
 import json
 import shutil
+import sys
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -14,8 +15,11 @@ import pytest
 def run_main(module, stdin_data: dict | str, env: dict | None = None):
     """Chạy main() với stdin giả và env giả, trả về SystemExit code hoặc None."""
     raw = json.dumps(stdin_data) if isinstance(stdin_data, dict) else stdin_data
+    raw_bytes = raw.encode("utf-8")
     env = env or {}
-    with patch("sys.stdin", io.StringIO(raw)):
+    mock_stdin = MagicMock()
+    mock_stdin.buffer.read.return_value = raw_bytes
+    with patch("sys.stdin", mock_stdin):
         with patch.dict("os.environ", env, clear=False):
             try:
                 module.main()

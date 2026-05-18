@@ -9,10 +9,14 @@ from pathlib import Path
 
 
 def main() -> None:
+    # Windows dùng cp1252 mặc định — reconfigure sang UTF-8 (in-place, không close buffer)
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8")
     try:
-        raw = sys.stdin.read()
+        raw = sys.stdin.buffer.read().decode("utf-8")
         data = json.loads(raw)
-    except (json.JSONDecodeError, ValueError):
+    except (json.JSONDecodeError, ValueError, UnicodeDecodeError):
         sys.exit(0)
 
     file_path_raw = (
