@@ -1,63 +1,43 @@
-# Cấu hình plugins cần load vào ~/.claude/
-# Format:
-#   plugin-name          → load tất cả (agents + skills + commands)
-#   plugin-name:agents   → chỉ load agents
-#   plugin-name:skills   → chỉ load skills
-#   plugin-name:commands → chỉ load commands
+# Danh sách plugin được load vào ~/.claude/skills, agents, commands
+# Format: "plugin" (load all) hoặc "plugin:skills" / "plugin:agents" / "plugin:commands"
 # Dòng bắt đầu bằng # là comment. Nếu file trống → load TẤT CẢ.
 
-# === PR REVIEW TOOLKIT (agents + skills + commands) ===
-pr-review-toolkit
-
-# === FEATURE DEV ===
-feature-dev
-
-# === GIT WORKFLOW ===
-commit-commands:skills
-
-# === DEBUG ===
+# === CORE SET ===
+session
+commit-commands
 debug
-
-# === SECURITY ===
-security-guidance:agents
-
-# === HOOKS ===
+code-review
 hookify
-
-# === SESSION MANAGEMENT ===
-session:skills
-
-# === CODE QUALITY ===
-code-simplifier:skills
-frontend-design:skills
-claude-md-management
-
-# === TEST & PERFORMANCE ===
-test-toolkit
-performance
-
-# === PLAN AUDIT ===
-audit-plan
+feature-dev
+session-report
 
 # === OPTIONAL: bỏ comment để enable ===
-# mcp-server-dev           # Build MCP servers (remote HTTP, MCPB, UI widgets)
-# mcp-builder              # Build MCP servers (FastMCP/SDK)
-# plugin-dev               # Phát triển Claude Code plugins
-# skill-creator            # Tạo/eval skills
-# code-modernization       # Migrate legacy code
-# documentation            # docs + Next.js agents
-# claude-code-setup        # Recommend automations
+# pr-review-toolkit        # Review PR: code-reviewer, silent-failure-hunter, type-design-analyzer
+# audit-plan               # Audit plan files
 # claude-api               # Claude API/SDK development
-# webapp-testing           # Test web apps với Playwright
-# web-artifacts-builder    # Build HTML artifacts (React, Tailwind)
-# session-report           # Generate session reports
-# code-review              # Standalone PR code review command
-# docx                     # Word document creation/editing
+# claude-code-setup        # Recommend automations
+# claude-md-management     # Audit/improve CLAUDE.md
+# code-modernization       # Migrate legacy code
+# code-simplifier          # Refactor/simplify
+# doc-coauthoring          # Co-author docs/proposals/specs
+# documentation            # documentation-engineer, nextjs-developer
+# docx                     # Word document
+# explanatory-output-style # Giải thích implementation choices
+# feature-dev              # (đã có trong core)
+# frontend-design          # UI design
+# hookify                  # (đã có trong core)
+# learning-output-style    # Interactive learning mode
+# mcp-builder              # Build MCP servers (FastMCP/SDK)
+# mcp-server-dev           # Build MCP servers (remote HTTP, MCPB, UI)
 # pdf                      # PDF manipulation
-# pptx                     # PowerPoint creation/editing
-# xlsx                     # Spreadsheet creation/editing
-# theme-factory            # Apply themes to slides/docs/HTML (10 presets)
-# doc-coauthoring          # Co-authoring workflow cho docs/proposals/specs
-# explanatory-output-style # Giải thích implementation choices khi code
-# learning-output-style    # Interactive learning mode tại decision points
-# playwright               # Browser automation MCP (Microsoft) — cần npx
+# performance              # Performance engineer, dependency manager
+# playwright               # Browser automation MCP
+# plugin-dev               # Phát triển Claude Code plugins
+# pptx                     # PowerPoint
+# security-guidance        # Security auditor (OWASP)
+# skill-creator            # Tạo/eval/optimize skills
+# test-toolkit             # test-writer, test-analyzer
+# theme-factory            # Apply themes to artifacts
+# web-artifacts-builder    # Build HTML artifacts (React, Tailwind)
+# webapp-testing           # Test web apps với Playwright
+# xlsx                     # Spreadsheet
