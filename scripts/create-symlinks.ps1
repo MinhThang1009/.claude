@@ -84,7 +84,7 @@ Get-ChildItem "$src\plugins" -Directory | Where-Object { Should-Load-Type $_.Nam
     $d = "$($_.FullName)\skills"
     if (Test-Path $d) {
         Get-ChildItem $d -Directory | ForEach-Object {
-            & cmd.exe /c "mklink /D `"$skillsDir\$($_.Name)`" `"$($_.FullName)`"" | Out-Null
+            & cmd.exe /c "mklink /J `"$skillsDir\$($_.Name)`" `"$($_.FullName)`"" | Out-Null
         }
     }
 }
