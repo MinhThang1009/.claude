@@ -87,10 +87,6 @@ limiter = RateLimiter(...)
 - Lint pass trước khi báo "xong". `eslint`, `ruff`, `clippy`, `golangci-lint`...
 - Import order: theo formatter quy định, không thủ công.
 
-## Tool usage
-
-- Sửa **1 file** → **dùng Edit tool**, không viết Python script `open(file, 'w')` (tránh truncate). Batch op (rename N file, mass refactor) → script OK nhưng PHẢI: (1) preview list file affected, (2) backup hoặc git stash trước, (3) dry-run flag nếu có.
-
 ## Cờ đỏ DỪNG-HỎI
 
 Cần hỏi xác nhận trước khi thực hiện:

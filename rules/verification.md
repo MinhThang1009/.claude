@@ -28,6 +28,7 @@
 - Sửa claim xuất hiện ở **nhiều file** → grep claim đó across toàn repo sau khi edit. Sửa file A mà file B vẫn giữ giá trị cũ = tạo inconsistency mới.
 - File có thể bị **edit bởi process khác** (user edit tay, hook, formatter, linter) giữa lúc edit và verify → read lại file trước khi kết luận edit thành công.
 - Trước batch edit (>3 files) → đảm bảo **git clean** (commit hoặc stash WIP). Nếu edit fail giữa chừng → dùng `/rewind` hoặc `git checkout` để revert. KHÔNG để codebase ở trạng thái nửa-edit.
+- Sửa **1 file** → **dùng Edit tool**, không viết Python script `open(file, 'w')` (tránh truncate). Batch op (rename N file, mass refactor) → script OK nhưng PHẢI: (1) preview list file affected, (2) backup hoặc git stash trước, (3) dry-run flag nếu có.
 
 ## Tool output reliability
 
@@ -46,4 +47,3 @@
 
 - Dùng GitHub Action / package bên ngoài → **verify tồn tại** (WebFetch check repo/tag) trước khi commit. WebFetch fail khi verify → áp dụng "Tool output reliability": thử URL khác hoặc ghi cần user confirm.
 - Dep tồn tại nhưng **version mismatch** → cảnh báo user, không tự downgrade/upgrade.
-- Sửa **1 file** bằng Python script `open(file, 'w')` → **dùng Edit tool** thay vì viết script (tránh vô tình truncate). Batch op (rename N file, mass refactor) → script OK nhưng PHẢI: (1) preview list file affected, (2) backup hoặc git stash trước, (3) chạy với dry-run flag nếu có.
