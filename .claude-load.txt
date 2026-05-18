@@ -11,32 +11,33 @@ hookify
 feature-dev
 session-report
 
+# === EXTENDED SET ===
+pr-review-toolkit
+test-toolkit
+audit-plan
+claude-md-management
+plugin-dev
+webapp-testing
+
 # === OPTIONAL: bỏ comment để enable ===
-# pr-review-toolkit        # Review PR: code-reviewer, silent-failure-hunter, type-design-analyzer
-# audit-plan               # Audit plan files
 # claude-api               # Claude API/SDK development
 # claude-code-setup        # Recommend automations
-# claude-md-management     # Audit/improve CLAUDE.md
 # code-modernization       # Migrate legacy code
 # code-simplifier          # Refactor/simplify
 # doc-coauthoring          # Co-author docs/proposals/specs
 # documentation            # documentation-engineer, nextjs-developer
 # docx                     # Word document
 # explanatory-output-style # Giải thích implementation choices
-# feature-dev              # (đã có trong core)
 # frontend-design          # UI design
-# hookify                  # (đã có trong core)
 # learning-output-style    # Interactive learning mode
 # mcp-builder              # Build MCP servers (FastMCP/SDK)
 # mcp-server-dev           # Build MCP servers (remote HTTP, MCPB, UI)
 # pdf                      # PDF manipulation
 # performance              # Performance engineer, dependency manager
 # playwright               # Browser automation MCP
-# plugin-dev               # Phát triển Claude Code plugins
 # pptx                     # PowerPoint
 # security-guidance        # Security auditor (OWASP)
 # skill-creator            # Tạo/eval/optimize skills
-# test-toolkit             # test-writer, test-analyzer
 # theme-factory            # Apply themes to artifacts
 # web-artifacts-builder    # Build HTML artifacts (React, Tailwind)
 # webapp-testing           # Test web apps với Playwright
