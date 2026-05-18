@@ -172,6 +172,21 @@ class TestMoveFailure:
         assert result == 0
 
 
+class TestStreamReconfigure:
+    def test_stream_without_reconfigure_skipped(self, handoff_auto_move, tmp_path):
+        src = tmp_path / "handoff.md"
+        src.write_text("x")
+        mock_stream = MagicMock(spec=["write", "flush"])  # không có reconfigure
+        with patch("sys.stdout", mock_stream):
+            with patch("sys.stderr", mock_stream):
+                result = run_main(
+                    handoff_auto_move,
+                    {"file_path": str(src)},
+                    env={"CLAUDE_PROJECT_DIR": str(tmp_path)},
+                )
+        assert result is None
+
+
 class TestResolveOSError:
     def test_oserror_during_resolve_continues(self, handoff_auto_move, tmp_path):
         src = tmp_path / "handoff.md"
