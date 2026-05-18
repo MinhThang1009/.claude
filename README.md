@@ -148,7 +148,7 @@ git clone https://github.com/MinhThang1009/dotclaude.git
 
 ### Bước 3 — Sao chép vào `~/.claude/`
 
-Chạy script tương ứng với platform — script tự copy các files cần thiết và tạo symlinks cho tất cả plugins:
+Chạy script tương ứng với platform — script tạo junctions từ `~/.claude/` trỏ vào repo, sau đó tạo junctions/hardlinks cho từng plugin được chọn:
 
 **Windows (PowerShell)**
 
@@ -162,9 +162,19 @@ powershell -File dotclaude\scripts\create-symlinks.ps1
 bash dotclaude/scripts/create-symlinks.sh
 ```
 
-> Script copy `CLAUDE.md`, `settings.json`, `hooks`, `output-styles`, `rules`, `templates` vào `~/.claude/`, sau đó tạo symlinks cho từng plugin. Repo metadata (`README.md`, `LICENSE`, `CHANGELOG.md`, `docs/`, `.github/`, `.gitignore`...) KHÔNG copy.
+> **Cơ chế**: `~/.claude/hooks`, `rules`, `templates`, `output-styles`, `.claude-plugin` là **junctions** trỏ vào repo (không cần admin). Sửa file trong `dotclaude/` là Claude Code thấy ngay. `settings.json` và `memory/` là real file — intentionally local, không sync.
 >
-> Để chọn plugins nào load, sửa file `.claude-load.txt` trong thư mục `dotclaude/` trước khi chạy script.
+> **Chọn plugins**: sửa `.claude-load.txt` trong `dotclaude/` trước khi chạy script. Mỗi dòng là tên plugin (load tất cả) hoặc `plugin:skills` / `plugin:agents` / `plugin:commands`. File trống = load tất cả.
+>
+> **Rebuild sau khi đổi `.claude-load.txt`** (không cần chạy lại toàn bộ script):
+> ```powershell
+> powershell -File dotclaude\scripts\rebuild-links.ps1
+> ```
+>
+> **Xem trạng thái symlinks hiện tại**:
+> ```powershell
+> powershell -File dotclaude\scripts\check-links.ps1
+> ```
 
 ### Bước 4 — Verify
 

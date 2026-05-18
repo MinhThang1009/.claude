@@ -6,6 +6,25 @@ Format theo [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/), tuâ
 
 ## [Unreleased]
 
+### Added (2026-05-18)
+
+- **hooks/handoff-auto-move.sh + .py**: hook mới tự động move `HANDOFF.md` từ project root vào `.claude/` sau khi Write tool ghi file. Python version xử lý Unicode + Windows path đúng hơn bash thuần.
+- **scripts/rebuild-links.ps1**: script rebuild `skills/`, `agents/`, `commands/` theo `.claude-load.txt` mà không cần chạy lại toàn bộ `create-symlinks.ps1`.
+- **scripts/check-links.ps1**: script xem trạng thái symlink/junction của toàn bộ `~/.claude/`.
+- **settings.json hook entry**: đăng ký `handoff-auto-move.sh` vào `PostToolUse → Write`.
+
+### Changed (2026-05-18)
+
+- **scripts/create-symlinks.ps1**: đổi `mklink /D` → `mklink /J` (junction, không cần admin). Thêm safety check: skip nếu source là symlink/junction để tránh circular ELOOP.
+- **.claude-plugin/marketplace.json**: đổi `name` từ `claude-plugins` → `minhthang-plugins` (tránh impersonation validation của Claude Code).
+- **.claude-load.txt**: giới hạn core 7 plugins (`session`, `commit-commands`, `debug`, `code-review`, `hookify`, `feature-dev`, `session-report`) thay vì load tất cả.
+- **README.md**: cập nhật mô tả install section — junction mechanism, `.claude-load.txt` usage, `rebuild-links.ps1`, `check-links.ps1`.
+
+### Fixed (2026-05-18)
+
+- **hooks/bash-guard.py**: fix pattern `.key` yêu cầu path separator, tránh block lệnh có từ kết thúc `.key` không phải file path.
+- **rules/ circular junction**: `dotclaude/rules/` và `~/.claude/rules/` trỏ vào nhau gây ELOOP. Fix: restore `dotclaude/rules/` về real dir từ git, tạo lại junction đúng chiều `~/.claude/rules/` → `dotclaude/rules/`.
+
 ### Changed (2026-05-16 — v2.1.142 compatibility + cross-platform)
 
 - **REFERENCE.md** cập nhật cho Claude Code v2.1.142: `/goal`, `/bg`, `claude agents` flags, hook `args` exec form, `terminalSequence`, `worktree.baseRef`, `autoMode.hard_deny`, reactive compaction, skill budget settings, env vars mới
