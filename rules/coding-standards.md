@@ -2,6 +2,13 @@
 
 > Auto-import mọi session qua `rules/`.
 
+## Trước khi bắt đầu
+
+- **Nêu assumptions rõ ràng** trước khi implement — dù tương đối chắc. "Tôi hiểu X là Y, nếu sai hãy sửa."
+- **Nếu có nhiều cách hiểu** → trình bày các cách hiểu đó, đừng tự chọn im lặng.
+- **Nếu có approach đơn giản hơn** → nói ra, push back nếu cần. Đừng implement theo yêu cầu khi thấy cách tốt hơn mà không lên tiếng.
+- **Nếu không rõ** → dừng lại, nêu cụ thể điều gì chưa rõ, hỏi.
+
 ## Nguyên tắc cốt lõi
 
 - **Đọc trước khi viết**: ưu tiên đọc cả function chứa change; function >100 dòng thì 30 dòng xung quanh + signature/return là đủ. Fix nhỏ (1-2 dòng) thì context narrow hơn OK. File mới → scan file tương tự để theo pattern.
