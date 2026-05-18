@@ -47,11 +47,21 @@ def _load_module(name: str, path: Path):
 _bash_guard = _load_module("bash_guard", HOOKS_DIR / "bash-guard.py")
 _statusline = _load_module("statusline", HOOKS_DIR / "statusline.py")
 _format_on_edit = _load_module("format_on_edit", HOOKS_DIR / "format-on-edit.py")
+_handoff_auto_move = _load_module(
+    "handoff_auto_move", HOOKS_DIR / "handoff-auto-move.py"
+)
 
 
 @pytest.fixture
 def bash_guard():
     return _bash_guard
+
+
+@pytest.fixture
+def handoff_auto_move():
+    if _handoff_auto_move is None:
+        pytest.skip("handoff-auto-move.py không tồn tại")
+    return _handoff_auto_move
 
 
 @pytest.fixture

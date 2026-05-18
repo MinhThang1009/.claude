@@ -42,10 +42,10 @@ $dirs = @(".claude-plugin", "docs", "hooks", "output-styles", "rules", "template
 foreach ($d in $dirs) {
     $dstPath = "$dst\$d"
     $srcPath = "$src\$d"
-    # Safety: srcPath phải là real dir, không phải symlink/junction (tránh circular)
+    # Safety: skip if source is a symlink/junction to avoid circular references
     $srcItem = Get-Item $srcPath -ErrorAction SilentlyContinue
-    if (-not $srcItem) { Write-Host "SKIP dir: $d (source không tồn tại)"; continue }
-    if ($srcItem.LinkType) { Write-Host "SKIP dir: $d (source là $($srcItem.LinkType), không phải real dir — tránh circular)"; continue }
+    if (-not $srcItem) { Write-Host "SKIP dir: $d (source not found)"; continue }
+    if ($srcItem.LinkType) { Write-Host "SKIP dir: $d (source is $($srcItem.LinkType), not a real dir)"; continue }
     $item = Get-Item $dstPath -ErrorAction SilentlyContinue
     if ($item) { $item.Delete() }
     & cmd.exe /c "mklink /J `"$dstPath`" `"$srcPath`"" | Out-Null
@@ -58,7 +58,7 @@ foreach ($f in $files) {
     $dstPath = "$dst\$f"
     $srcPath = "$src\$f"
     if (Test-Path $dstPath) { Remove-Item $dstPath -Force }
-    & cmd.exe /c "mklink `"$dstPath`" `"$srcPath`"" | Out-Null
+    & cmd.exe /c "mklink /H `"$dstPath`" `"$srcPath`"" | Out-Null
     Write-Host "OK file: $f"
 }
 
