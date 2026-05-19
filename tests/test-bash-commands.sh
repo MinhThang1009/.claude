@@ -13,6 +13,10 @@ ERRORS=()
 ok()   { echo "  ✓ $1"; PASS=$((PASS+1)); }
 fail() { echo "  ✗ $1"; FAIL=$((FAIL+1)); ERRORS+=("$1"); }
 
+# Compute PLUGIN_DIR absolute trước khi cd — $(dirname $0) là relative
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PLUGIN_DIR="$SCRIPT_DIR/../plugins/sub-agent-system"
+
 # Setup mock environment
 MOCK_HOME=$(mktemp -d)
 MOCK_PROJECT=$(mktemp -d)
@@ -85,7 +89,6 @@ FOUND=$(find "$MOCK_PROJECT/.claude/progress" -name '*-progress.md' 2>/dev/null 
 [ "$FOUND" = "1" ] && ok "find progress files works ($FOUND file)" || fail "find progress failed: $FOUND"
 
 echo "=== Install script: hook copy ==="
-PLUGIN_DIR="$(dirname "$0")/../plugins/sub-agent-system"
 [ -f "$PLUGIN_DIR/commands/plan-tasks.md" ] && ok "plan-tasks.md exists in plugin" || fail "plan-tasks.md missing"
 [ -f "$PLUGIN_DIR/skills/completion-checker/SKILL.md" ] && ok "completion-checker SKILL.md exists" || fail "SKILL.md missing"
 [ -f "$PLUGIN_DIR/hooks/post-commit" ] && ok "post-commit hook exists" || fail "post-commit hook missing"
