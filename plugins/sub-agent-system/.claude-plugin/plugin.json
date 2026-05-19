@@ -1,0 +1,8 @@
+{
+  "name": "sub-agent-system",
+  "description": "Prevention and control system for multi-agent workflows. Rules, skills, agents, and commands to prevent the 22 most common sub-agent failure modes: false positives, scope creep, hallucination, premature termination, race conditions, and more.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Minh Thang"
+  }
+}
