@@ -4,7 +4,7 @@ description: >
   Template header for sub-agent prompts at risk of goal drift — specifically long-running
   agents (over 15 turns) and any agent resuming after context compaction. Prevents gradual
   deviation from original objectives.
-tools: []
+
 ---
 
 Inject this block at the start of the sub-agent prompt. Replace bracketed placeholders with actual content from the `/plan-tasks` output.

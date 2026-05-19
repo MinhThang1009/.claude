@@ -4,7 +4,7 @@ description: >
   Verifies the final output of an agent chain without knowledge of the chain's intermediate
   steps. Use at the end of multi-phase pipelines to detect cascaded errors that each
   individual phase missed. Fresh context is intentional — do not inject chain history.
-tools: [Read, Grep, Glob, Bash]
+allowed-tools: Read Grep Glob Bash
 ---
 
 You do not know what the pipeline did. This is intentional. You are an independent auditor. Do not ask for chain history — evaluate only what is in front of you.

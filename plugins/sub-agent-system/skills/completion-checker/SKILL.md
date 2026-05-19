@@ -4,7 +4,7 @@ description: >
   Parses a sub-agent's COMPLETION_CHECKLIST to verify all assigned tasks were processed.
   Use after receiving output from any sub-agent with an explicit task list to detect premature
   termination. Input is injected directly into the prompt — no file read required.
-tools: [Bash, Write]
+allowed-tools: Bash Write
 ---
 
 **Input:** Original task list assigned to the sub-agent + the sub-agent's full output.

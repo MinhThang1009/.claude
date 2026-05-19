@@ -6,7 +6,7 @@ description: >
   Returns a 0-5 score — score below 3 triggers re-anchoring. For CRITICAL phases, invoke
   as a fresh sub-agent (not inline) to avoid the same self-review bias this skill is
   designed to detect. Inline invocation is acceptable for routine phase checks.
-tools: []
+
 ---
 
 **Input:** Original objective (verbatim quote) + agent output to evaluate.

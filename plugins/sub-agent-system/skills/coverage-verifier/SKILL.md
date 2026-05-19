@@ -4,7 +4,7 @@ description: >
   Spot-checks whether a sub-agent actually read the files it claims to have covered. Use
   after any audit or analysis agent to detect superficial or fabricated coverage before
   accepting findings.
-tools: [Read]
+allowed-tools: Read
 ---
 
 **Input:** Agent's coverage report + list of files the agent was assigned.

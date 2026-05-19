@@ -5,7 +5,7 @@ description: >
   injection into sub-agent prompts. Use before spawning any sub-agent that may not load
   CLAUDE.md automatically — specifically Explore agents, Plan agents, and all
   Task-tool-spawned agents.
-tools: [Read, Glob]
+allowed-tools: Read Glob
 ---
 
 **Note:** Explore and Plan agents never auto-load CLAUDE.md. Task-tool-spawned sub-agents also do not load CLAUDE.md or rules files automatically. Always use this skill before spawning these agent types.

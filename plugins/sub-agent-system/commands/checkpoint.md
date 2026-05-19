@@ -1,5 +1,4 @@
 ---
-name: checkpoint
 description: Saves current phase state to disk and creates a git commit to enable session recovery if interrupted.
 ---
 

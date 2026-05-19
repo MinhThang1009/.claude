@@ -4,7 +4,7 @@ description: >
   Extracts the minimum context a dependent sub-agent needs from the previous phase's output.
   Use before spawning any agent whose task depends on the results of a prior agent. Prevents
   both context loss (too little) and context rot (too much).
-tools: [Read]
+allowed-tools: Read
 ---
 
 **Input:** Previous phase results + description of the next agent's task.

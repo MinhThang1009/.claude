@@ -4,7 +4,7 @@ description: >
   Verifies specific factual claims in sub-agent output against source code and git state.
   Distinguishes content hallucination (wrong facts about code) from state hallucination
   (claiming actions that were not taken). Use after any agent that reports findings or edits.
-tools: [Read, Grep, Bash]
+allowed-tools: Read Grep Bash
 ---
 
 **Input:** List of claims from the sub-agent + file paths + claim type (content or state).

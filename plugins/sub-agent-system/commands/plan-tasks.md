@@ -1,5 +1,4 @@
 ---
-name: plan-tasks
 description: Analyzes a task list and generates an execution plan with dependency graph, file ownership, and parallel execution groups. Run before any multi-agent workflow.
 ---
 

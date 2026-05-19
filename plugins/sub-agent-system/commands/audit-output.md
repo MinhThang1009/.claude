@@ -1,5 +1,4 @@
 ---
-name: audit-output
 description: Post-run audit of a completed multi-agent pipeline. Runs completion-checker, git diff verification, coverage-verifier, and fact-checker in sequence. Pass your project's test command as an argument — e.g., /audit-output "npm test" or /audit-output "pytest -q".
 ---
 

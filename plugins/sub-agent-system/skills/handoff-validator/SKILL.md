@@ -4,7 +4,7 @@ description: >
   Validates a phase's output before passing it to the next phase in an agent chain. Use
   between every phase transition to prevent error cascades. Checks objective alignment,
   edit verification, and test results.
-tools: [Read, Grep, Bash]
+allowed-tools: Read Grep Bash
 ---
 
 **Input:** Phase N output + original phase objectives + affected file paths + TEST_COMMAND (injected by the main agent, e.g., `"npm test"`, `"pytest"`, `"cargo test"`).

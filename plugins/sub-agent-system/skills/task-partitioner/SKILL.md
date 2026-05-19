@@ -4,7 +4,7 @@ description: >
   Analyzes a task list and codebase to produce a dependency graph, file ownership map, and
   grouped execution plan for multi-agent workflows. Use before spawning any parallel agents
   to prevent scope overlap and out-of-order execution.
-tools: [Read, Glob, Grep]
+allowed-tools: Read Glob Grep
 ---
 
 Analyze the provided task list and produce a multi-agent execution plan.

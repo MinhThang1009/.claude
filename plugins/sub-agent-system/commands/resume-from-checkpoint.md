@@ -1,5 +1,4 @@
 ---
-name: resume-from-checkpoint
 description: Reads checkpoint files after a session interruption to determine which phase to resume from and what context to inject.
 ---
 

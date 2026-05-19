@@ -4,7 +4,7 @@ description: >
   Saves phase results to disk and creates a git commit after each phase completes. Use at
   the end of every implementation phase to enable session recovery if the session is
   interrupted.
-tools: [Write, Bash]
+allowed-tools: Write Bash
 ---
 
 After a phase completes, execute these steps in order:

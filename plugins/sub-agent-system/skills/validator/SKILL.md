@@ -5,7 +5,7 @@ description: >
   batch audits to filter false positives — for 1-5 findings inline in the current
   conversation. For larger batches (>5 findings) or when fresh-context independence is
   required, use finding-validator instead (spawns isolated context with no audit bias).
-tools: [Read, Grep, Glob]
+allowed-tools: Read Grep Glob
 ---
 
 You do not know the original intent of the audit that produced these findings. This isolation is intentional — it prevents confirmation bias.
