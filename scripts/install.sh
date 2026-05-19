@@ -29,13 +29,18 @@ sync_dir() {
   done
 }
 
-sync_dir "$PLUGIN_SRC/commands" "commands" \
-  "$HOME/.claude/commands" \
-  "$MARKETPLACE/commands"
+# Marketplace optional — chỉ sync nếu dir tồn tại (không có trong CI/fresh clone)
+MARKETPLACE_EXISTS=false
+[ -d "$MARKETPLACE" ] && MARKETPLACE_EXISTS=true
 
-sync_dir "$PLUGIN_SRC/agents" "agents" \
-  "$HOME/.claude/agents" \
-  "$MARKETPLACE/agents"
+if $MARKETPLACE_EXISTS; then
+  sync_dir "$PLUGIN_SRC/commands" "commands" "$HOME/.claude/commands" "$MARKETPLACE/commands"
+  sync_dir "$PLUGIN_SRC/agents"   "agents"   "$HOME/.claude/agents"   "$MARKETPLACE/agents"
+else
+  sync_dir "$PLUGIN_SRC/commands" "commands" "$HOME/.claude/commands"
+  sync_dir "$PLUGIN_SRC/agents"   "agents"   "$HOME/.claude/agents"
+  echo "  (marketplace not found — skipped, OK for fresh install)"
+fi
 
 # Skills: có subdirectory mỗi skill
 echo ""; echo "Syncing skills..."
@@ -44,8 +49,9 @@ for skill_dir in "$PLUGIN_SRC/skills"/*/; do
   for f in "$skill_dir"*.md; do
     [ -f "$f" ] || continue
     filename=$(basename "$f")
-    [ -d "$HOME/.claude/skills/$skill" ] && cp "$f" "$HOME/.claude/skills/$skill/$filename" && echo "  ✓ $skill/$filename → skills/"
-    [ -d "$MARKETPLACE/skills/$skill" ] && cp "$f" "$MARKETPLACE/skills/$skill/$filename"
+    mkdir -p "$HOME/.claude/skills/$skill"
+    cp "$f" "$HOME/.claude/skills/$skill/$filename" && echo "  ✓ $skill/$filename → skills/"
+    $MARKETPLACE_EXISTS && [ -d "$MARKETPLACE/skills/$skill" ] && cp "$f" "$MARKETPLACE/skills/$skill/$filename" || true
   done
 done
 

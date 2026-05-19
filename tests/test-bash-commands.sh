@@ -3,14 +3,15 @@
 # Chạy trên Linux/Mac/Windows Git Bash
 # Exit code: 0 = all pass, 1 = failures
 
-set -euo pipefail
+set -uo pipefail  # remove -e: không exit sớm khi test fail
 
 PASS=0
 FAIL=0
 ERRORS=()
 
-ok() { echo "  ✓ $1"; ((PASS++)); }
-fail() { echo "  ✗ $1"; ((FAIL++)); ERRORS+=("$1"); }
+# Dùng PASS=$((PASS+1)) thay ((PASS++)) — tránh exit code 1 khi var=0 dưới set -e
+ok()   { echo "  ✓ $1"; PASS=$((PASS+1)); }
+fail() { echo "  ✗ $1"; FAIL=$((FAIL+1)); ERRORS+=("$1"); }
 
 # Setup mock environment
 MOCK_HOME=$(mktemp -d)
