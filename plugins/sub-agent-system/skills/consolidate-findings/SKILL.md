@@ -10,8 +10,22 @@ allowed-tools: Bash Write
 **Input:** List of agent outputs (injected directly) OR paths to progress files.
 
 **Step 1 — Parse findings from each agent output.**
-For each agent, extract findings with format:
+
+Two formats are supported — detect per-agent which applies:
+
+**Format A** (security-auditor, quick-audit style):
 `[severity emoji] [file:line] — [description]`
+
+**Format B** (pipeline-reviewer style — block format):
+```
+Finding: [description]
+File: [path]
+Line: [N]
+Evidence: "[quote]"
+Severity: CRITICAL | HIGH | MEDIUM | LOW
+```
+For Format B, map severity text to emoji: CRITICAL→🔴, HIGH→🟠, MEDIUM→🟡, LOW→🟢.
+If an agent's output contains `Finding:` / `Severity:` blocks, use Format B. Otherwise use Format A.
 
 Severity mapping:
 - 🔴 = CRITICAL (weight 4)

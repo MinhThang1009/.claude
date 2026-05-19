@@ -7,11 +7,22 @@ description: >
 allowed-tools: Bash Write
 ---
 
-**Input:** Consolidated findings (from consolidate-findings skill output OR injected text).
+**Input:** Consolidated findings (from consolidate-findings skill output OR injected text). Optionally `PROJECT_ROOT: /path` can be injected.
+
+**Step 0 — Resolve PROJECT_ROOT.**
+If `PROJECT_ROOT:` was injected in the input, use it. Otherwise auto-detect:
+```bash
+Bash("cat .claude/PIPELINE_CONFIG.md 2>/dev/null | grep '^PROJECT_ROOT:' | cut -d' ' -f2-")
+```
+If that returns empty, fall back to:
+```bash
+Bash("git rev-parse --show-toplevel 2>/dev/null || echo '.'")
+```
+Set `RESOLVED_ROOT` to the result. If RESOLVED_ROOT is `.`, warn "PROJECT_ROOT not resolved — grepping relative path, may miss findings if session cwd ≠ project root."
 
 **Step 1 — Count CRITICAL findings.**
 ```bash
-Bash("grep '🔴 CRITICAL' [PROJECT_ROOT]/.claude/FINDINGS_REPORT.md 2>/dev/null | grep -v '^|' | grep -v '^| Severity' | wc -l | tr -d ' ' || echo 0")
+Bash("grep '🔴 CRITICAL' [RESOLVED_ROOT]/.claude/FINDINGS_REPORT.md 2>/dev/null | grep -v '^|' | grep -v '^| Severity' | wc -l | tr -d ' ' || echo 0")
 ```
 Dùng `grep -v '^|'` để loại bỏ dòng summary table (bắt đầu bằng `|`). Nếu FINDINGS_REPORT.md không tồn tại, count từ injected text thay thế.
 

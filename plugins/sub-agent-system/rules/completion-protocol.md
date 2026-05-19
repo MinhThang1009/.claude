@@ -6,7 +6,7 @@ Before reporting done, every assigned task must be accounted for. Prevents prema
 - Output a COMPLETION_CHECKLIST before every final response, marking each task `[x]` done or `[o]` skipped with a reason
 - Include TASKS_PROCESSED and TASKS_TOTAL counts
 - Set STATUS to `COMPLETED`, `PARTIAL`, `FAILED`, or `SUSPICIOUS` (uppercase — required for automated parsing)
-- List REMAINING_TASKS when STATUS is `PARTIAL`
+- List REMAINING_TASKS when STATUS is `PARTIAL` or `SUSPICIOUS`
 
 **Don't:**
 - Report done when TASKS_PROCESSED < TASKS_TOTAL

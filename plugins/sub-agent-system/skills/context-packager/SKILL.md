@@ -25,6 +25,13 @@ Extract only the information the next agent needs to avoid breaking existing wor
 - Style or formatting changes
 - Intermediate reasoning or chain-of-thought from the previous phase
 
+**Empty context guard:** After extracting, if all four sections (interface changes, breaking changes, key file changes, constraints) are empty or contain only "none" / "N/A" entries, output:
+```
+WARNING: context package is empty — the previous phase may not have produced output,
+or its output was not in a parseable form. Verify the previous phase actually completed
+before injecting this package into the next agent.
+```
+
 **Output format:**
 
 ```

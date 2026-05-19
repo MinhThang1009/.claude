@@ -29,6 +29,8 @@ Use the task-partitioner skill to analyze the task list and codebase.
 
 **Critical:** Never use `code-explorer` for tasks that require writing progress files — it has no Bash/Write tools and will silently skip the progress file instruction.
 
+**Model selection:** All agents default to `sonnet`. Override with `model: haiku` only for pure read/exploration tasks with no Bash/Write (e.g., "summarize this module", "list all API endpoints") to reduce token cost. Never use haiku for implementation, security review, or verification — it produces lower-quality findings.
+
 **Mandatory pipeline shape — always end with this sequence:**
 ```
 Batch N-2: [fix agents in parallel]
@@ -41,6 +43,8 @@ Batch N-1: pipeline-reviewer
 Batch N:   chain-verifier
 ```
 Never skip severity-gate. If pipeline-reviewer returns 0 findings, severity-gate still runs (it will pass instantly).
+
+**Non-git projects:** `chain-verifier` requires git and will output `CHAIN_VERIFICATION_BLOCKED` on non-git repos. For non-git projects, replace the final `chain-verifier` batch with a manual verification step: have `pipeline-reviewer` do a second pass over all affected files, then escalate to the user for sign-off instead of automated APPROVED verdict.
 
 **Present the plan to the user for approval before spawning any agents.** Do not begin execution until the user confirms.
 

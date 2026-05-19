@@ -28,7 +28,8 @@ This file is the anchor for `chain-verifier`. Skip for phases 2+.
 **Step 1 — Write the checkpoint file.**
 ```bash
 # TIMESTAMP cross-platform: date -u +%Y%m%dT%H%M%S (macOS/Linux/Git Bash on Windows)
-Bash("TIMESTAMP=$(date -u +%Y%m%dT%H%M%S); ROOT=$(git rev-parse --show-toplevel); cat > \"$ROOT/.claude/checkpoints/phase-N-$TIMESTAMP.md\" << 'CPEOF'\n[checkpoint content]\nCPEOF")
+# Add $RANDOM suffix to prevent filename collision when two phases complete in the same second
+Bash("TIMESTAMP=$(date -u +%Y%m%dT%H%M%S); ROOT=$(git rev-parse --show-toplevel); cat > \"$ROOT/.claude/checkpoints/phase-N-${TIMESTAMP}-$RANDOM.md\" << 'CPEOF'\n[checkpoint content]\nCPEOF")
 ```
 Write `.claude/checkpoints/phase-[N]-[timestamp].md` with the following content:
 

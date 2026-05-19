@@ -61,3 +61,9 @@ Recommended action:
 **In automated (unattended) pipelines:** This skill produces an LLM score with no secondary verification. A miscalibrated score (scoring drifted output as ALIGNED) propagates silently — there is no meta-checker for this skill. Apply a conservative rule at the boundary:
 - Score exactly 3 (PARTIAL_DRIFT boundary) → treat as PARTIAL_DRIFT and re-anchor; do not continue without re-anchoring.
 - For high-stakes pipelines: invoke this skill twice with different phrasings and escalate if results disagree (scores differ by ≥2).
+
+  **Template for second phrasing (negated form):**
+  - Phrasing 1 (positive): `"[verbatim objective as originally stated]"`
+  - Phrasing 2 (negated): `"Is there any evidence that [key outcome of objective] was NOT achieved? List specific gaps, omissions, or contradicting evidence in the output."`
+
+  The negated phrasing activates different reasoning paths and is more likely to surface missed requirements that a positive framing overlooks. If the two scores differ by ≥2, treat the lower score as authoritative and escalate.

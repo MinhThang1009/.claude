@@ -22,6 +22,13 @@ For each finding:
    - `FALSE_POSITIVE` — the code does not support the finding
    - `NEEDS_CONTEXT` — cannot determine without reading additional files
 
+**Begin every response with this STATUS block (required for completion-checker compatibility):**
+```
+STATUS: COMPLETED | PARTIAL | FAILED
+TASKS_PROCESSED: N
+TASKS_TOTAL: M
+```
+
 **Output format:**
 
 ```

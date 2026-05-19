@@ -87,7 +87,7 @@ Bash("git -C [PROJECT_ROOT] rev-parse HEAD > [PROJECT_ROOT]/.claude/checkpoints/
 ```
 This allows `chain-verifier` to determine git diff scope automatically. Without it, chain-verifier cannot compute which files changed and will output `CHAIN_VERIFICATION_BLOCKED`.
 
-8. **Report:**
+9. **Report:**
 ```
 PIPELINE_READY:
 Project: [PROJECT_ROOT]

@@ -10,18 +10,24 @@ allowed-tools: Bash Write
 **Input:** Original task list assigned to the sub-agent + the sub-agent's full output.
 
 **Step 1 — Save output to a temp file for deterministic counting.**
+
+If `PROJECT_ROOT` was injected in the input, use it as an absolute base path. Otherwise fall back to the relative path (works only when session cwd = project root — warn if uncertain):
 ```bash
-Bash("mkdir -p .claude/tmp")
-Write(".claude/tmp/cc_input.txt", [sub-agent output])
+Bash("mkdir -p [PROJECT_ROOT_OR_DOT]/.claude/tmp")
+Write("[PROJECT_ROOT_OR_DOT]/.claude/tmp/cc_input.txt", [sub-agent output])
 ```
-Uses `.claude/tmp/` (project-relative, works on macOS/Linux/Windows). Enables `grep` to count mechanically rather than relying on LLM text parsing.
+**Warning:** If the Claude session was started from a directory other than the project root, `.claude/tmp/` resolves to the wrong location and grep counts will be 0. Always inject `PROJECT_ROOT` from `PIPELINE_CONFIG.md` when calling this skill in a multi-project setup.
 
 **Step 2 — Count deterministically with grep.**
+
+First, extract only the COMPLETION_CHECKLIST section to avoid counting `[x]` in code snippets or findings text:
 ```bash
-Bash("grep -Fc '[x]' .claude/tmp/cc_input.txt")                           # done count
-Bash("grep -Fc '[o]' .claude/tmp/cc_input.txt")                           # skipped count
 Bash("grep -Eic 'COMPLETION.{0,1}CHECKLIST' .claude/tmp/cc_input.txt")    # block exists (flex)
+Bash("sed -n '/COMPLETION.CHECKLIST/,/^STATUS:/p' .claude/tmp/cc_input.txt > .claude/tmp/cc_checklist.txt 2>/dev/null || cp .claude/tmp/cc_input.txt .claude/tmp/cc_checklist.txt")
+Bash("grep -Fc '[x]' .claude/tmp/cc_checklist.txt")                       # done count (checklist only)
+Bash("grep -Fc '[o]' .claude/tmp/cc_checklist.txt")                       # skipped count (checklist only)
 ```
+If the sed extraction fails (no COMPLETION_CHECKLIST found), fall back to counting from the full file and note "CHECKLIST_NOT_FOUND — counts may include false positives from document content."
 The third grep uses `-Ei` (case-insensitive extended regex) to match both `COMPLETION_CHECKLIST` and `COMPLETION CHECKLIST` — agents sometimes use a space instead of underscore.
 Use `-Fc` for `[x]`/`[o]` counts (fixed-string, no escaping issues). Use these counts as ground truth. Do NOT rely on LLM estimation.
 
@@ -29,6 +35,8 @@ Use `-Fc` for `[x]`/`[o]` counts (fixed-string, no escaping issues). Use these c
 
 **Step 3 — Identify missing tasks.**
 Compare task names in the original task list against lines found in the COMPLETION_CHECKLIST block. A task is MISSING if its name or identifier does not appear in any `[x]` or `[o]` line. This step uses LLM matching — flag any uncertain matches explicitly.
+
+Uncertain match threshold: if more than 30% of matches are flagged uncertain, set STATUS to SUSPICIOUS regardless of grep counts. Uncertain matches that include critical-path tasks (implementation, security, database) → set ACTION to ESCALATE.
 
 **Step 4 — Compare totals.**
 Compare grep-counted items (Step 2) against the number of tasks in the original task list. If checklist item count < assigned task count, flag SUSPICIOUS.

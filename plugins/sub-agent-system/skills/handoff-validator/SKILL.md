@@ -49,11 +49,24 @@ When DECISION is `REVERT_AND_RETRY`:
   VALID=$(Bash("git cat-file -t [HASH] 2>/dev/null"))
   # Only proceed if VALID == "commit"
   
-  # Step 2: stash current work
-  Bash("git stash push -m 'auto-stash before handoff revert'")
+  # Step 2: stash current work — ABORT if stash fails
+  STASH_OUT=$(Bash("git stash push -m 'auto-stash before handoff revert' 2>&1; echo EXIT:$?"))
+  # Case A: EXIT:0 AND output contains "No local changes to save"
+  #   → tree is already clean (no uncommitted tracked-file changes). Safe to proceed.
+  #   Note: untracked files (.claude/, etc.) are not stashed — they persist after checkout (intended).
+  # Case B: EXIT:0 AND output does NOT contain "No local changes to save"
+  #   → stash entry was created. Proceed.
+  # Case C: EXIT: followed by non-zero
+  #   → output REVERT_BLOCKED: git stash failed ([stash output]) and escalate to human.
+  #   Do NOT run git checkout.
   
-  # Step 3: revert files (NOT HEAD — preserves commit history)
+  # Step 3: revert files (NOT HEAD — preserves commit history) — only if stash succeeded
   Bash("git checkout [HASH] -- .")
+  # Note: git checkout only reverts tracked files. Untracked files created by the pipeline
+  # (e.g., .claude/checkpoints/, .claude/progress/) remain on disk after this revert.
+  # If a clean state is required, manually remove these with:
+  # Bash("rm -rf [PROJECT_ROOT]/.claude/checkpoints/ [PROJECT_ROOT]/.claude/progress/")
+  # Only do this if you are certain these directories contain only pipeline artifacts.
   ```
   If `VALID` is not "commit" (hash missing, truncated, or invalid): do NOT run git checkout. Instead output `REVERT_BLOCKED: invalid hash in chain-start-commit` and escalate to human.
 

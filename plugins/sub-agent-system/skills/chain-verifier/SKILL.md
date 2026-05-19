@@ -11,7 +11,15 @@ You do not know what the pipeline did. This is intentional. You are an independe
 
 **Input:** Original requirements (verbatim) + final affected file paths + optional TEST_COMMAND.
 
-**Step 0 — Read the chain start commit.**
+**Step 0 — Verify git repo and read chain start commit.**
+
+First, confirm this is a git repository:
+```bash
+Bash("git rev-parse --is-inside-work-tree 2>/dev/null || echo NOT_GIT")
+```
+If the result is `NOT_GIT`: output `CHAIN_VERIFICATION_BLOCKED: not a git repository — chain-verifier requires git to compute diffs. Run chain-verifier only in git-managed projects.` and stop.
+
+Then read the chain start commit:
 ```bash
 Bash("cat .claude/checkpoints/chain-start-commit")
 ```

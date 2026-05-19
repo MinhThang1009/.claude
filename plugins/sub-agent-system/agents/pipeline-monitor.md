@@ -4,7 +4,7 @@ description: >
   Post-batch health checker for multi-agent workflows. Invoke after each agent batch
   completes to detect stalls, blocked agents, and silent failures. Not a realtime monitor
   — Claude Code has no sleep mechanism. Requires sub-agents to write progress files.
-tools: [Read, Write, Glob]
+tools: [Read, Write, Glob, Bash]
 model: sonnet
 maxTurns: 10
 ---
@@ -72,11 +72,16 @@ Read each progress file found in Step 2.
 Rows that do not match (missing columns, wrong separator, missing DONE) are `MALFORMED`.
 If more than 50% of rows in a file are MALFORMED, flag the entire file as `MALFORMED_PROGRESS` and do not attempt health analysis on it — add it to the anomaly list instead.
 
+Get current time for STALL comparison:
+```bash
+Bash("date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u +%Y-%m-%dT%H:%M:%S")
+```
+
 For well-formed files, detect:
-- `STALL` — last entry timestamp is more than 5 minutes ago and status is not COMPLETE
+- `STALL` — last entry timestamp is more than 5 minutes ago (compare against current time from Bash above) and status is not COMPLETE
 - `BLOCKED` — TASKS_PROCESSED = 0 after multiple entries exist
-- `POSSIBLE_SILENT_DENIAL` — zero findings reported across a large scope (more than 10 files)
-- `NEVER_STARTED` — no progress file exists for an agent that was spawned more than 5 minutes ago
+- `POSSIBLE_SILENT_DENIAL` — zero findings reported across a large scope (more than 10 files); likely cause: agent's Bash tool was silently denied in background mode (background agents auto-deny any tool call that would otherwise prompt)
+- `NEVER_STARTED` — no progress file exists for an agent that was spawned more than 5 minutes ago; possible causes: (1) Bash tool silently denied so progress file was never written, (2) progress file instruction omitted from agent prompt, (3) agent never actually spawned
 - `MALFORMED_PROGRESS` — file exists but majority of rows cannot be parsed
 
 ---
@@ -86,10 +91,15 @@ For well-formed files, detect:
 For each anomaly found, write `[PROJECT_ROOT]/.claude/alerts/[timestamp]-[agent-id]-alert.md`:
 
 ```markdown
-ALERT: [STALL | BLOCKED | POSSIBLE_SILENT_DENIAL | NEVER_STARTED]
+ALERT: [STALL | BLOCKED | POSSIBLE_SILENT_DENIAL | NEVER_STARTED | MALFORMED_PROGRESS]
 Agent: [agent-id or progress file path]
 Detail: [what was found — last timestamp, task counts, etc.]
-Recommended action: [retry foreground | check OTel | escalate to user]
+Recommended action:
+  STALL: Retry agent in foreground mode to allow tool permission prompts.
+  BLOCKED: Check if agent prompt included the progress file instruction. Retry foreground.
+  POSSIBLE_SILENT_DENIAL: Background agents auto-deny unpermitted tools. Re-run in foreground with explicit tool grants, or add Bash to the agent's allowed tools.
+  NEVER_STARTED: (1) Verify agent was spawned. (2) If spawned, check if Bash was silently denied — retry in foreground. (3) Confirm progress file instruction was in the agent prompt.
+  MALFORMED_PROGRESS: Inspect file manually. Agent may have written output in wrong format.
 Timestamp: [ISO 8601]
 ```
 

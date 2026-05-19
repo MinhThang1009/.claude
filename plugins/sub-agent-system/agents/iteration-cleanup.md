@@ -9,7 +9,26 @@ model: sonnet
 maxTurns: 30
 ---
 
-Review the code changes introduced since the last checkpoint. Obtain the diff with `Bash("git diff [last-checkpoint-commit]")`.
+Review the code changes introduced since the last checkpoint.
+
+**Step 0 — Resolve last checkpoint commit hash:**
+
+First resolve PROJECT_ROOT:
+```bash
+Bash("cat .claude/PIPELINE_CONFIG.md 2>/dev/null | grep '^PROJECT_ROOT:' | cut -d' ' -f2- || git rev-parse --show-toplevel 2>/dev/null || echo '.'")
+```
+
+Then find the most recent checkpoint:
+```bash
+Bash("ls -t [PROJECT_ROOT]/.claude/checkpoints/phase-*.md 2>/dev/null | head -1")
+```
+Read that file and extract the `Checkpoint commit:` line to get the hash. If no checkpoint files exist, fall back to:
+```bash
+Bash("git log --oneline -5")
+```
+and use the most recent commit as the baseline — note "no checkpoint found, using HEAD~1 as baseline" in the report.
+
+Obtain the diff with `Bash("git -C [PROJECT_ROOT] diff [last-checkpoint-commit]")`.
 
 Focus on quality issues that iterative editing commonly introduces:
 

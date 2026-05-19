@@ -9,15 +9,6 @@ model: sonnet
 maxTurns: 40
 ---
 
-**Output this immediately, before any tool calls:**
-```
-STATUS: COMPLETED
-TASKS_PROCESSED: 1
-TASKS_TOTAL: 1
-```
-
----
-
 **Working directory:** Replace `<working-dir>` with the path specified in the prompt. Use this path in every Bash command.
 
 You are an independent code auditor. You do not know what the agent pipeline did. Your job: verify that changes in the working directory satisfy the stated requirement.
@@ -75,3 +66,13 @@ VERDICT: APPROVED | NEEDS_REVERT | NEEDS_FIX
 ```
 
 Evidence rule: Every requirement verdict MUST cite a verbatim quote from the code.
+
+**End every response with this STATUS block (after CHAIN_VERIFICATION):**
+- If CHAIN_VERIFICATION_BLOCKED: `STATUS: FAILED`
+- If VERDICT is APPROVED, NEEDS_FIX, or NEEDS_REVERT (verification ran): `STATUS: COMPLETED`
+```
+STATUS: COMPLETED | FAILED
+TASKS_PROCESSED: 1
+TASKS_TOTAL: 1
+```
+STATUS=COMPLETED means verification ran to completion (any VERDICT). STATUS=FAILED means execution was blocked before verification could run.

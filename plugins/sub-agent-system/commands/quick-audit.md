@@ -18,7 +18,7 @@ Examples:
 
 2. **List files in scope:**
 ```bash
-Bash("find [PATH] -name '*.js' -o -name '*.ts' -o -name '*.tsx' 2>/dev/null | grep -v node_modules | head -20")
+Bash("find [PATH] \( -name '*.js' -o -name '*.ts' -o -name '*.tsx' -o -name '*.py' -o -name '*.go' -o -name '*.rs' -o -name '*.java' -o -name '*.rb' -o -name '*.php' \) 2>/dev/null | grep -v node_modules | head -20")
 ```
 If >10 files: warn "Scope has [N] files — consider /plan-tasks for full pipeline. Proceeding with first 10."
 
@@ -36,7 +36,7 @@ Files to audit:
 [list from step 2]
 
 Read each file. Report findings with:
-- severity: 🔴CRITICAL / 🟠HIGH / 🟡MEDIUM / 🟢LOW
+- severity: 🔴 CRITICAL / 🟠 HIGH / 🟡 MEDIUM / 🟢 LOW
 - file:line
 - description
 - specific fix
