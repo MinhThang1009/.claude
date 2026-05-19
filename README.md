@@ -80,7 +80,7 @@
     └── skill-evals.json            # → <skill>/evals/evals.json (eval-driven optimize)
 ```
 
-**Baseline tokens** — đo thực tế bằng `/context` (Opus 4.7 1M context, snapshot session start, 2026-05-10, agents/skills từ plugins đã symlink):
+**Baseline tokens** — đo thực tế bằng `/context` (Opus 4.7 1M context, snapshot session start, 2026-05-10, agents/skills từ plugins đã junction):
 
 | Category                      | Tokens     | % of 1M   |
 | ----------------------------- | ---------- | --------- |
@@ -171,7 +171,7 @@ bash dotclaude/scripts/create-symlinks.sh
 > powershell -File dotclaude\scripts\rebuild-links.ps1
 > ```
 >
-> **Xem trạng thái symlinks hiện tại**:
+> **Xem trạng thái junctions hiện tại**:
 > ```powershell
 > powershell -File dotclaude\scripts\check-links.ps1
 > ```
@@ -309,7 +309,7 @@ Cao → thấp khi xung đột:
 | ---------------------- | ----------------------------------------------------------------------------- |
 | **CLAUDE.md**          | Hướng dẫn cần load **MỌI session** — giữ ngắn (<100 dòng)                     |
 | **rules/** auto-import | Rule áp dụng MỌI session                                                       |
-| **plugins/**           | Nhóm agents + skills theo domain — install qua `claude plugin install` hoặc symlink |
+| **plugins/**           | Nhóm agents + skills theo domain — install qua `claude plugin install` hoặc junction |
 | **hooks**              | Hành động **BẮT BUỘC** chạy mỗi lần (CLAUDE.md là gợi ý, hooks deterministic) |
 | **MCP**                | Tool ngoài (Notion, Figma, DB, GitHub…)                                       |
 | **`permissions.deny`** | Chặn Claude đọc file nhạy cảm (`.env`, `*.key`) hoặc thư mục lớn (build, lockfile) — đây là cách ChÍNH THỨC, không có `.claudeignore` trong docs |
