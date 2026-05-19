@@ -40,4 +40,4 @@ Use the task-partitioner skill to analyze the task list and codebase.
 
 If the task list contains ambiguous dependencies (tasks that might or might not need to be sequential), surface them explicitly and ask the user to decide before finalizing the plan.
 
-**Chain verification prerequisite:** If the plan includes a chain-verifier invocation at the end of the pipeline, the plan MUST include `checkpoint-writer` at the end of Phase 1 (before Phase 2 begins). The chain-verifier requires `.claude/checkpoints/chain-start-commit` written by `checkpoint-writer` Step 0. Without this, chain-verifier will block with `CHAIN_VERIFICATION_BLOCKED`. Note this dependency explicitly in the execution plan under Phase 1.
+**Chain verification prerequisite:** If the plan includes a chain-verifier invocation at the end of the pipeline, the plan MUST include `checkpoint-writer` at the end of Phase 1 (before Phase 2 begins). The chain-verifier requires `.claude/checkpoints/chain-start-commit` written by `checkpoint-writer` Step 0. Without this, chain-verifier will block with `CHAIN_VERIFICATION_BLOCKED`. Note this dependency explicitly in the execution plan under Phase 1.# hook-test
