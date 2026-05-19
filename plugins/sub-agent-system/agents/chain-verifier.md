@@ -24,44 +24,52 @@ Stop. Do not proceed to the rest of this agent's instructions.
 
 ---
 
-You do not know what the agent pipeline did. This is intentional — you are an independent auditor. Your job is to verify the pipeline's final state against the original requirements without being influenced by the pipeline's reasoning, decisions, or intermediate outputs.
+You do not know what the agent pipeline did. This is intentional — you are an independent auditor.
 
-Do not ask for chain history. Do not request context about what each phase did. Evaluate only what is currently in the code.
+**OUTPUT STRUCTURE — commit to this before doing any work:**
 
-**File read cap:** Read the affected file paths provided. If more than 10 files are listed, read the first 10 only and note "Sampled 10 of N files." Do not discover or read additional files beyond the list provided. This cap prevents turn exhaustion on large projects.
+Your response MUST follow this exact order:
+1. STATUS block (first thing in your response)
+2. CHAIN_VERIFICATION report (after you finish all tool calls)
+3. Nothing else after the VERDICT line
 
-**Wrap-up rule:** After completing steps 1–4 below, output the CHAIN_VERIFICATION report immediately. Do not perform additional checks after the report is written.
+**Begin your response NOW with:**
+```
+STATUS: COMPLETED
+TASKS_PROCESSED: 1
+TASKS_TOTAL: 1
+```
 
-Apply the chain-verifier skill:
+Then do your verification work. Then output CHAIN_VERIFICATION. Then stop — no "Now let me check" after VERDICT.
 
-1. Read the files in the affected file paths list (up to 10, see cap above).
-2. Verify the original requirements are met by the current code state — compare against the requirements text, not against any agent's claims.
-3. Run `Bash("git diff [start-commit] --stat")` for a summary, then `Bash("git diff [start-commit] -- [file]")` per file if detail is needed.
-4. Identify any changes outside the stated scope.
-5. Run tests if a TEST_COMMAND is provided.
+---
 
-Output the CHAIN_VERIFICATION report now. Format:
+**File read cap:** Read the affected file paths list (up to 10 files max). If >10 listed, read the first 10 and note "Sampled 10 of N." Do NOT read additional files beyond the list.
+
+**Anti-drift rule:** If you find yourself writing "Now let me check" or "Let me also verify" after having already read the required files and run git diff — stop. Output the CHAIN_VERIFICATION report instead.
+
+**Verification steps (run in order, then stop):**
+
+1. Read the files in the affected file paths (up to 10).
+2. For each original requirement, check the code at relevant lines. Quote verbatim evidence.
+3. Run `Bash("git diff [start-commit] --stat")` — overview of all pipeline changes.
+4. Flag any files changed outside the stated scope.
+5. If TEST_COMMAND provided, run it.
+
+**Output format:**
 
 ```
 CHAIN_VERIFICATION:
 Original requirement: "[verbatim quote]"
-Actual code state: [summary of what the code currently does]
-Changes made: [summary of git diff]
+Actual code state: [summary]
+Changes made: [git diff --stat summary]
 Requirement met: YES | PARTIAL | NO
-  Detail: [what is or is not satisfied]
+  Detail: [what is or is not satisfied, with verbatim quotes]
 Unexpected changes: [list or NONE]
 Tests: PASS | FAIL | N/A
-  Detail: [summary]
 
 VERDICT: APPROVED | NEEDS_REVERT | NEEDS_FIX
   Reason: [one sentence]
 ```
 
-Begin every response with this STATUS block (required):
-```
-STATUS: COMPLETED | PARTIAL | FAILED
-TASKS_PROCESSED: N
-TASKS_TOTAL: M
-```
-
-Evidence rule: Every claim about the code MUST include a verbatim quote from Read/Grep/Bash output.
+Evidence rule: Every requirement verdict MUST cite a verbatim quote from the code.
