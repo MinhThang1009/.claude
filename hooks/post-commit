@@ -1,41 +1,38 @@
 #!/bin/bash
-# post-commit hook — sync plugin commands và agents to installed location sau mỗi commit
+# post-commit hook — sync plugin to installed + marketplace locations sau mỗi commit
 # Install: cp hooks/post-commit .git/hooks/post-commit && chmod +x .git/hooks/post-commit
 
 DOTCLAUDE_ROOT="$(git rev-parse --show-toplevel)"
+PLUGIN="sub-agent-system"
+PLUGIN_SRC="$DOTCLAUDE_ROOT/plugins/$PLUGIN"
+
+# Destination locations
 INSTALL_COMMANDS="$HOME/.claude/commands"
 INSTALL_AGENTS="$HOME/.claude/agents"
+INSTALL_SKILLS="$HOME/.claude/skills"
+MARKETPLACE="$HOME/.claude/plugins/marketplaces/minhthang-plugins/plugins/$PLUGIN"
 
-# Lấy danh sách files thay đổi trong commit vừa rồi
-CHANGED_COMMANDS=$(git diff-tree --no-commit-id -r --name-only HEAD 2>/dev/null | grep "plugins/.*/commands/.*\.md$")
-CHANGED_AGENTS=$(git diff-tree --no-commit-id -r --name-only HEAD 2>/dev/null | grep "plugins/.*/agents/.*\.md$")
+# Files changed in this commit
+CHANGED=$(git diff-tree --no-commit-id -r --name-only HEAD 2>/dev/null | grep "plugins/$PLUGIN/")
+[ -z "$CHANGED" ] && exit 0
 
-SYNCED=0
+echo "[post-commit] Syncing $PLUGIN..."
 
-if [ -n "$CHANGED_COMMANDS" ]; then
-  echo "[post-commit] Syncing plugin commands..."
-  for f in $CHANGED_COMMANDS; do
-    filename=$(basename "$f")
-    src="$DOTCLAUDE_ROOT/$f"
-    dst="$INSTALL_COMMANDS/$filename"
-    if [ -f "$src" ]; then
-      cp "$src" "$dst"
-      echo "  ✓ $filename"
-      SYNCED=1
-    fi
-  done
-fi
+for f in $CHANGED; do
+  filename=$(basename "$f")
+  src="$DOTCLAUDE_ROOT/$f"
+  [ -f "$src" ] || continue
 
-if [ -n "$CHANGED_AGENTS" ]; then
-  echo "[post-commit] Syncing plugin agents..."
-  for f in $CHANGED_AGENTS; do
-    filename=$(basename "$f")
-    src="$DOTCLAUDE_ROOT/$f"
-    dst="$INSTALL_AGENTS/$filename"
-    if [ -f "$src" ]; then
-      cp "$src" "$dst"
-      echo "  ✓ $filename"
-      SYNCED=1
-    fi
-  done
-fi
+  # Sync dựa theo loại file
+  if echo "$f" | grep -q "/commands/"; then
+    cp "$src" "$INSTALL_COMMANDS/$filename" && echo "  ✓ commands/$filename"
+    [ -d "$MARKETPLACE/commands" ] && cp "$src" "$MARKETPLACE/commands/$filename"
+  elif echo "$f" | grep -q "/agents/"; then
+    cp "$src" "$INSTALL_AGENTS/$filename" && echo "  ✓ agents/$filename"
+    [ -d "$MARKETPLACE/agents" ] && cp "$src" "$MARKETPLACE/agents/$filename"
+  elif echo "$f" | grep -q "/skills/"; then
+    skill_dir=$(echo "$f" | sed 's|.*/skills/\([^/]*\)/.*|\1|')
+    [ -d "$INSTALL_SKILLS/$skill_dir" ] && cp "$src" "$INSTALL_SKILLS/$skill_dir/$filename" && echo "  ✓ skills/$skill_dir/$filename"
+    [ -d "$MARKETPLACE/skills/$skill_dir" ] && cp "$src" "$MARKETPLACE/skills/$skill_dir/$filename"
+  fi
+done
