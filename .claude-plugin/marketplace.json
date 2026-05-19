@@ -242,6 +242,13 @@
       "author": { "name": "Minh Thang" },
       "source": "./plugins/audit-plan",
       "category": "development"
+    },
+    {
+      "name": "sub-agent-system",
+      "description": "Prevent 22 sub-agent failure modes: task planning, output auditing, pipeline review, and checkpoint recovery for multi-agent workflows",
+      "author": { "name": "Minh Thang" },
+      "source": "./plugins/sub-agent-system",
+      "category": "development"
     }
   ]
 }

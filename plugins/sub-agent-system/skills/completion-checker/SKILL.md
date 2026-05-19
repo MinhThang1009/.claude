@@ -11,15 +11,16 @@ allowed-tools: Bash Write
 
 **Step 1 — Save output to a temp file for deterministic counting.**
 ```bash
-Write("/tmp/cc_input.txt", [sub-agent output])
+Bash("mkdir -p .claude/tmp")
+Write(".claude/tmp/cc_input.txt", [sub-agent output])
 ```
-Uses `/tmp/` (guaranteed writable on all platforms with bash). Enables `grep` to count mechanically rather than relying on LLM text parsing.
+Uses `.claude/tmp/` (project-relative, works on macOS/Linux/Windows). Enables `grep` to count mechanically rather than relying on LLM text parsing.
 
 **Step 2 — Count deterministically with grep.**
 ```bash
-Bash("grep -Fc '[x]' /tmp/cc_input.txt")              # done count
-Bash("grep -Fc '[o]' /tmp/cc_input.txt")              # skipped count
-Bash("grep -Fc 'COMPLETION_CHECKLIST' /tmp/cc_input.txt")  # verify block exists
+Bash("grep -Fc '[x]' .claude/tmp/cc_input.txt")              # done count
+Bash("grep -Fc '[o]' .claude/tmp/cc_input.txt")              # skipped count
+Bash("grep -Fc 'COMPLETION_CHECKLIST' .claude/tmp/cc_input.txt")  # verify block exists
 ```
 Use `-Fc` (fixed-string, count) — no regex, no escaping issues, portable across all bash environments.
 Use these counts as ground truth. Do NOT rely on LLM estimation for count values.

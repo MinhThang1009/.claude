@@ -9,18 +9,22 @@ allowed-tools: Write Bash
 
 After a phase completes, execute these steps in order:
 
-**Step 0 — Record chain start commit (first phase only).**
-If this is Phase 1 (the first phase of the pipeline), run:
+**Step 0 — Locate project root and record chain start commit (first phase only).**
 ```bash
-Bash("git rev-parse HEAD")
+Bash("git rev-parse --show-toplevel")   # → PROJECT_ROOT (absolute, cross-platform)
+Bash("mkdir -p $(git rev-parse --show-toplevel)/.claude/checkpoints")
 ```
-Write the output hash to `.claude/checkpoints/chain-start-commit`:
+If this is Phase 1, record the start commit:
 ```bash
-Write(".claude/checkpoints/chain-start-commit", "[hash]")
+Bash("git rev-parse HEAD > $(git rev-parse --show-toplevel)/.claude/checkpoints/chain-start-commit")
 ```
 This file is the anchor for `chain-verifier` to compute a full pipeline diff. Skip this step for phases 2+.
 
 **Step 1 — Write the checkpoint file.**
+```bash
+# TIMESTAMP cross-platform: date -u +%Y%m%dT%H%M%S (macOS/Linux/Git Bash on Windows)
+Bash("TIMESTAMP=$(date -u +%Y%m%dT%H%M%S); ROOT=$(git rev-parse --show-toplevel); cat > \"$ROOT/.claude/checkpoints/phase-N-$TIMESTAMP.md\" << 'CPEOF'\n[checkpoint content]\nCPEOF")
+```
 Write `.claude/checkpoints/phase-[N]-[timestamp].md` with the following content:
 
 ```markdown

@@ -5,15 +5,21 @@ description: >
   injection into sub-agent prompts. Use before spawning any sub-agent that may not load
   CLAUDE.md automatically — specifically Explore agents, Plan agents, and all
   Task-tool-spawned agents.
-allowed-tools: Read Glob
+allowed-tools: Read Bash
 ---
 
 **Note:** Explore and Plan agents never auto-load CLAUDE.md. Task-tool-spawned sub-agents also do not load CLAUDE.md or rules files automatically. Always use this skill before spawning these agent types.
 
 **Step 1 — Collect convention sources.**
-- Glob `.claude/rules/*.md` and read each file
-- Read `.claude/CLAUDE.md` (project-level) if it exists
-- Read `~/.claude/CLAUDE.md` (user-level) if accessible
+Run to list all rule files (works on macOS/Linux/Windows Git Bash):
+```bash
+Bash("find .claude/rules -name '*.md' 2>/dev/null; find ~/.claude/rules -name '*.md' 2>/dev/null")
+```
+Read each file found. Then:
+```bash
+Bash("cat .claude/CLAUDE.md 2>/dev/null")        # project-level
+Bash("cat ~/.claude/CLAUDE.md 2>/dev/null")       # user-level
+```
 
 **Step 2 — Extract relevant conventions.**
 From all sources, extract conventions relevant to the sub-agent's specific task:

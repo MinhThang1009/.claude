@@ -20,8 +20,10 @@ After processing each file, append one line to .claude/progress/[agent-id]-progr
 ```
 
 **Step 0 — Pre-flight check.**
+Locate project root first (works on macOS/Linux/Windows Git Bash):
 ```bash
-Bash("ls .claude/progress/ 2>/dev/null | wc -l")
+Bash("git rev-parse --show-toplevel 2>/dev/null || pwd")   # → PROJECT_ROOT
+Bash("ls $(git rev-parse --show-toplevel 2>/dev/null || pwd)/.claude/progress/ 2>/dev/null | wc -l")
 ```
 If the result is 0 (no progress files exist):
 ```
@@ -39,7 +41,10 @@ Fallback: Use OTel spans (span gap detection) or run agents in foreground mode i
 Stop — do not proceed to Step 1 when unconfigured. Report MONITOR_UNCONFIGURED, not a health status.
 
 **Step 1 — Read all progress files.**
-Glob `.claude/progress/*-progress.md` and read each one.
+```bash
+Bash("find $(git rev-parse --show-toplevel 2>/dev/null || pwd)/.claude/progress -name '*-progress.md' 2>/dev/null")
+```
+Read each file found.
 
 **Step 2 — Check each file for anomalies.**
 For each progress file, examine:
@@ -54,7 +59,10 @@ Detect these conditions:
 - `NEVER_STARTED` — no progress file exists for an agent that was spawned more than 5 minutes ago
 
 **Step 3 — Write alert files for anomalies.**
-For each anomaly, write `.claude/alerts/[timestamp]-[agent-id]-alert.md`:
+```bash
+Bash("mkdir -p $(git rev-parse --show-toplevel 2>/dev/null || pwd)/.claude/alerts")
+```
+For each anomaly, write `$PROJECT_ROOT/.claude/alerts/[timestamp]-[agent-id]-alert.md`:
 
 ```markdown
 ALERT: [STALL | BLOCKED | POSSIBLE_SILENT_DENIAL | NEVER_STARTED]
