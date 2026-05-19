@@ -24,7 +24,7 @@ If it succeeds → record result as `HEAD_HASH`.
 
 **Step 2 — Get pipeline start commit (optional):**
 ```bash
-Bash("git -C \"<working-dir>\" show HEAD:.claude/checkpoints/chain-start-commit 2>/dev/null || echo NO_CHECKPOINT")
+Bash("cat \"<working-dir>/.claude/checkpoints/chain-start-commit\" 2>/dev/null || echo NO_CHECKPOINT")
 ```
 - Returns a commit hash → `START_COMMIT` = that hash. Full pipeline diff available.
 - Returns `NO_CHECKPOINT` → `START_COMMIT` = `HEAD_HASH` from Step 1. Add the ⚠ block below to the top of your CHAIN_VERIFICATION report, then continue normally.
