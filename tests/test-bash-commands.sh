@@ -89,13 +89,14 @@ FOUND=$(find "$MOCK_PROJECT/.claude/progress" -name '*-progress.md' 2>/dev/null 
 [ "$FOUND" = "1" ] && ok "find progress files works ($FOUND file)" || fail "find progress failed: $FOUND"
 
 echo "=== Install script: hook copy ==="
+REPO_ROOT="$SCRIPT_DIR/.."
 [ -f "$PLUGIN_DIR/commands/plan-tasks.md" ] && ok "plan-tasks.md exists in plugin" || fail "plan-tasks.md missing"
 [ -f "$PLUGIN_DIR/skills/completion-checker/SKILL.md" ] && ok "completion-checker SKILL.md exists" || fail "SKILL.md missing"
-[ -f "$PLUGIN_DIR/hooks/post-commit" ] && ok "post-commit hook exists" || fail "post-commit hook missing"
-[ -f "$PLUGIN_DIR/scripts/install.sh" ] && ok "install.sh exists" || fail "install.sh missing"
+[ -f "$REPO_ROOT/hooks/post-commit" ] && ok "post-commit hook exists" || fail "post-commit hook missing"
+[ -f "$REPO_ROOT/scripts/install.sh" ] && ok "install.sh exists" || fail "install.sh missing"
 
 echo "=== install.sh dry run ==="
-bash "$PLUGIN_DIR/scripts/install.sh" > /dev/null 2>&1 && ok "install.sh runs without error" || fail "install.sh failed"
+bash "$REPO_ROOT/scripts/install.sh" > /dev/null 2>&1 && ok "install.sh runs without error" || fail "install.sh failed"
 
 # Cleanup
 rm -rf "$MOCK_HOME" "$MOCK_PROJECT" /tmp/cc_test.txt /tmp/cc_test2.txt /tmp/findings.md
