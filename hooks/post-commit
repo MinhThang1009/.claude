@@ -1,0 +1,24 @@
+#!/bin/bash
+# post-commit hook — sync plugin commands to installed location sau mỗi commit
+# Install: cp hooks/post-commit .git/hooks/post-commit && chmod +x .git/hooks/post-commit
+
+DOTCLAUDE_ROOT="$(git rev-parse --show-toplevel)"
+INSTALL_DIR="$HOME/.claude/commands"
+
+# Lấy danh sách files thay đổi trong commit vừa rồi
+CHANGED=$(git diff-tree --no-commit-id -r --name-only HEAD 2>/dev/null | grep "plugins/.*/commands/.*\.md$")
+
+if [ -z "$CHANGED" ]; then
+  exit 0
+fi
+
+echo "[post-commit] Syncing plugin commands..."
+for f in $CHANGED; do
+  filename=$(basename "$f")
+  src="$DOTCLAUDE_ROOT/$f"
+  dst="$INSTALL_DIR/$filename"
+  if [ -f "$src" ]; then
+    cp "$src" "$dst"
+    echo "  ✓ $filename"
+  fi
+done
