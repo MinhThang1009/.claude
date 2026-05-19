@@ -11,14 +11,19 @@ After a phase completes, execute these steps in order:
 
 **Step 0 — Locate project root and record chain start commit (first phase only).**
 ```bash
-Bash("git rev-parse --show-toplevel")   # → PROJECT_ROOT (absolute, cross-platform)
+Bash("git rev-parse --show-toplevel 2>/dev/null || pwd")   # → PROJECT_ROOT
+```
+If result is NOT a git repo (git rev-parse fails, falls back to pwd): note "No git repo detected — skipping chain-start-commit and git commit steps. Checkpoint file will be written to .claude/checkpoints/ but not committed."
+
+If git repo found:
+```bash
 Bash("mkdir -p $(git rev-parse --show-toplevel)/.claude/checkpoints")
 ```
-If this is Phase 1, record the start commit:
+If Phase 1, record start commit:
 ```bash
 Bash("git rev-parse HEAD > $(git rev-parse --show-toplevel)/.claude/checkpoints/chain-start-commit")
 ```
-This file is the anchor for `chain-verifier` to compute a full pipeline diff. Skip this step for phases 2+.
+This file is the anchor for `chain-verifier`. Skip for phases 2+.
 
 **Step 1 — Write the checkpoint file.**
 ```bash
@@ -70,3 +75,11 @@ Next phase can resume from: [one sentence describing the current state]
 ```
 
 If the git commit fails (e.g., nothing to commit), report the checkpoint file path and note "No changes to commit — working tree clean."
+
+If not in a git repo: skip Step 2 entirely. Report:
+```
+CHECKPOINT_WRITTEN:
+File: [path]
+Git commit: SKIPPED (not a git repository)
+Next phase can resume from: [description]
+```
