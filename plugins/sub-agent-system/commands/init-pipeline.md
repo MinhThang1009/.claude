@@ -39,7 +39,7 @@ If IGNORED: warn:
 
 5. **Check WorktreeCreate hooks in settings.json:**
 ```bash
-Bash("cat \"$HOME/.claude/settings.json\" | python3 -c \"import sys,json; d=json.load(sys.stdin); print('HAS_HOOK' if 'WorktreeCreate' in d.get('hooks', {}) else 'NO_HOOK')\" 2>/dev/null || echo NO_HOOK")
+Bash("grep -q 'WorktreeCreate' \"$HOME/.claude/settings.json\" 2>/dev/null && echo HAS_HOOK || echo NO_HOOK")
 ```
 If NO_HOOK AND session cwd is not a git repo: warn:
 ```
