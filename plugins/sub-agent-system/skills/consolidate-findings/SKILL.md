@@ -58,6 +58,12 @@ Bash("cat > \"$PROJECT_ROOT/.claude/FINDINGS_REPORT.md\" << 'REPORT_EOF'\n[repor
 ```
 Dùng absolute path để tránh ghi vào session cwd thay vì project dir.
 
+After writing, verify the file is non-empty:
+```bash
+Bash("wc -c < \"$PROJECT_ROOT/.claude/FINDINGS_REPORT.md\" | tr -d ' '")
+```
+If result is `0`: output `CONSOLIDATION_FAILED: FINDINGS_REPORT.md was written but is empty — report content was not rendered. Do NOT proceed to severity-gate.` and stop.
+
 **Output format:**
 
 ```markdown

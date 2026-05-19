@@ -52,6 +52,9 @@ COMPLETE
 ## Prerequisites for next phase
 - [What Phase N+1 needs to know or have available]
 
+## Checkpoint commit
+[git commit hash written by Step 2, or SKIPPED if non-git]
+
 ## Timestamp
 [ISO 8601 timestamp]
 ```

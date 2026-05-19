@@ -27,7 +27,7 @@ Bash("sed -n '/COMPLETION.CHECKLIST/,/^STATUS:/p' .claude/tmp/cc_input.txt > .cl
 Bash("grep -Fc '[x]' .claude/tmp/cc_checklist.txt")                       # done count (checklist only)
 Bash("grep -Fc '[o]' .claude/tmp/cc_checklist.txt")                       # skipped count (checklist only)
 ```
-If the sed extraction fails (no COMPLETION_CHECKLIST found), fall back to counting from the full file and note "CHECKLIST_NOT_FOUND — counts may include false positives from document content."
+If the sed extraction fails (no COMPLETION_CHECKLIST found): **do NOT count from the full file** — set STATUS=SUSPICIOUS and ACTION=ESCALATE immediately, with reason "CHECKLIST_NOT_FOUND — sub-agent did not produce a completion checklist." Skip Steps 3-4.
 The third grep uses `-Ei` (case-insensitive extended regex) to match both `COMPLETION_CHECKLIST` and `COMPLETION CHECKLIST` — agents sometimes use a space instead of underscore.
 Use `-Fc` for `[x]`/`[o]` counts (fixed-string, no escaping issues). Use these counts as ground truth. Do NOT rely on LLM estimation.
 
