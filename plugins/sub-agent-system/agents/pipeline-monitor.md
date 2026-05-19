@@ -19,11 +19,26 @@ After processing each file, append one line to .claude/progress/[agent-id]-progr
 | [timestamp] | [filename] | [lines read] | [findings count] | DONE |
 ```
 
-**Step 0 — Pre-flight check.**
-Locate project root first (works on macOS/Linux/Windows Git Bash):
+**Step 0 — Locate project root.**
+
+Read PROJECT_ROOT from the prompt arguments. The main agent MUST provide it explicitly:
+```
+PROJECT_ROOT: /absolute/path/to/project
+```
+
+If PROJECT_ROOT is NOT in the prompt: do not attempt auto-detection. Output:
+```
+MONITOR_BLOCKED:
+Reason: PROJECT_ROOT not provided in prompt.
+Action required: The main agent must pass PROJECT_ROOT as an explicit argument.
+Example: "PROJECT_ROOT: /Users/alice/myproject"
+Cannot reliably auto-detect — agent cwd is the Claude session root, not the monitored project.
+```
+Stop. Do not proceed.
+
+Once PROJECT_ROOT is confirmed, check progress files:
 ```bash
-Bash("git rev-parse --show-toplevel 2>/dev/null || pwd")   # → PROJECT_ROOT
-Bash("ls $(git rev-parse --show-toplevel 2>/dev/null || pwd)/.claude/progress/ 2>/dev/null | wc -l")
+Bash("ls [PROJECT_ROOT]/.claude/progress/ 2>/dev/null | wc -l")
 ```
 If the result is 0 (no progress files exist):
 ```
@@ -42,7 +57,7 @@ Stop — do not proceed to Step 1 when unconfigured. Report MONITOR_UNCONFIGURED
 
 **Step 1 — Read all progress files.**
 ```bash
-Bash("find $(git rev-parse --show-toplevel 2>/dev/null || pwd)/.claude/progress -name '*-progress.md' 2>/dev/null")
+Bash("find [PROJECT_ROOT]/.claude/progress -name '*-progress.md' 2>/dev/null")
 ```
 Read each file found.
 
@@ -60,9 +75,9 @@ Detect these conditions:
 
 **Step 3 — Write alert files for anomalies.**
 ```bash
-Bash("mkdir -p $(git rev-parse --show-toplevel 2>/dev/null || pwd)/.claude/alerts")
+Bash("mkdir -p [PROJECT_ROOT]/.claude/alerts")
 ```
-For each anomaly, write `$PROJECT_ROOT/.claude/alerts/[timestamp]-[agent-id]-alert.md`:
+For each anomaly, write `[PROJECT_ROOT]/.claude/alerts/[timestamp]-[agent-id]-alert.md`:
 
 ```markdown
 ALERT: [STALL | BLOCKED | POSSIBLE_SILENT_DENIAL | NEVER_STARTED]

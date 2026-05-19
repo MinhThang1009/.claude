@@ -31,7 +31,9 @@ Use the task-partitioner skill to analyze the task list and codebase.
 **Present the plan to the user for approval before spawning any agents.** Do not begin execution until the user confirms.
 
 **Monitoring prerequisite:** Before finalizing the plan, confirm how agent health will be monitored:
-- If using `pipeline-monitor`: each sub-agent prompt MUST include the progress file instruction below. Add it to the plan as a required template suffix for all sub-agent prompts:
+- If using `pipeline-monitor`:
+  1. Each sub-agent prompt MUST include the progress file instruction (template suffix below)
+  2. When invoking pipeline-monitor, ALWAYS pass `PROJECT_ROOT: /absolute/path` explicitly — the agent cannot auto-detect it from session cwd
   ```
   After processing each file, append one line to .claude/progress/[AGENT_ID]-progress.md:
   | [timestamp] | [filename] | [lines read] | [findings count] | DONE |
