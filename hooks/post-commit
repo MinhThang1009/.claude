@@ -36,3 +36,9 @@ for f in $CHANGED; do
     [ -d "$MARKETPLACE/skills/$skill_dir" ] && cp "$src" "$MARKETPLACE/skills/$skill_dir/$filename"
   fi
 done
+
+# Commit marketplace changes nếu có
+if git -C "$MARKETPLACE/.." status --short | grep -q "plugins/$PLUGIN" 2>/dev/null; then
+  git -C "$MARKETPLACE/.." add "plugins/$PLUGIN/" 2>/dev/null
+  git -C "$MARKETPLACE/.." commit -m "sync: update $PLUGIN from dotclaude" 2>/dev/null && echo "  ✓ marketplace committed"
+fi
