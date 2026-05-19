@@ -18,12 +18,14 @@ Uses `.claude/tmp/` (project-relative, works on macOS/Linux/Windows). Enables `g
 
 **Step 2 — Count deterministically with grep.**
 ```bash
-Bash("grep -Fc '[x]' .claude/tmp/cc_input.txt")              # done count
-Bash("grep -Fc '[o]' .claude/tmp/cc_input.txt")              # skipped count
-Bash("grep -Fc 'COMPLETION_CHECKLIST' .claude/tmp/cc_input.txt")  # verify block exists
+Bash("grep -Fc '[x]' .claude/tmp/cc_input.txt")                           # done count
+Bash("grep -Fc '[o]' .claude/tmp/cc_input.txt")                           # skipped count
+Bash("grep -Eic 'COMPLETION.{0,1}CHECKLIST' .claude/tmp/cc_input.txt")    # block exists (flex)
 ```
-Use `-Fc` (fixed-string, count) — no regex, no escaping issues, portable across all bash environments.
-Use these counts as ground truth. Do NOT rely on LLM estimation for count values.
+The third grep uses `-Ei` (case-insensitive extended regex) to match both `COMPLETION_CHECKLIST` and `COMPLETION CHECKLIST` — agents sometimes use a space instead of underscore.
+Use `-Fc` for `[x]`/`[o]` counts (fixed-string, no escaping issues). Use these counts as ground truth. Do NOT rely on LLM estimation.
+
+**Format enforcement note:** Sub-agents MUST write their checklist header as exactly `COMPLETION_CHECKLIST:` (underscore, colon). If the detected block uses a different format, note it in the report as a FORMAT_WARNING alongside the counts.
 
 **Step 3 — Identify missing tasks.**
 Compare task names in the original task list against lines found in the COMPLETION_CHECKLIST block. A task is MISSING if its name or identifier does not appear in any `[x]` or `[o]` line. This step uses LLM matching — flag any uncertain matches explicitly.

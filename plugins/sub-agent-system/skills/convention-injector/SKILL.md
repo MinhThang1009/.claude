@@ -11,15 +11,18 @@ allowed-tools: Read Bash
 **Note:** Explore and Plan agents never auto-load CLAUDE.md. Task-tool-spawned sub-agents also do not load CLAUDE.md or rules files automatically. Always use this skill before spawning these agent types.
 
 **Step 1 — Collect convention sources.**
-Run to list all rule files (works on macOS/Linux/Windows Git Bash):
+Use `$HOME` (not `~`) — required for Windows Git Bash path resolution:
 ```bash
-Bash("find .claude/rules -name '*.md' 2>/dev/null; find ~/.claude/rules -name '*.md' 2>/dev/null")
+Bash("ls \"$HOME/.claude/rules/\"*.md 2>/dev/null; ls .claude/rules/*.md 2>/dev/null")
 ```
-Read each file found. Then:
+Read each file found with:
 ```bash
-Bash("cat .claude/CLAUDE.md 2>/dev/null")        # project-level
-Bash("cat ~/.claude/CLAUDE.md 2>/dev/null")       # user-level
+Bash("cat \"$HOME/.claude/rules/\"*.md 2>/dev/null")    # user-level rules
+Bash("cat .claude/rules/*.md 2>/dev/null")               # project-level rules
+Bash("cat \"$HOME/.claude/CLAUDE.md\" 2>/dev/null")      # user CLAUDE.md
+Bash("cat .claude/CLAUDE.md 2>/dev/null")                # project CLAUDE.md
 ```
+If all return empty: note "No convention files found — proceeding without conventions."
 
 **Step 2 — Extract relevant conventions.**
 From all sources, extract conventions relevant to the sub-agent's specific task:

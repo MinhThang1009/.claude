@@ -15,6 +15,19 @@ Use the task-partitioner skill to analyze the task list and codebase.
 4. Include a FILE OWNERSHIP MAP section listing which files belong to which task
 5. Include TOTAL TASKS count
 
+**Agent type selection — include in the execution plan for each task:**
+
+| Task type | Agent type to spawn | Why |
+|-----------|--------------------|----|
+| Audit / read-only analysis | `claude` (NOT `code-explorer`) | `code-explorer` lacks Bash/Write — cannot write progress files |
+| Implementation / fix | `claude` | Needs Edit, Write, Bash tools |
+| Fresh-context code review | `pipeline-reviewer` | Isolated context prevents self-review bias |
+| Test writing | `test-writer` | Specialized test generation |
+| Finding verification (>5) | `finding-validator` | Isolated context prevents confirmation bias |
+| Final pipeline integrity | `chain-verifier` | Fresh context, no chain history |
+
+**Critical:** Never use `code-explorer` for tasks that require writing progress files — it has no Bash/Write tools and will silently skip the progress file instruction.
+
 **Present the plan to the user for approval before spawning any agents.** Do not begin execution until the user confirms.
 
 **Monitoring prerequisite:** Before finalizing the plan, confirm how agent health will be monitored:
