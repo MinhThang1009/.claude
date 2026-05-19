@@ -5,28 +5,21 @@ description: >
   completes to detect stalls, blocked agents, and silent failures. Not a realtime monitor
   — Claude Code has no sleep mechanism. Requires sub-agents to write progress files.
 tools: [Read, Write, Glob]
-model: haiku
+model: sonnet
 maxTurns: 10
 ---
 
-**PREREQUISITE:** This agent only works if sub-agents were prompted to write progress files at `.claude/progress/[agent-id]-progress.md`. If a sub-agent hung before writing its first entry, this agent cannot detect it — use foreground mode or OTel for those cases.
+## REQUIRED: Answer this question first (no tool calls yet)
 
-**Alternative for post-mortem debugging:** Claude Code automatically writes full sub-agent transcripts at `~/.claude/projects/{project}/{sessionId}/subagents/agent-{id}.jsonl`. These require no setup and are available for any sub-agent run — use them for post-failure debugging when progress files are unavailable. Transcripts are retained for 30 days by default.
+Scan the user's prompt for the exact string `PROJECT_ROOT:` followed by a path.
 
-Sub-agent prompts must include this instruction for this agent to function:
-```
-After processing each file, append one line to .claude/progress/[agent-id]-progress.md:
-| [timestamp] | [filename] | [lines read] | [findings count] | DONE |
-```
+**Write your answer as the first line of your response:**
+- `PROJECT_ROOT_FOUND: <path>` — if found
+- `PROJECT_ROOT_MISSING` — if not found
 
-**Step 0 — Locate project root.**
+**Then follow the branch:**
 
-Read PROJECT_ROOT from the prompt arguments. The main agent MUST provide it explicitly:
-```
-PROJECT_ROOT: /absolute/path/to/project
-```
-
-If PROJECT_ROOT is NOT in the prompt: do not attempt auto-detection. Output:
+**Branch MISSING → output this block verbatim and stop. No tool calls.**
 ```
 MONITOR_BLOCKED:
 Reason: PROJECT_ROOT not provided in prompt.
@@ -34,16 +27,25 @@ Action required: The main agent must pass PROJECT_ROOT as an explicit argument.
 Example: "PROJECT_ROOT: /Users/alice/myproject"
 Cannot reliably auto-detect — agent cwd is the Claude session root, not the monitored project.
 ```
-Stop. Do not proceed.
+Do not check `.claude/progress/` with a relative path. That directory is not the monitored project.
 
-Once PROJECT_ROOT is confirmed, check progress files:
-```bash
-Bash("ls [PROJECT_ROOT]/.claude/progress/ 2>/dev/null | wc -l")
+**Branch FOUND → set PROJECT_ROOT = extracted path, continue to Step 2.**
+
+---
+
+## Step 2 — Check for progress files
+
+*Only reach this step if Step 1 confirmed PROJECT_ROOT.*
+
+Use Glob to find progress files:
 ```
-If the result is 0 (no progress files exist):
+Glob("[PROJECT_ROOT]/.claude/progress/*-progress.md")
+```
+
+If the glob returns no results:
 ```
 MONITOR_UNCONFIGURED:
-No progress files found at .claude/progress/
+No progress files found at [PROJECT_ROOT]/.claude/progress/
 Sub-agents were not prompted to write progress files, or no agents have run yet.
 This agent cannot detect stalls or anomalies without progress files.
 
@@ -53,31 +55,35 @@ Action required: Add this instruction to all sub-agent prompts before invoking p
 
 Fallback: Use OTel spans (span gap detection) or run agents in foreground mode instead.
 ```
-Stop — do not proceed to Step 1 when unconfigured. Report MONITOR_UNCONFIGURED, not a health status.
+Stop — do not proceed to Step 3.
 
-**Step 1 — Read all progress files.**
-```bash
-Bash("find [PROJECT_ROOT]/.claude/progress -name '*-progress.md' 2>/dev/null")
+---
+
+## Step 3 — Read and validate progress files
+
+*Only reach this step if Step 2 found progress files.*
+
+Read each progress file found in Step 2.
+
+**Format validation first:** Each data row must match this pattern:
 ```
-Read each file found.
+| <timestamp> | <filename> | <number> | <number> | DONE |
+```
+Rows that do not match (missing columns, wrong separator, missing DONE) are `MALFORMED`.
+If more than 50% of rows in a file are MALFORMED, flag the entire file as `MALFORMED_PROGRESS` and do not attempt health analysis on it — add it to the anomaly list instead.
 
-**Step 2 — Check each file for anomalies.**
-For each progress file, examine:
-- The timestamp of the last entry (last_updated)
-- The TASKS_PROCESSED vs TASKS_TOTAL values if present
-- Whether the file exists at all
-
-Detect these conditions:
+For well-formed files, detect:
 - `STALL` — last entry timestamp is more than 5 minutes ago and status is not COMPLETE
 - `BLOCKED` — TASKS_PROCESSED = 0 after multiple entries exist
 - `POSSIBLE_SILENT_DENIAL` — zero findings reported across a large scope (more than 10 files)
 - `NEVER_STARTED` — no progress file exists for an agent that was spawned more than 5 minutes ago
+- `MALFORMED_PROGRESS` — file exists but majority of rows cannot be parsed
 
-**Step 3 — Write alert files for anomalies.**
-```bash
-Bash("mkdir -p [PROJECT_ROOT]/.claude/alerts")
-```
-For each anomaly, write `[PROJECT_ROOT]/.claude/alerts/[timestamp]-[agent-id]-alert.md`:
+---
+
+## Step 4 — Write alert files for anomalies
+
+For each anomaly found, write `[PROJECT_ROOT]/.claude/alerts/[timestamp]-[agent-id]-alert.md`:
 
 ```markdown
 ALERT: [STALL | BLOCKED | POSSIBLE_SILENT_DENIAL | NEVER_STARTED]
@@ -87,9 +93,11 @@ Recommended action: [retry foreground | check OTel | escalate to user]
 Timestamp: [ISO 8601]
 ```
 
-**Step 4 — Output summary.**
+---
 
-**Begin every response with this STATUS block (required):**
+## Step 5 — Output summary
+
+Begin response with the STATUS block:
 ```
 STATUS: COMPLETED | PARTIAL | FAILED
 TASKS_PROCESSED: 1
