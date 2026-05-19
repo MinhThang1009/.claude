@@ -37,10 +37,12 @@ Agents consolidated: N
 ```
 
 **Step 5 — Write FINDINGS_REPORT.md.**
+PROJECT_ROOT phải được truyền vào trong input (hoặc lấy từ `git rev-parse --show-toplevel`):
 ```bash
-Bash("mkdir -p .claude")
-Write(".claude/FINDINGS_REPORT.md", [report content])
+Bash("PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo '.'); mkdir -p \"$PROJECT_ROOT/.claude\"")
+Bash("cat > \"$PROJECT_ROOT/.claude/FINDINGS_REPORT.md\" << 'REPORT_EOF'\n[report content]\nREPORT_EOF")
 ```
+Dùng absolute path để tránh ghi vào session cwd thay vì project dir.
 
 **Output format:**
 

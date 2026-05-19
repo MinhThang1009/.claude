@@ -11,9 +11,9 @@ allowed-tools: Bash Write
 
 **Step 1 — Count CRITICAL findings.**
 ```bash
-Bash("grep -c '🔴 CRITICAL' .claude/FINDINGS_REPORT.md 2>/dev/null || echo 0")
+Bash("grep '🔴 CRITICAL' [PROJECT_ROOT]/.claude/FINDINGS_REPORT.md 2>/dev/null | grep -v '^|' | grep -v '^| Severity' | wc -l | tr -d ' ' || echo 0")
 ```
-If FINDINGS_REPORT.md does not exist, count from injected text instead.
+Dùng `grep -v '^|'` để loại bỏ dòng summary table (bắt đầu bằng `|`). Nếu FINDINGS_REPORT.md không tồn tại, count từ injected text thay thế.
 
 **Step 2 — Evaluate gate.**
 

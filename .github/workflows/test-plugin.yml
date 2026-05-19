@@ -1,0 +1,94 @@
+name: Test sub-agent-system plugin
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'plugins/sub-agent-system/**'
+      - 'tests/**'
+      - 'scripts/**'
+      - 'hooks/**'
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-bash:
+    name: Bash commands (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Git identity
+        run: |
+          git config --global user.email "ci@test.com"
+          git config --global user.name "CI Test"
+
+      - name: Run bash command tests (Linux/Mac)
+        if: runner.os != 'Windows'
+        run: bash tests/test-bash-commands.sh
+
+      - name: Run bash command tests (Windows Git Bash)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: bash tests/test-bash-commands.sh
+
+  test-install-script:
+    name: install.sh (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create mock .claude dirs
+        run: |
+          mkdir -p ~/.claude/commands ~/.claude/agents ~/.claude/skills
+
+      - name: Run install.sh
+        run: bash scripts/install.sh
+
+      - name: Verify sync
+        run: |
+          test -f ~/.claude/commands/plan-tasks.md && echo "✓ plan-tasks.md synced" || (echo "✗ plan-tasks.md missing"; exit 1)
+          test -f ~/.claude/commands/init-pipeline.md && echo "✓ init-pipeline.md synced" || (echo "✗ init-pipeline.md missing"; exit 1)
+          test -f ~/.claude/agents/pipeline-monitor.md && echo "✓ pipeline-monitor.md synced" || (echo "✗ pipeline-monitor.md missing"; exit 1)
+
+  test-post-commit-hook:
+    name: post-commit hook (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup mock .claude dirs
+        run: mkdir -p ~/.claude/commands ~/.claude/agents ~/.claude/skills
+
+      - name: Install hook
+        run: cp hooks/post-commit .git/hooks/post-commit && chmod +x .git/hooks/post-commit
+
+      - name: Modify a command file and commit
+        run: |
+          echo "# test" >> plugins/sub-agent-system/commands/plan-tasks.md
+          git config user.email "ci@test.com" && git config user.name "CI"
+          git add plugins/sub-agent-system/commands/plan-tasks.md
+          git commit -m "test: trigger post-commit hook"
+
+      - name: Verify hook synced the file
+        run: |
+          INSTALLED=$(cat ~/.claude/commands/plan-tasks.md | tail -1)
+          [ "$INSTALLED" = "# test" ] && echo "✓ post-commit hook synced plan-tasks.md" || (echo "✗ sync failed, last line: $INSTALLED"; exit 1)
