@@ -62,9 +62,9 @@ jobs:
 
       - name: Verify sync
         run: |
-          test -f ~/.claude/commands/plan-tasks.md && echo "✓ plan-tasks.md synced" || (echo "✗ plan-tasks.md missing"; exit 1)
-          test -f ~/.claude/commands/init-pipeline.md && echo "✓ init-pipeline.md synced" || (echo "✗ init-pipeline.md missing"; exit 1)
-          test -f ~/.claude/agents/pipeline-monitor.md && echo "✓ pipeline-monitor.md synced" || (echo "✗ pipeline-monitor.md missing"; exit 1)
+          if test -f ~/.claude/commands/plan-tasks.md; then echo "✓ plan-tasks.md synced"; else echo "✗ plan-tasks.md missing"; exit 1; fi
+          if test -f ~/.claude/commands/init-pipeline.md; then echo "✓ init-pipeline.md synced"; else echo "✗ init-pipeline.md missing"; exit 1; fi
+          if test -f ~/.claude/agents/pipeline-monitor.md; then echo "✓ pipeline-monitor.md synced"; else echo "✗ pipeline-monitor.md missing"; exit 1; fi
 
   test-post-commit-hook:
     name: post-commit hook (${{ matrix.os }})
@@ -93,5 +93,5 @@ jobs:
 
       - name: Verify hook synced the file
         run: |
-          INSTALLED=$(cat ~/.claude/commands/plan-tasks.md | tail -1)
-          [ "$INSTALLED" = "# test" ] && echo "✓ post-commit hook synced plan-tasks.md" || (echo "✗ sync failed, last line: $INSTALLED"; exit 1)
+          INSTALLED=$(tail -1 ~/.claude/commands/plan-tasks.md)
+          if [ "$INSTALLED" = "# test" ]; then echo "✓ post-commit hook synced plan-tasks.md"; else echo "✗ sync failed, last line: $INSTALLED"; exit 1; fi
