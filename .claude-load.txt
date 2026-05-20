@@ -1,5 +1,10 @@
 # Danh sách plugin được load vào ~/.claude/skills, agents, commands
-# Format: "plugin" (load all) hoặc "plugin:skills" / "plugin:agents" / "plugin:commands"
+# Format:
+#   "plugin"                  → load tất cả agents/skills/commands của plugin
+#   "plugin:agents"           → chỉ load agents
+#   "plugin:skills"           → chỉ load skills
+#   "plugin:commands"         → chỉ load commands
+#   "!name"                   → exclude agent hoặc skill theo tên (áp dụng mọi plugin)
 # Dòng bắt đầu bằng # là comment. Nếu file trống → load TẤT CẢ.
 
 # === CORE SET ===
@@ -12,12 +17,21 @@ feature-dev
 session-report
 
 # === EXTENDED SET ===
+sub-agent-system
 pr-review-toolkit
 test-toolkit
 audit-plan
 claude-md-management
-plugin-dev
+plugin-dev:agents
+plugin-dev:commands
 webapp-testing
+code-modernization:agents
+
+# === EXCLUSIONS (individual agents/skills) ===
+!type-design-analyzer
+!writing-rules
+!business-rules-extractor
+!legacy-analyst
 
 # === OPTIONAL: bỏ comment để enable ===
 # claude-api               # Claude API/SDK development
