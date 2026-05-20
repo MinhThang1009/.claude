@@ -17,9 +17,15 @@ Two verification paths:
 3. Check ±20 lines for context that might invalidate or confirm the claim.
 
 **State claims** — claims about actions taken (e.g., "fixed the bug in file Y", "added error handling to function Z"):
-1. Run `Bash("git diff [file]")`.
-2. If the diff is empty: the claimed action did not occur — this is state hallucination.
-3. If a diff exists: verify the diff content matches the claim intent.
+1. Try unstaged diff first: `Bash("git diff [file]")`.
+2. If empty, try committed diff — read start commit then diff:
+   ```bash
+   Bash("cat .claude/checkpoints/chain-start-commit 2>/dev/null || echo NO_CHECKPOINT")
+   Bash("git diff [start-commit] -- [file]")   # use start-commit hash from above
+   ```
+   If still empty and NO_CHECKPOINT: try `Bash("git diff HEAD~1 -- [file]")` as last resort.
+3. If all diffs are empty: the claimed action did not occur — this is state hallucination.
+4. If a diff exists: verify the diff content matches the claim intent.
 
 **Output per claim:**
 

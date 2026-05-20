@@ -21,10 +21,19 @@ Bash("git rev-parse --show-toplevel 2>/dev/null || echo '.'")
 Set `RESOLVED_ROOT` to the result. If RESOLVED_ROOT is `.`, warn "PROJECT_ROOT not resolved — grepping relative path, may miss findings if session cwd ≠ project root."
 
 **Step 1 — Count CRITICAL findings.**
+
+First check if FINDINGS_REPORT.md exists:
+```bash
+Bash("test -f \"[RESOLVED_ROOT]/.claude/FINDINGS_REPORT.md\" && echo EXISTS || echo MISSING")
+```
+If MISSING and no findings were injected as text input: output `GATE_BLOCKED: FINDINGS_REPORT.md not found and no findings injected — cannot evaluate gate. Run consolidate-findings first.` and stop. Do NOT output GATE_PASSED.
+
+If MISSING but findings were injected as text: count from injected text directly.
+
+If EXISTS:
 ```bash
 Bash("grep '🔴 CRITICAL' [RESOLVED_ROOT]/.claude/FINDINGS_REPORT.md 2>/dev/null | grep -v '^|' | grep -v '^| Severity' | wc -l | tr -d ' ' || echo 0")
 ```
-Dùng `grep -v '^|'` để loại bỏ dòng summary table (bắt đầu bằng `|`). Nếu FINDINGS_REPORT.md không tồn tại, count từ injected text thay thế.
 
 **Step 2 — Evaluate gate.**
 

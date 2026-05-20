@@ -86,5 +86,3 @@ Do not stop. Follow this loop:
 
 After 3 iterations without APPROVED: stop and escalate to the user with a summary of unresolved findings. Do not loop indefinitely.
 
-> Tip: For fully automated looping, invoke `/goal` with a goal file that defines success as `chain-verifier VERDICT: APPROVED`.
-
