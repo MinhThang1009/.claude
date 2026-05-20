@@ -46,7 +46,7 @@ Mark each item [x] when done, [o] if skipped (with reason).
 [ ] [file 1]
 [ ] [file 2]
 ...
-[ ] Tổng hợp theo severity
+[ ] Summarize findings by severity
 ```
 
 4. **After agent completes:**
