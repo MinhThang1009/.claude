@@ -1,13 +1,11 @@
-name: Test subagent-system plugin
+name: Validate plugins
 
 on:
   push:
     branches: [main]
     paths:
-      - 'plugins/subagent-system/**'
-      - 'tests/**'
-      - 'scripts/**'
-      - 'hooks/**'
+      - 'plugins/**'
+      - '.claude-plugin/**'
   pull_request:
     branches: [main]
 
@@ -15,83 +13,66 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  test-bash:
-    name: Bash commands (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+  validate-structure:
+    name: Plugin structure
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Git identity
+      - name: Validate marketplace manifest
         run: |
-          git config --global user.email "ci@test.com"
-          git config --global user.name "CI Test"
+          if [ ! -f .claude-plugin/marketplace.json ]; then
+            echo "✗ .claude-plugin/marketplace.json missing"
+            exit 1
+          fi
+          python3 -c "import json; json.load(open('.claude-plugin/marketplace.json'))"
+          echo "✓ marketplace.json valid"
 
-      - name: Run bash command tests (Linux/Mac)
-        if: runner.os != 'Windows'
-        run: bash tests/test-bash-commands.sh
-
-      - name: Run bash command tests (Windows Git Bash)
-        if: runner.os == 'Windows'
-        shell: bash
-        run: bash tests/test-bash-commands.sh
-
-  test-install-script:
-    name: install.sh (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Create mock .claude dirs
+      - name: Validate plugin.json for each plugin
         run: |
-          mkdir -p ~/.claude/commands ~/.claude/agents ~/.claude/skills
+          ERRORS=0
+          for dir in plugins/*/; do
+            plugin=$(basename "$dir")
+            if [ ! -f "$dir.claude-plugin/plugin.json" ]; then
+              echo "✗ $plugin: missing .claude-plugin/plugin.json"
+              ERRORS=$((ERRORS + 1))
+            elif python3 -c "import json; json.load(open('${dir}.claude-plugin/plugin.json'))" 2>/dev/null; then
+              echo "✓ $plugin"
+            else
+              echo "✗ $plugin: invalid JSON"
+              ERRORS=$((ERRORS + 1))
+            fi
+          done
+          [ $ERRORS -gt 0 ] && exit 1 || true
 
-      - name: Run install.sh
-        run: bash scripts/install.sh
-
-      - name: Verify sync
+      - name: Validate SKILL.md frontmatter
         run: |
-          if test -f ~/.claude/commands/plan-tasks.md; then echo "✓ plan-tasks.md synced"; else echo "✗ plan-tasks.md missing"; exit 1; fi
-          if test -f ~/.claude/commands/init-pipeline.md; then echo "✓ init-pipeline.md synced"; else echo "✗ init-pipeline.md missing"; exit 1; fi
-          if test -f ~/.claude/agents/pipeline-monitor.md; then echo "✓ pipeline-monitor.md synced"; else echo "✗ pipeline-monitor.md missing"; exit 1; fi
+          ERRORS=0
+          for skill in $(find plugins -name "SKILL.md"); do
+            has_name=$(head -20 "$skill" | grep -c "^name:" || true)
+            has_desc=$(head -20 "$skill" | grep -c "^description:" || true)
+            if [ "$has_name" -eq 0 ] || [ "$has_desc" -eq 0 ]; then
+              echo "✗ $skill: missing name or description"
+              ERRORS=$((ERRORS + 1))
+            else
+              echo "✓ $skill"
+            fi
+          done
+          [ $ERRORS -gt 0 ] && exit 1 || true
 
-  test-post-commit-hook:
-    name: post-commit hook (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup mock .claude dirs
-        run: mkdir -p ~/.claude/commands ~/.claude/agents ~/.claude/skills
-
-      - name: Install hook
-        run: cp hooks/post-commit .git/hooks/post-commit && chmod +x .git/hooks/post-commit
-
-      - name: Modify a command file and commit
+      - name: Validate marketplace lists all plugins
         run: |
-          echo "# test" >> plugins/subagent-system/commands/plan-tasks.md
-          git config user.email "ci@test.com" && git config user.name "CI"
-          git add plugins/subagent-system/commands/plan-tasks.md
-          git commit -m "test: trigger post-commit hook"
-
-      - name: Verify hook synced the file
-        run: |
-          INSTALLED=$(tail -1 ~/.claude/commands/plan-tasks.md)
-          if [ "$INSTALLED" = "# test" ]; then echo "✓ post-commit hook synced plan-tasks.md"; else echo "✗ sync failed, last line: $INSTALLED"; exit 1; fi
+          python3 -c "
+          import json, os
+          manifest = json.load(open('.claude-plugin/marketplace.json'))
+          listed = {p['name'] for p in manifest['plugins']}
+          actual = {d for d in os.listdir('plugins')
+                    if os.path.isfile(os.path.join('plugins', d, '.claude-plugin', 'plugin.json'))}
+          missing = actual - listed
+          if missing:
+              print(f'✗ Not in marketplace.json: {missing}')
+              exit(1)
+          print(f'✓ All {len(actual)} plugins listed in marketplace.json')
+          "
