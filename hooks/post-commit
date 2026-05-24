@@ -3,7 +3,7 @@
 # Install: cp hooks/post-commit .git/hooks/post-commit && chmod +x .git/hooks/post-commit
 
 DOTCLAUDE_ROOT="$(git rev-parse --show-toplevel)"
-PLUGIN="sub-agent-system"
+PLUGIN="subagent-system"
 PLUGIN_SRC="$DOTCLAUDE_ROOT/plugins/$PLUGIN"
 
 # Destination locations

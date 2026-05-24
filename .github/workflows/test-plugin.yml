@@ -1,10 +1,10 @@
-name: Test sub-agent-system plugin
+name: Test subagent-system plugin
 
 on:
   push:
     branches: [main]
     paths:
-      - 'plugins/sub-agent-system/**'
+      - 'plugins/subagent-system/**'
       - 'tests/**'
       - 'scripts/**'
       - 'hooks/**'
@@ -86,9 +86,9 @@ jobs:
 
       - name: Modify a command file and commit
         run: |
-          echo "# test" >> plugins/sub-agent-system/commands/plan-tasks.md
+          echo "# test" >> plugins/subagent-system/commands/plan-tasks.md
           git config user.email "ci@test.com" && git config user.name "CI"
-          git add plugins/sub-agent-system/commands/plan-tasks.md
+          git add plugins/subagent-system/commands/plan-tasks.md
           git commit -m "test: trigger post-commit hook"
 
       - name: Verify hook synced the file

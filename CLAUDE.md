@@ -37,6 +37,7 @@
 
 - Khi cần plan (theo rule ["Phong cách làm việc"](#phong-cách-làm-việc) ở trên) → ưu tiên đề xuất Plan Mode (`Shift+Tab×2 từ default mode`) hoặc `/plan` thay vì viết plan inline trong response.
 - Investigate codebase rộng → đề xuất subagent ("use a subagent to investigate ...") để giữ context chính sạch. Nếu không dùng subagent → scope narrow (chỉ đọc file/dir cần thiết, không explore toàn bộ).
+- Khi spawn subagent → prompt PHẢI có đủ 4 thành phần: **what** (task cụ thể), **scope** (files/dirs nào, không đụng gì), **output format** (trả về dạng nào), **done criteria** (thế nào là xong).
 - Refactor lớn → tách commit nhỏ revert được độc lập.
 - Bug khó → reproduce trước, viết failing test, mới fix (chi tiết tại coding-standards.md §Test, §Verification khi refactor).
 

@@ -242,11 +242,6 @@ def check_command(cmd: str):
             "rm --recursive --force ~, find / -delete). Để xóa subdir, "
             "dùng path đầy đủ cụ thể (vd: rm -rf ./node_modules).",
         ),
-        (
-            is_force_push_variant,
-            "git push với --force/--force-with-lease/+ref/"
-            "git -c override. Có thể overwrite branch chia sẻ.",
-        ),
         (is_fork_bomb, "fork bomb pattern — sẽ làm máy treo."),
         (is_dd_to_disk, "dd ghi vào disk device — risk wipe ổ cứng."),
     ]

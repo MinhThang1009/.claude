@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# test-bash-commands.sh — test shell commands từ sub-agent-system skills/commands
+# test-bash-commands.sh — test shell commands từ subagent-system skills/commands
 # Chạy trên Linux/Mac/Windows Git Bash
 # Exit code: 0 = all pass, 1 = failures
 
@@ -15,7 +15,7 @@ fail() { echo "  ✗ $1"; FAIL=$((FAIL+1)); ERRORS+=("$1"); }
 
 # Compute PLUGIN_DIR absolute trước khi cd — $(dirname $0) là relative
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PLUGIN_DIR="$SCRIPT_DIR/../plugins/sub-agent-system"
+PLUGIN_DIR="$SCRIPT_DIR/../plugins/subagent-system"
 
 # Setup mock environment
 MOCK_HOME=$(mktemp -d)

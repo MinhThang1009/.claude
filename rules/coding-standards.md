@@ -1,99 +1,97 @@
-# Quy tắc Code
+# Coding Standards
 
-> Auto-import mọi session qua `rules/`.
+> Auto-imported every session via `rules/`.
 
-## Trước khi bắt đầu
+## Before Starting
 
-- **Nêu assumptions rõ ràng** trước khi implement — dù tương đối chắc. "Tôi hiểu X là Y, nếu sai hãy sửa."
-- **Nếu có nhiều cách hiểu** → trình bày các cách hiểu đó, đừng tự chọn im lặng.
-- **Nếu có approach đơn giản hơn** → nói ra, push back nếu cần. Đừng implement theo yêu cầu khi thấy cách tốt hơn mà không lên tiếng.
-- **Nếu không rõ** → dừng lại, nêu cụ thể điều gì chưa rõ, hỏi.
+- **State assumptions explicitly** before implementing — even when fairly confident. "I understand X is Y; correct me if wrong."
+- **If something is unclear** → stop, name exactly what's unclear, and ask.
 
-## Nguyên tắc cốt lõi
+## Core Principles
 
-- **Đọc trước khi viết**: ưu tiên đọc cả function chứa change; function >100 dòng thì 30 dòng xung quanh + signature/return là đủ. Fix nhỏ (1-2 dòng) thì context narrow hơn OK. File mới → scan file tương tự để theo pattern.
-- **Convention codebase trước, "best practice" sau**. Snake_case nếu codebase snake_case. Tab nếu codebase tab.
-- **Đúng > đẹp > nhanh**. Code chạy đúng quan trọng hơn pattern fancy.
-- **Không over-engineer**. YAGNI. Generic abstraction sinh trong nhu cầu thật, không "phòng xa". Viết 200 dòng mà 50 dòng giải quyết được → viết lại.
-- **Function < 50 dòng** lý tưởng. >100 dòng → xem xét tách (trừ khi logic có kết dính trên toàn bộ). Nesting >3 level → có thể flatten.
-- **Đặt tên rõ ràng**. `getUserById` thay `getUser`. `isEmailVerified` thay `verified`. Tránh `data`, `info`, `obj` trừ khi context rõ.
+- **Read before you write**: prefer reading the whole containing function before making a change; for functions >100 lines, 30 lines of context around the change plus the signature/return is enough. Small fixes (1–2 lines) can use narrower context. New file → scan a similar file first to match the pattern.
+- **Codebase conventions first, "best practices" second**. snake_case if the codebase uses snake_case. Tabs if the codebase uses tabs.
+- **Correct > clean > fast**. Working code matters more than fancy patterns.
+- **Don't over-engineer**. YAGNI. Generic abstractions should emerge from real needs, not speculation. If 200 lines can be solved in 50 → rewrite.
+- **Functions < 50 lines** ideally. >100 lines → consider splitting (unless the logic is cohesive throughout). Nesting >3 levels → consider flattening.
+- **Name things clearly**. `getUserById` over `getUser`. `isEmailVerified` over `verified`. Avoid `data`, `info`, `obj` unless context makes them obvious.
 
 ## Surgical Changes
 
-- **Chỉ sửa đúng thứ được yêu cầu**. Mọi dòng thay đổi phải trace trực tiếp về request của user.
-- KHÔNG "cải thiện" code, comment, formatting xung quanh khi đang sửa thứ khác. KHÔNG refactor thứ chưa hỏng.
-- Orphan do chính mình tạo ra (import, biến, function không còn dùng SAU khi sửa) → **xóa luôn**. Dead code có sẵn từ trước → **đề cập, không xóa** trừ khi user yêu cầu.
-- Self-check: "Senior engineer có thấy diff này phức tạp quá không?" Nếu có → đơn giản lại.
+- **Only change what was asked**. Every changed line must trace directly back to the user's request.
+- Do NOT "improve" surrounding code, comments, or formatting while fixing something else. Do NOT refactor things that aren't broken.
+- Orphans you created (imports, variables, functions that are unused *after* your change) → **delete them**. Pre-existing dead code → **mention it, don't delete** unless the user asks.
+- Self-check: "Would a senior engineer find this diff more complex than necessary?" If yes → simplify.
 
-## Verification khi refactor
+## Verification During Refactoring
 
-- Refactor → **chạy test TRƯỚC khi sửa** (xác nhận baseline pass), sửa, **chạy test SAU** (xác nhận không regression).
-- Nếu task mơ hồ ("make it work", "clean up") → transform thành tiêu chí verify cụ thể trước khi bắt đầu. Tiêu chí yếu → hỏi user thay vì đoán.
+- Refactoring → **run tests BEFORE changing** (confirm baseline passes), make the change, **run tests AFTER** (confirm no regressions).
+- If the task is vague ("make it work", "clean up") → translate it into specific, verifiable criteria before starting. Weak criteria → ask the user instead of guessing.
 
-## Comment
+## Comments
 
-- **Comment WHY, không WHAT** (code tự nói WHAT).
-- **Tiếng Việt** cho comment giải thích logic/lý do (project tiếng Anh hoàn toàn → tiếng Anh).
-- **Tiếng Anh** cho TODO/FIXME tag (để tool grep được): `// TODO(tên): Mô tả ngắn bằng tiếng Việt`.
-- Docstring/JSDoc: tiếng Việt cho mô tả, nhưng giữ format chuẩn (`@param`, `@returns`, `@throws`).
+- **Comment WHY, not WHAT** (code already says WHAT).
+- **Vietnamese** for comments explaining logic/rationale (fully English project → English).
+- **English** for TODO/FIXME tags (so tools can grep them): `// TODO(name): Short description`.
+- Docstrings/JSDoc: Vietnamese for the description, but keep standard format (`@param`, `@returns`, `@throws`).
 
-Ví dụ tốt:
+Good example:
 ```python
-# Cache theo IP để tránh user attack rate-limit qua nhiều account
+# Cache by IP to prevent users from bypassing rate limits across multiple accounts
 limiter = RateLimiter(key_func=get_remote_ip)
 ```
 
-Ví dụ kém (comment WHAT thay vì WHY):
+Bad example (comments WHAT instead of WHY):
 ```python
-# Tạo rate limiter
+# Create rate limiter
 limiter = RateLimiter(...)
 ```
 
-## Error handling
+## Error Handling
 
-- KHÔNG `catch` rỗng/swallow exception. Lỗi cần được handle có chủ đích.
-- KHÔNG `catch (Exception e)` blanket — bắt cụ thể loại lỗi mong đợi.
-- KHÔNG thêm error handling cho scenario không thể xảy ra. Chỉ validate ở system boundary (user input, external API, I/O).
-- Ưu tiên **early return / guard clause / Result types** hơn try-catch khi có thể. Try-catch chỉ dùng khi thực sự cần catch exception (I/O, network, parsing).
-- Fallback behavior phải **explicit và justified** — không silently fallback mà user không biết. Optional chaining (`?.`) có thể hide errors — chỉ dùng khi `undefined` là kết quả hợp lệ.
-- Re-throw kèm context: `throw new ServiceError("Không lấy được user", { cause: e })`.
-- Error message hiển thị cho user: **tiếng Việt**, generic, không lộ stack/internal info.
-- Log internal: tiếng Việt OK, kèm context (user id, request id).
+- Do NOT empty-catch / swallow exceptions. Errors must be handled intentionally.
+- Do NOT use blanket `catch (Exception e)` — catch the specific expected error types.
+- Do NOT add error handling for scenarios that cannot happen. Only validate at system boundaries (user input, external APIs, I/O).
+- Prefer **early return / guard clauses / Result types** over try-catch where possible. Use try-catch only when you genuinely need to catch exceptions (I/O, network, parsing).
+- Fallback behavior must be **explicit and justified** — never silently fall back without the user knowing. Optional chaining (`?.`) can hide errors — only use it when `undefined` is a valid result.
+- Re-throw with context: `throw new ServiceError("Failed to fetch user", { cause: e })`.
+- User-facing error messages: **Vietnamese**, generic, no stack trace or internal info exposed.
+- Internal logs: Vietnamese OK, include context (user id, request id).
 
-## Test
+## Testing
 
-- Project có test framework → mọi feature mới có test, mọi bug fix có failing-test-then-fix.
-- Test đặt tên mô tả: `test_login_fails_when_password_wrong` thay `test_login_2`.
-- Arrange-Act-Assert. Mỗi test 1 assertion logic.
-- KHÔNG mock thừa: chỉ mock external dependency (DB, HTTP, time, random). Không mock code đang test.
-- Test description bằng tiếng Việt: `it('trả về 401 khi token hết hạn', ...)`.
+- Project has a test framework → every new feature has tests, every bug fix has failing-test-then-fix.
+- Name tests descriptively: `test_login_fails_when_password_wrong` over `test_login_2`.
+- Arrange-Act-Assert. One logical assertion per test.
+- Do NOT over-mock: only mock external dependencies (DB, HTTP, time, random). Don't mock the code under test.
+- Test descriptions in Vietnamese: `it('trả về 401 khi token hết hạn', ...)`.
 
 ## Performance
 
-- **Đo trước khi optimize**. Profile (`cProfile`, `py-spy`, Chrome DevTools, `perf`) — không đoán.
-- **Big-O quan trọng > vi-optimize**. O(n²) trên 10k item = 100 triệu phép tính — rất chậm; vi-optimize không cứu được.
-- DB: index theo column hay query, không index loạn. N+1 query → batch hoặc join.
-- Network: batch request, cache hợp lý, set timeout.
+- **Measure before optimizing**. Profile (`cProfile`, `py-spy`, Chrome DevTools, `perf`) — don't guess.
+- **Big-O matters more than micro-optimization**. O(n²) on 10k items = 100 million operations — very slow; micro-optimization won't save it.
+- DB: index on queried columns, not randomly. N+1 queries → batch or join.
+- Network: batch requests, cache appropriately, set timeouts.
 
-## Type safety
+## Type Safety
 
-- Project có type system (TypeScript, mypy, Pydantic, Rust...) → dùng triệt để.
-- KHÔNG `any`/`Any`/`unknown` trừ khi thực sự cần và có comment giải thích.
-- Type chặt cho boundary (input từ user/network/file): validate runtime, không tin TypeScript compiler.
+- Project has a type system (TypeScript, mypy, Pydantic, Rust…) → use it fully.
+- Do NOT use `any`/`Any`/`unknown` unless truly necessary, with an explanatory comment.
+- Strong types at boundaries (input from user/network/file): validate at runtime, don't trust the TypeScript compiler alone.
 
 ## Style
 
-- Format theo formatter project (`prettier`, `black`, `gofmt`, `rustfmt`...). Không tự ý đổi style.
-- Lint pass trước khi báo "xong". `eslint`, `ruff`, `clippy`, `golangci-lint`...
-- Import order: theo formatter quy định, không thủ công.
+- Format using the project formatter (`prettier`, `black`, `gofmt`, `rustfmt`…). Don't change style arbitrarily.
+- Lint must pass before reporting done. `eslint`, `ruff`, `clippy`, `golangci-lint`…
+- Import order: follow formatter conventions, not manual ordering.
 
-## Cờ đỏ DỪNG-HỎI
+## Red Flags — STOP AND ASK
 
-Cần hỏi xác nhận trước khi thực hiện:
-- Thêm dependency mới (kể cả "phổ biến").
-- Đổi schema DB / migration.
-- Thay đổi config production / deployment.
-- Sửa file shared (>3 module dùng) làm thay đổi behavior.
-- Refactor cross-cutting (>5 file).
-- Đổi public API signature.
-- Xóa file/code không chắc 100% là dead.
+Confirm with the user before:
+- Adding a new dependency (even a "popular" one) — check maintained/license/CVEs first (see security.md §Dependencies).
+- Changing a DB schema / running a migration.
+- Modifying production config / deployment config.
+- Editing a shared file (used by >3 modules) in a way that changes behavior.
+- Cross-cutting refactor (>5 files).
+- Changing a public API signature.
+- Deleting files/code you're not 100% certain is dead.

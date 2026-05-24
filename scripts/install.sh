@@ -4,7 +4,7 @@
 
 set -e
 DOTCLAUDE_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-PLUGIN="sub-agent-system"
+PLUGIN="subagent-system"
 PLUGIN_SRC="$DOTCLAUDE_ROOT/plugins/$PLUGIN"
 MARKETPLACE="$HOME/.claude/plugins/marketplaces/minhthang-plugins/plugins/$PLUGIN"
 

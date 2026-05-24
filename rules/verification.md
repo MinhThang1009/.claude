@@ -1,49 +1,49 @@
-# Quy tắc Verification
+# Verification Rules
 
-> Bổ sung "Phong cách làm việc" trong CLAUDE.md. Tránh lặp lại lỗi từ session trước.
+> Supplements "Working Style" in CLAUDE.md. Prevents repeating mistakes from prior sessions.
 
-## Subagent
+## Subagents
 
-- Kết quả từ subagent có **impact** (security finding, action user sẽ thực thi, claim về số liệu/version) → **verify bằng tool trực tiếp** (Grep, Read, WebFetch) trước khi báo user. **Named sub-agent** bắt đầu fresh, không thấy parent context → dễ báo sai. **Fork** kế thừa toàn bộ history nên ít bị vấn đề này hơn. Summary trivial (vd "đã đọc 5 file, không tìm thấy X") thì có thể skip verify.
-- Data trong parent context (WebFetch, tool output trước, conversation) → **paste subset relevant** vào prompt subagent. Data trên disk + subagent có `Read`/`Grep` → để subagent tự tìm.
-- Không báo findings cho user mà chưa tự confirm ít nhất 1 lần *(self-imposed — không trong docs Anthropic)*.
-- Subagent KHÔNG nhận full Claude Code system prompt — chỉ nhận system prompt riêng (markdown body của agent definition). **CLAUDE.md và rules/*.md**: main session load bình thường; `--agent` mode và `context: fork` skills — CLAUDE.md load (confirmed), rules/*.md load cùng mechanism nhưng chưa có docs tường minh cho sub-agent context. Agent-tool spawned named sub-agents: **KHÔNG load CLAUDE.md** từ working directory — open bug [#58942](https://github.com/anthropics/claude-code/issues/58942) (has repro); `@-imports` không expand trong **Agent-tool spawned** sub-agent context — bug [#58940](https://github.com/anthropics/claude-code/issues/58940) (scope confirmed chỉ Agent-tool, chưa verify context:fork/--agent); rules/*.md cũng không load. **→ Luôn inject convention cần thiết vào prompt hoặc dùng `skills` field**, không giả định CLAUDE.md/rules có sẵn trong Agent-tool spawned sub-agent. Hai cơ chế fork: (1) `CLAUDE_CODE_FORK_SUBAGENT=1` (env var) = fork kế thừa toàn bộ history + system prompt + tools. (2) `context: fork` (skill frontmatter) = chạy isolation, **KHÔNG kế thừa history** — skill content thành prompt cho subagent; CLAUDE.md vẫn load.
-- **Background subagent** auto-deny mọi tool call chưa được grant trong session hiện tại (*"auto-deny any tool call that would otherwise prompt"*). Nếu cần ask clarifying questions, tool call đó fail nhưng subagent vẫn tiếp tục. Kết quả unexpected (ít findings, empty output) → có thể do tool bị deny silently. Retry foreground để có permission prompts đầy đủ.
-- Consolidate output từ nhiều subagent → **đếm findings mỗi subagent** trước (tự đếm, không tin self-count), ghi tổng expected. Nếu consolidated report ít hơn → liệt kê rõ finding nào bị drop + lý do. KHÔNG drop ngầm. Hai subagent report cùng finding nhưng severity khác → lấy severity **cao hơn**. Finding partially valid → giữ phần đúng, ghi rõ phần sai.
-- Audit/review spec thay đổi giữa chừng → **re-dispatch** subagent với spec mới. KHÔNG re-evaluate findings cũ từ memory — findings cũ chạy theo spec cũ, không đại diện cho spec mới.
-- Subagent có thể **miss content** khi file dài hoặc task quá nhiều (fetch URLs + đọc files + evaluate + report cùng lúc). Không tin coverage rating tuyệt đối — subagent báo "not covered" → **grep verify trước khi chấp nhận**. Giới hạn scope: mỗi subagent ≤10 files hoặc ≤3 complex tasks đồng thời *(heuristic — không trong docs Anthropic)*.
-- **Startup content** (CLAUDE.md, memory, environment info — loaded đầu session) ≠ disk state hiện tại. Disk changes trong session không tự reflect vào startup content. Sau `/compact`: **project-root CLAUDE.md** và **auto memory** được re-inject từ disk ✅, nhưng **nested CLAUDE.md trong subdirectories** và **path-scoped rules** thì **không** — lost cho đến khi đọc file trong thư mục đó. Ảnh hưởng **cả subagent lẫn lead agent**. Khi consolidate findings hoặc so sánh file → luôn dùng Read/Grep từ disk, KHÔNG dựa vào nội dung đã load trong context.
-- **Resume subagent** (thay vì spawn mới): ask Claude tự nhiên ("Continue that code review") hoặc gọi `SendMessage` trực tiếp — cả 2 đều dùng `SendMessage` tool internally, đều cần `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. Sub-agent giữ nguyên full conversation history + tool calls. Dùng khi task cần nhiều vòng lặp hoặc sub-agent đã tích lũy context quan trọng.
-- **Sub-agents KHÔNG thể spawn sub-agents khác** — nesting bị chặn hoàn toàn. Nếu cần delegation lồng nhau → dùng Skills hoặc chain sub-agents từ main conversation.
-- **Persistent memory cho subagent**: field `memory: user|project|local` trong frontmatter. Paths: `user` → `~/.claude/agent-memory/<name>/`; `project` → `.claude/agent-memory/<name>/`; `local` → `.claude/agent-memory-local/<name>/`. Dùng khi muốn sub-agent tích lũy knowledge (patterns, architecture decisions) qua nhiều session. Khác với main agent memory — đây là memory riêng của từng sub-agent type.
+- Subagent results with **impact** (security findings, actions the user will execute, claims about numbers/versions) → **verify with a direct tool** (Grep, Read, WebFetch) before reporting to the user. **Named subagents** start fresh and don't see parent context → higher risk of incorrect output. **Forked subagents** inherit full history and are less prone to this. Skip verification only for tasks that are purely informational with no action consequence. "Found nothing" from audit/security tasks is NOT trivial — verify anyway.
+- Data already in the parent context (WebFetch results, previous tool output, conversation) → **paste the relevant subset** into the subagent prompt. Data on disk where the subagent has `Read`/`Grep` → let the subagent find it directly.
+- Never report findings to the user without confirming them at least once yourself *(self-imposed — not in Anthropic's docs)*.
+- Subagents do NOT receive the full Claude Code system prompt — they only receive their own system prompt (the markdown body of the agent definition). **CLAUDE.md and rules/*.md**: custom named subagents (Agent-tool-spawned) **DO load** the full memory hierarchy — `~/.claude/CLAUDE.md`, project rules (`.claude/rules/*.md`), `CLAUDE.local.md`, managed policy files. Exception: built-in **Explore and Plan** agents skip CLAUDE.md and git status. Two fork mechanisms: (1) `CLAUDE_CODE_FORK_SUBAGENT=1` (env var) = fork inherits full history + system prompt + tools. (2) `context: fork` (skill frontmatter) = runs in isolation, **does NOT inherit history** — skill content becomes the subagent's prompt; CLAUDE.md still loads *(inferred — not explicitly stated in docs)*.
+- **Background subagents** auto-deny any tool call that would otherwise prompt. If a clarifying-question tool call is needed, that call fails but the subagent continues. Unexpected results (few findings, empty output) → may be due to silently denied tools. Retry in the foreground to get full permission prompts.
+- Consolidating output from multiple subagents → **count findings per subagent** yourself first (self-count, don't trust the subagent's own count), record the expected total. If the consolidated report has fewer → explicitly list which findings were dropped and why. Never drop silently. Two subagents report the same finding with different severities → use the **higher** severity. Finding partially valid → keep the valid part, explicitly note the incorrect part.
+- Audit/review spec changes mid-run → **re-dispatch** the subagent with the new spec. Do NOT re-evaluate old findings from memory — old findings were produced under the old spec and don't represent the new one.
+- Subagents can **miss content** when files are long or the task is overloaded (fetch URLs + read files + evaluate + report all at once). Don't trust coverage ratings as absolute — subagent reports "not covered" → **grep-verify before accepting**. Limit scope: each subagent ≤10 files or ≤3 complex tasks simultaneously *(heuristic — not in Anthropic's docs)*. Scope vượt giới hạn → split thành nhiều subagent thay vì nhồi vào 1.
+- **Startup content** (CLAUDE.md, memory, environment info — loaded at session start) ≠ current disk state. Disk changes during the session don't auto-reflect in startup content. After `/compact`: **project-root CLAUDE.md** and **auto memory** are re-injected from disk ✅, but **nested CLAUDE.md files in subdirectories** and **path-scoped rules** are **not** — they're lost until a file in that directory is read. Affects **both subagents and the lead agent**. When consolidating findings or comparing files → always use Read/Grep from disk, never rely on content already loaded in context.
+- **Resuming a subagent** (instead of spawning a new one): ask Claude naturally ("Continue that code review") or call `SendMessage` directly — both use `SendMessage` internally and both require `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. The subagent retains its full conversation history and tool calls. Use when the task needs multiple iterations or the subagent has accumulated important context.
+- **Subagents cannot spawn other subagents** — nesting is fully blocked. When nested delegation is needed → use Skills or chain subagents from the main conversation.
+- **Persistent subagent memory**: use the `memory: user|project|local` field in frontmatter. Paths: `user` → `~/.claude/agent-memory/<name>/`; `project` → `.claude/agent-memory/<name>/`; `local` → `.claude/agent-memory-local/<name>/`. Use when you want a subagent to accumulate knowledge (patterns, architecture decisions) across sessions. This is separate from main agent memory — each subagent type has its own memory.
 
-## Self-review bias
+## Self-Review Bias
 
-- Sau batch fixes (>5 edits) → dispatch **fresh subagent** review changes thay vì tự verify. Tự fix → tự review = bias (session này đã chứng minh: tự verify bằng grep miss 5 regressions, fresh subagent bắt được).
-- Fresh subagent KHÔNG nhận context về intent sửa — chỉ nhận file paths + instruction "review for correctness". Đây là feature, không phải bug: independent review cần independent context.
+- After batch fixes (>5 edits) → dispatch a **fresh subagent** to review the changes instead of self-verifying. Self-fix → self-review = bias (demonstrated in this session: self-verification via grep missed 5 regressions that a fresh subagent caught).
+- The fresh subagent does NOT receive context about the edit intent — only file paths + instruction "review for correctness". This is a feature, not a bug: independent review requires independent context.
 
-## Batch edits
+## Batch Edits
 
-- Sau khi edit → verify **nội dung thay thế** đúng, không chỉ confirm nội dung cũ đã biến mất. Grep "pattern cũ removed" ≠ "pattern mới correct". Đặc biệt với factual claims (version, threshold, URL) → WebFetch verify source trước khi apply.
-- Sửa claim xuất hiện ở **nhiều file** → grep claim đó across toàn repo sau khi edit. Sửa file A mà file B vẫn giữ giá trị cũ = tạo inconsistency mới.
-- File có thể bị **edit bởi process khác** (user edit tay, hook, formatter, linter) giữa lúc edit và verify → read lại file trước khi kết luận edit thành công.
-- Trước batch edit (>3 files) → đảm bảo **git clean** (commit hoặc stash WIP). Nếu edit fail giữa chừng → dùng `/rewind` hoặc `git checkout` để revert. KHÔNG để codebase ở trạng thái nửa-edit.
-- Sửa **1 file** → **dùng Edit tool**, không viết Python script `open(file, 'w')` (tránh truncate). Batch op (rename N file, mass refactor) → script OK nhưng PHẢI: (1) preview list file affected, (2) backup hoặc git stash trước, (3) dry-run flag nếu có.
+- After editing → verify the **replacement content** is correct, not just that the old content is gone. Grepping "old pattern removed" ≠ "new pattern correct". Especially for factual claims (versions, thresholds, URLs) → WebFetch the source to verify before applying.
+- A claim appearing in **multiple files** → grep for it across the entire repo after editing. Fixing file A while file B keeps the old value creates a new inconsistency.
+- A file may be **edited by another process** (user edits manually, hooks, formatters, linters) between the edit and the verification → re-read the file before concluding the edit succeeded.
+- Before batch editing (>3 files) → ensure a **clean git state** (commit or stash WIP). If an edit fails mid-way → use `/rewind` or `git checkout` to revert. Never leave the codebase in a half-edited state.
+- Editing **1 file** → **use the Edit tool**, don't write a Python script with `open(file, 'w')` (risk of truncation). Batch operations (renaming N files, mass refactoring) → script is OK but MUST: (1) preview the list of affected files, (2) back up or `git stash` first, (3) use a dry-run flag if available.
 
-## Tool output reliability
+## Tool Output Reliability
 
-- Output bị **truncate** (Read `limit`, Bash timeout, WebFetch summary) → không đủ để kết luận. Expand/retry trước khi confirm. Đặc biệt: Read file lớn mà không thấy pattern → chưa chắc không có, có thể nằm ngoài range đã đọc.
-- WebFetch **output không reliable để verify** khi: cross-host redirect (không tự động follow — trả về redirect message với target URL, cần WebFetch lần 2), **15-min cache** (fetch lại cùng URL không có nghĩa là content mới), large page truncation. Ngoài ra: 404/timeout/auth-required là standard HTTP failures *(practical, không trong docs)*. Thử URL khác hoặc ghi rõ "không verify được, cần user confirm".
-- WebFetch summary được tạo bởi **small model trong context riêng** → có thể sai factual. Data dùng để ra quyết định quan trọng (version, threshold, security advisory) → cross-check bằng URL thứ hai hoặc `Bash(curl)` nếu cần raw content.
-- Verify qua **MCP tools** (GitHub MCP, database MCP...) → cùng nguyên tắc với subagent: output có impact → cross-check bằng tool khác. MCP server do user cấu hình (third-party, không qua Anthropic audit), có thể trả data stale hoặc không tin cậy.
+- Output that is **truncated** (Read `limit`, Bash timeout, WebFetch summary) → insufficient to draw conclusions. Expand/retry before confirming. Especially: reading a large file without seeing a pattern → doesn't mean the pattern isn't there; it may be outside the range that was read.
+- WebFetch **output is not reliable for verification** in these cases: cross-host redirects (not followed automatically — returns a redirect message with the target URL; requires a second WebFetch), **15-minute cache** (re-fetching the same URL does not mean fresh content), large page truncation. Additionally: 404/timeout/auth-required are standard HTTP failures *(practical, not in Anthropic docs)*. Try a different URL or explicitly note "could not verify, needs user confirmation".
+- WebFetch summaries are generated by a **small model in a separate context** → may contain factual errors. Data used for important decisions (versions, thresholds, security advisories) → cross-check with a second URL or `Bash(curl)` if raw content is needed.
+- Verification via **MCP tools** (GitHub MCP, database MCP…) → same principles as subagents: impactful output → cross-check with another tool. MCP servers are configured by the user (third-party, not Anthropic-audited) and may return stale or unreliable data.
 
-## Git state
+## Git State
 
-- Trước khi làm git operations → **verify branch** bằng `git branch --show-current`. Startup context phản ánh git state lúc SessionStart hook chạy gần nhất — hook fires khi: new session, `/resume`, `/clear`, hoặc `/compact` (source: `"startup"` / `"resume"` / `"clear"` / `"compact"`). Stale nếu git state thay đổi sau đó mà chưa trigger lại.
-- Kiểm tra file trên branch khác → dùng `git ls-tree`/`git show branch:path`, **KHÔNG** dùng `ls`/`find` (working tree chỉ phản ánh branch hiện tại).
-- Section này chỉ áp dụng khi project có **git repo**. Project không có git → skip, dùng file system trực tiếp.
+- Before git operations → **verify the current branch** with `git branch --show-current`. Startup context reflects git state as of the most recent SessionStart hook (only if the hook script runs git commands — not automatic) — the hook fires on: new session, `/resume`, `/clear`, or `/compact` (source: `"startup"` / `"resume"` / `"clear"` / `"compact"`). It's stale if git state changed after that without re-triggering the hook.
+- Checking files on another branch → use `git ls-tree`/`git show branch:path`, **NOT** `ls`/`find` (the working tree only reflects the current branch).
+- This section only applies when the project has a **git repo**. No git → skip and use the file system directly.
 
-## External dependencies
+## External Dependencies
 
-- Dùng GitHub Action / package bên ngoài → **verify tồn tại** (WebFetch check repo/tag) trước khi commit. WebFetch fail khi verify → áp dụng "Tool output reliability": thử URL khác hoặc ghi cần user confirm.
-- Dep tồn tại nhưng **version mismatch** → cảnh báo user, không tự downgrade/upgrade.
+- Using a GitHub Action or external package → **verify it exists** (WebFetch to check the repo/tag) before committing. WebFetch fails during verification → apply "Tool Output Reliability": try a different URL or note that user confirmation is needed.
+- Dependency exists but **version mismatch** → warn the user; don't downgrade/upgrade unilaterally.

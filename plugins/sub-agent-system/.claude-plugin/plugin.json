@@ -1,7 +1,0 @@
-{
-  "name": "sub-agent-system",
-  "description": "Prevents 22 sub-agent failure modes via task partitioning, output auditing, checkpoint management, and convention injection",
-  "author": {
-    "name": "Minh Thang"
-  }
-}

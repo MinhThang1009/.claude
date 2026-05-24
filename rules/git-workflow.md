@@ -1,22 +1,22 @@
-# Quy tắc Git
+# Git Workflow
 
-> Auto-import mọi session qua `rules/`.
+> Auto-imported every session via `rules/`.
 
-## Commit message
+## Commit Messages
 
-**Format**: Conventional Commits, **subject TIẾNG VIỆT**.
+**Format**: Conventional Commits, **subject in VIETNAMESE**.
 
 ```text
-<type>(<scope>): <mô tả ngắn bằng tiếng Việt, không chấm cuối, ≤72 ký tự>
+<type>(<scope>): <short description in Vietnamese, no trailing period, ≤72 chars>
 
-<body — giải thích WHY, có thể nhiều đoạn, tiếng Việt>
+<body — explain WHY, can be multiple paragraphs, Vietnamese>
 
-<footer — tham chiếu issue/breaking change, tiếng Anh chuẩn>
+<footer — issue/breaking change references, in English>
 ```
 
-**Type** (giữ tiếng Anh để tool parse được): `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
+**Type** (keep in English so tools can parse): `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
 
-**Ví dụ đúng**:
+**Good examples**:
 ```text
 feat(auth): thêm đăng nhập bằng Google OAuth
 
@@ -35,65 +35,65 @@ về default avatar URL thay vì throw.
 Refs #218
 ```
 
-**Ví dụ sai**:
-- `fix: bug` (không scope, không mô tả)
-- `Update auth.ts` (không type, không mô tả vấn đề)
-- `feat(auth): add Google OAuth login` (subject tiếng Anh — quy ước project là tiếng Việt)
+**Bad examples**:
+- `fix: bug` (no scope, no description)
+- `Update auth.ts` (no type, no problem description)
+- `feat(auth): add Google OAuth login` (subject in English — project convention is Vietnamese)
 
-## Branch name
+## Branch Names
 
-**TIẾNG ANH**, kebab-case, theo prefix:
-- `feat/<short-description>` — feature mới
+**ENGLISH**, kebab-case, with prefix:
+- `feat/<short-description>` — new feature
 - `fix/<issue-id>-<short-description>` — bug fix
-- `refactor/<area>` — refactor
-- `docs/<topic>` — chỉ docs
-- `chore/<task>` — task vặt
-- `hotfix/<issue-id>` — fix gấp lên prod
+- `refactor/<area>` — refactoring
+- `docs/<topic>` — docs-only
+- `chore/<task>` — housekeeping
+- `hotfix/<issue-id>` — urgent production fix
 
-Ví dụ: `feat/google-oauth`, `fix/218-avatar-fallback`, `refactor/auth-middleware`.
+Examples: `feat/google-oauth`, `fix/218-avatar-fallback`, `refactor/auth-middleware`.
 
-## PR title & description
+## PR Title & Description
 
-- **PR title**: tiếng Anh, theo Conventional Commits format (khác commit message ở chỗ subject tiếng Anh). Tool như Linear/Jira parse được.
-- **PR description**: tiếng Việt OK (review trong team Việt). Bao gồm: mục đích (1-2 câu), thay đổi chính (bullet), cách test, screenshot/video nếu UI, breaking change nếu có.
+- **PR title**: English, Conventional Commits format (unlike commit messages, subject is in English so tools like Linear/Jira can parse it).
+- **PR description**: Vietnamese is fine (reviewed within a Vietnamese team). Include: purpose (1–2 sentences), key changes (bullets), how to test, screenshots/video for UI changes, breaking changes if any.
 
 ## Workflow
 
-- **Trước khi commit**: `git diff --staged` review thay đổi sắp commit. Không commit "blind".
-- **Add từng file** cụ thể, KHÔNG `git add .` (dễ commit file rác).
-- **Commit nhỏ và thường xuyên** > commit lớn cuối ngày. Mỗi commit là 1 đơn vị logic revert được.
-- **Pull/rebase** trước push. `git pull --rebase` trên feature branch.
-- **Squash** trước merge nếu PR có nhiều commit "WIP", "fix typo".
+- **Before committing**: `git diff --staged` to review what's about to be committed. Never commit blind. Phát hiện file staged không liên quan → unstage ngay, báo user trước khi tiếp tục.
+- **Stage files individually**, NOT `git add .` (easy to include junk files).
+- **Small, frequent commits** > one large end-of-day commit. Each commit should be one logical unit that can be reverted independently.
+- **Pull/rebase before push**. `git pull --rebase` on feature branches.
+- **Squash before merging** if the PR has many "WIP" or "fix typo" commits.
 
-## Lệnh CẤM TUYỆT ĐỐI (không tự ý chạy)
+## Forbidden Commands (never run without explicit user request)
 
-- `git push --force` (hay `-f`) lên branch chia sẻ: `main`, `master`, `develop`, `release/*`. Trên feature branch riêng → dùng `--force-with-lease`.
-- `git reset --hard` khi chưa stash/commit work hiện tại.
-- `git clean -fdx` trên repo không nắm 100% file sẽ bị xóa.
-- `git rebase` khi commit đã được người khác pull về.
-- `git filter-repo` / `filter-branch` trên branch chia sẻ.
-- Sửa `.git/` trực tiếp.
+- `git push --force` (or `-f`) to shared branches: `main`, `master`, `develop`, `release/*`. On your own feature branch → use `--force-with-lease` instead.
+- `git reset --hard` when current work is not stashed/committed.
+- `git clean -fdx` on a repo where you don't know 100% of what will be deleted.
+- `git rebase` when commits have already been pulled by someone else.
+- `git filter-repo` / `filter-branch` on shared branches.
+- Direct edits to `.git/`.
 
-## Lệnh nên xác nhận trước khi chạy
+## Commands That Require Confirmation
 
-- `git checkout <file>` (mất work uncommitted của file đó).
+- `git checkout <file>` (loses uncommitted changes to that file).
 - `git stash drop`.
-- `git branch -D <name>` (force delete unmerged).
+- `git branch -D <name>` (force-delete unmerged branch).
 - `git tag -d` + `git push --delete tag`.
-- `git revert <commit>` trên public history.
+- `git revert <commit>` on public history.
 
 ## Attribution
 
-- KHÔNG thêm `Co-Authored-By: Claude` vào commit (đã tắt qua `attribution.commit: ""` trong `~/.claude/settings.json`) (xem [settings docs](https://code.claude.com/docs/en/settings)).
-- KHÔNG thêm tagline `🤖 Generated with [Claude Code]` vào commit/PR description. Lưu ý: `attribution.commit` chỉ control commit message — PR description attribution từ plugins (vd `/commit-push-pr`) cần set thêm `attribution.pr: ""`.
-- Nếu vẫn xuất hiện → bug, báo người dùng để check cả `attribution.commit` và `attribution.pr` trong settings.
+- Do NOT add `Co-Authored-By: Claude` to commits (disabled via `attribution.commit: ""` in `~/.claude/settings.json`) (see [settings docs](https://code.claude.com/docs/en/settings)).
+- Do NOT add the `🤖 Generated with [Claude Code]` tagline to commits or PR descriptions. Note: `attribution.commit` only controls commit messages — PR description attribution from plugins (e.g., `/commit-push-pr`) requires setting `attribution.pr: ""` separately.
+- If it still appears → it's a bug; tell the user to check both `attribution.commit` and `attribution.pr` in settings.
 
-## Hooks an toàn
+## Safe Hook Behavior
 
-- Pre-commit hook trong project (`.husky/`, `.git/hooks/`) → tôn trọng, không bypass `--no-verify` trừ khi user yêu cầu rõ ràng.
-- Lint/format/type-check fail → sửa, không bypass.
+- Respect pre-commit hooks in the project (`.husky/`, `.git/hooks/`) — do not bypass with `--no-verify` unless the user explicitly asks.
+- Lint/format/type-check failures → fix them, don't bypass.
 
-## Khi xung đột
+## Merge Conflicts
 
-- `git merge` conflict → đọc kỹ cả 2 phía, KHÔNG auto-resolve theo pattern. Hỏi user nếu không chắc bên nào đúng.
-- Sau resolve → chạy test trước khi commit merge.
+- `git merge` conflict → read both sides carefully, do NOT auto-resolve by pattern. Ask the user if unsure which side is correct.
+- After resolving → run tests before committing the merge.

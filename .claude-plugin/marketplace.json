@@ -244,10 +244,17 @@
       "category": "development"
     },
     {
-      "name": "sub-agent-system",
-      "description": "Prevent 22 sub-agent failure modes: task planning, output auditing, pipeline review, and checkpoint recovery for multi-agent workflows",
+      "name": "subagent-system",
+      "description": "Prevent 22 subagent failure modes: task planning, output auditing, pipeline review, and checkpoint recovery for multi-agent workflows",
       "author": { "name": "Minh Thang" },
-      "source": "./plugins/sub-agent-system",
+      "source": "./plugins/subagent-system",
+      "category": "development"
+    },
+    {
+      "name": "plan-workflow",
+      "description": "Universal 8-phase implementation plan workflow with human approval gates for any plan type: feature, bug fix, refactoring, migration, security",
+      "author": { "name": "Minh Thang" },
+      "source": "./plugins/plan-workflow",
       "category": "development"
     }
   ]
