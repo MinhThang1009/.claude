@@ -230,16 +230,16 @@ jobs:
         run: |
           $count = (Get-ChildItem "$env:USERPROFILE\.claude\agents" -Filter "*.md" -ErrorAction SilentlyContinue).Count
           Write-Host "agents: $count"
-          if ($count -ne 35) { Write-Error "Expected 29, got $count"; exit 1 }
+          if ($count -ne 35) { Write-Error "Expected 35, got $count"; exit 1 }
       - name: Verify skills (59 dirs)
         shell: pwsh
         run: |
           $count = (Get-ChildItem "$env:USERPROFILE\.claude\skills" -ErrorAction SilentlyContinue).Count
           Write-Host "skills: $count"
-          if ($count -ne 59) { Write-Error "Expected 55, got $count"; exit 1 }
+          if ($count -ne 59) { Write-Error "Expected 59, got $count"; exit 1 }
       - name: Verify commands (30 files)
         shell: pwsh
         run: |
           $count = (Get-ChildItem "$env:USERPROFILE\.claude\commands" -Filter "*.md" -ErrorAction SilentlyContinue).Count
           Write-Host "commands: $count"
-          if ($count -ne 30) { Write-Error "Expected 28, got $count"; exit 1 }
+          if ($count -ne 30) { Write-Error "Expected 30, got $count"; exit 1 }

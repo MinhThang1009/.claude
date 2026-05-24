@@ -45,12 +45,12 @@ jobs:
               ERRORS=$((ERRORS + 1))
             fi
           done
-          [ $ERRORS -gt 0 ] && exit 1 || true
+          if [ "$ERRORS" -gt 0 ]; then exit 1; fi
 
       - name: Validate SKILL.md frontmatter
         run: |
           ERRORS=0
-          for skill in $(find plugins -name "SKILL.md"); do
+          while IFS= read -r skill; do
             has_name=$(head -20 "$skill" | grep -c "^name:" || true)
             has_desc=$(head -20 "$skill" | grep -c "^description:" || true)
             if [ "$has_name" -eq 0 ] || [ "$has_desc" -eq 0 ]; then
@@ -59,8 +59,8 @@ jobs:
             else
               echo "✓ $skill"
             fi
-          done
-          [ $ERRORS -gt 0 ] && exit 1 || true
+          done < <(find plugins -name "SKILL.md")
+          if [ "$ERRORS" -gt 0 ]; then exit 1; fi
 
       - name: Validate marketplace lists all plugins
         run: |
