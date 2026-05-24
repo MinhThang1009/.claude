@@ -34,8 +34,9 @@
 │   ├── security.md                 # ✅ Auto-import (essential mọi task)
 │   ├── verification.md             # ✅ Auto-import (verify & avoid past mistakes)
 │   ├── coding-standards.md         # ✅ Auto-import (coding conventions)
-│   └── git-workflow.md             # ✅ Auto-import (git workflow)
-├── plugins/                        # 34 plugins (mỗi plugin có agents/ và/hoặc skills/ bên trong)
+│   ├── git-workflow.md             # ✅ Auto-import (git workflow)
+│   └── plan-workflow.md            # ✅ Auto-import (8 principles for any implementation plan)
+├── plugins/                        # 36 plugins (mỗi plugin có agents/ và/hoặc skills/ bên trong)
 │   ├── pr-review-toolkit/          # PR review: code-reviewer, silent-failure-hunter, type-design-analyzer...
 │   │   ├── .claude-plugin/
 │   │   ├── agents/                 # code-reviewer.md, code-simplifier.md, comment-analyzer.md...
@@ -60,7 +61,7 @@
 │   ├── claude-md-management/       # Audit CLAUDE.md: /claude-md-management skill
 │   └── plugin-dev/                 # Phát triển plugin: 7 skills (agent/skill/hook/mcp/command/structure/settings)
 ├── .claude-plugin/
-│   └── marketplace.json            # Marketplace manifest (34 plugins)
+│   └── marketplace.json            # Marketplace manifest (36 plugins)
 ├── output-styles/
 │   └── concise-vietnamese.md       # Style tiếng Việt ngắn gọn
 ├── hooks/                          # Hook scripts (gọi từ settings.json)
@@ -480,13 +481,13 @@ claude plugin marketplace add https://github.com/MinhThang1009/dotclaude
 Sau đó install plugin muốn dùng:
 
 ```bash
-claude plugin install pr-review-toolkit
-claude plugin install feature-dev
-claude plugin install commit-commands
-# ... hoặc bất kỳ plugin nào trong 34 plugins
+claude plugin install pr-review-toolkit@minhthang-plugins
+claude plugin install feature-dev@minhthang-plugins
+claude plugin install plan-workflow@minhthang-plugins
+# ... hoặc bất kỳ plugin nào trong 36 plugins
 ```
 
-**34 plugins hiện có** (xem `.claude-plugin/marketplace.json` để đầy đủ, hoặc `.claude-load.txt` để chọn plugins load):
+**36 plugins hiện có** (xem `.claude-plugin/marketplace.json` để đầy đủ):
 
 | Plugin | Loại | Mô tả ngắn |
 | --- | --- | --- |
@@ -523,6 +524,9 @@ claude plugin install commit-commands
 | `web-artifacts-builder` | skills | Xây dựng web artifacts |
 | `webapp-testing` | agents + skills | Test web application |
 | `xlsx` | skills | Làm việc với file Excel (.xlsx) |
+| `plan-workflow` | skills | 8-phase implementation plan workflow với 3 human gates |
+| `subagent-system` | agents + skills | Pipeline multi-agent: checkpoint, chain-verifier, task-partitioner |
+| `audit-plan` | skills | Audit plan file: gap detection, dead code, test coverage |
 
 ## 10. Cấu trúc nội bộ — lý do thiết kế
 
