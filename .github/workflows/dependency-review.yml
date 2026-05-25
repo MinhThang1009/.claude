@@ -13,7 +13,7 @@ jobs:
     name: Scan PR cho vulnerable dependencies
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - name: Run dependency-review-action
         uses: actions/dependency-review-action@v4
         with:
