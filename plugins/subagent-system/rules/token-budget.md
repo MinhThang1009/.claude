@@ -4,7 +4,7 @@ Monitor context usage and select models by task type before spawning agents. Pre
 
 **Do:**
 - Check `/context` **before spawning each subagent** — if usage is above 40%, compact first before spawning more agents. Note: this 40% threshold applies specifically to spawning new subagents (subagent output will consume additional context). It does not mean all activity stops at 40% — the main conversation can continue; the restriction is on spawning new subagents that will return large outputs.
-  - **Rationale for 40%:** Claude Code has two window sizes — 200k (Opus/Haiku) and 1M (Sonnet 4.6+). At 200k: 40% used = ~120k remaining, enough for 2–3 large agent returns (~30–50k each). At 1M: 40% = ~600k remaining — very conservative; 65% is the practical threshold. Check which model you're on before applying this rule blindly.
+  - **Rationale for 40%:** Claude Code has two window sizes — 200k (Haiku) and 1M (Opus 4.6+ / Sonnet 4.6+, depending on plan + `[1m]` alias). At 200k: 40% used = ~120k remaining, enough for 2–3 large agent returns (~30–50k each). At 1M: 40% = ~600k remaining — very conservative; 65% is the practical threshold. Check which model you're on before applying this rule blindly.
   - **Absolute ceiling regardless of window:** If context exceeds 65%, compact before spawning any new agent. At 200k window this is ~130k used; at 1M window it's ~650k used — both are close to dangerous territory for multi-agent returns.
 - Select the model appropriate for the task type by setting the `model:` field in the agent definition:
   - Research, exploration, search → `model: haiku`

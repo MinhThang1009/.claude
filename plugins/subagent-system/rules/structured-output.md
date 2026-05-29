@@ -4,7 +4,7 @@ Every subagent response must begin with a STATUS block. Prevents silent failures
 
 **Do:**
 - Start every response with the STATUS block shown below
-- Include ERRORS when STATUS is `failed`
+- Include ERRORS when STATUS is `FAILED`
 - Include REMAINING_TASKS when TASKS_PROCESSED < TASKS_TOTAL
 
 **Don't:**
