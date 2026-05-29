@@ -76,7 +76,7 @@ limiter = RateLimiter(...)
 ## Type Safety
 
 - Project has a type system (TypeScript, mypy, Pydantic, Rust…) → use it fully.
-- Do NOT use `any`/`Any`/`unknown` unless truly necessary, with an explanatory comment.
+- Do NOT use `any`/`Any` unless truly necessary, with an explanatory comment. Prefer `unknown` (TS) over `any` for values whose type isn't known — it's type-safe and forces narrowing before use.
 - Strong types at boundaries (input from user/network/file): validate at runtime, don't trust the TypeScript compiler alone.
 
 ## Style
