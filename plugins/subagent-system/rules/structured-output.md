@@ -26,6 +26,6 @@ REMAINING_TASKS: [list of unprocessed tasks]
 ERRORS: [description of what failed]
 ```
 
-Note: `SUSPICIOUS` is used by `completion-checker` when the checklist has fewer items than tasks assigned (possible truncation). All STATUS values are uppercase to enable exact-string matching in automated pipelines.
+Note: Use `PARTIAL` when some but not all tasks completed (TASKS_PROCESSED between 1 and TASKS_TOTAL - 1); use `COMPLETED` only when all tasks are accounted for. `SUSPICIOUS` is used by `completion-checker` when the checklist has fewer items than tasks assigned (possible truncation). All STATUS values are uppercase to enable exact-string matching in automated pipelines.
 
 The main agent uses the STATUS block to validate format before parsing content. A missing STATUS block is treated as a failure — the main agent will retry the task in foreground mode.

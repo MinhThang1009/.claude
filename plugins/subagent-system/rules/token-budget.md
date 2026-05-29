@@ -14,7 +14,7 @@ Monitor context usage and select models by task type before spawning agents. Pre
 - Use fork (`CLAUDE_CODE_FORK_SUBAGENT=1`) when a subagent needs a large amount of parent context — fork reuses the parent's prompt cache and is significantly cheaper than manual injection
 
 **Don't:**
-- Continue spawning agents when context exceeds 40%
+- Continue spawning agents past the model-appropriate threshold (40% on a 200k window, ~65% on 1M) — see the Rationale above
 - Pre-load all tools in the prompt — use ToolSearch on-demand instead (ToolSearch significantly reduces token overhead by discovering tools dynamically rather than listing all upfront; exact savings vary by workflow)
 - Allow subagents to return full file contents when a summary is sufficient
 

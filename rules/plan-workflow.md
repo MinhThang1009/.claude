@@ -1,18 +1,18 @@
 # Plan Workflow Rules
 
 > Auto-imported every session. Applies whenever creating or executing any implementation plan.
-> Full workflow: `/plan-refactor` skill. Principles: `plan-refactor/references/principles.md`.
+> Full workflow: `/plan-refactor` skill. Principles: see `references/principles.md` inside that skill (`plugins/plan-workflow/skills/plan-refactor/`).
 
 ## The 8 Principles
 
-**P1 — Plan Is a Contract:** Complete enough for a fresh agent with zero prior context to execute.
-**P2 — Verify Before Trusting:** Every agent claim verified against actual files before entering the plan.
-**P3 — Independent Verification:** The agent that created something cannot reliably verify it.
-**P4 — Test Gates Are Non-Negotiable:** Baseline established before first edit; checked after every phase.
-**P5 — Implementation Creates New Issues:** Post-implementation audit is always mandatory.
-**P6 — Scope Freezes Before Implementation:** Out-of-scope findings go to backlog, not the current plan.
-**P7 — Oscillation = Missing Ground Truth:** Stop iterating; read the code; make a FINAL DECISION.
-**P8 — Agent Executes; Human Approves:** Three mandatory human gates: after Phase 3 (scope), after Phase 5 (plan), after Phase 7 (findings). Agent stops and waits. Agent does not self-approve.
+- **P1 — Plan Is a Contract:** Complete enough for a fresh agent with zero prior context to execute.
+- **P2 — Verify Before Trusting:** Every agent claim verified against actual files before entering the plan.
+- **P3 — Independent Verification:** The agent that created something cannot reliably verify it.
+- **P4 — Test Gates Are Non-Negotiable:** Baseline established before first edit; checked after every phase.
+- **P5 — Implementation Creates New Issues:** Post-implementation audit is always mandatory.
+- **P6 — Scope Freezes Before Implementation:** Out-of-scope findings go to backlog, not the current plan.
+- **P7 — Oscillation = Missing Ground Truth:** Stop iterating; read the code; make a FINAL DECISION.
+- **P8 — Agent Executes; Human Approves:** Three mandatory human gates: after Phase 3 (scope), after Phase 5 (plan), after Phase 7 (findings). Agent stops and waits. Agent does not self-approve.
 
 ## When to Create a Plan
 

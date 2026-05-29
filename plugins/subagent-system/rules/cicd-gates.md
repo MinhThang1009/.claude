@@ -22,7 +22,7 @@ Other examples:
 - Run all three gate commands after every agent edit phase, before spawning the next phase
 - Stop the pipeline immediately if ANY gate command exits with non-zero status
 - Inject `TEST_COMMAND` into `handoff-validator` skill invocations (that skill runs it as part of phase handoff verification)
-- Treat gate failures as a signal to spawn `iteration-cleanup` before retrying
+- Treat gate failures as a signal to spawn `iteration-cleanup` (`agents/iteration-cleanup.md`) before retrying
 
 **Don't:**
 - Proceed to the next agent phase if lint, tests, or type-check fail

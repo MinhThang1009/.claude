@@ -7,6 +7,7 @@ Before reporting done, every assigned task must be accounted for. Prevents prema
 - Include TASKS_PROCESSED and TASKS_TOTAL counts
 - Set STATUS to `COMPLETED`, `PARTIAL`, `FAILED`, or `SUSPICIOUS` (uppercase — required for automated parsing)
 - List REMAINING_TASKS when STATUS is `PARTIAL` or `SUSPICIOUS`
+- A skipped `[o]` task still counts toward TASKS_PROCESSED (it was accounted for), but set STATUS to `PARTIAL` — not `COMPLETED` — whenever any task is skipped
 
 **Don't:**
 - Report done when TASKS_PROCESSED < TASKS_TOTAL
