@@ -19,7 +19,7 @@
 
 ## Self-Review Bias
 
-- After batch fixes (>5 edits) → dispatch a **fresh subagent** to review the changes instead of self-verifying. Self-fix → self-review = bias (demonstrated in this session: self-verification via grep missed 5 regressions that a fresh subagent caught).
+- After batch fixes (>5 edits) → dispatch a **fresh subagent** to review the changes instead of self-verifying. Self-fix → self-review = bias (demonstrated in this session: self-verification via grep missed 5 regressions that a fresh subagent caught) *(self-imposed/empirical — not in Anthropic's docs)*.
 - The fresh subagent does NOT receive context about the edit intent — only file paths + instruction "review for correctness". This is a feature, not a bug: independent review requires independent context.
 
 ## Batch Edits
