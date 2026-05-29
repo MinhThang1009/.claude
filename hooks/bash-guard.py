@@ -194,21 +194,6 @@ def is_force_push_variant(cmd: str) -> bool:
     return any(re.search(p, cmd) for p in patterns)
 
 
-def is_dangerous_git(cmd: str) -> bool:
-    """git reset --hard / git clean -f* — phá hủy working tree.
-
-    reset --hard vứt mọi uncommitted change; clean -f xóa untracked files.
-    Cùng nhóm blast-radius với force push (forbidden per git-workflow.md) →
-    chặn cứng thay vì chỉ ask. KHÔNG match `git reset --soft`/`git reset HEAD`
-    hay `git clean -n` (dry-run) — chỉ chặn khi thực sự phá hủy.
-    """
-    patterns = [
-        r"\bgit\b[^|;&]*\breset\b[^|;&]*--hard\b",
-        r"\bgit\b[^|;&]*\bclean\b[^|;&]*(?:\s-[a-zA-Z]*f|\s--force)",
-    ]
-    return any(re.search(p, cmd) for p in patterns)
-
-
 def is_fork_bomb(cmd: str) -> bool:
     """Classic fork bomb pattern."""
     return bool(re.search(r":\(\)\s*\{", cmd))
@@ -261,12 +246,6 @@ def check_command(cmd: str):
             is_force_push_variant,
             "force push (--force/-f/--force-with-lease/+ref/git -c override) — "
             "xin phép user trước hoặc dùng `git push` thường.",
-        ),
-        (
-            is_dangerous_git,
-            "git reset --hard / git clean -f* — phá hủy working tree (vứt "
-            "uncommitted changes / xóa untracked files). Forbidden per "
-            "git-workflow.md. Commit/stash trước, hoặc xin phép user.",
         ),
         (is_fork_bomb, "fork bomb pattern — sẽ làm máy treo."),
         (is_dd_to_disk, "dd ghi vào disk device — risk wipe ổ cứng."),

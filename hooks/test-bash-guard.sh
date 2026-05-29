@@ -94,11 +94,6 @@ run "git push --force-with-lease"    "git push --force-with-lease origin main"  
 run "git push --force-if-includes"   "git push --force-if-includes origin main"    BLOCK
 run "git push +ref"                  "git push origin +main"                       BLOCK
 run "git -c override push"           "git -c push.default=current push origin main" BLOCK
-run "git reset --hard"               "git reset --hard"                            BLOCK
-run "git reset --hard HEAD~1"        "git reset --hard HEAD~1"                     BLOCK
-run "git clean -fdx"                 "git clean -fdx"                              BLOCK
-run "git clean -fd"                  "git clean -fd"                               BLOCK
-run "git clean --force -d"           "git clean --force -d"                        BLOCK
 
 echo ""
 echo "=== rm bypass (H1) ==="
@@ -183,6 +178,8 @@ run "git diff main"                  "git diff main"                            
 run "git -c color.ui=auto status"    "git -c color.ui=auto status"                 PASS
 run "git reset --soft"               "git reset --soft HEAD~1"                     PASS
 run "git reset HEAD file"            "git reset HEAD src/a.ts"                     PASS
+run "git reset --hard (ask-level)"   "git reset --hard HEAD~1"                     PASS
+run "git clean -fdx (ask-level)"     "git clean -fdx"                             PASS
 run "git clean -n dry-run"           "git clean -n"                               PASS
 
 echo ""
