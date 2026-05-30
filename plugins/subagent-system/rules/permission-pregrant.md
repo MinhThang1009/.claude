@@ -6,8 +6,7 @@ Grant all required tool permissions before spawning background agents. Prevents 
 - Before spawning background agents, run one foreground agent with the same tools to trigger permission prompts
 - Accept required permissions during that foreground run, then spawn background agents
 - Use `disallowedTools` in agent definitions to restrict per-agent access to only what is needed
-- Use `permissionMode: default` in agent definitions to prevent bypass inheritance from a parent running in a permissive mode
-  - **Plugin agent caveat:** `permissionMode` is silently ignored in plugin-defined agents (security restriction). For plugin agents, use `disallowedTools` to restrict access — `permissionMode` has no effect and provides a false sense of security if relied upon.
+- `permissionMode` is **not** a reliable boundary against a permissive parent: if the parent runs `bypassPermissions`, `acceptEdits`, or `auto` mode, the parent takes precedence and the child's `permissionMode` is ignored *(Claude Code sub-agents docs)*. It is also silently ignored for **plugin-defined** agents. Restrict access with `disallowedTools`, not `permissionMode`.
 
 **Don't:**
 - Use `--dangerously-skip-permissions` when the session will spawn subagents — all subagents inherit the bypass, including those inside worktrees (`isolation: "worktree"` provides filesystem isolation but NOT permission restriction)
