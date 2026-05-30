@@ -48,7 +48,7 @@ Rationale: An agent that reads its own ground truth will appear to have a high d
 Target ≤300 tokens. Be specific and imperative.
 
 **If conventions exceed 300 tokens:** Do NOT silently truncate. Instead, fall back in order:
-1. Use the `skills` field in the agent definition — full SKILL.md content is auto-injected at startup without consuming the prompt
+1. Use the `skills` field in the agent definition — full SKILL.md content auto-injects into the subagent's context at startup (bypasses the ≤300-token block, but still consumes the subagent's context window)
 2. Create a dedicated convention skill file and reference it via `skills`
 
 **Output format:**
