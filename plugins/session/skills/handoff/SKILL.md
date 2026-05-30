@@ -1,4 +1,5 @@
 ---
+name: handoff
 description: "Creates a handoff brief to compact the current session OR transition to a new session. Use when session shows signs of high context usage or before clearing history."
 disable-model-invocation: false
 allowed-tools: Read Write Bash(git *) Bash(find *)

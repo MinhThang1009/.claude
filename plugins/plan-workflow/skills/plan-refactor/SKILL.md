@@ -1,7 +1,6 @@
 ---
 name: plan-refactor
 description: This skill should be used when the user asks to "create a plan", "plan this refactoring", "plan this feature", "make an implementation plan", "how should we approach this", or when a change touches more than 3 files, crosses layer boundaries, or requires /compact to complete. Provides a universal 8-phase workflow with 3 human approval gates for any plan type.
-version: 1.0.0
 ---
 
 # Implementation Plan Workflow
@@ -45,7 +44,7 @@ Identify the plan type from the user's request, then read the corresponding appe
 ## Phase Gate Sequence
 
 ```
-Pre-Planning: test baseline + git clean + behavioral baseline (if applicable)
+Phase 0  PRE-FLIGHT    → test baseline + git clean + behavioral baseline (P4)
         ↓
 Phase 1  EXPLORE       → ground truth inventory (P2)
         ↓
