@@ -1,7 +1,6 @@
 ---
 name: completion-checker
 description: This skill should be used after receiving output from a subagent that was assigned an explicit numbered task list and is expected to have produced a COMPLETION_CHECKLIST block. Do not invoke if the subagent was not given a task list — there will be no checklist to parse. Uses grep counts, not LLM estimation, to detect premature termination. Also trigger when user asks to "verify completion checklist", "check if agent finished all tasks", or "detect premature termination".
-version: 0.1.0
 allowed-tools: Bash Write
 ---
 
@@ -20,13 +19,14 @@ Write("[PROJECT_ROOT_OR_DOT]/.claude/tmp/cc_input.txt", [subagent output])
 
 First, extract only the COMPLETION_CHECKLIST section to avoid counting `[x]` in code snippets or findings text:
 ```bash
-Bash("grep -Eic 'COMPLETION.{0,1}CHECKLIST' [PROJECT_ROOT_OR_DOT]/.claude/tmp/cc_input.txt")    # block exists (first grep, -Ei: matches both COMPLETION_CHECKLIST and COMPLETION CHECKLIST)
-Bash("sed -n '/COMPLETION.CHECKLIST/,/^STATUS:/p' [PROJECT_ROOT_OR_DOT]/.claude/tmp/cc_input.txt > [PROJECT_ROOT_OR_DOT]/.claude/tmp/cc_checklist.txt 2>/dev/null || cp [PROJECT_ROOT_OR_DOT]/.claude/tmp/cc_input.txt [PROJECT_ROOT_OR_DOT]/.claude/tmp/cc_checklist.txt")
+Bash("grep -Ec 'COMPLETION[_ ]?CHECKLIST' [PROJECT_ROOT_OR_DOT]/.claude/tmp/cc_input.txt")    # block exists (-E optional separator: matches COMPLETION_CHECKLIST, COMPLETION CHECKLIST, COMPLETIONCHECKLIST; case-sensitive to stay in sync with the sed below)
+Bash("sed -nE '/COMPLETION[_ ]?CHECKLIST/,/^STATUS:/p' [PROJECT_ROOT_OR_DOT]/.claude/tmp/cc_input.txt > [PROJECT_ROOT_OR_DOT]/.claude/tmp/cc_checklist.txt")   # sed regex MUST match the grep above (same optional separator) — else block is "found" but extracts nothing
+Bash("[ -s [PROJECT_ROOT_OR_DOT]/.claude/tmp/cc_checklist.txt ] && echo CHECKLIST_FOUND || echo CHECKLIST_EMPTY")   # guard: sed -n exits 0 even on no match → rely on this non-empty test, NOT the exit code
 Bash("grep -Fc '[x]' [PROJECT_ROOT_OR_DOT]/.claude/tmp/cc_checklist.txt")                       # done count (checklist only)
 Bash("grep -Fc '[o]' [PROJECT_ROOT_OR_DOT]/.claude/tmp/cc_checklist.txt")                       # skipped count (checklist only)
 ```
-If the sed extraction fails (no COMPLETION_CHECKLIST found): **do NOT count from the full file** — set STATUS=SUSPICIOUS and ACTION=ESCALATE immediately, with reason "CHECKLIST_NOT_FOUND — subagent did not produce a completion checklist." Skip Steps 3-4.
-The first grep uses `-Ei` (case-insensitive extended regex) to match both `COMPLETION_CHECKLIST` and `COMPLETION CHECKLIST` — agents sometimes use a space instead of underscore.
+If the guard prints `CHECKLIST_EMPTY` (no COMPLETION_CHECKLIST extracted — note `sed -n` exits 0 even when nothing matches, so trust the `[ -s ]` non-empty test, NOT the exit code): **do NOT count from the full file** — set STATUS=SUSPICIOUS and ACTION=ESCALATE immediately, with reason "CHECKLIST_NOT_FOUND — subagent did not produce a completion checklist." Skip Steps 3-4.
+Both the grep and the sed use the same `[_ ]?` optional separator (extended regex, case-sensitive — neither uses `-i`/`I`, so they agree on case) to match `COMPLETION_CHECKLIST`, `COMPLETION CHECKLIST`, and `COMPLETIONCHECKLIST` — agents sometimes use a space or no separator instead of an underscore. The exact uppercase header is mandated below, so case-sensitivity is intentional. Keep the two regexes in sync.
 Use `-Fc` for `[x]`/`[o]` counts (fixed-string, no escaping issues). Use these counts as ground truth. Do NOT rely on LLM estimation.
 
 **Format enforcement note:** Sub-agents MUST write their checklist header as exactly `COMPLETION_CHECKLIST:` (underscore, colon). If the detected block uses a different format, note it in the report as a FORMAT_WARNING alongside the counts.
@@ -40,8 +40,8 @@ Uncertain match threshold: if more than 30% of matches are flagged uncertain, se
 Compare grep-counted items (Step 2) against the number of tasks in the original task list. If checklist item count < assigned task count, flag SUSPICIOUS.
 
 **Step 5 — Determine action.**
-- `COMPLETED` — all tasks accounted for in the checklist
-- `PARTIAL` — some tasks missing or skipped; list them in REMAINING_TASKS
+- `COMPLETED` — all tasks accounted for in the checklist AND skipped count `[o]` = 0
+- `PARTIAL` — some tasks missing, or any task skipped (`[o]` count > 0); list them in REMAINING_TASKS. A checklist where every task is present but ≥1 is `[o]` is PARTIAL, never COMPLETED (matches `completion-protocol.md`)
 - `SUSPICIOUS` — checklist has fewer items than tasks assigned (possible truncation or skipping)
 
 Note: `FAILED` (agent crash/error) is intentionally absent from this skill's output. Agent execution failures are detected upstream by `structured-output.md` parsing — a missing or invalid STATUS block in the subagent's raw output causes the main agent to retry in foreground mode before invoking completion-checker. By the time completion-checker is invoked, the input is always a valid output; hence only COMPLETED, PARTIAL, and SUSPICIOUS are valid completion states.

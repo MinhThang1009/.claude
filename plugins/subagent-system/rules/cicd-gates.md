@@ -1,6 +1,6 @@
 # CI/CD Gates
 
-Run linting, type-checking, and tests after every implementation phase before proceeding to the next. Prevents code quality degradation (6.5) through deterministic enforcement — a failing gate stops the pipeline unconditionally, unlike iteration-cleanup which is probabilistic.
+Run linting, type-checking, and tests after every implementation phase before proceeding to the next. Prevents code quality degradation through deterministic enforcement — a failing gate stops the pipeline unconditionally, unlike iteration-cleanup which is probabilistic.
 
 > **This rule is a template.** It does nothing until you define the actual commands for your project. Add the three lines below to your project's `CLAUDE.md` (or inject into the main agent's context before starting a pipeline):
 

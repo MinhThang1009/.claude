@@ -1,7 +1,6 @@
 ---
 name: validator
 description: This skill should be used after a small audit (1–5 findings) to verify whether the cited code locations actually contain the reported issues. Use this skill — not fact-checker — when findings are specific code-location claims that need confirmation. Use fact-checker instead when an agent's narrative claims are suspect. For more than 5 findings, use the finding-validator agent. Also trigger when user asks to "validate findings", "verify these findings", or "filter false positives".
-version: 0.1.0
 allowed-tools: Read Grep Glob
 ---
 
@@ -19,12 +18,14 @@ For each finding:
    - `FALSE_POSITIVE` — the code does not support the finding
    - `NEEDS_CONTEXT` — cannot determine without reading additional files
 
-**Begin every response with this STATUS block (required for completion-checker compatibility):**
+**Begin every response with this STATUS block:**
 ```
 STATUS: COMPLETED | PARTIAL | FAILED
 TASKS_PROCESSED: N
 TASKS_TOTAL: M
 ```
+
+> Note: `completion-checker` consumes this STATUS block, not a full COMPLETION_CHECKLIST (validator does not emit one). Only run completion-checker against validator output when validator was assigned an explicit numbered task list; otherwise completion-checker reports `CHECKLIST_NOT_FOUND → SUSPICIOUS` by design.
 
 **Output format:**
 

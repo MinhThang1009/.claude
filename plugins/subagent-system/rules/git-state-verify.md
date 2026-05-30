@@ -1,6 +1,6 @@
 # Git State Verify
 
-After a subagent reports edits, verify those edits actually exist in the working tree. Prevents state hallucination (4.2b).
+After a subagent reports edits, verify those edits actually exist in the working tree. Prevents state hallucination.
 
 **Do:**
 - Run `git diff HEAD -- [file]` for every file a subagent claims to have edited before accepting the result

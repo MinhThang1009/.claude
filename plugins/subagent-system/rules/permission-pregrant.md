@@ -1,6 +1,6 @@
 # Permission Pre-grant
 
-Grant all required tool permissions before spawning background agents. Prevents silent tool denial (5.1) and permission inheritance issues (7.2).
+Grant all required tool permissions before spawning background agents. Prevents silent tool denial and permission inheritance issues.
 
 **Do:**
 - Before spawning background agents, run one foreground agent with the same tools to trigger permission prompts

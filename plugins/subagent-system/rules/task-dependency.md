@@ -1,6 +1,6 @@
 # Task Dependency
 
-Identify dependencies before spawning agents and pass outputs explicitly between dependent phases. Prevents context loss (2.2) and out-of-order execution (2.3).
+Identify dependencies before spawning agents and pass outputs explicitly between dependent phases. Prevents context loss and out-of-order execution.
 
 **Do:**
 - Map which tasks depend on outputs from other tasks before spawning anything

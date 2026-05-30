@@ -1,6 +1,6 @@
 ---
 description: Lightweight security audit for 1–5 files, no pipeline.
-argument-hint: [path] [focus:<concern>]
+argument-hint: "[path] [focus:<concern>]"
 ---
 
 Run a focused security audit on a specific path or module.
@@ -19,9 +19,9 @@ Examples:
 
 2. **List files in scope:**
 ```bash
-Bash("find [PATH] \( -name '*.js' -o -name '*.ts' -o -name '*.tsx' -o -name '*.py' -o -name '*.go' -o -name '*.rs' -o -name '*.java' -o -name '*.rb' -o -name '*.php' \) 2>/dev/null | grep -v node_modules | head -20")
+Bash("find [PATH] \( -name '*.js' -o -name '*.ts' -o -name '*.tsx' -o -name '*.py' -o -name '*.go' -o -name '*.rs' -o -name '*.java' -o -name '*.rb' -o -name '*.php' \) 2>/dev/null | grep -v node_modules | head -10")
 ```
-If >10 files: warn "Scope has [N] files — consider /plan-tasks for full pipeline. Proceeding with first 10."
+If >5 files: warn "Scope has [N] files — quick-audit targets 1–5 files; for more, use /plan-tasks for the full pipeline. Proceeding with the first 5."
 
 3. **Spawn a single audit agent:**
 

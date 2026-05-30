@@ -94,12 +94,13 @@ VERDICT: APPROVED | NEEDS_REVERT | NEEDS_FIX
 
 Evidence rule: Every requirement verdict MUST cite a verbatim quote from the code.
 
-**End every response with this STATUS block (after CHAIN_VERIFICATION):**
-- If CHAIN_VERIFICATION_BLOCKED: `STATUS: FAILED`
+**Begin every response with this STATUS block (before CHAIN_VERIFICATION), per `structured-output.md`:**
+- If CHAIN_VERIFICATION_BLOCKED: `STATUS: FAILED` + an `ERRORS:` line carrying the block reason (structured-output.md requires ERRORS whenever STATUS is FAILED)
 - If VERDICT is APPROVED, NEEDS_FIX, or NEEDS_REVERT (verification ran): `STATUS: COMPLETED`
 ```
 STATUS: COMPLETED | FAILED
 TASKS_PROCESSED: 1
 TASKS_TOTAL: 1
+ERRORS: [include only when STATUS is FAILED — the CHAIN_VERIFICATION_BLOCKED reason, e.g. "Not a git repository"]
 ```
-STATUS=COMPLETED means verification ran to completion (any VERDICT). STATUS=FAILED means execution was blocked before verification could run.
+STATUS=COMPLETED means verification ran to completion (any VERDICT). STATUS=FAILED means execution was blocked before verification could run. `PARTIAL` and `SUSPICIOUS` from the canonical enum (`structured-output.md`) are intentionally omitted: chain-verifier always processes exactly one task (TASKS_TOTAL=1), so partial completion is not meaningful.

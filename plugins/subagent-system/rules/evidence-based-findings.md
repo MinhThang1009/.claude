@@ -1,6 +1,6 @@
 # Evidence-Based Findings
 
-Every finding, claim, or completion report must be grounded in direct tool output. Prevents false positives (1.1) and hallucination (4.2).
+Every finding, claim, or completion report must be grounded in direct tool output. Prevents false positives and hallucination.
 
 **Do:**
 - Include a verbatim quote from Read or Grep output for every finding

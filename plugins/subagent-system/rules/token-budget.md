@@ -1,13 +1,13 @@
 # Token Budget
 
-Monitor context usage and select models by task type before spawning agents. Prevents token and cost explosion (5.3).
+Monitor context usage and select models by task type before spawning agents. Prevents token and cost explosion.
 
 **Spawn threshold — check `/context` before spawning each subagent.** Compact first if usage is above the window-appropriate threshold:
 
 | Window | Soft threshold (compact before spawning more) | Absolute ceiling (compact before ANY new agent) |
 | ------ | --------------------------------------------- | ----------------------------------------------- |
 | 200k (Haiku) | ~40% → ~120k left, fits 2–3 large returns (~30–50k each) | ~65% → ~130k used |
-| 1M (Opus 4.6+ / Sonnet 4.6+, plan-dependent + `[1m]` alias) | ~65% (40% = ~600k left is very conservative) | ~65% → ~650k used |
+| 1M (Opus 4.6+ / Sonnet 4.6+, plan-dependent + `[1m]` alias) | ~50% → ~500k left | ~65% → ~650k used |
 
 - The threshold gates **spawning new subagents** (their output adds context), not all activity — the main conversation can continue.
 - Check which model/window you're on before applying the rule.
@@ -20,7 +20,7 @@ Monitor context usage and select models by task type before spawning agents. Pre
 
 **Don't:**
 
-- Spawn past the window-appropriate threshold (~40% on 200k, ~65% on 1M).
+- Spawn past the window-appropriate soft threshold (~40% on 200k, ~50% on 1M).
 - Pre-load all tools in the prompt → use ToolSearch on-demand (discovers tools dynamically rather than listing all upfront; exact savings vary by workflow).
 - Let subagents return full file contents when a summary suffices.
 

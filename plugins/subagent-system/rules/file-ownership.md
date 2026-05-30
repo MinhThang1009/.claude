@@ -1,6 +1,6 @@
 # File Ownership
 
-Before spawning parallel agents, assign a non-overlapping file set to each agent. Prevents scope overlap (2.1) and race conditions (5.4).
+Before spawning parallel agents, assign a non-overlapping file set to each agent. Prevents scope overlap and race conditions.
 
 **Do:**
 - Assign a disjoint file set to every parallel agent before spawning

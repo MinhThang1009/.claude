@@ -1,14 +1,13 @@
 ---
 name: goal-anchor
 description: This skill should be used before spawning any agent expected to run more than 15 turns, before resuming an agent after /compact or session interruption, or before launching the next phase in a multi-phase chain where prior phases have accumulated significant context. Prepends an OBJECTIVE block to the subagent prompt to prevent gradual goal drift. Also trigger when user asks to "prevent agent drift" or "anchor the objective".
-version: 0.1.0
 ---
 
-Inject this block at the start of the subagent prompt. Replace bracketed placeholders with actual content from the `/plan-tasks` output.
+Inject this block at the start of the subagent prompt. Replace bracketed placeholders: OBJECTIVE from the user's original request / pipeline goal, SCOPE from the `/plan-tasks` execution plan.
 
 ```
 OBJECTIVE (fixed — does not change during this session):
-[Original objective — copy verbatim from /plan-tasks output]
+[Original objective — copy verbatim from the user's original request / pipeline goal]
 
 SCOPE (fixed):
 [File list and constraints — copy from execution plan]

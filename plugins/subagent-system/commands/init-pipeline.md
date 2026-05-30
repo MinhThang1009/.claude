@@ -42,9 +42,11 @@ Bash("grep -q 'WorktreeCreate' \"$HOME/.claude/settings.json\" 2>/dev/null && ec
 If NO_HOOK AND session cwd is not a git repo: warn:
 ```
 ⚠️  WorktreeCreate hook not found. If your session root is not a git repo,
-   agent spawning will fail. Run /update-config to add it, or start Claude Code
-   from within a git repository.
+   agent spawning will fail. Run /update-config (a built-in Claude Code skill)
+   to add it, manually add the WorktreeCreate hook to ~/.claude/settings.json,
+   or start Claude Code from within a git repository.
 ```
+Set the Step 7 template field `CLAUDE_SETTINGS_HOOKS` to `CONFIGURED` if HAS_HOOK, `MISSING` if NO_HOOK.
 
 6. **Detect test command:**
 
@@ -67,6 +69,17 @@ Set `TEST_COMMAND` to the first non-NONE result:
 - `make test` — for Makefile
 - `NONE` — if no test suite detected
 
+**Detect lint + typecheck commands** (same first-match approach; set `NONE` if none found — the Step 7 template requires both fields):
+```bash
+# LINT_COMMAND
+Bash("node -e \"const p=require('[PROJECT_ROOT]/package.json'); console.log(p.scripts&&p.scripts.lint?'npm run lint':'NONE')\" 2>/dev/null || echo NONE")
+Bash("ls [PROJECT_ROOT]/.eslintrc* [PROJECT_ROOT]/ruff.toml [PROJECT_ROOT]/.ruff.toml 2>/dev/null | grep -q . && echo 'ruff check .' || echo NONE")   # grep -q . : exit 0 iff ≥1 file listed (ls with multiple args exits non-zero when ANY arg is missing, so don't rely on its exit code)
+# TYPECHECK_COMMAND
+Bash("ls [PROJECT_ROOT]/tsconfig.json 2>/dev/null >/dev/null && echo 'tsc --noEmit' || echo NONE")
+Bash("(ls [PROJECT_ROOT]/mypy.ini 2>/dev/null || grep -q '\\[tool\\.mypy\\]' [PROJECT_ROOT]/pyproject.toml 2>/dev/null) && echo 'mypy .' || echo NONE")
+```
+Set `LINT_COMMAND` and `TYPECHECK_COMMAND` to the first non-NONE result each, else `NONE`.
+
 7. **Write pipeline config** using the Write tool with the resolved PROJECT_ROOT path:
 ```
 Write("[PROJECT_ROOT]/.claude/PIPELINE_CONFIG.md", content below)
@@ -88,7 +101,7 @@ TYPECHECK_COMMAND: [detected command or NONE]
 ```bash
 Bash("[ -f \"[PROJECT_ROOT]/.claude/checkpoints/chain-start-commit\" ] || git -C [PROJECT_ROOT] rev-parse HEAD > [PROJECT_ROOT]/.claude/checkpoints/chain-start-commit")
 ```
-This allows `chain-verifier` to determine git diff scope automatically. Without it, chain-verifier cannot compute which files changed and will output `CHAIN_VERIFICATION_BLOCKED`.
+This allows `chain-verifier` to determine git diff scope automatically. Without it, chain-verifier falls back to `HEAD~1` (diffs only the most recent commit) and prints a FALLBACK MODE warning — it does NOT output `CHAIN_VERIFICATION_BLOCKED` (that occurs only in a non-git repo).
 
 9. **Report:**
 ```

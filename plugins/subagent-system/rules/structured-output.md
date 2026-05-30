@@ -1,6 +1,6 @@
 # Structured Output
 
-Every subagent response must begin with a STATUS block. Prevents silent failures and unparseable output (3.1).
+Every subagent response must begin with a STATUS block. Prevents silent failures and unparseable output.
 
 **Do:**
 - Start every response with the STATUS block shown below

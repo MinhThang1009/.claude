@@ -1,6 +1,6 @@
 # Completion Protocol
 
-Before reporting done, every assigned task must be accounted for. Prevents premature termination (3.2).
+Before reporting done, every assigned task must be accounted for. Prevents premature termination.
 
 **Do:**
 - Output a COMPLETION_CHECKLIST before every final response, marking each task `[x]` done or `[o]` skipped with a reason

@@ -30,6 +30,8 @@ Use the task-partitioner skill to analyze the task list and codebase.
 
 **Critical:** Never use `code-explorer` for tasks that require writing progress files — it has no Bash/Write tools and will silently skip the progress file instruction.
 
+**Cross-plugin agents:** `test-writer` ships with the **test-toolkit** plugin and `code-explorer` with the **feature-dev** plugin — neither lives in subagent-system, and its `plugin.json` declares no dependency on them. If those plugins are not enabled, fall back to the generic `claude` agent type for test writing (and never rely on `code-explorer`).
+
 **Model selection:** All agents default to `sonnet`. Override with `model: haiku` only for pure read/exploration tasks with no Bash/Write (e.g., "summarize this module", "list all API endpoints") to reduce token cost. Never use haiku for implementation, security review, or verification — it produces lower-quality findings.
 
 **Mandatory pipeline shape — always end with this sequence:**

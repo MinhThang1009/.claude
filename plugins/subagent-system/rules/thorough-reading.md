@@ -1,6 +1,6 @@
 # Thorough Reading
 
-Read the complete file before drawing conclusions. Prevents incomplete analysis (4.1).
+Read the complete file before drawing conclusions. Prevents incomplete analysis.
 
 **Do:**
 - Read the entire assigned file before reporting findings or conclusions

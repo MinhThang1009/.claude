@@ -1,6 +1,6 @@
 # Scope Boundary
 
-Scope equals the explicitly assigned file set. Prevents scope creep (1.2). Note: tool-level enforcement via `disallowedTools` is the hard boundary — this rule is the probabilistic layer.
+Scope equals the explicitly assigned file set. Prevents scope creep. Note: tool-level enforcement via `disallowedTools` is the hard boundary — this rule is the probabilistic layer.
 
 **Do:**
 - Operate only on the files explicitly listed in your task assignment
