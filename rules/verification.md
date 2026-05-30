@@ -4,48 +4,87 @@
 
 ## Subagents
 
-- Subagent results with **impact** (security findings, actions the user will execute, claims about numbers/versions) → **verify with a direct tool** (Grep, Read, WebFetch) before reporting to the user. **Named subagents** start fresh and don't see parent context → higher risk of incorrect output. **Forked subagents** inherit full history and are less prone to this. Skip verification only for tasks that are purely informational with no action consequence. "Found nothing" from audit/security tasks is NOT trivial — verify anyway.
-- Data already in the parent context (WebFetch results, previous tool output, conversation) → **paste the relevant subset** into the subagent prompt. Data on disk where the subagent has `Read`/`Grep` → let the subagent find it directly.
-- Never report findings to the user without confirming them at least once yourself *(self-imposed — not in Anthropic's docs)*.
-- Subagents do NOT receive the full Claude Code system prompt — they only receive their own system prompt (the markdown body of the agent definition). **CLAUDE.md and rules/*.md**: custom named subagents (Agent-tool-spawned) **DO load** the full memory hierarchy — `~/.claude/CLAUDE.md`, project rules (`.claude/rules/*.md`), `CLAUDE.local.md`, managed policy files. Exception: built-in **Explore and Plan** agents skip CLAUDE.md and git status. Two fork mechanisms: (1) `CLAUDE_CODE_FORK_SUBAGENT=1` (env var, experimental — requires Claude Code v2.1.117+) = fork inherits full history + system prompt + tools. (2) `context: fork` (skill frontmatter) = runs in isolation, **does NOT inherit history** — skill content becomes the subagent's prompt; CLAUDE.md still loads (except Explore/Plan agents) *(confirmed — Claude Code skills docs)*.
-- **Background subagents** auto-deny any tool call that would otherwise prompt. If a clarifying-question tool call is needed, that call fails but the subagent continues. Unexpected results (few findings, empty output) → may be due to silently denied tools. Retry in the foreground to get full permission prompts.
-- Consolidating output from multiple subagents → **count findings per subagent** yourself first (self-count, don't trust the subagent's own count), record the expected total. If the consolidated report has fewer → explicitly list which findings were dropped and why. Never drop silently. Two subagents report the same finding with different severities → use the **higher** severity. Finding partially valid → keep the valid part, explicitly note the incorrect part.
-- Audit/review spec changes mid-run → **re-dispatch** the subagent with the new spec. Do NOT re-evaluate old findings from memory — old findings were produced under the old spec and don't represent the new one.
-- Subagents can **miss content** when files are long or the task is overloaded (fetch URLs + read files + evaluate + report all at once). Don't trust coverage ratings as absolute — subagent reports "not covered" → **grep-verify before accepting**. Limit scope: each subagent ≤10 files or ≤3 complex tasks simultaneously *(heuristic — not in Anthropic's docs)*. If a scope exceeds the limit, split into multiple subagents rather than overloading one.
-- **Make each subagent prompt self-sufficient** (subagents have no session context): give every prompt an objective, an output format, guidance on the tools/sources to use, and clear scope boundaries; scale the number of agents to task complexity. Vague prompts make subagents misinterpret the task or duplicate each other's work *(Anthropic — multi-agent research system: "Each subagent needs an objective, an output format, guidance on the tools and sources to use, and clear task boundaries"; "Simple fact-finding requires just 1 agent with 3-10 tool calls... complex research might use more than 10 subagents with clearly divided responsibilities")*.
-- **For audit/review, separate FINDING from VERIFICATION.** A finder agent's job is **coverage** — report every candidate including uncertain and low-severity ones, each tagged with a confidence level. A fresh **verifier** (finding-validator / pipeline-reviewer) filters false positives afterward. Do NOT tell finders to "be conservative" or "only report high-severity" — newer models follow that literally, dropping recall and silently missing real bugs; filter at the verifier stage instead *(Anthropic — prompt best-practices, §Code review harnesses)*.
-- **Startup content** (CLAUDE.md, memory, environment info — loaded at session start) ≠ current disk state. Disk changes during the session don't auto-reflect in startup content. After `/compact`: **project-root CLAUDE.md** and **auto memory** are re-injected from disk ✅, but **nested CLAUDE.md files in subdirectories** and **path-scoped rules** are **not** — they're lost until a file in that directory is read. Affects **both subagents and the lead agent**. When consolidating findings or comparing files → always use Read/Grep from disk, never rely on content already loaded in context.
-- **Resuming a subagent** (instead of spawning a new one): ask Claude naturally ("Continue that code review") or call `SendMessage` directly — both use `SendMessage` internally and both require `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. The subagent retains its full conversation history and tool calls. Use when the task needs multiple iterations or the subagent has accumulated important context.
-- **Subagents cannot spawn other subagents** — nesting is fully blocked. When nested delegation is needed → use Skills or chain subagents from the main conversation.
-- **Persistent subagent memory**: use the `memory: user|project|local` field in frontmatter. Paths: `user` → `~/.claude/agent-memory/<name>/`; `project` → `.claude/agent-memory/<name>/`; `local` → `.claude/agent-memory-local/<name>/`. Use when you want a subagent to accumulate knowledge (patterns, architecture decisions) across sessions. This is separate from main agent memory — each subagent type has its own memory.
+**Verify impactful results before reporting.** Output with impact (security findings, actions the user will run, claims about numbers/versions) → **verify with a direct tool** (Grep, Read, WebFetch).
+
+- **Named** subagents start fresh, don't see parent context → higher risk of wrong output. **Forked** subagents inherit history → lower risk.
+- Skip verification only for purely informational tasks with no action consequence.
+- "Found nothing" from an audit/security task is NOT trivial — verify anyway.
+- Never report findings without confirming them yourself at least once *(self-imposed — not in Anthropic's docs)*.
+
+**Feed context efficiently.**
+
+- Data already in parent context (WebFetch results, prior tool output, conversation) → **paste the relevant subset** into the prompt.
+- Data on disk where the subagent has `Read`/`Grep` → let it find the data directly.
+- **Make each prompt self-sufficient**: give it an objective, an output format, guidance on tools/sources, and clear scope boundaries; scale agent count to task complexity *(Anthropic — multi-agent research system: "Each subagent needs an objective, an output format, guidance on the tools and sources to use, and clear task boundaries"; "Simple fact-finding requires just 1 agent with 3-10 tool calls... complex research might use more than 10 subagents with clearly divided responsibilities")*.
+
+**What a subagent loads.**
+
+- Only its own system prompt (the agent's markdown body), not the full Claude Code system prompt.
+- Custom named subagents **DO load** the full memory hierarchy: `~/.claude/CLAUDE.md`, project rules (`.claude/rules/*.md`), `CLAUDE.local.md`, managed policy files.
+- Exception: built-in **Explore and Plan** skip CLAUDE.md and git status.
+- Two fork mechanisms:
+  - `CLAUDE_CODE_FORK_SUBAGENT=1` (env var, experimental — requires Claude Code v2.1.117+) → inherits full history + system prompt + tools.
+  - `context: fork` (skill frontmatter) → runs in isolation, **does NOT inherit history**; skill content becomes the prompt; CLAUDE.md still loads (except Explore/Plan) *(confirmed — Claude Code skills docs)*.
+
+**Background subagents auto-deny** any tool call that would otherwise prompt.
+
+- A needed clarifying-question call fails, but the subagent continues.
+- Unexpected results (few findings, empty output) → suspect silently denied tools. Retry in the foreground for full permission prompts.
+
+**Separate FINDING from VERIFICATION** (audit/review).
+
+- A finder's job is **coverage**: report every candidate, including uncertain and low-severity ones, each tagged with a confidence level.
+- A fresh **verifier** (finding-validator / pipeline-reviewer) filters false positives afterward.
+- Do NOT tell finders to "be conservative" or "only report high-severity" — newer models follow that literally, dropping recall *(Anthropic — prompt best-practices, §Code review harnesses)*.
+
+**Consolidating multiple subagents' output.**
+
+- **Count findings per subagent yourself** first (don't trust their self-count); record the expected total.
+- Consolidated report has fewer → list which findings were dropped and why. Never drop silently.
+- Same finding, different severities → use the **higher** severity.
+- Finding partially valid → keep the valid part, note the incorrect part.
+
+**Other subagent rules.**
+
+- Audit spec changes mid-run → **re-dispatch** with the new spec; don't re-evaluate old findings from memory (produced under the old spec).
+- Subagents **miss content** when files are long or the task is overloaded (e.g. fetch URLs + read files + evaluate + report all at once) → don't trust coverage ratings; "not covered" → **grep-verify** first. Limit each to ≤10 files or ≤3 complex tasks *(heuristic — not in Anthropic's docs)*; split rather than overload.
+- **Resume** a subagent instead of re-spawning: ask Claude naturally or call `SendMessage` — both require `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. It retains full history + tool calls.
+- **Subagents cannot spawn subagents** — nesting is fully blocked. Use Skills or chain subagents from the main conversation.
+- **Persistent memory**: `memory: user|project|local` frontmatter → `~/.claude/agent-memory/<name>/`, `.claude/agent-memory/<name>/`, `.claude/agent-memory-local/<name>/`. Separate from main agent memory.
+
+**Startup content ≠ current disk state.** CLAUDE.md, memory, and environment info load at session start and don't auto-refresh when disk changes.
+
+- After `/compact`: project-root CLAUDE.md and auto memory are re-injected ✅; nested CLAUDE.md and path-scoped rules are **not** — lost until a file in that directory is read.
+- Affects both subagents and the lead agent. When consolidating or comparing → always Read/Grep from disk, never trust already-loaded content.
 
 ## Self-Review Bias
 
-- After batch fixes (>5 edits) → dispatch a **fresh subagent** to review the changes instead of self-verifying. Self-fix → self-review = bias (demonstrated in this session: self-verification via grep missed 5 regressions that a fresh subagent caught) *(self-imposed/empirical — not in Anthropic's docs)*.
-- The fresh subagent does NOT receive context about the edit intent — only file paths + instruction "review for correctness". This is a feature, not a bug: independent review requires independent context.
+- After batch fixes (>5 edits) → dispatch a **fresh subagent** to review instead of self-verifying. Self-fix → self-review = bias *(self-imposed/empirical — not in Anthropic's docs)*.
+- The fresh subagent gets **no edit-intent context** — only file paths + "review for correctness". Independent review requires independent context.
 
 ## Batch Edits
 
-- After editing → verify the **replacement content** is correct, not just that the old content is gone. Grepping "old pattern removed" ≠ "new pattern correct". Especially for factual claims (versions, thresholds, URLs) → WebFetch the source to verify before applying.
-- A claim appearing in **multiple files** → grep for it across the entire repo after editing. Fixing file A while file B keeps the old value creates a new inconsistency.
-- A file may be **edited by another process** (user edits manually, hooks, formatters, linters) between the edit and the verification → re-read the file before concluding the edit succeeded.
-- Before batch editing (>3 files) → ensure a **clean git state** (commit or stash WIP). If an edit fails mid-way → use `/rewind` or `git checkout` to revert. Never leave the codebase in a half-edited state.
-- Editing **1 file** → **use the Edit tool**, don't write a Python script with `open(file, 'w')` (risk of truncation). Batch operations (renaming N files, mass refactoring) → script is OK but MUST: (1) preview the list of affected files, (2) back up or `git stash` first, (3) use a dry-run flag if available.
+- Verify the **replacement content** is correct, not just that the old content is gone. For factual claims (versions, thresholds, URLs) → WebFetch the source first.
+- A claim in **multiple files** → grep the whole repo after editing; fixing A while B keeps the old value creates a new inconsistency.
+- A file may be **edited by another process** (user, hooks, formatters) mid-edit → re-read before concluding the edit landed.
+- Before batch-editing (>3 files) → ensure a **clean git state**. Edit fails mid-way → `/rewind` or `git checkout` to revert. Never leave a half-edited codebase.
+- Editing **1 file** → use the Edit tool, not a Python `open(file, 'w')` script (truncation risk). Mass operations may script, but MUST preview affected files, back up / `git stash` first, and use a dry-run if available.
 
 ## Tool Output Reliability
 
-- Output that is **truncated** (Read `limit`, Bash timeout, WebFetch summary) → insufficient to draw conclusions. Expand/retry before confirming. Especially: reading a large file without seeing a pattern → doesn't mean the pattern isn't there; it may be outside the range that was read.
-- WebFetch **output is not reliable for verification** in these cases: cross-host redirects (not followed automatically — returns a redirect message with the target URL; requires a second WebFetch), **15-minute cache** (re-fetching the same URL does not mean fresh content), large page truncation. Additionally: 404/timeout/auth-required are standard HTTP failures *(practical, not in Anthropic docs)*. Try a different URL or explicitly note "could not verify, needs user confirmation".
-- WebFetch summaries are generated by a **small model in a separate context** → may contain factual errors. Data used for important decisions (versions, thresholds, security advisories) → cross-check with a second URL or `Bash(curl)` if raw content is needed.
-- Verification via **MCP tools** (GitHub MCP, database MCP…) → same principles as subagents: impactful output → cross-check with another tool. MCP servers are configured by the user (third-party, not Anthropic-audited) and may return stale or unreliable data.
+- **Truncated** output (Read `limit`, Bash timeout, WebFetch summary) → insufficient; expand/retry before concluding. Not seeing a pattern in a partial read ≠ it's absent.
+- **WebFetch is unreliable** for: cross-host redirects (not followed — returns a redirect message; needs a second WebFetch), the **15-minute cache** (re-fetch ≠ fresh), large-page truncation. 404/timeout/auth are standard HTTP failures *(practical, not in Anthropic docs)*. Try another URL or note "could not verify".
+- WebFetch summaries come from a **small model in a separate context** → may contain errors. Important data (versions, thresholds, advisories) → cross-check a second URL or `Bash(curl)` for raw content.
+- **MCP tool** output → treat like subagent output: cross-check impactful results. MCP servers are third-party (not Anthropic-audited), may be stale.
 
 ## Git State
 
-- Before git operations → **verify the current branch** with `git branch --show-current`. Startup context reflects git state as of the most recent SessionStart hook (only if the hook script runs git commands — not automatic) — the hook fires on: new session, `/resume`, `/clear`, or `/compact` (source: `"startup"` / `"resume"` / `"clear"` / `"compact"`). It's stale if git state changed after that without re-triggering the hook.
-- Checking files on another branch → use `git ls-tree`/`git show branch:path`, **NOT** `ls`/`find` (the working tree only reflects the current branch).
-- This section only applies when the project has a **git repo**. No git → skip and use the file system directly.
+> Only when the project has a git repo. No git → use the filesystem directly.
+
+- Before git operations → **verify the current branch** with `git branch --show-current`. Startup git state reflects the most recent SessionStart hook (only if that hook runs git commands) — it fires on new session, `/resume`, `/clear`, `/compact` (source `"startup"`/`"resume"`/`"clear"`/`"compact"`). Stale if git changed since without re-triggering.
+- Checking another branch → use `git ls-tree` / `git show branch:path`, **NOT** `ls`/`find` (the working tree only reflects the current branch).
 
 ## External Dependencies
 
-- Using a GitHub Action or external package → **verify it exists** (WebFetch to check the repo/tag) before committing. WebFetch fails during verification → apply "Tool Output Reliability": try a different URL or note that user confirmation is needed.
-- Dependency exists but **version mismatch** → warn the user; don't downgrade/upgrade unilaterally.
+- Using a GitHub Action or external package → **verify it exists** (WebFetch the repo/tag) before committing. WebFetch fails → try another URL or note user confirmation is needed.
+- Dependency exists but **version mismatch** → warn the user; don't change versions unilaterally.
