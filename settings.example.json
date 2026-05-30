@@ -203,6 +203,16 @@
             "shell": "bash"
           }
         ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/subagent-edit-surface.sh\"",
+            "shell": "bash"
+          }
+        ]
       }
     ],
     "SessionStart": [
