@@ -55,7 +55,7 @@ Run these checks in order and stop at the first match:
 # Node/JS
 Bash("node -e \"const p=require('[PROJECT_ROOT]/package.json'); console.log(p.scripts&&p.scripts.test?'npm test':'NONE')\" 2>/dev/null || echo NONE")
 # Python pytest
-Bash("ls [PROJECT_ROOT]/pytest.ini [PROJECT_ROOT]/pyproject.toml [PROJECT_ROOT]/setup.cfg 2>/dev/null | head -1 || echo NONE")
+Bash("ls [PROJECT_ROOT]/pytest.ini [PROJECT_ROOT]/pyproject.toml [PROJECT_ROOT]/setup.cfg 2>/dev/null | grep -q . && echo 'pytest' || echo NONE")   # grep -q . : exit 0 iff ≥1 file listed (head -1 luôn exit 0 nên không gate được NONE)
 # Go
 Bash("ls [PROJECT_ROOT]/go.mod 2>/dev/null || echo NONE")
 # Makefile test target

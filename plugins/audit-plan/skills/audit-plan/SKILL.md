@@ -1,6 +1,6 @@
 ---
 name: audit-plan
-description: "Audit a plan file against the actual codebase. Loops until 0 new gaps found. Cross-checks gap coverage, dead code cleanup, and test completeness. Sub-commands: gaps, verify, tests. Use when the user asks to 'audit a plan', 'check plan coverage', 'verify cleanup grep commands', or to audit a plan document for gap/test/cleanup coverage before implementation (distinct from /audit-dead's post-implementation Phase 7 code audit)."
+description: "Audit a plan file against the actual codebase. Loops until 0 new gaps found. Cross-checks gap coverage, dead code cleanup, and test completeness. Sub-commands: gaps, verify, tests. Use when the user asks to 'audit a plan', 'check plan coverage', 'verify cleanup grep commands', or to audit a plan document for gap/test/cleanup coverage before implementation (distinct from /audit-dead's post-implementation Phase 7 code audit). Expects a gap-tracking plan format (### Gap entries, cleanup grep checklist, - [ ] tests); for /plan-refactor 8-phase plans (## Nhóm/Phase + inline verify: lines) use /verify-plan instead."
 allowed-tools: Read Grep Glob Edit Write Bash
 argument-hint: "[gaps|verify|tests] [path to plan.md]"
 ---
@@ -26,6 +26,16 @@ Otherwise, auto-detect:
 2. **No project-level plans found**: Do NOT fallback to global `~/.claude/plans/` — those may belong to other projects. Instead, report error:
    `"No plan files found in .claude/plans/. Specify a path: /audit-plan <path>"`
 3. If multiple project-level files exist, pick the most recently modified one. Log which file was selected.
+
+### Step 0: Input-format guard (run BEFORE any mode)
+
+audit-plan expects a **gap-tracking plan**: `### Gap N:` entries, a Dead Code Removal / Cleanup Checklist with `grep` commands, and `- [ ]` test checklists. Before running any mode, grep the plan for these three markers:
+- `### Gap`
+- `- [ ]`
+- `grep ` lines inside a cleanup/checklist section
+
+If the plan has **zero** of all three → **STOP. Do NOT print an empty table** — an audit that reports "0 gaps" when it actually parsed nothing is a silent false-negative (violates Rule 1 below). Report instead:
+> `audit-plan: '<file>' has none of the expected markers (### Gap / - [ ] / cleanup grep). This looks like a different plan format — e.g. a /plan-refactor 8-phase plan ('## Nhóm/Phase' + inline 'verify:' lines). For that format use /verify-plan. Aborting to avoid a silent empty audit.`
 
 ---
 
