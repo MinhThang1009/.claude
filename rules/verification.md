@@ -59,7 +59,7 @@
 
 ## Self-Review Bias
 
-- After batch fixes (>5 edits) → dispatch a **fresh subagent** to review instead of self-verifying. Self-fix → self-review = bias *(self-imposed/empirical — not in Anthropic's docs)*.
+- After a **risk-bearing edit batch** — a shared/logic-bearing file, a behavior change, or a batch large enough to lose track of every change (>5 edits is one signal, not the sole trigger) → dispatch a **fresh subagent** to review instead of self-verifying. Self-fix → self-review = bias *(self-imposed/empirical — not in Anthropic's docs)*.
 - The fresh subagent gets **no edit-intent context** — only file paths + "review for correctness". Independent review requires independent context.
 
 ## Batch Edits

@@ -12,7 +12,9 @@ from __future__ import annotations
 import json
 import sys
 
-# Ngưỡng theo §Self-Review Bias: ">5 edits → fresh subagent review".
+# Đếm edit là proxy deterministic — hook không tự phán được "risk-bearing".
+# Rule thật (§Self-Review Bias) là risk-based: >5 edit chỉ là 1 signal để NHẮC;
+# agent tự đánh giá batch có risk-bearing không (shared/logic-bearing, behavior).
 EDIT_THRESHOLD = 5
 EDIT_TOOLS = frozenset({"Edit", "Write", "MultiEdit", "NotebookEdit"})
 # Agent/Task = đã delegate sang subagent (fresh context) → reset bộ đếm.
@@ -79,9 +81,10 @@ def main() -> int:
     edits = count_edits_since_review(transcript_path)
     if edits > EDIT_THRESHOLD:
         msg = (
-            f"⚠️ §Self-Review Bias: {edits} edit kể từ lần delegate gần "
-            "nhất, chưa có fresh-agent review. Cân nhắc dispatch một subagent mới "
-            "để review thay vì tự kiểm (rules/verification.md §Self-Review Bias)."
+            f"⚠️ §Self-Review Bias: {edits} edit kể từ lần delegate gần nhất, "
+            "chưa fresh-agent review. Nếu đây là batch risk-bearing (shared/"
+            "logic-bearing file, behavior change), dispatch một subagent mới để "
+            "review thay vì tự kiểm (rules/verification.md §Self-Review Bias)."
         )
         # systemMessage = nhắc non-blocking, hiện cho user. Không block stop.
         print(json.dumps({"systemMessage": msg}))

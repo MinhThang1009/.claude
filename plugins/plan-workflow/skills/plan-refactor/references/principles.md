@@ -61,4 +61,4 @@ At critical gates — before scope is frozen, before the plan becomes binding, b
 | Agent oscillates | P7 (missing ground truth) | Read code. FINAL DECISION. Stop. |
 | Scope expands mid-plan | P6 (not enforced) | Move to backlog. Freeze scope. |
 | Context lost after /compact | P1 (plan not self-contained) | Re-read files listed in plan |
-| Self-review misses regressions | P3 (not enforced) | Fresh agent review after >5 edits |
+| Self-review misses regressions | P3 (not enforced) | Fresh agent review after a risk-bearing edit batch |

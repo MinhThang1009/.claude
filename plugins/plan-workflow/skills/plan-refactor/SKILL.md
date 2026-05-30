@@ -167,7 +167,7 @@ For each phase in the plan:
 
 **If tests fail:** Test references old behavior → update the test. Functional regression → `git revert` the phase commit; find root cause before re-applying. Unrelated flaky → re-run once; if still failing, investigate and fix before proceeding.
 
-**Anti-bias (P3):** After >5 edits in one phase, dispatch a fresh agent to review the changes before reporting done.
+**Anti-bias (P3):** After a risk-bearing edit batch (shared/logic-bearing changes, or too many to track — >5 edits is one signal), dispatch a fresh agent to review the changes before reporting done.
 
 **New issues found during implementation:** Note them, continue the current phase, add to Phase 7 list (P6). Do not stop to replan.
 

@@ -30,5 +30,5 @@ Create a plan when: >3 files touched, crosses a layer boundary, shared interface
 - Pass unverified agent findings directly into the plan.
 - Use grep line counts when you need occurrence counts (they differ when one line has multiple hits).
 - Expand scope after Phase 3.
-- Self-verify after >5 consecutive edits.
+- Self-verify a risk-bearing edit batch (shared/logic-bearing changes, or a batch too large to track — >5 edits is one signal) — dispatch a fresh agent instead.
 - Reopen a decision marked FINAL DECISION.
