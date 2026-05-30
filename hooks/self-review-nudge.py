@@ -72,6 +72,11 @@ def main() -> int:
         return 0
     if not isinstance(obj, dict):
         return 0
+    # Stop hook tự convert sang SubagentStop khi subagent kết thúc (hooks docs).
+    # Nudge này dành cho MAIN agent (spawn fresh reviewer); subagent không spawn
+    # được subagent → skip để tránh nudge thừa trong context subagent.
+    if obj.get("hook_event_name") == "SubagentStop":
+        return 0
     # Nếu chính hook này đã giữ session chạy tiếp → không lặp lại.
     if obj.get("stop_hook_active"):
         return 0
