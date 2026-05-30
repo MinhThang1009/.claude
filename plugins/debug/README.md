@@ -5,7 +5,7 @@ Systematic debugging workflow: reproduce first, write a failing test, then fix. 
 ## Installation
 
 ```bash
-claude plugin install debug@dotclaude
+claude plugin install debug@minhthang-plugins
 ```
 
 ## Contents

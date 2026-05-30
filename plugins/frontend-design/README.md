@@ -5,7 +5,7 @@ Create distinctive, production-grade frontend interfaces with high design qualit
 ## Installation
 
 ```bash
-claude plugin install frontend-design@dotclaude
+claude plugin install frontend-design@minhthang-plugins
 ```
 
 ## Contents

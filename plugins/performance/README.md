@@ -5,7 +5,7 @@ Performance profiling, optimization, and dependency audit agents. Covers slow qu
 ## Installation
 
 ```bash
-claude plugin install performance@dotclaude
+claude plugin install performance@minhthang-plugins
 ```
 
 ## Contents

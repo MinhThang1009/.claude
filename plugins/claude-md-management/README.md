@@ -5,7 +5,7 @@ Audit, evaluate quality, and improve CLAUDE.md files. Captures session learnings
 ## Installation
 
 ```bash
-claude plugin install claude-md-management@dotclaude
+claude plugin install claude-md-management@minhthang-plugins
 ```
 
 ## Contents

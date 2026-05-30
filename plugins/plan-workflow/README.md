@@ -7,7 +7,7 @@ Built from real-world lessons across multi-file refactoring sessions — capture
 ## Installation
 
 ```bash
-claude plugin install plan-workflow@dotclaude
+claude plugin install plan-workflow@minhthang-plugins
 ```
 
 ## Contents
@@ -37,7 +37,7 @@ Pairs with `rules/plan-workflow.md` (auto-loaded every session) — provides the
 
 ## Plan Type Support
 
-The core workflow is universal. Type-specific guidance is in `references/`:
+The core workflow is universal. Type-specific guidance is in `skills/plan-refactor/references/`:
 
 - **Renaming / Structural refactoring** — occurrence counts, DO NOT RENAME list, mass rename scripts, dead parameter cascade
 - **Bug fix** — reproduce first, failing test, root cause, regression test

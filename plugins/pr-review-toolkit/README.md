@@ -5,7 +5,7 @@ Comprehensive PR review agents specializing in comments, tests, error handling, 
 ## Installation
 
 ```bash
-claude plugin install pr-review-toolkit@dotclaude
+claude plugin install pr-review-toolkit@minhthang-plugins
 ```
 
 ## Contents

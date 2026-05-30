@@ -5,7 +5,7 @@ Architecture review and code modernization with adversarial analysis. Challenges
 ## Installation
 
 ```bash
-claude plugin install code-modernization@dotclaude
+claude plugin install code-modernization@minhthang-plugins
 ```
 
 ## Contents

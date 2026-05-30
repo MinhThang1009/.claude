@@ -5,7 +5,7 @@ Commands for git commit workflows including commit, push, and PR creation. Enfor
 ## Installation
 
 ```bash
-claude plugin install commit-commands@dotclaude
+claude plugin install commit-commands@minhthang-plugins
 ```
 
 ## Contents

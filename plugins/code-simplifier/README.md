@@ -5,7 +5,7 @@ Refactor and simplify code for clarity, consistency, and maintainability while p
 ## Installation
 
 ```bash
-claude plugin install code-simplifier@dotclaude
+claude plugin install code-simplifier@minhthang-plugins
 ```
 
 ## Contents

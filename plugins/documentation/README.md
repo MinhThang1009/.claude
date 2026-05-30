@@ -5,7 +5,7 @@ Documentation engineering and specialized framework development agents. Covers R
 ## Installation
 
 ```bash
-claude plugin install documentation@dotclaude
+claude plugin install documentation@minhthang-plugins
 ```
 
 ## Contents

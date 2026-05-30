@@ -5,7 +5,7 @@ Easily create custom hooks to prevent unwanted behaviors by analyzing conversati
 ## Installation
 
 ```bash
-claude plugin install hookify@dotclaude
+claude plugin install hookify@minhthang-plugins
 ```
 
 ## Contents

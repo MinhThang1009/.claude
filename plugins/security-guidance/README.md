@@ -5,7 +5,7 @@ Senior security engineer agent for finding vulnerabilities including injection, 
 ## Installation
 
 ```bash
-claude plugin install security-guidance@dotclaude
+claude plugin install security-guidance@minhthang-plugins
 ```
 
 ## Contents

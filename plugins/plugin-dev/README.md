@@ -5,7 +5,7 @@ Comprehensive toolkit for developing Claude Code plugins including hooks, MCP in
 ## Installation
 
 ```bash
-claude plugin install plugin-dev@dotclaude
+claude plugin install plugin-dev@minhthang-plugins
 ```
 
 ## Contents

@@ -5,7 +5,7 @@ Comprehensive feature development workflow with specialized agents for codebase 
 ## Installation
 
 ```bash
-claude plugin install feature-dev@dotclaude
+claude plugin install feature-dev@minhthang-plugins
 ```
 
 ## Contents

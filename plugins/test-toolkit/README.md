@@ -5,7 +5,7 @@ Specialized agents for writing tests and analyzing test coverage quality. Covers
 ## Installation
 
 ```bash
-claude plugin install test-toolkit@dotclaude
+claude plugin install test-toolkit@minhthang-plugins
 ```
 
 ## Contents

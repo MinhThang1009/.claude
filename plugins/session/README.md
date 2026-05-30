@@ -5,7 +5,7 @@ Session management tools for context window monitoring and conversation handoff.
 ## Installation
 
 ```bash
-claude plugin install session@dotclaude
+claude plugin install session@minhthang-plugins
 ```
 
 ## Contents
