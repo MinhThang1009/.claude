@@ -9,7 +9,10 @@
 
 ## Core Principles
 
-- **Read before you write**: prefer reading the whole containing function before making a change; for functions >100 lines, 30 lines of context around the change plus the signature/return is enough. Small fixes (1–2 lines) can use narrower context. New file → scan a similar file first to match the pattern.
+- **Read before you write**: read the whole containing function before changing it.
+  - Functions >100 lines → 30 lines of context around the change plus the signature/return is enough.
+  - Small fixes (1–2 lines) → narrower context is fine.
+  - New file → scan a similar file first to match the pattern.
 - **Codebase conventions first, "best practices" second**. snake_case if the codebase uses snake_case. Tabs if the codebase uses tabs.
 - **Correct > clean > fast**. Working code matters more than fancy patterns.
 - **Don't over-engineer**. YAGNI. Generic abstractions should emerge from real needs, not speculation. If 200 lines can be solved in 50 → rewrite.
