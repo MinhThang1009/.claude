@@ -19,7 +19,7 @@ Performs automated code review on a pull request using multiple specialized agen
 4. Launches 4 parallel agents to independently review:
    - **Agents #1 & #2**: Audit for CLAUDE.md compliance
    - **Agent #3**: Scan for obvious bugs in changes
-   - **Agent #4**: Analyze git blame/history for context-based issues
+   - **Agent #4**: Scan introduced/changed code for problems (security, incorrect logic)
 5. Scores each issue 0-100 for confidence level
 6. Filters out issues below 80 confidence threshold
 7. Outputs review (to terminal by default, or as PR comment with `--comment` flag)
@@ -211,14 +211,9 @@ https://github.com/owner/repo/blob/[full-sha]/path/file.ext#L[start]-L[end]
 
 ## Configuration
 
-### Adjusting confidence threshold
+### Adjusting review strictness
 
-The default threshold is 80. To adjust, modify the command file at `commands/code-review.md`:
-```markdown
-Filter out any issues with a score less than 80.
-```
-
-Change `80` to your preferred threshold (0-100).
+> **Note:** The command (`commands/code-review.md`) filters issues by **binary validation** — step 5 validates each flagged issue and step 6 drops any that fail — not by a numeric confidence score. The 0–100 scoring described elsewhere in this README is aspirational and does not match the current command. To make review stricter or looser, edit the flagging and validation criteria in steps 4–5 of the command file.
 
 ### Customizing review focus
 
@@ -233,7 +228,7 @@ Edit `commands/code-review.md` to add or modify agent tasks:
 ### Agent architecture
 - **2x CLAUDE.md compliance agents**: Redundancy for guideline checks
 - **1x bug detector**: Focused on obvious bugs in changes only
-- **1x history analyzer**: Context from git blame and history
+- **1x security/logic detector**: Problems in introduced code (security, incorrect logic)
 - **Nx confidence scorers**: One per issue for independent scoring
 
 ### Scoring system
@@ -246,7 +241,6 @@ Edit `commands/code-review.md` to add or modify agent tasks:
 Uses `gh` CLI for:
 - Viewing PR details and diffs
 - Fetching repository data
-- Reading git blame and history
 - Posting review comments
 
 ## Author

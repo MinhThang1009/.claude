@@ -112,12 +112,12 @@ For each file changed, look for:
 For finding type definitions, see the "Finding Type Reference" table below.
 
 ```
-[FILE:LINE] TYPE | Description | Confidence (HIGH/MED)
+[FILE:LINE] TYPE | Description | Confidence (HIGH/MED/LOW)
 ```
 
 Types: `DEAD_IMPORT` · `DEAD_VAR` · `DEAD_PARAM` · `DEAD_CASCADE` · `YAGNI_PARAM` · `SCHEMA_GAP` · `MISPLACED_FUNCTION` · `STALE_DOC` · `UNREACHABLE`
 
-Report HIGH and MED confidence findings only. Prefix LOW confidence with `(needs-verify)` and let the user decide.
+Report findings at all confidence levels — HIGH/MED directly, LOW prefixed with `(needs-verify)` — and let the user decide. (This is a single-pass finder feeding HUMAN GATE 3 with no automated verifier downstream, so surface everything rather than self-filtering — per the single-pass exception in `evidence-based-findings.md`.)
 
 End with:
 ```

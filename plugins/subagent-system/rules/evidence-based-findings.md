@@ -16,6 +16,14 @@ Every finding, claim, or completion report must be grounded in direct tool outpu
 
 If uncertain about a fact: state "unverified" rather than guessing.
 
+## Coverage at the finding stage — don't self-filter
+
+When a separate verification stage exists (finding-validator / pipeline-reviewer / severity-gate), a finding agent's job is **coverage, not filtering** — report every candidate issue including uncertain or low-severity ones, each tagged with a **confidence level** and **estimated severity**, and let the downstream stage rank and filter. Telling a finder to "be conservative" or "only report high-severity" drops real bugs (recall falls); surfacing a finding that later gets filtered is cheap. *(Anthropic — prompt best-practices, "Code review harnesses": "Report every issue you find... Do not filter for importance or confidence at this stage - a separate verification step will do that. Your goal here is coverage.")*
+
+- **Single-pass self-filter** (only when there is NO downstream verifier): use a concrete bar, not vague words like "important" — report anything that could cause incorrect behavior, a test failure, or a misleading result; omit only pure style/naming nits.
+- **Retract, don't assert:** after drafting findings, find a supporting quote from actual tool output for each claim. If you cannot find one, **drop the claim**. *(Anthropic — reduce-hallucinations: "If it can't find a quote, it must retract the claim.")*
+- **Ground in provided sources only:** base findings on the files/data in your assigned scope and on tool output — not on general knowledge or assumptions about code you did not read. *(Anthropic — reduce-hallucinations: "only use information from provided documents and not its general knowledge.")*
+
 **Important — re-reading after Edit is not sufficient to detect state hallucination:** A subagent that fabricates both an Edit call and a subsequent Read call will pass this rule's check while no actual file change occurred. The only reliable verification is `git diff HEAD -- [file]` run by the **main agent** after receiving the subagent's report. Sub-agents should not self-certify edits — only the main agent can confirm via git state.
 
 ## Severity Calibration (CVSS v3.1)

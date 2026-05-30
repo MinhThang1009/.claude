@@ -1,6 +1,6 @@
 ---
 name: goal-checker
-description: This skill should be used after receiving output from any subagent in a long-running pipeline to verify the output actually addresses the original objective — not a related but different problem. Invoke when a subagent's output seems off-topic, overly broad, or suspiciously brief. Returns a 0–5 score; below 4 triggers re-anchoring. Also trigger when user asks to "check goal alignment" or "detect goal drift".
+description: This skill should be used after receiving output from any subagent in a long-running pipeline to verify the output actually addresses the original objective — not a related but different problem. Invoke when a subagent's output seems off-topic, overly broad, or suspiciously brief. Returns a 0–5 score; below 4 triggers intervention (re-anchor for 2–3, compact + respawn for <2). Also trigger when user asks to "check goal alignment" or "detect goal drift".
 version: 0.1.0
 ---
 

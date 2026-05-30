@@ -25,7 +25,8 @@ After the user sends `/context` output, analyze it per the steps below.
 > - `<30/<40/60%` + "dumb zone": [Dex Horthy at MLOps Community](https://youtu.be/YwZR6tc7qYg?t=1541) (2026-03-24)
 > - `300-400k tokens` context rot (1M model): Thariq Shihipar (Anthropic Claude Code team) via [howborisusesclaudecode.com](https://howborisusesclaudecode.com/)
 > - `155k tokens` auto-compact (200k window): [Boris Cherny X tweet](https://x.com/bcherny/status/1977163445205450783)
-> - Full citations + nuance by task complexity: [docs/REFERENCE.md §16](../../../../docs/REFERENCE.md#16-quản-lý-context-window--chi-tiết). Anthropic does not publish official % thresholds.
+> - `~95%` auto-compact trigger (official): [Claude Code sub-agents docs §Auto-compaction](https://code.claude.com/docs/en/sub-agents#auto-compaction) — *"auto-compaction triggers at approximately 95% capacity"*; lower it with `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`.
+> - Full citations + nuance by task complexity: [docs/REFERENCE.md §16](../../../../docs/REFERENCE.md#16-quản-lý-context-window--chi-tiết). Apart from the ~95% auto-compact trigger, Anthropic does not publish official % thresholds for the zone/quality bands below.
 
 | % context | State                               | Recommended action                                                        |
 | --------- | ----------------------------------- | ------------------------------------------------------------------------- |
@@ -33,7 +34,7 @@ After the user sends `/context` output, analyze it per the steps below.
 | `30-40%`  | 🟢 Sweet spot                       | Newcomer target — "shoot to keep it under 40%" (Dex)                    |
 | `40-60%`  | 🟡 "Dumb zone" begins               | Performance degrading — plan to wrap up current phase                     |
 | `60-77%`  | 🟠 Wrap up actively                 | `/compact` OR `/handoff` → `/clear` + new brief                           |
-| `~77%`    | 🔴 Critical zone (Boris claim 155k) | Compact proactively — auto-compact default ~95% per newer docs, but quality degrades here |
+| `~77%`    | 🔴 Critical zone (Boris claim 155k) | Compact proactively — official auto-compact triggers ~95% (`CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` to lower), but quality degrades here |
 | `>90%`    | ⛔ Hard limit                        | STOP large task immediately, brief + new session                           |
 
 ### Step 3 — Analyze by group

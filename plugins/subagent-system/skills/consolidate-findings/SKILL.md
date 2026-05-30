@@ -21,8 +21,10 @@ File: [path]
 Line: [N]
 Evidence: "[quote]"
 Severity: CRITICAL | HIGH | MEDIUM | LOW
+Confidence: HIGH | MEDIUM | LOW
 ```
 For Format B, map severity text to emoji: CRITICAL→🔴, HIGH→🟠, MEDIUM→🟡, LOW→🟢.
+`Confidence:` is optional (only pipeline-reviewer emits it). When present, carry it through to the merged finding and surface it in FINDINGS_REPORT.md; when absent (e.g. Format A), omit the confidence line for that finding.
 If an agent's output contains `Finding:` / `Severity:` blocks, use Format B. Otherwise use Format A.
 
 Severity mapping:
@@ -34,6 +36,7 @@ Severity mapping:
 **Step 2 — Deduplicate.**
 Two findings are duplicates if they reference the same `file:line` AND describe the same issue category (e.g., both flag "missing rate limit" at same location). When duplicating:
 - Keep the HIGHER severity verdict
+- Keep the HIGHEST confidence among the merged duplicates (more agents confirming → higher confidence)
 - Note "Confirmed by N agents" in the merged finding
 - Do NOT merge findings at different lines even if same issue type (they may be separate instances)
 
@@ -84,6 +87,7 @@ Duplicates removed: N
 ## Critical Findings (fix immediately)
 ### [file:line]
 **Severity:** 🔴 CRITICAL
+**Confidence:** HIGH (omit if not reported by the agent)
 **Agent(s):** T1, T3
 **Issue:** [description]
 **Fix:** [specific fix]
