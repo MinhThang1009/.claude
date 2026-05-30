@@ -2,21 +2,29 @@
 
 Monitor context usage and select models by task type before spawning agents. Prevents token and cost explosion (5.3).
 
+**Spawn threshold — check `/context` before spawning each subagent.** Compact first if usage is above the window-appropriate threshold:
+
+| Window | Soft threshold (compact before spawning more) | Absolute ceiling (compact before ANY new agent) |
+| ------ | --------------------------------------------- | ----------------------------------------------- |
+| 200k (Haiku) | ~40% → ~120k left, fits 2–3 large returns (~30–50k each) | ~65% → ~130k used |
+| 1M (Opus 4.6+ / Sonnet 4.6+, plan-dependent + `[1m]` alias) | ~65% (40% = ~600k left is very conservative) | ~65% → ~650k used |
+
+- The threshold gates **spawning new subagents** (their output adds context), not all activity — the main conversation can continue.
+- Check which model/window you're on before applying the rule.
+
 **Do:**
-- Check `/context` **before spawning each subagent** — if usage is above the window-appropriate threshold (~40% on a 200k window, ~65% on a 1M window), compact first before spawning more agents. Note: this threshold applies specifically to spawning new subagents (subagent output will consume additional context). It does not mean all activity stops at 40% — the main conversation can continue; the restriction is on spawning new subagents that will return large outputs.
-  - **Rationale for 40%:** Claude Code has two window sizes — 200k (Haiku) and 1M (Opus 4.6+ / Sonnet 4.6+, depending on plan + `[1m]` alias). At 200k: 40% used = ~120k remaining, enough for 2–3 large agent returns (~30–50k each). At 1M: 40% = ~600k remaining — very conservative; 65% is the practical threshold. Check which model you're on before applying this rule blindly.
-  - **Absolute ceiling regardless of window:** If context exceeds 65%, compact before spawning any new agent. At 200k window this is ~130k used; at 1M window it's ~650k used — both are close to dangerous territory for multi-agent returns.
-- Select the model appropriate for the task type by setting the `model:` field in the agent definition:
-  - Research, exploration, search → `model: haiku`
-  - Review, audit, verification → `model: sonnet`
-  - Architecture, planning, complex reasoning → `model: opus`
-- Limit subagent output in the prompt: "Report at most 5 findings ranked by severity", "Summary under 200 words"
-- Use fork (`CLAUDE_CODE_FORK_SUBAGENT=1`) when a subagent needs a large amount of parent context — fork reuses the parent's prompt cache and is significantly cheaper than manual injection
+
+- Set `model:` per task type: research / exploration / search → `haiku`; review / audit / verification → `sonnet`; architecture / planning / complex reasoning → `opus`.
+- Limit subagent output in the prompt (e.g. "report at most 5 findings ranked by severity", "summary under 200 words").
+- Use a fork (`CLAUDE_CODE_FORK_SUBAGENT=1`) when a subagent needs a lot of parent context — it reuses the parent's prompt cache, cheaper than manual injection.
 
 **Don't:**
-- Continue spawning agents past the model-appropriate threshold (40% on a 200k window, ~65% on 1M) — see the Rationale above
-- Pre-load all tools in the prompt — use ToolSearch on-demand instead (ToolSearch significantly reduces token overhead by discovering tools dynamically rather than listing all upfront; exact savings vary by workflow)
-- Allow subagents to return full file contents when a summary is sufficient
 
-**When token usage spikes more than 20 percentage points after one agent return:** stop spawning, compact immediately before continuing.
-Definition: spike = `(usage_after_return) − (usage_before_spawn)`. Example: 32% before spawn → 54% after return = 22pp spike → trigger compact. A spike this large means the agent returned more context than budgeted and the remaining capacity is shrinking faster than expected.
+- Spawn past the window-appropriate threshold (~40% on 200k, ~65% on 1M).
+- Pre-load all tools in the prompt → use ToolSearch on-demand (discovers tools dynamically rather than listing all upfront; exact savings vary by workflow).
+- Let subagents return full file contents when a summary suffices.
+
+**Spike rule** — if context jumps >20 percentage points after one agent return, stop spawning and compact before continuing.
+
+- Spike = `usage_after_return − usage_before_spawn`. Example: 32% before spawn → 54% after return = 22pp → compact.
+- A large spike means the agent returned more context than budgeted; remaining capacity is shrinking faster than expected.
