@@ -61,6 +61,11 @@
 
 - After a **risk-bearing edit batch** — a shared/logic-bearing file, a behavior change, or a batch large enough to lose track of every change (>5 edits is one signal, not the sole trigger) → dispatch a **fresh subagent** to review instead of self-verifying. Self-fix → self-review = bias *(self-imposed/empirical — not in Anthropic's docs)*.
 - The fresh subagent gets **no edit-intent context** — only file paths + "review for correctness". Independent review requires independent context.
+- **Completeness/correctness of an artifact YOU produced (handoff / plan / audit / checklist / "is it done?") — STRICT.** Judging your own output "complete" by re-reading it is self-review and **converges to FALSE confidence** *(empirical: I declared a handoff "complete" 2× in one session; a fresh agent then caught 3 real broken references I'd skimmed past)*.
+  - **NEVER** assert "complete" / "đầy đủ" / "done" / "verified" as fact for your own artifact from self-review alone. State "self-checked, NOT independently verified" until an independent pass confirms.
+  - **PROACTIVE (the standard, not reactive):** for a high-stakes artifact another session/agent/human will RELY on (handoff, plan, audit, migration checklist) → dispatch the independent validation **BEFORE the first "done"/"ready" claim**. Do NOT wait to be asked; do NOT rely on the human to catch the gaps. The reactive trigger below is only a backstop for when you skipped this.
+  - The **2nd time** you are asked "is it complete / are you sure" about the same artifact in a session → **STOP self-reviewing. Another self-pass is BANNED as proof** — it only manufactures confidence. You MUST dispatch a **fresh agent (zero chat history, NOT given your conclusions)** that **VERIFIES every reference against disk** — each file path exists with the correct name/extension, each commit hash resolves, each cited section/number is real, each command actually runs — and reports gaps from a cold start. Only an independent pass (or the human) certifies completeness.
+  - A validator's "found nothing" counts **only if it verified each claim against disk**, not skimmed. Don't trust a self-count or a glance.
 
 ## Batch Edits
 
