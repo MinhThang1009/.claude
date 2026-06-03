@@ -13,6 +13,7 @@
   - Functions >100 lines → 30 lines of context around the change plus the signature/return is enough.
   - Small fixes (1–2 lines) → narrower context is fine.
   - New file → scan a similar file first to match the pattern.
+  - **Use the Read tool (not Bash `cat`/`grep`) for any file you'll Edit/Write**: the Edit/Write guard only counts Read-tool reads (it tracks content-state); `cat` doesn't satisfy it → Edit fails *"File has not been read yet"* and wastes a retry. View-only → `cat`/`grep` fine; will-edit → Read tool.
 - **Codebase conventions first, "best practices" second**. snake_case if the codebase uses snake_case. Tabs if the codebase uses tabs.
 - **Correct > clean > fast**. Working code matters more than fancy patterns.
 - **Don't over-engineer**. YAGNI. Generic abstractions should emerge from real needs, not speculation. If 200 lines can be solved in 50 → rewrite.
