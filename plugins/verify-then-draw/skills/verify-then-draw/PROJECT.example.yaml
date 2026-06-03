@@ -1,0 +1,90 @@
+# PROJECT.django.example.yaml — VÍ DỤ portable: cùng FRAMEWORK.md, chỉ đổi file params này.
+# Chứng minh khung generic re-use được cho stack KHÁC (Django/Python/Postgres).
+# KHÔNG dùng cho repo TechStore — đây là mẫu tham chiếu cho người port sang Django.
+
+stack:
+  language: python
+  runtime: python3.12
+  framework: django5
+  orm: django-orm
+  db: postgres16
+  arch: django-apps   # apps/<name>/{views,services,models,urls}.py
+
+# --- P3: layer theo Django (glob khác Express, FRAMEWORK.md KHÔNG đổi) ---
+layer_globs:
+  entrypoint:     "config/urls.py"
+  route_layer:    "apps/*/urls.py"
+  business_layer: "apps/*/services.py,apps/*/views.py"
+  data_layer:     "apps/*/models.py"          # ActiveRecord: data_layer = model_layer
+  model_layer:    "apps/*/models.py"
+
+# --- P2: cú pháp ghi-state Django ORM (fallback đọc-trọn-file vẫn áp) ---
+mutation_signature_set:
+  - ".save("
+  - ".update("
+  - "bulk_update"
+  - ".objects.create("
+  - ".objects.update("
+  - "F("            # Django F() expression
+fallback_rule: "Nghi pattern thiếu -> đọc TRỌN apps/<x>/services.py + column-centric grep tên field."
+
+# --- Denominator tools Python (tương đương Stryker/knip/route-enum) ---
+# 4 key FRAMEWORK.md đặt tên (giữ NGUYÊN tên key, chỉ đổi giá trị theo stack):
+denominator_tools:
+  mutation_cmd:          "mutmut run"             # hoặc cosmic-ray (full, report-only)
+  mutation_critical_cmd: "mutmut run --paths-to-mutate apps/orders,apps/payment,apps/cart"  # scope critical; mutation_break=70
+  deadcode_cmd:          "vulture apps/"
+  route_enumerator_cmd:  "python manage.py show_urls"   # django-extensions; in TOTAL url (denominator)
+  ledger_gate_cmd:       "python verify_workflow/check_ledger.py --gate"  # port của check-ledger sang Python
+  schema_drift_cmd:      "python manage.py makemigrations --check --dry-run"
+  db_verify_cmd:         "python manage.py migrate --plan"
+
+test_cmd:
+  unit:        "pytest -q"
+  unit_cov:    "pytest --cov"
+  integration: "pytest -m integration"
+  invariant_runner: "hypothesis"   # property-based Python (tương đương fast-check)
+  property_glob: "**/test_*_property.py"   # tương đương *.property.test.js
+
+coverage_thresholds:
+  mutation_break: 70   # mutmut: fail nếu survival > ngưỡng (≠ null — wire stop-condition #3)
+  route_diagram_coverage_min: 100
+  enum_state_coverage_min: 100
+
+applicable_lenses:
+  universal: [correctness, security, error-handling, boundary-validation]
+  domain:    [race-transaction, state-machine-completeness, money-integrity, idempotency]
+  # nếu là CMS/blog không có tiền: bỏ money-integrity; nếu không có concurrent mutate: bỏ race-transaction
+
+enum_source:
+  primary: "apps/orders/models.py (TextChoices/IntegerChoices)"
+  live:    "python manage.py shell -> Model._meta.get_field('status').choices"
+
+route_enumerator:
+  glob: "apps/*/urls.py"
+  cross_module_note: "Kiểm include() lồng nhau (urls.py include app khác) — completeness phải cross-app."
+
+critical_resources: [stock, payment_status, order_status]
+invariants_file: "verify-workflow/invariants.ecommerce.md"   # cùng domain thì cùng oracle
+
+toolchain:
+  PLANTUML_JAR: "${PLANTUML_JAR}"
+  GRAPHVIZ_DOT: "${GRAPHVIZ_DOT}"
+  diagram_tool: { usecase: plantuml, sequence: plantuml, state: plantuml, erd: dbml, pipeline: mermaid }
+  render_cmd:
+    plantuml: 'java -jar "$PLANTUML_JAR" -charset UTF-8 -tpng <file.puml>'
+
+vision_context:
+  notation: UML
+  language: en      # ví dụ project quốc tế
+  print_mode: color # KHÔNG cần tiêu chí dấu-tiếng-Việt + B&W
+  page: letter
+
+diagram_manifest: "verify-workflow/diagram-manifest.yaml"
+naming_template: "{type}-{seq:02d}-{scope}.{ext}"
+output_root: "diagrams/"
+
+# === GHI CHÚ PORTABILITY ===
+# So với PROJECT.yaml (Node): chỉ các GIÁ TRỊ đổi (glob, cmd, signature, vision_context).
+# FRAMEWORK.md giữ NGUYÊN. invariants.<domain>.md giữ nguyên nếu cùng domain e-commerce,
+# đổi nếu domain khác. Đó là contract "portable" — verify bằng chính file ví dụ này.
