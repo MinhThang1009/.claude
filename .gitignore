@@ -1,5 +1,5 @@
-# Personal config (dùng settings.example.json làm template)
-settings.json
+# settings.json được quản lý qua symlink ~/.claude/settings.json → dotclaude/settings.json
+# Không gitignore nữa — track trực tiếp trong repo
 
 # Audit specs + reports (internal tooling, không phải template)
 docs/AUDIT_INSTRUCTIONS.md

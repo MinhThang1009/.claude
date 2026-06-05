@@ -1,0 +1,322 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "respectGitignore": true,
+  "cleanupPeriodDays": 30,
+  "env": {
+    "MAX_MCP_OUTPUT_TOKENS": "50000",
+    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "64000"
+  },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "includeGitInstructions": false,
+  "permissions": {
+    "allow": [
+      "Bash(echo *)",
+      "Bash(printf *)",
+      "Bash(which *)",
+      "Bash(file *)",
+      "Bash(tree *)",
+      "Bash(date *)",
+      "Bash(true)",
+      "Bash(false)",
+      "Bash(node --version)",
+      "Bash(npm --version)",
+      "Bash(pnpm --version)",
+      "Bash(yarn --version)",
+      "Bash(bun --version)",
+      "Bash(python --version)",
+      "Bash(python3 --version)",
+      "Bash(go version)",
+      "Bash(cargo --version)",
+      "Bash(rustc --version)",
+      "Bash(claude --version)",
+      "Bash(gh --version)",
+      "Bash(mkdir *)",
+      "Bash(touch *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git checkout *)",
+      "Bash(git switch *)",
+      "Bash(git fetch *)",
+      "Bash(git pull *)",
+      "Bash(git merge *)",
+      "Bash(git rebase *)",
+      "Bash(git cherry-pick *)",
+      "Bash(git tag *)",
+      "Bash(git stash *)",
+      "Bash(git restore *)",
+      "Bash(git rm *)",
+      "Bash(git mv *)",
+      "Bash(git revert *)",
+      "Bash(git push *)",
+      "Bash(npm run *)",
+      "Bash(npm test *)",
+      "Bash(pnpm run *)",
+      "Bash(pnpm test *)",
+      "Bash(yarn run *)",
+      "Bash(yarn test *)",
+      "Bash(bun run *)",
+      "Bash(bun test *)",
+      "Bash(pytest *)",
+      "Bash(ruff *)",
+      "Bash(mypy *)",
+      "Bash(black *)",
+      "Bash(go test *)",
+      "Bash(go vet *)",
+      "Bash(gofmt *)",
+      "Bash(cargo test *)",
+      "Bash(cargo check *)",
+      "Bash(cargo clippy *)",
+      "Bash(cargo fmt *)",
+      "Bash(gh issue view *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr diff *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr checks *)",
+      "Bash(gh repo view *)",
+      "Bash(gh run list *)",
+      "Bash(gh run view *)",
+      "Bash(gh pr merge *)",
+      "Bash(gh pr close *)",
+      "Bash(gh pr reopen *)",
+      "Bash(gh pr edit *)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr review *)",
+      "Bash(gh issue create *)",
+      "Bash(gh issue close *)",
+      "Bash(gh issue edit *)",
+      "Bash(gh release create *)",
+      "WebFetch(domain:platform.claude.com)",
+      "WebFetch(domain:code.claude.com)",
+      "WebFetch(domain:docs.claude.com)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:www.anthropic.com)",
+      "WebFetch(domain:anthropic.com)"
+    ],
+    "deny": [
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~)",
+      "Bash(rm -rf $HOME*)",
+      "Bash(sudo rm *)",
+      "Bash(chmod -R 777 *)",
+      "Bash(chmod 777 *)",
+      "Bash(nc *)",
+      "Bash(ncat *)",
+      "Bash(socat *)",
+      "Bash(telnet *)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/*.p12)",
+      "Read(**/*.jks)",
+      "Read(**/*.pfx)",
+      "Read(**/id_rsa*)",
+      "Read(**/id_ed25519)",
+      "Read(**/id_ecdsa)",
+      "Read(**/id_dsa)",
+      "Read(**/credentials.json)",
+      "Read(**/service-account*.json)",
+      "Read(**/serviceAccount*.json)",
+      "Read(**/firebase-adminsdk*.json)",
+      "Read(**/gcp-key*.json)",
+      "Read(~/.aws/credentials)",
+      "Read(~/.aws/config)",
+      "Read(~/.netrc)",
+      "Read(~/.npmrc)",
+      "Read(~/.pypirc)",
+      "Read(~/.docker/config.json)",
+      "Read(~/.kube/config)"
+    ],
+    "ask": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(*.env)",
+      "Read(.envrc)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git push --force-with-lease *)",
+      "Bash(git reset --hard *)",
+      "Bash(git clean -fdx *)",
+      "Bash(git filter-repo *)",
+      "Bash(git filter-branch *)",
+      "Bash(chown -R *)",
+      "Bash(npm install *)",
+      "Bash(npm i)",
+      "Bash(npm i *)",
+      "Bash(pnpm add *)",
+      "Bash(pnpm install *)",
+      "Bash(yarn add *)",
+      "Bash(yarn install *)",
+      "Bash(pip install *)",
+      "Bash(pip3 install *)",
+      "Bash(cargo add *)",
+      "Bash(cargo install *)",
+      "Bash(go get *)",
+      "Bash(go install *)",
+      "Bash(brew install *)"
+    ],
+    "defaultMode": "acceptEdits",
+    "additionalDirectories": []
+  },
+  "hooks": {
+    "WorktreeCreate": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "WTDIR=$(mktemp -d); cygpath -w \"$WTDIR\" 2>/dev/null || echo \"$WTDIR\"",
+            "shell": "bash"
+          }
+        ]
+      }
+    ],
+    "WorktreeRemove": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -n \"$WORKTREE_PATH\" ] && rm -rf \"$(cygpath -u \"$WORKTREE_PATH\" 2>/dev/null || echo \"$WORKTREE_PATH\")\" || true",
+            "shell": "bash"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/bash-guard.sh\"",
+            "shell": "bash"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/format-on-edit.sh\"",
+            "shell": "bash"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/plan-auto-move.sh\"",
+            "shell": "bash"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/handoff-auto-move.sh\"",
+            "shell": "bash"
+          }
+        ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/subagent-edit-surface.sh\"",
+            "shell": "bash"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'cd \"${CLAUDE_PROJECT_DIR:-.}\" 2>/dev/null; git rev-parse --git-dir >/dev/null 2>&1 && { echo \"=== Git status ===\"; git status -s; echo \"=== Branch ===\"; git rev-parse --abbrev-ref HEAD; }; exit 0'",
+            "shell": "bash"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/handoff-auto-move.sh\"",
+            "shell": "bash"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/self-review-nudge.sh\"",
+            "shell": "bash"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "$HOME/.claude/hooks/statusline.sh"
+  },
+  "enabledPlugins": {
+    "plan-workflow@minhthang-plugins": true,
+    "subagent-system@minhthang-plugins": true,
+    "debug@minhthang-plugins": true,
+    "feature-dev@minhthang-plugins": true,
+    "commit-commands@minhthang-plugins": true,
+    "hookify@minhthang-plugins": true,
+    "code-review@minhthang-plugins": true,
+    "pr-review-toolkit@minhthang-plugins": true,
+    "audit-plan@minhthang-plugins": true,
+    "session@minhthang-plugins": true,
+    "verify-then-draw@minhthang-plugins": true
+  },
+  "extraKnownMarketplaces": {
+    "minhthang-plugins": {
+      "source": {
+        "source": "directory",
+        "path": "C:\\Users\\Admin\\dotclaude"
+      }
+    }
+  },
+  "outputStyle": "concise-vietnamese",
+  "viewMode": "default",
+  "language": "vietnamese",
+  "skipWebFetchPreflight": false,
+  "feedbackSurveyRate": 0,
+  "spinnerTipsEnabled": true,
+  "syntaxHighlightingDisabled": false,
+  "alwaysThinkingEnabled": false,
+  "effortLevel": "high",
+  "fastModePerSessionOptIn": false,
+  "awaySummaryEnabled": true,
+  "autoUpdatesChannel": "latest",
+  "tui": "fullscreen",
+  "voice": {
+    "enabled": false,
+    "mode": "tap"
+  },
+  "autoMemoryEnabled": true,
+  "showThinkingSummaries": false,
+  "claudeMdExcludes": [
+    "**/node_modules/**/CLAUDE.md",
+    "**/.next/**/CLAUDE.md",
+    "**/dist/**/CLAUDE.md",
+    "**/build/**/CLAUDE.md",
+    "**/.venv/**/CLAUDE.md"
+  ],
+  "editorMode": "normal",
+  "preferredNotifChannel": "auto",
+  "autoScrollEnabled": true,
+  "showTurnDuration": true,
+  "terminalProgressBarEnabled": true,
+  "agentPushNotifEnabled": true,
+  "model": "claude-sonnet-4-6[1m]"
+}
