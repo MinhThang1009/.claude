@@ -280,8 +280,17 @@ ASK_REASON = (
 )
 
 
+# Prefix các lệnh CLI an toàn — không bao giờ chứa pattern nhạy cảm,
+# quyền hạn được quản lý hoàn toàn qua settings.json permissions.
+_SAFE_CLI_PREFIXES = ("gh ",)
+
+
 def check_command(cmd: str):
     """Return (blocked, reason). blocked=True → exit 2. (ask path xử riêng trong main)."""
+    cmd_stripped = cmd.strip()
+    if any(cmd_stripped.startswith(p) for p in _SAFE_CLI_PREFIXES):
+        return False, None
+
     checks = [
         (
             is_sensitive_path_access,
