@@ -23,6 +23,7 @@ Perform a systematic, line-by-line logic audit of the target module. The goal is
 3. Identify and run the existing test suite for this module to establish a **green baseline**:
    - Find the test runner and config (jest.config, pytest.ini, go test, etc.)
    - Run only the tests relevant to this module if possible
+   - If **no test files exist** → note this explicitly. Proceed with code-only analysis. All fixes will be unverified by automated tests — flag this prominently in the Phase 6 summary.
    - If tests are **already failing before any changes** → stop, report the failures, and ask the user whether to continue with code-only analysis
    - If tests **cannot be run** (missing environment, requires external services, CI-only) → note this explicitly and proceed with code-only analysis. Flag at the end that fixes should be verified in the appropriate environment.
 
@@ -41,10 +42,11 @@ Apply these rules while reading:
 - **Read the corresponding test file** for each source file. Understand what is already asserted, what is assumed-but-untested, and what scenarios have no test at all.
 - **Maintain a running issue list** as you read. Do not stop to fix. Complete the full read of all files first — later files often reveal whether an earlier suspicious pattern is actually a bug or an intentional invariant.
 
-**Reading order for large modules (>10 files):**
-1. Business logic / service layer first (highest bug density)
-2. Data access / repository layer (transaction and integrity bugs)
-3. Controllers / routes / handlers last (validation gaps)
+**Reading order for large modules (>10 files)** — adapt to the stack:
+- **Backend:** business logic / service layer → data access / repository → controllers / routes / handlers
+- **Frontend:** state management / stores / hooks → components (logic-heavy) → pages / views (rendering)
+- **CLI / scripts:** core algorithm / business logic → I/O and error handling → entry point
+- **Any stack:** start where the most consequential decisions happen, end at the outermost layer
 
 **What to look for** — consult `references/reading-patterns.md` while reading each file. Key patterns: race conditions, missing transactions, aggregate-vs-per-item checks, null/undefined boundary failures, guard clauses that can be bypassed, dead code, type coercion bugs, off-by-one errors, and business rules enforced in one path but missing in another.
 
@@ -80,7 +82,10 @@ For each confirmed bug, in severity order (HIGH first):
    - Assert the outcome, not the implementation detail
    - Are named to describe the scenario, not the code path
 
-3. Run the test suite for this module. Expected: previously passing tests still pass, the new/updated test passes. If unrelated tests break, investigate before continuing — a fix that breaks other tests may have incorrect scope.
+3. Run the test suite for this module. Expected: previously passing tests still pass, the new/updated test passes. If unrelated tests break:
+   - **Investigate first** — the fix may have incorrect scope
+   - **If the broken test was asserting the old wrong behavior** → update the test to assert the correct behavior, and document why in the commit
+   - **If the broken test is unrelated to the fix** → the fix has too wide a scope; narrow it before continuing
 
 4. Run the **full** project test suite to confirm no regressions.
 
@@ -130,6 +135,7 @@ Print a final summary:
 - **Verify before and after every fix.** Run the test suite before touching the code (baseline), and again after (regression check).
 - **One bug = one commit.** Each commit must be independently revertable. If you discover two bugs, fix them in two separate commits.
 - **Document what you don't fix.** If something is wrong but out of scope, confirmed by design, or requires an environment you don't have — say so explicitly in the Phase 6 summary. Silence is not acceptable.
+- **For very large modules (50+ source files):** Do not attempt to finish in one session if the context window cannot hold all files. Instead: (1) audit the highest-priority layer (service/business logic) in this session, commit findings and fixes, (2) report clearly what was covered and what remains, (3) continue in a fresh session. Partial coverage with honest scope is better than shallow coverage of everything.
 
 ---
 
