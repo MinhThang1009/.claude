@@ -53,15 +53,13 @@ def main() -> int:
         missing.append("Phase 5 Exit Gate  (stale documentation update)")
 
     if missing:
-        lines = ["⚠️  logic-audit: Gates chưa hoàn tất — hoàn thành trước khi kết thúc:"]
+        lines = ["[logic-audit] Gates chua hoan tat - hoan thanh truoc khi ket thuc:"]
         for m in missing:
             lines.append(f"  - [ ] {m}")
         lines.append("")
-        lines.append(
-            "Sau khi tick hết: cập nhật .claude/logic-audit-state.json "
-            '→ {"phase4_gate": true, "phase5_gate": true}'
-        )
-        print("\n".join(lines))
+        lines.append('Cap nhat .claude/logic-audit-state.json -> {"phase4_gate": true, "phase5_gate": true}')
+        msg = "\n".join(lines) + "\n"
+        os.write(2, msg.encode("utf-8"))  # fd 2 = stderr — hiện trong Stop hook feedback
         return 2  # Block stop
 
     return 0
