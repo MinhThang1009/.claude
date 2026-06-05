@@ -1,7 +1,7 @@
 ---
 name: logic-audit
 description: This skill should be used when the user asks to "audit logic bugs", "read all source files and find bugs", "gate tầng 0", "logic check a module", "verify module correctness", "find business logic bugs", "audit this module before drawing diagrams", or says "read every line of code". Works on any module, language, or framework — discovers tests, docs, and project structure at runtime.
-version: 0.4.6
+version: 0.4.7
 argument-hint: <module-path-or-directory>
 allowed-tools: [Read, Grep, Glob, Bash, Edit, Write]
 ---
@@ -109,6 +109,9 @@ For each confirmed bug, in severity order (HIGH first):
    - **Pass** with the fix (verifies the correct behavior)
    - Assert the outcome, not the implementation detail
    - Are named to describe the scenario, not the code path
+   - **For `[UNIT-TEST-BLIND]` fixes:** unit test updates only document intent — mocks accept any argument so they cannot verify real DB/integration behavior. You must also:
+     1. Note in the commit message: "Unit tests document fix; integration/API test required for full verification."
+     2. If possible within the session, write an integration or API test (even if it cannot run without a real DB) so the test exists for the next CI run. Place it in the project's integration test directory with a comment: `// Verifies [BUG-X]: [description]`.
 
 3. Run the test suite for this module. Expected: previously passing tests still pass, the new/updated test passes. If unrelated tests break:
    - **Investigate first** — the fix may have incorrect scope
