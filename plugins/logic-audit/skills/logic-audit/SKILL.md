@@ -1,7 +1,7 @@
 ---
 name: logic-audit
 description: This skill should be used when the user asks to "audit logic bugs", "read all source files and find bugs", "gate tầng 0", "logic check a module", "verify module correctness", "find business logic bugs", "audit this module before drawing diagrams", or says "read every line of code". Works on any module, language, or framework — discovers tests, docs, and project structure at runtime.
-version: 0.4.2
+version: 0.4.3
 argument-hint: <module-path-or-directory>
 allowed-tools: [Read, Grep, Glob, Bash, Edit, Write]
 ---
@@ -118,6 +118,7 @@ For each confirmed bug, in severity order (HIGH first):
 
 Before proceeding to Phase 5, confirm every item below. Do not skip or defer silently — if an item cannot be done, state the reason explicitly.
 
+- [ ] Test written or updated for each fix — would have FAILED before the fix, passes after (Phase 4 step 2)
 - [ ] Independent verification agent run for every fix (Phase 4 step 6)
 - [ ] Full project test suite passes (not just module tests)
 - [ ] No fix was batched — each bug has its own commit
