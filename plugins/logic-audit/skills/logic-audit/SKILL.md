@@ -1,7 +1,7 @@
 ---
 name: logic-audit
 description: This skill should be used when the user asks to "audit logic bugs", "read all source files and find bugs", "gate tầng 0", "logic check a module", "verify module correctness", "find business logic bugs", "audit this module before drawing diagrams", or says "read every line of code". Works on any module, language, or framework — discovers tests, docs, and project structure at runtime.
-version: 0.4.9
+version: 0.5.0
 argument-hint: <module-path-or-directory>
 allowed-tools: [Read, Grep, Glob, Bash, Edit, Write]
 ---
@@ -53,12 +53,6 @@ Apply these rules while reading:
   Reading these is faster than running them, and they often directly name the bugs unit tests miss.
 - **Maintain a running issue list** as you read. Do not stop to fix. Complete the full read of all files first — later files often reveal whether an earlier suspicious pattern is actually a bug or an intentional invariant. **After finishing each layer (e.g., all service files), print the current issue list so the user can see progress.** Do not disappear silently for 10 files.
 
-**Phase 2 self-check before proceeding to Phase 3:** Confirm all of the following:
-- For each source file: which unit test file(s) cover it, what they assert about each public method, and what they do NOT assert (gaps).
-- Which higher-level test files (integration, API HTTP, invariant) were read and what business rules they assert that unit tests cannot verify.
-
-Simply listing file names is not sufficient — you must demonstrate you read the content. If you cannot answer "what does TC-X assert about method Y?" for key methods, or "what business rule does the integration test for this module verify?", you have not completed Phase 2.
-
 **Reading order for large modules (>10 files)** — adapt to the stack:
 - **Backend:** business logic / service layer → data access / repository → controllers / routes / handlers
 - **Frontend:** state management / stores / hooks → components (logic-heavy) → pages / views (rendering)
@@ -66,6 +60,12 @@ Simply listing file names is not sufficient — you must demonstrate you read th
 - **Any stack:** start where the most consequential decisions happen, end at the outermost layer
 
 **What to look for** — consult `references/reading-patterns.md` while reading each file. Key patterns: race conditions, missing transactions, aggregate-vs-per-item checks, null/undefined boundary failures, guard clauses that can be bypassed, dead code, type coercion bugs, off-by-one errors, and business rules enforced in one path but missing in another.
+
+**Phase 2 self-check before proceeding to Phase 3:** Confirm all of the following:
+- For each source file: which unit test file(s) cover it, what they assert about each public method, and what they do NOT assert (gaps).
+- Which higher-level test files (integration, API HTTP, invariant) were read and what business rules they assert that unit tests cannot verify.
+
+Simply listing file names is not sufficient — you must demonstrate you read the content. If you cannot answer "what does TC-X assert about method Y?" for key methods, or "what business rule does the integration test for this module verify?", you have not completed Phase 2.
 
 ---
 
