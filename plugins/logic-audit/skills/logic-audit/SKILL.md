@@ -1,7 +1,7 @@
 ---
 name: logic-audit
 description: This skill should be used when the user asks to "audit logic bugs", "read all source files and find bugs", "gate tầng 0", "logic check a module", "verify module correctness", "find business logic bugs", "audit this module before drawing diagrams", or says "read every line of code". Works on any module, language, or framework — discovers tests, docs, and project structure at runtime.
-version: 0.2.0
+version: 0.3.0
 argument-hint: <module-path-or-directory>
 allowed-tools: [Read, Grep, Glob, Bash, Edit, Write]
 ---
@@ -40,7 +40,7 @@ Apply these rules while reading:
 - **Distrust comments.** Comments describe intent, not reality. When a comment says "this never happens" or "X is always guaranteed" — verify it by tracing the actual code logic. The comment was likely added to justify a guard that CAN fail.
 - **Distrust module documentation.** CLAUDE.md and README descriptions can be stale. The source code is the source of truth.
 - **Read the corresponding test file** for each source file. Understand what is already asserted, what is assumed-but-untested, and what scenarios have no test at all.
-- **Maintain a running issue list** as you read. Do not stop to fix. Complete the full read of all files first — later files often reveal whether an earlier suspicious pattern is actually a bug or an intentional invariant.
+- **Maintain a running issue list** as you read. Do not stop to fix. Complete the full read of all files first — later files often reveal whether an earlier suspicious pattern is actually a bug or an intentional invariant. **After finishing each layer (e.g., all service files), print the current issue list so the user can see progress.** Do not disappear silently for 10 files.
 
 **Reading order for large modules (>10 files)** — adapt to the stack:
 - **Backend:** business logic / service layer → data access / repository → controllers / routes / handlers
@@ -66,7 +66,7 @@ Classify each confirmed issue:
 - 🟡 **MEDIUM** — UX confusion, validation missing in one code path but present in equivalent paths, partial cleanup on failure
 - 🔵 **INFO** — dead code, misplaced/stale comment, minor inconsistency with no user-visible impact
 
-**Present the classified findings to the user and wait for confirmation before touching any file.** The user decides which severity levels to fix, and in what order.
+**Present the classified findings to the user and wait for confirmation before touching any file.** Use `examples/phase3-finding-report.md` as the format template — each finding must include: file + line, concrete reproduction steps, minimal fix description, and test name. The user decides which severity levels to fix, and in what order.
 
 ---
 
