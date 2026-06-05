@@ -1,7 +1,7 @@
 ---
 name: logic-audit
 description: This skill should be used when the user asks to "audit logic bugs", "read all source files and find bugs", "gate tầng 0", "logic check a module", "verify module correctness", "find business logic bugs", "audit this module before drawing diagrams", or says "read every line of code". Works on any module, language, or framework — discovers tests, docs, and project structure at runtime.
-version: 0.3.1
+version: 0.3.3
 argument-hint: <module-path-or-directory>
 allowed-tools: [Read, Grep, Glob, Bash, Edit, Write]
 ---
@@ -103,6 +103,15 @@ For each confirmed bug, in severity order (HIGH first):
 
 **Repeat for each bug. One bug = one commit. Do not batch multiple bugs into a single commit.**
 
+### Phase 4 Exit Gate
+
+Before proceeding to Phase 5, confirm every item below. Do not skip or defer silently — if an item cannot be done, state the reason explicitly.
+
+- [ ] Independent verification agent run for every fix (Phase 4 step 6)
+- [ ] Full project test suite passes (not just module tests)
+- [ ] No fix was batched — each bug has its own commit
+- [ ] Phase 5 (stale documentation) is next — do not jump to Phase 6
+
 ---
 
 ## Phase 5 — Update Stale Documentation
@@ -119,6 +128,12 @@ After all bug fixes are committed:
 3. If the project maintains test-count metrics or coverage summaries in documentation, update those numbers.
 
 4. Commit doc updates **separately** from code fixes with a message like `docs(<module>): update after <bug-name> fix`.
+
+### Phase 5 Exit Gate
+
+- [ ] Every doc file that referenced changed behavior has been checked (not just the obvious ones — use grep by function name)
+- [ ] Test-count metrics in documentation updated if the project tracks them
+- [ ] If no doc updates were needed, state explicitly why (not silence)
 
 ---
 
