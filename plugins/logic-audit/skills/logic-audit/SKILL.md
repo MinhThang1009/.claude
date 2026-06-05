@@ -20,11 +20,11 @@ Perform a systematic, line-by-line logic audit of the target module. The goal is
 
 2. Find the project's primary documentation (CLAUDE.md, README.md, architecture docs, or equivalent). Read the section describing what this module does and what business rules it must enforce. This establishes the expected behavior to audit against.
 
-3. **Create gate state file** — dùng Write tool tạo `.claude/logic-audit-state.json` tại project root:
+3. **Create gate state file** — use the Write tool to create `.claude/logic-audit-state.json` at the project root:
    ```json
    {"phase4_gate": false, "phase5_gate": false}
    ```
-   Stop hook sẽ đọc file này và block nếu gates chưa done. Xóa file ở cuối Phase 6.
+   The Stop hook reads this file and blocks if gates are incomplete. Delete the file at the end of Phase 6.
 
 4. Identify and run the existing test suite for this module to establish a **green baseline**:
    - Find the test runner and config (jest.config, pytest.ini, go test, etc.)
@@ -119,7 +119,7 @@ Before proceeding to Phase 5, confirm every item below. Do not skip or defer sil
 - [ ] No fix was batched — each bug has its own commit
 - [ ] Phase 5 (stale documentation) is next — do not jump to Phase 6
 
-**Sau khi tick hết:** cập nhật `.claude/logic-audit-state.json` → `{"phase4_gate": true, "phase5_gate": false}`
+**After completing all items:** update `.claude/logic-audit-state.json` → `{"phase4_gate": true, "phase5_gate": false}`
 
 ---
 
@@ -144,7 +144,7 @@ After all bug fixes are committed:
 - [ ] Test-count metrics in documentation updated if the project tracks them
 - [ ] If no doc updates were needed, state explicitly why (not silence)
 
-**Sau khi tick hết:** cập nhật `.claude/logic-audit-state.json` → `{"phase4_gate": true, "phase5_gate": true}`
+**After completing all items:** update `.claude/logic-audit-state.json` → `{"phase4_gate": true, "phase5_gate": true}`
 
 ---
 
@@ -156,7 +156,7 @@ Print a final summary:
 - Documentation files updated
 - Items deferred: issues found but not fixed, with explicit reason for each (out of scope, by design, requires environment to verify, user decision to defer)
 
-**Sau khi in summary:** xóa `.claude/logic-audit-state.json` (cleanup — cho phép Stop hook pass).
+**After printing the summary:** delete `.claude/logic-audit-state.json` (cleanup — allows the Stop hook to pass).
 
 ---
 
