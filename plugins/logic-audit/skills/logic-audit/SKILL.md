@@ -1,7 +1,7 @@
 ---
 name: logic-audit
 description: This skill should be used when the user asks to "audit logic bugs", "read all source files and find bugs", "gate tầng 0", "logic check a module", "verify module correctness", "find business logic bugs", "audit this module before drawing diagrams", or says "read every line of code". Works on any module, language, or framework — discovers tests, docs, and project structure at runtime.
-version: 0.4.7
+version: 0.4.8
 argument-hint: <module-path-or-directory>
 allowed-tools: [Read, Grep, Glob, Bash, Edit, Write]
 ---
@@ -53,12 +53,11 @@ Apply these rules while reading:
   Reading these is faster than running them, and they often directly name the bugs unit tests miss.
 - **Maintain a running issue list** as you read. Do not stop to fix. Complete the full read of all files first — later files often reveal whether an earlier suspicious pattern is actually a bug or an intentional invariant. **After finishing each layer (e.g., all service files), print the current issue list so the user can see progress.** Do not disappear silently for 10 files.
 
-**Phase 2 self-check before proceeding to Phase 3:** For each source file, state:
-- Which test file(s) cover it
-- What the tests assert about each public method
-- What each test does NOT assert (gaps that could hide bugs)
+**Phase 2 self-check before proceeding to Phase 3:** Confirm all of the following:
+- For each source file: which unit test file(s) cover it, what they assert about each public method, and what they do NOT assert (gaps).
+- Which higher-level test files (integration, API HTTP, invariant) were read and what business rules they assert that unit tests cannot verify.
 
-Simply listing file names is not sufficient — you must demonstrate you read the test content. If you cannot answer "what does TC-X assert about method Y?" for the key methods, you have not completed Phase 2.
+Simply listing file names is not sufficient — you must demonstrate you read the content. If you cannot answer "what does TC-X assert about method Y?" for key methods, or "what business rule does the integration test for this module verify?", you have not completed Phase 2.
 
 **Reading order for large modules (>10 files)** — adapt to the stack:
 - **Backend:** business logic / service layer → data access / repository → controllers / routes / handlers
@@ -133,7 +132,7 @@ For each confirmed bug, in severity order (HIGH first):
 
 Before proceeding to Phase 5, confirm every item below. Do not skip or defer silently — if an item cannot be done, state the reason explicitly.
 
-- [ ] Test written or updated for each fix — would have FAILED before the fix, passes after (Phase 4 step 2)
+- [ ] Test written or updated for each fix — would have FAILED before the fix, passes after (Phase 4 step 2). For `[UNIT-TEST-BLIND]` fixes: the unit test passes; any integration test written for CI is exempt from "passes after" since it cannot run without DB.
 - [ ] Independent verification agent run for every fix (Phase 4 step 6)
 - [ ] Full project test suite passes (not just module tests)
 - [ ] No fix was batched — each bug has its own commit
