@@ -66,7 +66,7 @@ Classify each confirmed issue:
 - 🟡 **MEDIUM** — UX confusion, validation missing in one code path but present in equivalent paths, partial cleanup on failure
 - 🔵 **INFO** — dead code, misplaced/stale comment, minor inconsistency with no user-visible impact
 
-**Present the classified findings to the user and wait for confirmation before touching any file.** Use `examples/phase3-finding-report.md` as the format template — each finding must include: file + line, concrete reproduction steps, minimal fix description, and test name. The user decides which severity levels to fix, and in what order.
+**Present the classified findings to the user and wait for confirmation before touching any file.** Use `examples/finding-report-template.md` as the format template — each finding must include: file + line, concrete reproduction steps, minimal fix description, and test name. The user decides which severity levels to fix, and in what order.
 
 ---
 
@@ -148,5 +148,5 @@ Load these references when needed — they contain detailed patterns and techniq
 
 Working examples for reference:
 
-- **`examples/phase3-finding-report.md`** — What a well-structured Phase 3 findings presentation looks like before asking user confirmation
+- **`examples/finding-report-template.md`** — Template for presenting audit findings to the user: file + line, reproduction steps, minimal fix, test name
 - **`examples/independent-verification-exchange.md`** — How to run Phase 4 step 6 independent verification and interpret the results, including how to handle new findings the agent surfaces
