@@ -2,7 +2,7 @@
 """Stop hook: block khi logic-audit phase gates chưa hoàn tất.
 
 State file: ${CLAUDE_PROJECT_DIR}/.claude/logic-audit-state.json
-  {"phase4_gate": false, "phase5_gate": false}
+  {"findings_confirmed": false, "phase5_gate": false, "phase6_gate": false}
 
 - File không tồn tại  → không đang chạy logic-audit → allow (exit 0)
 - File tồn tại, gates chưa done → block (exit 2, print reminder)
@@ -61,7 +61,7 @@ def main() -> int:
         for m in missing:
             lines.append(f"  - [ ] {m}")
         lines.append("")
-        lines.append('Cap nhat .claude/logic-audit-state.json -> {"phase5_gate": true, "phase6_gate": true}')
+        lines.append('Cap nhat .claude/logic-audit-state.json -> {"findings_confirmed": true, "phase5_gate": true, "phase6_gate": true}')
         msg = "\n".join(lines) + "\n"
         os.write(2, msg.encode("utf-8"))  # fd 2 = stderr — hiện trong Stop hook feedback
         return 2  # Block stop

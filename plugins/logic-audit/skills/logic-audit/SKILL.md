@@ -137,8 +137,8 @@ For each confirmed bug, in severity order (HIGH first):
 
 1. Apply the **minimal surgical fix** — change only what is necessary to fix this specific bug. Do not refactor adjacent code, rename variables, or improve style in the same commit.
 
-2. Write or update tests that:
-   - Would have **failed** with the old code (reproduces the bug)
+2. Write or update tests. Default: **REGRESSION** — would have failed before the fix, passes after. Exception: **DOCUMENTATION** — only for INFO fixes where behavior is genuinely unchanged (cosmetic/intent-clarification); must label explicitly in commit message. See Exit Gate for labeling requirements.
+   - Would have **failed** with the old code, OR is explicitly labeled DOCUMENTATION
    - **Pass** with the fix (verifies the correct behavior)
    - Assert the outcome, not the implementation detail
    - Are named to describe the scenario, not the code path
