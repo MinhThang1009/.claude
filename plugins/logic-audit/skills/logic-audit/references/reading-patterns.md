@@ -1,70 +1,148 @@
 # Reading Patterns — Systematic Code Analysis
 
-Reference for Phase 2 of the logic-audit skill. Load when reading complex code patterns.
+Reference for Phase 2 of the logic-audit skill. Load while reading each source file.
+
+---
+
+## Null / Undefined / None Boundary Failures
+
+The most common class of logic bug across all languages:
+
+- Function assumes input is non-null but no guard exists at the entry point
+- Optional chaining (`?.`, `&.`, `?.`) hides a null that should be an error
+- Default value masks a missing required field: `x || defaultValue` silently accepts invalid input
+- Array/list index access without bounds check: `items[0]` when `items` might be empty
+- Map/dict access without existence check: `obj[key]` when key might be absent
+
+**Verify:** trace every parameter back to its origin. Is there a path where it arrives as null/undefined/None? If so, is that path handled or does it silently propagate?
+
+---
+
+## Type Coercion and Comparison Bugs
+
+- Loose equality (`==` in JS, implicit casting in other langs) treating `0`, `""`, `null`, `false` as equivalent when they are not
+- String-to-number conversion that silently produces `NaN` or `0` instead of failing
+- Integer division producing `0` instead of a fraction (Python 2 vs 3, integer math in Go/Java/C)
+- Comparing values of different numeric types: float precision loss, overflow when casting large integers
+- String comparison that is case-sensitive when the spec requires case-insensitive (or vice versa)
+
+---
+
+## Off-By-One Errors
+
+- Loop bound: `< length` vs `<= length`, `> 0` vs `>= 0`
+- Index: 0-based vs 1-based inconsistency between caller and callee
+- Pagination: `offset = page * size` vs `offset = (page - 1) * size`
+- Date/time range: `>=` vs `>` at boundary, inclusive vs exclusive end
+- String slicing: `str[0:n]` vs `str[0:n+1]`
+
+---
 
 ## Async / Concurrency Patterns
 
 **Race conditions to look for:**
-- Read-then-write without transaction: `findOne()` followed by `create()` or `update()` — two concurrent requests can both read "not found" and both create, resulting in duplicates.
-- Check-then-act: `if (stock > 0) { decrement() }` without atomic lock — oversell risk.
-- Fire-and-forget side effects that must complete before the response: verify `.catch()` handlers exist and don't swallow errors silently.
+- Read-then-write without atomic lock: `findOne()` followed by `create()` or `update()` — two concurrent requests can both see "not found" and both create, producing duplicates
+- Check-then-act: `if (stock > 0) { decrement() }` without a database lock — oversell risk
+- Double-submit: no idempotency key, so retried requests create duplicate records
 
-**When reading async code, trace the happy path AND the failure path:**
-- What happens if the first `await` succeeds but the second fails?
-- Is there cleanup (temp files, partial DB writes) if mid-flow throws?
-- Are transaction boundaries correct — does the transaction wrap ALL the operations that must be atomic?
+**Transaction boundary failures:**
+- Transaction wraps only part of an atomic operation — some operations outside the transaction can partially succeed while the transaction rolls back
+- Sub-operations inside a transaction not passed the transaction object (ORM pattern: `{ transaction }` missing from nested calls)
+- Outer catch logs the error but doesn't re-throw — caller thinks the operation succeeded when it partially failed
+
+**Fire-and-forget side effects:**
+- `sendEmail()`, `publishEvent()`, `deleteFile()` called without `await` and without `.catch()` — failure is silent
+- Background job scheduled but result never checked — errors disappear
+
+---
 
 ## Guard Clauses and Early Returns
 
-**Pattern to watch:** disabled UI element + guard clause in handler.
-- A button with `disabled={condition}` does NOT guarantee the handler can't be called — keyboard events, programmatic calls, or testing can bypass disabled state.
-- Verify: does the handler have its own guard that mirrors the disabled condition?
+**Disabled UI ≠ handler unreachable:**
+- A UI element with `disabled={condition}` does NOT guarantee the handler can't be triggered — keyboard events, programmatic `.click()`, direct API calls, or tests can bypass the disabled state
+- Check: does the handler itself have a guard clause that mirrors the disable condition?
 
 **"Always true" invariant claims:**
-- Comment says "X is always Y here" — trace the call chain and verify the invariant holds for ALL callers, not just the happy path.
-- If the comment was added to justify a guard: the guard might be needed precisely because the invariant CAN fail.
+- Comment says "X is always Y here" — trace every call site to verify the invariant holds for ALL callers, including edge cases and direct test calls
+- If the comment was written to justify a guard, the guard may exist precisely because the invariant CAN fail
+
+**Guard order:**
+- Guard against `null` before accessing `.property` — flipped order causes NPE in the guard itself
+- Validation before side effects — if the validation runs after a DB write, partial state exists on validation failure
+
+---
 
 ## Database / ORM Patterns
 
-**Common integrity issues:**
-- `findOne` + `create` without transaction → duplicate rows on concurrent requests
-- Stock decrement without `SELECT FOR UPDATE` → oversell
-- Cascade operations that silently succeed even when sub-operations fail (catch-swallow)
-- Soft-delete queries that forget `WHERE deleted_at IS NULL` on related includes
+**Integrity risks:**
+- `findOne` + `create` without transaction → duplicate rows under concurrent load
+- Stock or balance decrement without row-level lock (`SELECT FOR UPDATE`) → oversell or balance going negative
+- Soft-delete queries that include deleted records in related `include`/`join` by omitting `WHERE deleted_at IS NULL`
+- Cascade operations that swallow sub-operation failures in a catch block
 
-**Verify transaction scope:**
-- Does the transaction wrap all operations that must be atomic?
-- Are all sub-operations within the transaction passed the `{ transaction }` option?
-- Does the outer catch re-throw or just log? (logging without re-throwing = silent data corruption)
+**Transaction scope:**
+- Does the transaction wrap ALL operations that must be atomic?
+- Are all ORM calls inside the transaction passed the transaction reference?
+- If the outer catch logs and swallows without re-throwing: a failed transaction looks like success
 
-## Caching Patterns
-
-**Common bugs:**
-- Cache key collision: two different inputs produce the same cache key
-- Stale cache served after mutation: invalidation missing or wrong key used
-- Cache populated with partial/incorrect data on first miss
-- TTL too short (cache miss storms) or too long (stale data served)
+---
 
 ## Business Rule Enforcement
 
-**Pattern: rule enforced in one place but not another**
-- Same operation available through multiple endpoints/paths — is the rule enforced on ALL paths?
-- Rule enforced at the service layer but the repository layer also directly accessible — can the rule be bypassed?
-- Validation in controller but not in service — service can be called directly from tests or other services without validation.
+**Rule enforced in one path but missing in another:**
+- Same operation reachable via multiple endpoints — is the rule checked on ALL of them?
+- Service-layer validation that can be bypassed by calling the repository directly (test code, other services, internal tools)
+- Validation only in the controller/handler — internal service-to-service calls skip it
 
-**Pattern: aggregate check misses per-item check**
-- `totalStock > 0` does not guarantee the specific requested variant/item has stock.
-- `totalPrice > discount` does not guarantee each line item individually passes rules.
+**Aggregate check misses per-item check:**
+- `totalStock > 0` does not mean the specific requested variant has stock
+- `totalPrice > minOrder` does not mean each individual item meets its own rules
+- `allVariantsActive` (via `.some()`) vs "the specific requested variant is active" (via `.find()`)
 
-## Dead Code Identification
+**Asymmetric enforcement:**
+- Create validates a field; update does not — invalid state can be introduced via update
+- Rule applied going in (write) but not going out (read) — corrupt data can be read back silently
 
-**Dead code in production (not tests):**
-- Functions defined but never called (grep all callers, not just the module)
-- DTO/model fields populated but never read by any consumer
-- Constants defined but only referenced in comments
-- Error messages hardcoded in a language the user won't see (EN error in a VI-only API)
+---
 
-**Before marking as dead:**
-- Grep the entire codebase, not just the current module
-- Check if it's referenced by dynamic access (`obj[key]`, `require(path)`)
-- Check if it's a public API that external callers might use
+## Caching Patterns
+
+- Cache key constructed from insufficient discriminators — two different inputs hash to the same key
+- Mutation that doesn't invalidate or update the cache — stale data served after a write
+- Cache populated with the result of a partially-failed operation — error state cached as success
+- TTL inconsistency — one caller refreshes every 5 minutes, another caches for 1 hour, producing inconsistent views
+
+---
+
+## Dead Code
+
+**Before marking something as dead, verify:**
+- Grep the entire codebase (not just this module) for all callers
+- Check for dynamic access: `obj[methodName]()`, `require(dynamicPath)`, reflection/eval
+- Check if it's part of a public API used by external consumers
+- Check if it's exported but the export itself is unused
+
+**Dead code patterns:**
+- Function defined but never called from any production path
+- Exported symbol that nothing imports
+- Constant defined but only referenced in a stale comment
+- Error message in a language no user will see (hardcoded EN string in a VI-only API, or vice versa)
+- DTO/model field populated on every write but never read by any consumer
+
+---
+
+## Encoding and Data Integrity
+
+- String encoding mismatch: UTF-8 vs Latin-1, URL-encoded vs raw, Base64-padded vs unpadded
+- Numeric serialization: floating-point stored as string and then compared as number without parsing
+- Date/time stored without timezone, then interpreted with different timezone on read
+- Hash or signature computed over different byte representations on write vs verify
+
+---
+
+## Initialization and Configuration
+
+- Module-level global mutated at runtime — concurrent requests corrupt shared state
+- Constructor side effect that throws in test environments but not in production (or vice versa)
+- Default configuration value that is unsafe for production (debug mode, open CORS, no auth)
+- Required configuration value that has a silently wrong default instead of failing loudly when missing

@@ -1,109 +1,150 @@
 # Verification Techniques
 
-Reference for Phases 3–5 of the logic-audit skill. Load when verifying findings or planning fixes.
+Reference for Phases 3–5 of the logic-audit skill.
+
+---
 
 ## Verifying a Finding is Real (Not False Positive)
 
-**Before reporting a bug, verify:**
+Before adding an issue to the confirmed list:
 
-1. **Trace the call chain** — who calls this function? Under what conditions? Can the buggy branch actually be reached from production code paths?
-2. **Check if the test already covers it** — grep test files for the function name and the specific condition. If a test already exercises the path and passes, revisit the analysis.
-3. **Check similar code elsewhere** — if the codebase has 5 similar functions and 4 do it correctly, the 5th is likely a bug. If all 5 do it the same "wrong" way, it might be intentional.
-4. **Construct a minimal reproduction** — can you write a test that fails with the current code and passes after the proposed fix? If yes, the bug is confirmed.
+1. **Trace the call chain.** Who calls this function? Under what conditions? Can the buggy branch actually be reached from a production code path? If only a test can reach it, it may not be a production bug.
+2. **Check if the test already covers it.** Grep test files for the function name and the specific condition. If an existing test exercises this exact path and passes, the behavior may be intentional — revisit the analysis.
+3. **Check similar code elsewhere.** If the codebase has 5 similar functions and 4 do it correctly, the 5th is almost certainly a bug. If all 5 do it the same "wrong" way, it might be an intentional design choice.
+4. **Construct a minimal reproduction mentally.** Can you describe a specific input that triggers the wrong behavior? If you can't construct a concrete example, the bug is likely theoretical.
+
+---
 
 ## Independent Verification Agent Prompt
 
-When spawning an independent verifier agent (Phase 4, step 6), give it this and only this:
+When spawning an independent verifier (Phase 4, step 6), give the agent **exactly this prompt** with no additional context about what you changed or why:
 
 ```
-Read these files: [list of changed files]
+Read these files: [paste list of changed files]
 
 For each file, determine:
 1. Is the logic correct? Are all business rules properly enforced?
 2. Are there race conditions, data integrity risks, or missing validation?
-3. Any edge cases not handled?
+3. Are there edge cases where the code produces incorrect output?
 
-Do NOT look at git history or ask what was changed. Read the current code only.
-Report findings with specific file:line references.
+Do NOT look at git history, commit messages, or any description of what was changed.
+Read the current code only.
+Report findings with specific file and line number references.
 ```
 
-The agent must not know what you fixed or why — that context would bias toward confirming your fix rather than finding remaining issues.
+**The agent must not know what you fixed.** That context creates confirmation bias — the agent converges toward "your fix looks correct" instead of finding remaining issues. The point is independent eyes, not a rubber stamp.
+
+---
 
 ## Test Strategy for Bug Fixes
 
-**A good bug-fix test must:**
-- Reproduce the bug (fail before the fix, pass after)
-- Assert the outcome, not the implementation detail
-- Cover both the buggy case AND the correct behavior after fix
-- Be named to describe the scenario, not the code path
+A good bug-fix test:
+- **Fails** on the unfixed code (reproduces the bug)
+- **Passes** on the fixed code
+- Asserts the **outcome**, not the implementation detail (do not test internal state)
+- Is **named** to describe the scenario, not the code path
 
-**Example for a stock check bug:**
+**Test naming examples:**
 ```
-// Bad test name: "test variant.stockQuantity check"
-// Good test name: "adding out-of-stock variant to cart throws 400 even if other variants have stock"
+// Bad:  "test variant.stockQuantity field check"
+// Good: "adding out-of-stock variant to cart throws 400 even if other variants have stock"
+
+// Bad:  "test null check branch"
+// Good: "getUser returns null when userId is not found, not an empty object"
 ```
 
-**For race conditions** — unit tests can mock time/order, but the real fix should be verifiable via integration test or by examining the transaction scope in the code.
+**When no test runner is available:**
+- Document the expected behavior as a comment in the fix commit
+- Note in the Phase 6 summary that the fix needs environment-level verification
+- Do not claim the fix is verified — it is not
+
+**For race conditions:**
+- Unit tests can mock concurrency order but cannot prove atomicity
+- The authoritative verification is examining the transaction boundaries in the code
+- Note in the commit: "Atomicity verified by code review — transaction wraps X, Y, Z operations"
+
+---
 
 ## Discovering Stale Documentation
 
-After fixing bugs, find stale docs by:
+After fixing bugs, find documentation that now states incorrect behavior:
 
-1. **Search by function/method name** changed — grep all `.md` files for the function name
-2. **Search by behavior description** — grep for keywords from the old behavior (e.g., if a check was added, grep for "does not check", "no validation for", "accepted without")
-3. **Search module-level docs** — always check `<module>/CLAUDE.md` or `<module>/README.md` in the same directory as changed files, and parent-level docs
-4. **Check test count tables** — grep for numbers like "5349 tests", "215 suites" and update if tests were added/removed
+1. **Search by function or method name.** Grep all documentation files (`.md`, `.txt`, docs directories) for the name of every function you changed.
+
+2. **Search by old behavior keywords.** If you added a check, grep for phrases like "does not check", "no validation", "accepted without". If you removed a field, grep for its name.
+
+3. **Check module-level docs.** Always look for a `CLAUDE.md`, `README.md`, or equivalent in:
+   - The same directory as the changed files
+   - The parent directory
+   - The project root
+
+4. **Check any centrally maintained metrics.** Some projects maintain test counts, coverage percentages, or API endpoint counts in documentation. If your fix added or removed tests, search for these numbers and update them.
 
 **Update only factually wrong content:**
-- Change descriptions that say the old incorrect behavior
+- Rewrite descriptions that state the old, incorrect behavior
 - Update business rule descriptions that no longer match the code
-- Do not rewrite accurate sections just to "refresh" them
+- Do **not** rewrite accurate sections as a "refresh" — unnecessary churn obscures the meaningful change
 
-## Severity Classification Guide
+---
+
+## Severity Classification
 
 **🔴 HIGH — fix immediately:**
-- Data written to DB can be wrong or duplicated
-- Security: userId spoofing, privilege escalation, sensitive data exposure
-- Race condition that can cause inconsistent state in production
-- Business rule not enforced that directly affects financial/stock/order accuracy
+- Data written to the database can be wrong, duplicated, or missing
+- Security: authentication bypass, privilege escalation, sensitive data exposed
+- Race condition that produces inconsistent state under concurrent load
+- Business rule not enforced that directly affects financial, inventory, or order accuracy
 
 **🟡 MEDIUM — fix before shipping:**
-- Feature behaves differently than documented and user-facing (confusing UX)
-- Check enforced in one code path but missing in an equivalent path
-- Partial cleanup on failure (temp files, orphaned records) that accumulates over time
+- Feature behaves differently than documented in a way users will notice
+- Validation enforced on one code path but missing on an equivalent path (same operation, different entry point)
+- Partial cleanup on failure that accumulates over time (orphaned files, dangling records)
 - Inconsistency with how the same pattern is handled elsewhere in the codebase
 
-**🔵 INFO — document, defer if needed:**
-- Dead code with no production caller (remove or explicitly document as intentional)
-- Comment that describes old behavior (update the comment)
+**🔵 INFO — document, defer if appropriate:**
+- Dead code with no production caller (remove, or document explicitly as intentional)
+- Comment that describes the old, wrong behavior (update the comment)
 - Minor inconsistency with no user-visible impact
-- Design limitation that's known and accepted
+- Design limitation that is known and accepted by the team
 
-**NOT a bug (do not report):**
-- Style or formatting issues
-- Missing test coverage for a branch that's genuinely unreachable
-- "Could be more efficient" without evidence of actual performance problem
-- Theoretical edge case with no realistic trigger path
+**NOT a bug — do not report:**
+- Style or formatting that violates no logic
+- Missing test coverage for a branch that is genuinely unreachable in production
+- "Could be more efficient" without a measured or demonstrated performance problem
+- Theoretical edge case with no realistic trigger path in the target environment
+
+---
 
 ## Commit Message Format
 
-Each fix commit should answer three questions:
-1. What was wrong?
-2. Why was it wrong (root cause)?
-3. What changed?
+Each fix commit answers three questions: what was wrong, why it was wrong, what changed.
 
 ```
-fix(<module>): <what was wrong>
+fix(<module>): <what was wrong — short, present tense>
 
-<why it was wrong — root cause in 1-2 sentences>
+<why it was wrong — root cause, 1-2 sentences>
 <what the fix changes>
 ```
 
-Example:
+**Examples:**
 ```
-fix(ai): addToCart checks total stock but not per-variant stock
+fix(cart): addToCart checks total stock but not per-variant stock
 
 totalStock > 0 doesn't guarantee the requested variant has stock.
 Blue(stock=0) + Red(stock=5) → totalStock=5 → allowed incorrectly.
 Now checks variant.stockQuantity when variantId is specified.
+```
+
+```
+fix(auth): getUserById returns empty object instead of null when not found
+
+Caller pattern `if (!user)` evaluates to false for `{}`, bypassing auth guard.
+Returns null explicitly when findByPk yields no result.
+```
+
+**Doc-update commit format:**
+```
+docs(<module>): update after <bug-name> fix
+
+<which behavior description was stale and what it says now>
 ```
