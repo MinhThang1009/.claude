@@ -1,7 +1,7 @@
 ---
 name: logic-audit
 description: This skill should be used when the user asks to "audit logic bugs", "read all source files and find bugs", "gate tầng 0", "logic check a module", "verify module correctness", "find business logic bugs", "audit this module before drawing diagrams", or says "read every line of code". Works on any module, language, or framework — discovers tests, docs, and project structure at runtime.
-version: 0.4.0
+version: 0.4.1
 argument-hint: <module-path-or-directory>
 allowed-tools: [Read, Grep, Glob, Bash, Edit, Write]
 ---
@@ -71,7 +71,11 @@ After reading all files, review the running issue list. For each item, determine
    - If **yes** → proceed with classification.
    - If **no** → verify the library behavior first: grep its source, check official docs, or run a minimal Bash script (`node -e "..."`) to confirm. Do not classify as HIGH without this verification. If verification is not possible in this environment, tag the finding `[NEEDS-RUNTIME-VERIFY]` and cap severity at MEDIUM.
 
-5. **What is the minimal fix?** State the exact change before touching any file.
+5. **What is the minimal fix?** Before touching any file, run a pre-flight check:
+   - Grep test files for assertions on the affected symbol, function, or variable.
+   - Determine whether existing tests assert **wrong behavior** (test needs updating) or **correct intent** (the code documents something meaningful even if it has no runtime effect — do not remove it).
+   - If more than 3 test files assert the current behavior and the severity is INFO or MEDIUM: defer. Fix cost exceeds benefit.
+   - Only after this check: state the exact change, including which test files need updating.
 
 Classify each confirmed issue:
 - 🔴 **HIGH** — data integrity, security, race condition, incorrect business rule that affects money/stock/orders
