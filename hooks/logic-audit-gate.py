@@ -34,6 +34,10 @@ def main() -> int:
     if obj.get("hook_event_name") == "SubagentStop":
         return 0
 
+    # Nếu hook này đã block lần trước → không lặp lại (tránh infinite loop)
+    if obj.get("stop_hook_active"):
+        return 0
+
     project_dir = os.environ.get("CLAUDE_PROJECT_DIR", ".")
     state_file = os.path.join(project_dir, ".claude", "logic-audit-state.json")
 
