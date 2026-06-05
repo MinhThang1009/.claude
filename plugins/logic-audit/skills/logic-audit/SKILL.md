@@ -1,7 +1,7 @@
 ---
 name: logic-audit
 description: This skill should be used when the user asks to "audit logic bugs", "read all source files and find bugs", "gate tầng 0", "logic check a module", "verify module correctness", "find business logic bugs", "audit this module before drawing diagrams", or says "read every line of code". Works on any module, language, or framework — discovers tests, docs, and project structure at runtime.
-version: 0.5.0
+version: 0.6.0
 argument-hint: <module-path-or-directory>
 allowed-tools: [Read, Grep, Glob, Bash, Edit, Write]
 ---
@@ -22,20 +22,25 @@ Perform a systematic, line-by-line logic audit of the target module. The goal is
 
 3. **Create gate state file** — use the Write tool to create `.claude/logic-audit-state.json` at the project root:
    ```json
-   {"phase4_gate": false, "phase5_gate": false}
+   {"findings_confirmed": false, "phase5_gate": false, "phase6_gate": false}
    ```
-   The Stop hook reads this file and blocks if gates are incomplete. Delete the file at the end of Phase 6.
+   The Stop hook reads this file and blocks if gates are incomplete. Delete the file at the end of Phase 7.
 
 4. Identify and run the existing test suite for this module to establish a **green baseline**:
    - Find the test runner and config (jest.config, pytest.ini, go test, etc.)
    - Run only the tests relevant to this module if possible
-   - If **no test files exist** → note this explicitly. Proceed with code-only analysis. All fixes will be unverified by automated tests — flag this prominently in the Phase 6 summary.
+   - If **no test files exist** → note this explicitly. Proceed with code-only analysis. All fixes will be unverified by automated tests — flag this prominently in the Phase 7 summary.
    - If tests are **already failing before any changes** → stop, report the failures, and ask the user whether to continue with code-only analysis
    - If tests **cannot be run** (missing environment, requires external services, CI-only) → note this explicitly and proceed with code-only analysis. Flag at the end that fixes should be verified in the appropriate environment.
 
 ---
 
 ## Phase 2 — Read Everything (No Gaps)
+
+**Before reading the first file:** read `references/reading-patterns.md` in full. Then print one line:
+> "Reading patterns loaded: [list the 5 categories most relevant to this module's stack and domain]."
+
+Use that list as a checklist while reading each source file — it prevents systematic blind spots (e.g., skipping encoding/type-coercion checks on a payment module).
 
 Read **every single line** of every source file listed in Phase 1. Not excerpts. Not grep summaries. Not subagent delegation. Full files, read directly.
 
@@ -95,9 +100,38 @@ Classify each confirmed issue:
 
 **Present the classified findings to the user and wait for confirmation before touching any file.** Use `examples/finding-report-template.md` as the format template — each finding must include: file + line, concrete reproduction steps, minimal fix description, and test name. The user decides which severity levels to fix, and in what order.
 
+**If the user does not reply in the same turn** (e.g., a stop hook fires forcing Phase 5): proceed for MEDIUM/HIGH findings only — invoking the audit is implicit approval. Print: "Proceeding with implicit approval for MEDIUM/HIGH findings." Update the state file: `findings_confirmed: true`. Then continue through Phase 4 (Completeness Check) before Phase 5 (Fix) — do not skip Phase 4.
+
+**After the user confirms** (explicit reply): update state file `findings_confirmed: true` before starting Phase 5.
+
 ---
 
-## Phase 4 — Fix (One Bug Per Commit)
+## Phase 4 — Completeness Check
+
+Before starting Phase 5, review the full running issue list from Phase 2.
+
+For every item you considered but did NOT include in Phase 3 findings, track it now for inclusion in the Phase 7 deferred list:
+
+```
+| [finding description] | [reason not included: out of scope / by design / unreachable / fix cost too high / ...] |
+```
+
+If nothing was dismissed: note "No dismissed findings." explicitly.
+
+**Rule: every item that appeared in the Phase 2 running issue list must appear in either Phase 3 findings or Phase 7 deferred. Silent disappearance is not allowed.**
+
+This step exists because "Document what you don't fix" is a ground rule, but without a checkpoint it is easy to skip. This is the checkpoint.
+
+### Phase 4 Exit Gate
+
+- [ ] Every dismissed finding from Phase 2 running list is tracked with an explicit reason, OR "No dismissed findings." is stated
+- [ ] Nothing silently dropped — if unsure whether an item counts, include it in Phase 7 deferred
+
+No state file update needed for this phase. Proceed to Phase 5.
+
+---
+
+## Phase 5 — Fix (One Bug Per Commit)
 
 For each confirmed bug, in severity order (HIGH first):
 
@@ -121,28 +155,46 @@ For each confirmed bug, in severity order (HIGH first):
 
 5. Run the project's linter/formatter if one exists and is configured.
 
-6. **Spawn an independent verification agent.** Give it only the list of changed files — no description of what was fixed or why. Use the exact prompt template in `references/verification-techniques.md` (Independent Verification Agent Prompt section). The agent must not know your intent; that context biases it toward confirming rather than finding remaining issues. Compare its findings against your fix.
-   - **If the agent surfaces new findings** (unrelated to the fix): verify each one yourself with grep/Read before reporting to the user. Do NOT relay subagent output directly — agents can hallucinate line numbers or misread context. Apply the same provability standard as Phase 3 step 4. Before queuing any of these findings for fixing, run the Phase 3 step 5 pre-flight check (test assertion grep + fix cost assessment) on each one — do not skip directly to Phase 4 step 1.
+6. **Spawn an independent verification agent.** Give it only the list of changed files — no description of what was fixed or why. **Do NOT write a custom prompt.** Use the exact template below, replacing only `[list changed files]`:
+
+   ```
+   Read these files: [list changed files]
+
+   For each file, determine:
+   1. Is the logic correct? Are all business rules properly enforced?
+   2. Are there race conditions, data integrity risks, or missing validation?
+   3. Are there edge cases where the code produces incorrect output?
+
+   Do NOT look at git history, commit messages, or any description of what was changed.
+   Read the current code only.
+   Report findings with specific file and line number references.
+   ```
+
+   The agent must not know your intent; that context biases it toward confirming rather than finding remaining issues. Compare its findings against your fix.
+   - **If the agent surfaces new findings** (unrelated to the fix): verify each one yourself with grep/Read before reporting to the user. Do NOT relay subagent output directly — agents can hallucinate line numbers or misread context. Apply the same provability standard as Phase 3 step 4. Before queuing any of these findings for fixing, run the Phase 3 step 5 pre-flight check (test assertion grep + fix cost assessment) on each one — do not skip directly to Phase 5 step 1.
 
 7. Commit with a message that answers three questions: what was wrong, why it was wrong, what changed. Use the commit format in `references/verification-techniques.md`.
 
 **Repeat for each bug. One bug = one commit. Do not batch multiple bugs into a single commit.**
 
-### Phase 4 Exit Gate
+### Phase 5 Exit Gate
 
-Before proceeding to Phase 5, confirm every item below. Do not skip or defer silently — if an item cannot be done, state the reason explicitly.
+Before proceeding to Phase 6, confirm every item below. Do not skip or defer silently — if an item cannot be done, state the reason explicitly.
 
-- [ ] Test written or updated for each fix — would have FAILED before the fix, passes after (Phase 4 step 2). For `[UNIT-TEST-BLIND]` fixes: the unit test passes; any integration test written for CI is exempt from "passes after" since it cannot run without DB.
-- [ ] Independent verification agent run for every fix (Phase 4 step 6)
+- [ ] Test written or updated for each fix — must be one of two labeled types:
+  - **REGRESSION**: would have FAILED before the fix, passes after. This is the default.
+  - **DOCUMENTATION**: fix does not change behavior (cosmetic/intent-clarification only) — test confirms existing behavior. Must write "DOCUMENTATION TEST: fix does not change behavior" explicitly in the commit message. Cannot use this label for MEDIUM or HIGH severity bugs.
+  - For `[UNIT-TEST-BLIND]` fixes: the unit test passes; any integration test written for CI is exempt from "passes after" since it cannot run without DB.
+- [ ] Independent verification agent run for every fix (Phase 5 step 6)
 - [ ] Full project test suite passes (not just module tests)
 - [ ] No fix was batched — each bug has its own commit
-- [ ] Phase 5 (stale documentation) is next — do not jump to Phase 6
+- [ ] Phase 6 (stale documentation) is next — do not jump to Phase 7
 
-**After completing all items:** update `.claude/logic-audit-state.json` → `{"phase4_gate": true, "phase5_gate": false}`
+**After completing all items:** update `.claude/logic-audit-state.json` → `{"findings_confirmed": true, "phase5_gate": true, "phase6_gate": false}`
 
 ---
 
-## Phase 5 — Update Stale Documentation
+## Phase 6 — Update Stale Documentation
 
 After all bug fixes are committed:
 
@@ -157,17 +209,17 @@ After all bug fixes are committed:
 
 4. Commit doc updates **separately** from code fixes with a message like `docs(<module>): update after <bug-name> fix`.
 
-### Phase 5 Exit Gate
+### Phase 6 Exit Gate
 
 - [ ] Every doc file that referenced changed behavior has been checked (not just the obvious ones — use grep by function name)
 - [ ] Test-count metrics in documentation updated if the project tracks them
 - [ ] If no doc updates were needed, state explicitly why (not silence)
 
-**After completing all items:** update `.claude/logic-audit-state.json` → `{"phase4_gate": true, "phase5_gate": true}`
+**After completing all items:** update `.claude/logic-audit-state.json` → `{"findings_confirmed": true, "phase5_gate": true, "phase6_gate": true}`
 
 ---
 
-## Phase 6 — Summary
+## Phase 7 — Summary
 
 Print a final summary:
 - Bugs found and fixed, with short description and commit hash for each
@@ -176,6 +228,8 @@ Print a final summary:
 - Items deferred: issues found but not fixed, with explicit reason for each (out of scope, by design, requires environment to verify, user decision to defer)
 
 **After printing the summary:** delete `.claude/logic-audit-state.json` (cleanup — allows the Stop hook to pass).
+
+**Then run `/pipeline-retrospective`** to evaluate this audit run and write improvement proposals to the plugin directory. This is mandatory — not optional. An ad-hoc retrospective in chat is not a substitute.
 
 ---
 
@@ -187,7 +241,7 @@ Print a final summary:
 - **No shortcuts on reading.** A 600-line file requires reading 600 lines. There is no representative sample.
 - **Verify before and after every fix.** Run the test suite before touching the code (baseline), and again after (regression check).
 - **One bug = one commit.** Each commit must be independently revertable. If you discover two bugs, fix them in two separate commits.
-- **Document what you don't fix.** If something is wrong but out of scope, confirmed by design, or requires an environment you don't have — say so explicitly in the Phase 6 summary. Silence is not acceptable.
+- **Document what you don't fix.** If something is wrong but out of scope, confirmed by design, or requires an environment you don't have — say so explicitly in the Phase 7 summary. Silence is not acceptable.
 - **For very large modules (50+ source files):** Do not attempt to finish in one session if the context window cannot hold all files. Instead: (1) audit the highest-priority layer (service/business logic) in this session, commit findings and fixes, (2) report clearly what was covered and what remains, (3) continue in a fresh session. Partial coverage with honest scope is better than shallow coverage of everything.
 
 ---
@@ -202,4 +256,4 @@ Load these references when needed — they contain detailed patterns and techniq
 Working examples for reference:
 
 - **`examples/finding-report-template.md`** — Template for presenting audit findings to the user: file + line, reproduction steps, minimal fix, test name
-- **`examples/independent-verification-exchange.md`** — How to run Phase 4 step 6 independent verification and interpret the results, including how to handle new findings the agent surfaces
+- **`examples/independent-verification-exchange.md`** — How to run Phase 5 step 6 independent verification and interpret the results, including how to handle new findings the agent surfaces

@@ -51,20 +51,25 @@ def main() -> int:
         return 0  # Lỗi đọc file → không block
 
     missing = []
-    if not state.get("phase4_gate"):
-        missing.append("Phase 4 Exit Gate  (verification agent + full test suite + 1 commit/bug)")
     if not state.get("phase5_gate"):
-        missing.append("Phase 5 Exit Gate  (stale documentation update)")
+        missing.append("Phase 5 Exit Gate  (verification agent + full test suite + 1 commit/bug)")
+    if not state.get("phase6_gate"):
+        missing.append("Phase 6 Exit Gate  (stale documentation update)")
 
     if missing:
         lines = ["[logic-audit] Gates chua hoan tat - hoan thanh truoc khi ket thuc:"]
         for m in missing:
             lines.append(f"  - [ ] {m}")
         lines.append("")
-        lines.append('Cap nhat .claude/logic-audit-state.json -> {"phase4_gate": true, "phase5_gate": true}')
+        lines.append('Cap nhat .claude/logic-audit-state.json -> {"phase5_gate": true, "phase6_gate": true}')
         msg = "\n".join(lines) + "\n"
         os.write(2, msg.encode("utf-8"))  # fd 2 = stderr — hiện trong Stop hook feedback
         return 2  # Block stop
+
+    # Warn (non-blocking) nếu Phase 5 đã chạy mà user chưa confirm findings
+    if state.get("phase5_gate") and not state.get("findings_confirmed"):
+        warn = "[logic-audit] WARNING: Phase 5 ran without explicit findings_confirmed. Was this implicit approval? Set findings_confirmed: true in state file if yes.\n"
+        os.write(2, warn.encode("utf-8"))
 
     return 0
 
