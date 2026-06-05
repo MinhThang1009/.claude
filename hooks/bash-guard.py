@@ -32,13 +32,10 @@ SENSITIVE_PATH_PATTERNS = [
     r"id_(?:rsa|ed25519|ecdsa|dsa)(?:_[\w-]+)?",
     # Cloud / dev tool credentials
     r"~?/?\.aws/credentials",
-    r"~?/?\.aws/config",
     r"~?/?\.netrc",
-    r"~?/?\.npmrc",
     r"~?/?\.pypirc",
     r"~?/?\.docker/config\.json",
     r"~?/?\.kube/config",
-    r"~?/?\.gitconfig",
     # Common credential filenames
     r"credentials\.json",
     r"service[_-]?account[\w.-]*\.json",
@@ -51,9 +48,29 @@ SENSITIVE_PATH_PATTERNS = [
 _SENSITIVE_INNER = "|".join(SENSITIVE_PATH_PATTERNS)
 SENSITIVE_RE = re.compile(
     r'(?:^|[\s;|&<>=,()`"\'*])'  # boundary trước (thêm * cho glob)
-    r"(?:[\w./~-]*/)?"  # optional path prefix (e.g. ~/.aws/, /etc/)
+    r"(?:[\w.:/~-]*/)?"  # optional path prefix (thêm : cho Windows drive C:/, ~/.aws/, /etc/)
     r"(?:" + _SENSITIVE_INNER + r")"
     r'(?=[\s;|&<>)`"\']|$)'  # boundary sau (lookahead)
+)
+
+# ===== Ask-confirmation path patterns =====
+# Path nhạy cảm VỪA: dev-config hay cần đọc/sửa hợp lệ nhưng CÓ THỂ chứa token/
+# cấu hình nhạy cảm. → ASK (prompt user) thay vì BLOCK cứng; user tự quyết case-by-case.
+# Cùng cú pháp boundary với SENSITIVE_RE.
+#   .npmrc       — npm registry/auth token
+#   .gitconfig   — git config (user.name/email/alias; hiếm khi secret) — hay đọc/sửa
+#   .aws/config  — region/profile/SSO (KHÔNG secret); .aws/credentials VẪN BLOCK
+ASK_PATH_PATTERNS = [
+    r"~?/?\.npmrc",
+    r"~?/?\.gitconfig",
+    r"~?/?\.aws/config",
+]
+_ASK_INNER = "|".join(ASK_PATH_PATTERNS)
+ASK_RE = re.compile(
+    r'(?:^|[\s;|&<>=,()`"\'*])'
+    r"(?:[\w.:/~-]*/)?"
+    r"(?:" + _ASK_INNER + r")"
+    r'(?=[\s;|&<>)`"\']|$)'
 )
 
 # ===== Helper functions =====
@@ -65,8 +82,8 @@ SAFE_METADATA_COMMANDS_RE = re.compile(
 )
 
 
-def is_sensitive_path_access(cmd: str) -> bool:
-    """Block if cmd references sensitive path AND is not safe metadata-only.
+def _references_path(cmd: str, regex) -> bool:
+    """True nếu 1 segment (không phải metadata-only) của cmd khớp `regex` path nhạy cảm.
 
     Safe metadata commands (ls/stat/file/test/wc -l/...) chỉ list metadata,
     không reveal nội dung file → cho qua kể cả với sensitive path.
@@ -81,14 +98,28 @@ def is_sensitive_path_access(cmd: str) -> bool:
             continue
         # Normalize $IFS obfuscation (cat$IFS.env → cat .env) trước khi check.
         # $IFS expand thành whitespace ở runtime; check pattern phải treat as space.
-        seg = re.sub(r"\$\{?IFS\}?", " ", seg)
+        # Bao luôn biến thể ${IFS:0:1}, ${IFS#x}... (obfuscation phổ biến).
+        seg = re.sub(r"\$IFS\b|\$\{IFS[^}]*\}", " ", seg)
+        # Normalize backslash → forward slash để bắt Windows drive path
+        # (vd C:\Users\...\.ssh\id_rsa) đồng nhất với pattern dùng '/'.
+        seg = seg.replace("\\", "/")
         # Skip if segment is metadata-safe command
         if SAFE_METADATA_COMMANDS_RE.match(seg):
             continue
-        # Block if sensitive path appears in this segment
-        if SENSITIVE_RE.search(seg):
+        # Match path in this segment
+        if regex.search(seg):
             return True
     return False
+
+
+def is_sensitive_path_access(cmd: str) -> bool:
+    """Block (exit 2) nếu cmd đọc/ghi path nhạy cảm cao (.pem, ~/.aws, ssh key...)."""
+    return _references_path(cmd, SENSITIVE_RE)
+
+
+def is_ask_path_access(cmd: str) -> bool:
+    """Ask (prompt) nếu cmd đọc/ghi path ask-list (vd .npmrc) — không metadata-only."""
+    return _references_path(cmd, ASK_RE)
 
 
 def is_raw_network_tool(cmd: str) -> bool:
@@ -182,10 +213,15 @@ def is_dangerous_rm(cmd: str) -> bool:
 
 
 def is_force_push_variant(cmd: str) -> bool:
-    """git push với force/force-with-lease/+ref/git -c override."""
+    """git push force NGUY HIỂM: --force/-f trần, +ref, git -c override.
+
+    CHO PHÉP --force-with-lease / --force-if-includes: chúng từ chối ghi đè nếu
+    remote đã đổi (an toàn cho feature branch — đúng git-workflow.md). Chỉ chặn
+    --force trần (ghi đè vô điều kiện) và -f short flag.
+    """
     patterns = [
-        # --force, --force-with-lease, --force-if-includes, hoặc -f short flag
-        r"\bgit\b[^|;&]*\bpush\b[^|;&]*(?:--force(?:-with-lease|-if-includes)?\b|\s-f\b)",
+        # --force trần (KHÔNG theo sau -with-lease/-if-includes) hoặc -f short flag
+        r"\bgit\b[^|;&]*\bpush\b[^|;&]*(?:--force(?!-with-lease|-if-includes)\b|\s-f\b)",
         # +ref refspec (e.g., git push origin +main)
         r"\bgit\b[^|;&]*\bpush\b[^|;&]*\s\+\w[\w/-]*",
         # git -c <key>=<val> push (override config inline)
@@ -209,11 +245,43 @@ def is_dd_to_disk(cmd: str) -> bool:
     )
 
 
+def is_windows_destructive(cmd: str) -> bool:
+    """Lệnh huỷ diệt hệ thống Windows (PowerShell) — security.md §Dangerous.
+
+    Chỉ match case rõ ràng (Format-Volume, xoá HKLM, Remove-Item -Recurse -Force
+    nhắm drive root / thư mục Windows) để KHÔNG false-positive lệnh thường ngày.
+    """
+    if re.search(r"\bFormat-Volume\b", cmd, re.IGNORECASE):
+        return True
+    if re.search(
+        r"\breg\s+delete\s+[\"']?(?:HKLM|HKEY_LOCAL_MACHINE)\b", cmd, re.IGNORECASE
+    ):
+        return True
+    # Remove-Item với -Recurse + -Force (cờ thứ tự bất kỳ) nhắm drive root / Windows dir.
+    dangerous_target = (
+        r"(?:[A-Za-z]:\\(?=[\s\"']|$)|[A-Za-z]:\\Windows\b|\$env:(?:SystemRoot|windir))"
+    )
+    return bool(
+        re.search(
+            r"\bRemove-Item\b(?=[^|;&]*-[Rr]ecurse)(?=[^|;&]*-[Ff]orce)[^|;&]*"
+            + dangerous_target,
+            cmd,
+            re.IGNORECASE,
+        )
+    )
+
+
 # ===== Main check =====
 
 
+ASK_REASON = (
+    "đọc/ghi dev-config (.npmrc/.gitconfig/.aws/config) — có thể chứa token/cấu hình nhạy cảm. "
+    "Xác nhận nếu thực sự cần (.aws/credentials, ssh key, .pem... vẫn bị chặn cứng)."
+)
+
+
 def check_command(cmd: str):
-    """Return (blocked, reason). blocked=True → exit 2."""
+    """Return (blocked, reason). blocked=True → exit 2. (ask path xử riêng trong main)."""
     checks = [
         (
             is_sensitive_path_access,
@@ -244,8 +312,9 @@ def check_command(cmd: str):
         ),
         (
             is_force_push_variant,
-            "force push (--force/-f/--force-with-lease/+ref/git -c override) — "
-            "xin phép user trước hoặc dùng `git push` thường.",
+            "force push nguy hiểm (--force/-f trần/+ref/git -c override) — "
+            "ghi đè vô điều kiện. Dùng `--force-with-lease` (an toàn, đã cho phép) "
+            "hoặc `git push` thường.",
         ),
         (is_fork_bomb, "fork bomb pattern — sẽ làm máy treo."),
         (is_dd_to_disk, "dd ghi vào disk device — risk wipe ổ cứng."),
@@ -273,10 +342,26 @@ def main():
     if not cmd:
         sys.exit(0)
 
+    # Deny ưu tiên (BLOCK thắng nếu command vừa đụng path block vừa đụng .npmrc).
     blocked, reason = check_command(cmd)
     if blocked:
         print(f"BLOCKED: {reason}", file=sys.stderr)
         sys.exit(2)
+
+    # Ask-list (vd .npmrc): PreToolUse hook JSON prompt user thay vì block cứng.
+    if is_ask_path_access(cmd):
+        print(
+            json.dumps(
+                {
+                    "hookSpecificOutput": {
+                        "hookEventName": "PreToolUse",
+                        "permissionDecision": "ask",
+                        "permissionDecisionReason": ASK_REASON,
+                    }
+                }
+            )
+        )
+        sys.exit(0)
 
     sys.exit(0)
 

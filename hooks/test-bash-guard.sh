@@ -12,7 +12,9 @@ run() {
   json="{\"tool_input\":{\"command\":$(printf '%s' "$cmd" | python -c 'import sys,json; print(json.dumps(sys.stdin.read()))')}}"
   out=$(echo "$json" | bash "$HOOK" 2>&1)
   code=$?
-  local actual="PASS"; [[ $code -eq 2 ]] && actual="BLOCK"
+  local actual="PASS"
+  [[ $code -eq 2 ]] && actual="BLOCK"
+  [[ $code -eq 0 && "$out" == *'"permissionDecision": "ask"'* ]] && actual="ASK"
   if [ "$actual" = "$expect" ]; then
     PASS=$((PASS+1))
     printf "  OK   [%-5s] %s\n" "$actual" "$label"
@@ -36,6 +38,18 @@ run "grep KEY .env"                  "grep API_KEY .env"                        
 run "cat ~/.aws/credentials"         "cat ~/.aws/credentials"                      BLOCK
 run "cat ~/.netrc"                   "cat ~/.netrc"                                BLOCK
 run "cat foo.pem"                    "cat /etc/ssl/private/foo.pem"                BLOCK
+
+echo ""
+echo "=== Ask-list path (.npmrc/.gitconfig/.aws/config) — prompt thay vì block cứng ==="
+run "cat .npmrc"                     "cat .npmrc"                                  ASK
+run "cat ~/.npmrc"                   "cat ~/.npmrc"                                ASK
+run "ls .npmrc (metadata safe)"      "ls -la .npmrc"                               PASS
+run "append .npmrc"                  "echo 'registry=x' >> .npmrc"                 ASK
+run ".npmrc + .pem → BLOCK thắng"    "cat .npmrc /etc/x.pem"                       BLOCK
+run "cat ~/.gitconfig"               "cat ~/.gitconfig"                            ASK
+run "cat ~/.aws/config"              "cat ~/.aws/config"                           ASK
+run "aws/credentials VẪN block"      "cat ~/.aws/credentials"                      BLOCK
+run "gitconfig + id_rsa → BLOCK"     "cat ~/.gitconfig ~/.ssh/id_rsa"             BLOCK
 
 echo ""
 echo "=== Sensitive path access — interpreter (C1) ==="
@@ -90,8 +104,8 @@ echo ""
 echo "=== Force push variants (C4) ==="
 run "git push --force"               "git push --force origin main"                BLOCK
 run "git push -f"                    "git push -f origin main"                     BLOCK
-run "git push --force-with-lease"    "git push --force-with-lease origin main"     BLOCK
-run "git push --force-if-includes"   "git push --force-if-includes origin main"    BLOCK
+run "git push --force-with-lease"    "git push --force-with-lease origin main"     PASS
+run "git push --force-if-includes"   "git push --force-if-includes origin main"    PASS
 run "git push +ref"                  "git push origin +main"                       BLOCK
 run "git -c override push"           "git -c push.default=current push origin main" BLOCK
 
