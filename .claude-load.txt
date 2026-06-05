@@ -7,132 +7,16 @@
 #   !name               → exclude agent/skill theo tên (áp dụng mọi plugin)
 # File trống → load TẤT CẢ plugins.
 
-# ─────────────────────────────────────────────
-# AGENTS
-# ─────────────────────────────────────────────
-
-# Code quality & review
-# Agents: code-reviewer, code-simplifier, comment-analyzer,
-#         pr-test-analyzer, silent-failure-hunter, type-design-analyzer
-pr-review-toolkit:agents
-
-# Feature development
-# Agents: code-architect, code-explorer, code-reviewer
-feature-dev:agents
-
-# Testing
-# Agents: test-analyzer, test-writer
-test-toolkit:agents
-
-# Debugging
-# Agents: debugger
-debug:agents
-
-# Sub-agent pipeline system
-# Agents: chain-verifier, finding-validator, iteration-cleanup,
-#         pipeline-monitor, pipeline-reviewer
-subagent-system:agents
-
-
-# Code modernization
-# Agents: architecture-critic, business-rules-extractor, legacy-analyst,
-#         security-auditor, test-engineer
-code-modernization:agents
-
-# ─────────────────────────────────────────────
-# SKILLS  (gọi qua /<tên>)
-# ─────────────────────────────────────────────
-
-# Session management: /context-check, /handoff
-session:skills
-
-# Git workflow: /commit, /commit-push-pr, /clean-gone
-commit-commands:skills
-
-# Code review: /code-review, /full-review, /review-pr
-pr-review-toolkit:skills
-
-# Feature dev: /feature-dev, /explain
-feature-dev:skills
-
-# Debugging: /debug
-debug:skills
-
-# Hooks: /hookify, /configure, /list, /help
-hookify:skills
-
-# Plan audit: /audit-plan
-audit-plan:skills
-
-# CLAUDE.md: /claude-md-management, /revise-claude-md
-claude-md-management:skills
-
-# Session report: /session-report
-session-report:skills
-
-# Web app testing: /webapp-testing
-webapp-testing:skills
-
-# Sub-agent pipeline: /chain-verifier, /severity-gate, /fact-checker, ...
-subagent-system:skills
-
-# ─────────────────────────────────────────────
-# COMMANDS  (hiện trong /help)
-# ─────────────────────────────────────────────
-
-# Code review commands
-code-review:commands
-pr-review-toolkit:commands
-
-# Debug commands
-debug:commands
-
-# Hookify commands
-hookify:commands
-
-# CLAUDE.md commands
-claude-md-management:commands
-
-# Audit plan commands
-audit-plan:commands
-
-# Feature dev commands
-feature-dev:commands
-
-
-# Sub-agent pipeline commands
-subagent-system:commands
-
-# ─────────────────────────────────────────────
-# EXCLUSIONS (tên agent/skill bị exclude khỏi tất cả plugins)
-# ─────────────────────────────────────────────
-!type-design-analyzer
-!writing-rules
-!business-rules-extractor
-!legacy-analyst
-
-# ─────────────────────────────────────────────
-# OPTIONAL — bỏ comment để enable
-# ─────────────────────────────────────────────
-# plugin-dev              # Phát triển plugin (agent-creator, plugin-validator, skill-reviewer)
-# claude-api               # Claude API/SDK development
-# claude-code-setup        # Recommend automations
-# code-modernization       # Full code modernization (all types)
-# code-simplifier          # Refactor/simplify skill
-# doc-coauthoring          # Co-author docs/proposals/specs
-# documentation            # documentation-engineer, nextjs-developer
-# docx                     # Word document
-# explanatory-output-style # Giải thích implementation choices khi code
-# frontend-design          # UI design skill
-# learning-output-style    # Interactive learning mode
-# mcp-builder              # Build MCP servers (FastMCP/SDK)
-# mcp-server-dev           # Build MCP servers (remote HTTP, MCPB, UI)
-# pdf                      # PDF manipulation
-# performance              # performance-engineer, dependency-manager
-# playwright               # Browser automation MCP
-# pptx                     # PowerPoint
-# security-guidance        # security-auditor (OWASP, full audit)
-# skill-creator            # Tạo/eval/optimize skills
-# theme-factory            # Apply themes to artifacts
-# web-artifacts-builder    # Build HTML artifacts (React, Tailwind)
-# xlsx                     # Spreadsheet
+subagent-system
+commit-commands
+debug
+feature-dev
+pr-review-toolkit
+hookify
+claude-md-management
+session
+audit-plan
+plan-workflow
+session-report
+pptx
+logic-audit

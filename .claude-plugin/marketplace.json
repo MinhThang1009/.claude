@@ -256,6 +256,20 @@
       "author": { "name": "Minh Thang" },
       "source": "./plugins/plan-workflow",
       "category": "development"
+    },
+    {
+      "name": "logic-audit",
+      "description": "Systematic logic audit: read every line of source code, find real logic bugs, fix with tests, update stale docs, commit. Language and framework agnostic.",
+      "author": { "name": "Minh Thang" },
+      "source": "./plugins/logic-audit",
+      "category": "development"
+    },
+    {
+      "name": "verify-then-draw",
+      "description": "Draw UML/architecture diagrams from a codebase with minimal error via a 3-tier hard-gated pipeline (code-is-business-correct, diagram-matches-code, notation+readability), out-of-model oracles and human gates; ships a skill, guided command, and adversarial diagram-verifier agent",
+      "author": { "name": "Minh Thang" },
+      "source": "./plugins/verify-then-draw",
+      "category": "development"
     }
   ]
 }

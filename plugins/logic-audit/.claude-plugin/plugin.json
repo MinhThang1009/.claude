@@ -1,0 +1,7 @@
+{
+  "name": "logic-audit",
+  "description": "Systematic logic audit workflow: read every line of source code, find logic bugs, fix, update tests and docs, commit. Language and framework agnostic.",
+  "author": {
+    "name": "Minh Thang"
+  }
+}
