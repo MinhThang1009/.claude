@@ -1,7 +1,7 @@
 ---
 name: review-pr
 description: "Comprehensive PR review using specialized agents, each focusing on a different aspect of code quality."
-argument-hint: "[review-aspects]"
+argument-hint: [review-aspects]
 allowed-tools: ["Bash", "Glob", "Grep", "Read", "Task"]
 context: fork
 ---

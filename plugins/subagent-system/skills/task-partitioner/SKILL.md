@@ -1,7 +1,6 @@
 ---
 name: task-partitioner
 description: This skill should be used when the user asks to "partition tasks for parallel agents", "plan multi-agent execution", "create dependency graph", or before spawning any parallel agents. Produces a dependency graph, disjoint file ownership map, and batched execution groups to prevent scope overlap and race conditions.
-version: 0.1.0
 allowed-tools: Read Glob Grep
 ---
 

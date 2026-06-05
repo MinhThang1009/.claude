@@ -1,7 +1,6 @@
 ---
 name: pipeline-retrospective
 description: This skill should be used after every completed pipeline run to evaluate agent and skill performance, then propose targeted improvements to the plugin itself. Trigger after /audit-output as the final mandatory step, or when user asks to "retrospect", "evaluate pipeline results", "improve plugin", or "what should we improve". Reads all pipeline artifacts and writes actionable proposals to .claude/improvement-proposals.md.
-version: 0.1.0
 allowed-tools: Read Glob Write Bash
 ---
 
@@ -14,7 +13,7 @@ Evaluate the completed pipeline run and propose specific improvements to the plu
 **Step 0 — Resolve PROJECT_ROOT.**
 If `PROJECT_ROOT:` was injected in the input, use it. Otherwise auto-detect:
 ```bash
-Bash("cat .claude/PIPELINE_CONFIG.md 2>/dev/null | grep '^PROJECT_ROOT:' | cut -d' ' -f2-")
+Bash("cat .claude/PIPELINE_CONFIG.md 2>/dev/null | sed -n 's/^PROJECT_ROOT:[[:space:]]*//p'")
 ```
 If that returns empty, fall back to:
 ```bash

@@ -1,7 +1,6 @@
 ---
 name: context-packager
 description: This skill should be used before spawning a dependent agent when the previous phase produced interface changes, breaking changes, new constraints, or key file modifications the next agent must not violate. Extracts only the minimum necessary context — not the full prior output. Uses character count to decide INJECT (≤4,000 chars) vs USE_FORK (>4,000 chars). Also trigger when user asks to "package context for next phase", "prepare agent handoff", or "extract phase context".
-version: 0.1.0
 allowed-tools: Read
 ---
 

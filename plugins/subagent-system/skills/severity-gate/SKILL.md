@@ -1,7 +1,6 @@
 ---
 name: severity-gate
 description: This skill should be used when the user asks to "run severity gate", "check for critical findings", "block pipeline on critical", or after consolidate-findings and before fix agents or chain-verifier. Outputs GATE_PASSED (0 CRITICALs) or GATE_PAUSED (≥1 CRITICAL) with OPTIONS A/B/C for user decision.
-version: 0.1.0
 allowed-tools: Bash Write
 ---
 
@@ -10,7 +9,7 @@ allowed-tools: Bash Write
 **Step 0 — Resolve PROJECT_ROOT.**
 If `PROJECT_ROOT:` was injected in the input, use it. Otherwise auto-detect:
 ```bash
-Bash("cat .claude/PIPELINE_CONFIG.md 2>/dev/null | grep '^PROJECT_ROOT:' | cut -d' ' -f2-")
+Bash("cat .claude/PIPELINE_CONFIG.md 2>/dev/null | sed -n 's/^PROJECT_ROOT:[[:space:]]*//p'")
 ```
 If that returns empty, fall back to:
 ```bash

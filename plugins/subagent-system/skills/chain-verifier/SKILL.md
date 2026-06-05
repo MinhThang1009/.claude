@@ -1,7 +1,6 @@
 ---
 name: chain-verifier
 description: This skill should be used at the final step of any multi-phase pipeline to verify the complete working-tree state satisfies the original requirements. Trigger after all fix agents and pipeline-reviewer have completed. Also invoke when user asks to "run chain-verifier", "verify the pipeline output", or "confirm requirements are met".
-version: 0.1.0
 allowed-tools: Read Grep Glob Bash
 ---
 

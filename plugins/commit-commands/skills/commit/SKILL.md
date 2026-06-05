@@ -3,7 +3,7 @@ name: commit
 description: Creates smart Conventional Commits following the project's commit conventions. Analyzes staged changes and generates appropriate commit messages.
 allowed-tools: Bash(git status:*) Bash(git diff:*) Bash(git log:*) Bash(git add:*) Bash(git commit:*) Read
 disable-model-invocation: true
-argument-hint: "[optional custom instructions, e.g.: fix #123]"
+argument-hint: [optional custom instructions, e.g.: fix #123]
 model: inherit
 ---
 

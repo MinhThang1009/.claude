@@ -1,7 +1,6 @@
 ---
 name: audit-dead
 description: This skill should be used when the user asks to "audit for dead code", "check for unused imports", "find cascade effects", "run post-implementation audit", or at Phase 7 of the /plan-refactor workflow after implementation completes. Finds dead imports, dead parameters, schema gaps, structural misplacements, and stale documentation created by changes.
-version: 1.0.0
 ---
 
 # Post-Implementation Audit
@@ -117,7 +116,7 @@ For finding type definitions, see the "Finding Type Reference" table below.
 
 Types: `DEAD_IMPORT` · `DEAD_VAR` · `DEAD_PARAM` · `DEAD_CASCADE` · `YAGNI_PARAM` · `SCHEMA_GAP` · `MISPLACED_FUNCTION` · `STALE_DOC` · `UNREACHABLE`
 
-Report findings at all confidence levels — HIGH/MED directly, LOW prefixed with `(needs-verify)` — and let the user decide. (This is a single-pass finder feeding HUMAN GATE 3 with no automated verifier downstream, so surface everything rather than self-filtering — per the single-pass exception in `evidence-based-findings.md`.)
+Report findings at all confidence levels — HIGH/MED directly, LOW prefixed with `(needs-verify)` — and let the user decide. (This is a single-pass finder feeding HUMAN GATE 3 with no automated verifier downstream, so surface everything rather than self-filtering.)
 
 End with:
 ```

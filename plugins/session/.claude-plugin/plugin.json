@@ -1,5 +1,6 @@
 {
   "name": "session",
+  "version": "1.0.0",
   "description": "Session management tools for context window monitoring and conversation handoff",
   "author": {
     "name": "Minh Thang"

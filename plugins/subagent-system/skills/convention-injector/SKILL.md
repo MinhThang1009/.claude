@@ -1,7 +1,6 @@
 ---
 name: convention-injector
 description: This skill should be used before spawning Explore or Plan agents (which skip CLAUDE.md), or when you need filtered/condensed conventions for a specific task type. Custom named subagents auto-load CLAUDE.md and rules/*.md — use this skill for task-specific filtering (≤300 tokens), anti-contamination for audit agents, and confirmation prompts. Also trigger when user asks to "inject project conventions", "add coding rules to agent", or "prepend CLAUDE.md to subagent".
-version: 0.1.0
 allowed-tools: Read Bash
 ---
 

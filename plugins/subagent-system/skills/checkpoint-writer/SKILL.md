@@ -1,7 +1,6 @@
 ---
 name: checkpoint-writer
 description: This skill should be used when saving current pipeline phase state to disk and creating a recovery commit. Trigger at the end of every implementation phase, when the user asks to "save a checkpoint", "commit this phase", or before any /compact or session end. Enables resume-from-checkpoint to reconstruct pipeline state after interruption.
-version: 0.1.0
 allowed-tools: Write Edit Bash
 ---
 

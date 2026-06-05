@@ -1,5 +1,8 @@
 {
   "name": "plan-workflow",
   "version": "1.0.0",
-  "description": "Universal 8-phase implementation plan workflow with human approval gates for any plan type: feature, bug fix, refactoring, migration, security."
+  "description": "Universal 8-phase implementation plan workflow with human approval gates for any plan type: feature, bug fix, refactoring, migration, security.",
+  "author": {
+    "name": "Minh Thang"
+  }
 }

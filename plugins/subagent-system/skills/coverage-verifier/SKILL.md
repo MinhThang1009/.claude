@@ -1,7 +1,6 @@
 ---
 name: coverage-verifier
 description: This skill should be used after every audit or analysis agent that was assigned specific files to read — invoke before accepting any audit findings as valid. An agent can describe plausible findings without having read the files; this skill detects that by requiring verbatim quotes from 3 positions (beginning, middle, end) of each sampled file. Also trigger when user asks to "verify agent coverage", "check if agent actually read the files", or "spot-check file reading".
-version: 0.1.0
 allowed-tools: Read
 ---
 

@@ -42,7 +42,7 @@ Review the code changes introduced since the last checkpoint.
 
 First resolve PROJECT_ROOT:
 ```bash
-Bash("cat .claude/PIPELINE_CONFIG.md 2>/dev/null | grep '^PROJECT_ROOT:' | cut -d' ' -f2- || git rev-parse --show-toplevel 2>/dev/null || echo '.'")   # → PROJECT_ROOT
+Bash("cat .claude/PIPELINE_CONFIG.md 2>/dev/null | sed -n 's/^PROJECT_ROOT:[[:space:]]*//p' || git rev-parse --show-toplevel 2>/dev/null || echo '.'")   # → PROJECT_ROOT
 ```
 
 Then find the most recent checkpoint:

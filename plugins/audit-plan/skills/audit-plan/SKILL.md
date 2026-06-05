@@ -2,7 +2,7 @@
 name: audit-plan
 description: "Audit a plan file against the actual codebase. Loops until 0 new gaps found. Cross-checks gap coverage, dead code cleanup, and test completeness. Sub-commands: gaps, verify, tests. Use when the user asks to 'audit a plan', 'check plan coverage', 'verify cleanup grep commands', or to audit a plan document for gap/test/cleanup coverage before implementation (distinct from /audit-dead's post-implementation Phase 7 code audit). Expects a gap-tracking plan format (### Gap entries, cleanup grep checklist, - [ ] tests); for /plan-refactor 8-phase plans (## Nhóm/Phase + inline verify: lines) use /verify-plan instead."
 allowed-tools: Read Grep Glob Edit Write Bash
-argument-hint: "[gaps|verify|tests] [path to plan.md]"
+argument-hint: [gaps|verify|tests] [path to plan.md]
 ---
 
 # Skill: Audit Plan

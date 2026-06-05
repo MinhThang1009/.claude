@@ -2,7 +2,7 @@
 name: refactor
 description: "Refactors code without changing behavior. Requires tests first, refactors step by step, verifies after each step."
 allowed-tools: Read Grep Glob Edit Bash
-argument-hint: "[file or function to refactor]"
+argument-hint: [file or function to refactor]
 ---
 
 # Skill: Safe Refactor

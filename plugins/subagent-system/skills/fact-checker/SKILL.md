@@ -1,7 +1,6 @@
 ---
 name: fact-checker
 description: This skill should be used when an agent's claims are suspect — either content claims (finding X at line Y) that may be hallucinated, or state claims (claimed to edit file Z) where git diff should confirm. Use this skill — not validator — when the concern is whether the agent fabricated its narrative. Use validator when findings are trusted and only code-location confirmation is needed. Also trigger when user asks to "check for hallucinations", "verify agent claims", or "fact-check findings".
-version: 0.1.0
 allowed-tools: Read Grep Bash
 ---
 

@@ -1,7 +1,6 @@
 ---
 name: consolidate-findings
 description: This skill should be used when the user asks to "merge findings", "consolidate audit results", "combine security findings", or after all parallel audit agents complete and before running finding-validator or severity-gate. Produces FINDINGS_REPORT.md sorted CRITICAL→HIGH→MEDIUM→LOW with duplicates removed.
-version: 0.1.0
 allowed-tools: Bash Write
 ---
 

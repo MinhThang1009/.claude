@@ -2,7 +2,7 @@
 name: full-review
 description: "Multi-agent review — adaptively dispatches 1-3 agents (code-review + security-audit + test-analyzer) based on complexity, validates findings, consolidates report. Use for comprehensive review before deploy or merging large PRs."
 allowed-tools: Read Grep Glob Bash(git diff:*) Bash(git log:*) Bash(git status:*) WebFetch
-argument-hint: "[scope: PR #N | branch | files | all]"
+argument-hint: [scope: PR #N | branch | files | all]
 context: fork
 ---
 

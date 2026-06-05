@@ -8,7 +8,7 @@ Read the saved checkpoint state and prepare to resume the workflow.
 
 1. **Resolve PROJECT_ROOT** — read `PIPELINE_CONFIG.md` to get the absolute project path:
    ```bash
-   Bash("cat .claude/PIPELINE_CONFIG.md 2>/dev/null | grep '^PROJECT_ROOT:' | cut -d' ' -f2-")
+   Bash("cat .claude/PIPELINE_CONFIG.md 2>/dev/null | sed -n 's/^PROJECT_ROOT:[[:space:]]*//p'")
    ```
    If found, use that path as `PROJECT_ROOT`. If not found, fall back to current directory and warn: "PIPELINE_CONFIG.md not found — using session cwd. Checkpoint paths may be wrong if session root differs from project root."
 
