@@ -3,7 +3,7 @@ name: handoff
 description: "Creates a handoff brief to compact the current session OR transition to a new session. Use when session shows signs of high context usage or before clearing history."
 disable-model-invocation: false
 allowed-tools: Read Write Bash(git *) Bash(find *)
-argument-hint: [--save | --inject]
+argument-hint: "[--save | --inject]"
 ---
 
 Generate a concise handoff brief for session continuity or context compaction. Per Anthropic guidance ([session management blog](https://claude.com/blog/using-claude-code-session-management-and-1m-context)): **brief-injection into a new session is often better than resuming** — resuming drags in stale data whereas a brief carries only decisions and current state.

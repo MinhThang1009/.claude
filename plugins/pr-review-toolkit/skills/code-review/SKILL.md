@@ -4,7 +4,7 @@ description: "Reviews code changes in the working tree, current branch, or PR. F
 allowed-tools: Read Grep Glob Bash(git diff:*) Bash(git log:*) Bash(git status:*) Bash(gh pr view:*) Bash(gh pr diff:*)
 context: fork
 agent: code-reviewer
-argument-hint: [optional: branch name or PR number]
+argument-hint: "[optional: branch name or PR number]"
 ---
 
 # Skill: Code Review
