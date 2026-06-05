@@ -1,7 +1,7 @@
 ---
 name: logic-audit
 description: This skill should be used when the user asks to "audit logic bugs", "read all source files and find bugs", "gate tầng 0", "logic check a module", "verify module correctness", "find business logic bugs", "audit this module before drawing diagrams", or says "read every line of code". Works on any module, language, or framework — discovers tests, docs, and project structure at runtime.
-version: 0.3.3
+version: 0.3.4
 argument-hint: <module-path-or-directory>
 allowed-tools: [Read, Grep, Glob, Bash, Edit, Write]
 ---
@@ -98,6 +98,7 @@ For each confirmed bug, in severity order (HIGH first):
 5. Run the project's linter/formatter if one exists and is configured.
 
 6. **Spawn an independent verification agent.** Give it only the list of changed files — no description of what was fixed or why. Use the exact prompt template in `references/verification-techniques.md` (Independent Verification Agent Prompt section). The agent must not know your intent; that context biases it toward confirming rather than finding remaining issues. Compare its findings against your fix.
+   - **If the agent surfaces new findings** (unrelated to the fix): verify each one yourself with grep/Read before reporting to the user. Do NOT relay subagent output directly — agents can hallucinate line numbers or misread context. Apply the same provability standard as Phase 3 step 4.
 
 7. Commit with a message that answers three questions: what was wrong, why it was wrong, what changed. Use the commit format in `references/verification-techniques.md`.
 
