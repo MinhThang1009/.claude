@@ -1,7 +1,7 @@
 ---
 name: logic-audit
 description: This skill should be used when the user asks to "audit logic bugs", "read all source files and find bugs", "gate tầng 0", "logic check a module", "verify module correctness", "find business logic bugs", "audit this module before drawing diagrams", or says "read every line of code". Works on any module, language, or framework — discovers tests, docs, and project structure at runtime.
-version: 0.3.4
+version: 0.4.0
 argument-hint: <module-path-or-directory>
 allowed-tools: [Read, Grep, Glob, Bash, Edit, Write]
 ---
@@ -20,7 +20,13 @@ Perform a systematic, line-by-line logic audit of the target module. The goal is
 
 2. Find the project's primary documentation (CLAUDE.md, README.md, architecture docs, or equivalent). Read the section describing what this module does and what business rules it must enforce. This establishes the expected behavior to audit against.
 
-3. Identify and run the existing test suite for this module to establish a **green baseline**:
+3. **Create gate state file** — dùng Write tool tạo `.claude/logic-audit-state.json` tại project root:
+   ```json
+   {"phase4_gate": false, "phase5_gate": false}
+   ```
+   Stop hook sẽ đọc file này và block nếu gates chưa done. Xóa file ở cuối Phase 6.
+
+4. Identify and run the existing test suite for this module to establish a **green baseline**:
    - Find the test runner and config (jest.config, pytest.ini, go test, etc.)
    - Run only the tests relevant to this module if possible
    - If **no test files exist** → note this explicitly. Proceed with code-only analysis. All fixes will be unverified by automated tests — flag this prominently in the Phase 6 summary.
@@ -113,6 +119,8 @@ Before proceeding to Phase 5, confirm every item below. Do not skip or defer sil
 - [ ] No fix was batched — each bug has its own commit
 - [ ] Phase 5 (stale documentation) is next — do not jump to Phase 6
 
+**Sau khi tick hết:** cập nhật `.claude/logic-audit-state.json` → `{"phase4_gate": true, "phase5_gate": false}`
+
 ---
 
 ## Phase 5 — Update Stale Documentation
@@ -136,6 +144,8 @@ After all bug fixes are committed:
 - [ ] Test-count metrics in documentation updated if the project tracks them
 - [ ] If no doc updates were needed, state explicitly why (not silence)
 
+**Sau khi tick hết:** cập nhật `.claude/logic-audit-state.json` → `{"phase4_gate": true, "phase5_gate": true}`
+
 ---
 
 ## Phase 6 — Summary
@@ -145,6 +155,8 @@ Print a final summary:
 - Files read (total count)
 - Documentation files updated
 - Items deferred: issues found but not fixed, with explicit reason for each (out of scope, by design, requires environment to verify, user decision to defer)
+
+**Sau khi in summary:** xóa `.claude/logic-audit-state.json` (cleanup — cho phép Stop hook pass).
 
 ---
 
