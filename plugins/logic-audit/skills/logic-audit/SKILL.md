@@ -100,9 +100,16 @@ Classify each confirmed issue:
 
 **Present the classified findings to the user and wait for confirmation before touching any file.** Use `examples/finding-report-template.md` as the format template — each finding must include: file + line, concrete reproduction steps, minimal fix description, and test name. The user decides which severity levels to fix, and in what order.
 
-**If the user does not reply in the same turn** (e.g., a stop hook fires forcing Phase 5): proceed for MEDIUM/HIGH findings only — invoking the audit is implicit approval. Print: "Proceeding with implicit approval for MEDIUM/HIGH findings." Update the state file: `findings_confirmed: true`. Then continue through Phase 4 (Completeness Check) before Phase 5 (Fix) — do not skip Phase 4.
+**If the user does not reply in the same turn** (e.g., a stop hook fires forcing Phase 5): proceed for MEDIUM/HIGH findings only — invoking the audit is implicit approval. Print: "Proceeding with implicit approval for MEDIUM/HIGH findings." Update the state file:
+```json
+{"findings_confirmed": true, "phase5_gate": false, "phase6_gate": false}
+```
+Then continue through Phase 4 (Completeness Check) before Phase 5 (Fix) — do not skip Phase 4.
 
-**After the user confirms** (explicit reply): update state file `findings_confirmed: true` before starting Phase 5.
+**After the user confirms** (explicit reply): update the state file to the same JSON before starting Phase 5:
+```json
+{"findings_confirmed": true, "phase5_gate": false, "phase6_gate": false}
+```
 
 ---
 
