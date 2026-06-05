@@ -151,7 +151,11 @@ For each confirmed bug, in severity order (HIGH first):
    - Are named to describe the scenario, not the code path
    - **For `[UNIT-TEST-BLIND]` fixes:** unit test updates only document intent — mocks accept any argument so they cannot verify real DB/integration behavior. You must also:
      1. Note in the commit message: "Unit tests document fix; integration/API test required for full verification."
-     2. If possible within the session, write an integration or API test (even if it cannot run without a real DB) so the test exists for the next CI run. Place it in the project's integration test directory with a comment: `// Verifies [BUG-X]: [description]`.
+     2. **Always write an integration or API test placeholder** in the project's integration test directory — even if it cannot run without a real DB. Use `test.skip` (or the framework's equivalent) with a comment explaining what it verifies and why it requires a real environment. This is not optional: without this placeholder, the atomicity/correctness guarantee has no safety net for future CI runs.
+        ```js
+        // Verifies [BUG-X]: [description of what the test proves]
+        test.skip('[BUG-X] integration test — requires MySQL', async () => { ... });
+        ```
 
 3. Run the test suite for this module. Expected: previously passing tests still pass, the new/updated test passes. If unrelated tests break:
    - **Investigate first** — the fix may have incorrect scope
@@ -191,7 +195,7 @@ Before proceeding to Phase 6, confirm every item below. Do not skip or defer sil
 - [ ] Test written or updated for each fix — must be one of two labeled types:
   - **REGRESSION**: would have FAILED before the fix, passes after. This is the default.
   - **DOCUMENTATION**: fix does not change behavior (cosmetic/intent-clarification only) — test confirms existing behavior. Must write "DOCUMENTATION TEST: fix does not change behavior" explicitly in the commit message. Cannot use this label for MEDIUM or HIGH severity bugs.
-  - For `[UNIT-TEST-BLIND]` fixes: the unit test passes; any integration test written for CI is exempt from "passes after" since it cannot run without DB.
+  - For `[UNIT-TEST-BLIND]` fixes: the unit test passes; **integration test placeholder written** (`test.skip` with `// Verifies [BUG-X]` comment) — this is mandatory, not optional.
 - [ ] Independent verification agent run for every fix (Phase 5 step 6)
 - [ ] Full project test suite passes (not just module tests)
 - [ ] No fix was batched — each bug has its own commit
