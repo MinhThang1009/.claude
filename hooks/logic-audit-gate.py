@@ -61,7 +61,13 @@ def main() -> int:
         for m in missing:
             lines.append(f"  - [ ] {m}")
         lines.append("")
-        lines.append('Cap nhat .claude/logic-audit-state.json -> {"findings_confirmed": true, "phase5_gate": true, "phase6_gate": true}')
+        # Incremental hint: chỉ set gate tiếp theo cần làm, không set cả phase6
+        # khi phase5 vẫn còn missing — tránh executor copy-paste bỏ qua Phase 6.
+        if not state.get("phase5_gate"):
+            hint = '{"findings_confirmed": true, "phase5_gate": true, "phase6_gate": false}'
+        else:
+            hint = '{"findings_confirmed": true, "phase5_gate": true, "phase6_gate": true}'
+        lines.append(f"Cap nhat .claude/logic-audit-state.json -> {hint}")
         msg = "\n".join(lines) + "\n"
         os.write(2, msg.encode("utf-8"))  # fd 2 = stderr — hiện trong Stop hook feedback
         return 2  # Block stop
