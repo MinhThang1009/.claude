@@ -139,3 +139,8 @@ Load these references when needed — they contain detailed patterns and techniq
 
 - **`references/reading-patterns.md`** — Concrete patterns to look for while reading: race conditions, transaction boundaries, guard clause bypasses, null/undefined failures, type coercion, off-by-one, business rule coverage, dead code
 - **`references/verification-techniques.md`** — False-positive filtering, independent verification agent prompt, test strategy, doc discovery, severity classification, commit message format
+
+Working examples for reference:
+
+- **`examples/phase3-finding-report.md`** — What a well-structured Phase 3 findings presentation looks like before asking user confirmation
+- **`examples/independent-verification-exchange.md`** — How to run Phase 4 step 6 independent verification and interpret the results, including how to handle new findings the agent surfaces
