@@ -2,7 +2,7 @@
 name: feature-dev
 description: "Guided feature development — explore codebase → clarify requirements → design architecture → implement → review. Use when implementing new features affecting multiple modules."
 allowed-tools: Read Grep Glob Bash Edit Write WebFetch WebSearch
-argument-hint: [feature description to implement]
+argument-hint: <feature-description>
 ---
 
 # Feature Development — Multi-phase Orchestration

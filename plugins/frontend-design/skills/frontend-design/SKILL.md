@@ -2,7 +2,7 @@
 name: frontend-design
 description: Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, or applications. Generates creative, polished code that avoids generic AI aesthetics.
 allowed-tools: Read Grep Glob Bash Edit Write
-argument-hint: [component or page description]
+argument-hint: <component-or-page>
 ---
 
 # Frontend Design — Distinctive Interfaces

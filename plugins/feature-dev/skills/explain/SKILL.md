@@ -2,7 +2,7 @@
 name: explain
 description: "Explains code, algorithms, or architecture to those unfamiliar with it. Goes from overview to details with concrete examples. Use when user says 'explain', 'what does this do', or 'why does this work'."
 allowed-tools: Read Grep Glob Bash(git log:*) Bash(git blame:*) WebFetch WebSearch
-argument-hint: [file path, function/class name, or question]
+argument-hint: <file-function-or-question>
 ---
 
 # Skill: Explain code
