@@ -2,7 +2,7 @@
 name: debug
 description: "Systematic debugging workflow: reproduce first, write failing test, then fix. Use when encountering bugs, unexplained errors, or unexpected behavior."
 allowed-tools: Read Grep Glob Bash Edit
-argument-hint: [bug description or error message]
+argument-hint: "[bug description or error message]"
 ---
 
 # Skill: Systematic Debugging
