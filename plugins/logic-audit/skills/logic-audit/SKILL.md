@@ -1,7 +1,7 @@
 ---
 name: logic-audit
 description: This skill should be used when the user asks to "audit logic bugs", "read all source files and find bugs", "gate tầng 0", "logic check a module", "verify module correctness", "find business logic bugs", "audit this module before drawing diagrams", or says "read every line of code". Works on any module, language, or framework — discovers tests, docs, and project structure at runtime.
-version: 0.4.3
+version: 0.4.4
 argument-hint: <module-path-or-directory>
 allowed-tools: [Read, Grep, Glob, Bash, Edit, Write]
 ---
@@ -45,8 +45,10 @@ Apply these rules while reading:
 
 - **Distrust comments.** Comments describe intent, not reality. When a comment says "this never happens" or "X is always guaranteed" — verify it by tracing the actual code logic. The comment was likely added to justify a guard that CAN fail.
 - **Distrust module documentation.** CLAUDE.md and README descriptions can be stale. The source code is the source of truth.
-- **Read the corresponding test file** for each source file. Understand what is already asserted, what is assumed-but-untested, and what scenarios have no test at all.
+- **Read the corresponding test file** for each source file — this is mandatory, not optional. Understand what is already asserted, what is assumed-but-untested, and what scenarios have no test at all. If you skip test files, you miss context about which behaviors are considered correct by design, and you may incorrectly classify intentional behavior as bugs (or miss bugs that tests expose via their mocks).
 - **Maintain a running issue list** as you read. Do not stop to fix. Complete the full read of all files first — later files often reveal whether an earlier suspicious pattern is actually a bug or an intentional invariant. **After finishing each layer (e.g., all service files), print the current issue list so the user can see progress.** Do not disappear silently for 10 files.
+
+**Phase 2 self-check before proceeding to Phase 3:** Confirm out loud: "I have read every source file AND its corresponding test file(s). The following test files were read: [list]." If you cannot list the test files read, you have not completed Phase 2.
 
 **Reading order for large modules (>10 files)** — adapt to the stack:
 - **Backend:** business logic / service layer → data access / repository → controllers / routes / handlers
