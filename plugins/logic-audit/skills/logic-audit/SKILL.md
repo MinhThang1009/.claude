@@ -1,7 +1,7 @@
 ---
 name: logic-audit
 description: This skill should be used when the user asks to "audit logic bugs", "read all source files and find bugs", "gate tầng 0", "logic check a module", "verify module correctness", "find business logic bugs", "audit this module before drawing diagrams", or says "read every line of code". Works on any module, language, or framework — discovers tests, docs, and project structure at runtime.
-version: 0.3.0
+version: 0.3.1
 argument-hint: <module-path-or-directory>
 allowed-tools: [Read, Grep, Glob, Bash, Edit, Write]
 ---
@@ -59,7 +59,13 @@ After reading all files, review the running issue list. For each item, determine
 1. **Is it a real logic bug?** Would it cause incorrect behavior, data corruption, a security vulnerability, a race condition, or meaningful user-facing confusion in production? If the answer is "maybe, theoretically" — it is not a bug yet.
 2. **Is it reachable?** Can the buggy branch actually be triggered from a production code path? Trace the call chain.
 3. **Is it already tested?** Grep test files for the condition. If an existing test exercises the path and it passes, revisit the analysis — maybe the "bug" is intentional behavior.
-4. **What is the minimal fix?** State the exact change before touching any file.
+   - **Caveat — mocked tests:** If tests mock all external dependencies (DB models, ORM, HTTP clients), integration-layer bugs (wrong column names, wrong association aliases, wrong API call signatures) will appear tested but aren't actually exercised. When the mock accepts any input and always resolves, the test proves nothing about the real behavior. Tag these findings `[UNIT-TEST-BLIND]` — the finding is real, but the unit test suite cannot confirm or deny it.
+
+4. **Is it provable from source code alone?** Can the bug be demonstrated by tracing the project's own source, without relying on assumptions about how a third-party framework or library behaves internally?
+   - If **yes** → proceed with classification.
+   - If **no** → verify the library behavior first: grep its source, check official docs, or run a minimal Bash script (`node -e "..."`) to confirm. Do not classify as HIGH without this verification. If verification is not possible in this environment, tag the finding `[NEEDS-RUNTIME-VERIFY]` and cap severity at MEDIUM.
+
+5. **What is the minimal fix?** State the exact change before touching any file.
 
 Classify each confirmed issue:
 - 🔴 **HIGH** — data integrity, security, race condition, incorrect business rule that affects money/stock/orders
