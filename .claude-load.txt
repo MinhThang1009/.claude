@@ -20,3 +20,5 @@ plan-workflow
 session-report
 pptx
 logic-audit
+verify-then-draw
+code-review
