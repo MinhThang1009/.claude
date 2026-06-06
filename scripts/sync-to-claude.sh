@@ -117,8 +117,11 @@ sync_skills() {
 
     dest_dir="$dest/$name"
     if [[ ! -e "$dest_dir" ]]; then
-      cmd.exe /c "mklink /J \"$(cygpath -w "$dest_dir")\" \"$(cygpath -w "$src_dir")\"" > /dev/null 2>&1
-      echo "  linked: skills/$name"
+      if powershell.exe -Command "New-Item -ItemType Junction -Path '$(cygpath -w "$dest_dir")' -Target '$(cygpath -w "$src_dir")' | Out-Null" 2>/dev/null; then
+        echo "  linked: skills/$name"
+      else
+        echo "  ERROR: junction failed: skills/$name"
+      fi
     fi
   done < <(find "$DOTCLAUDE/plugins" -mindepth 3 -maxdepth 3 -path "*/skills/*" -type d 2>/dev/null)
 
@@ -141,7 +144,7 @@ sync_skills() {
     fi
 
     if [[ "$remove" -eq 1 ]]; then
-      cmd.exe /c "rmdir \"$(cygpath -w "$dest_dir")\"" > /dev/null 2>&1 || rm -rf "$dest_dir"
+      powershell.exe -Command "Remove-Item -Path '$(cygpath -w "$dest_dir")' -Force" 2>/dev/null || rm -rf "$dest_dir"
     fi
   done
 }
