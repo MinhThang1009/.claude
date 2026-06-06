@@ -227,7 +227,7 @@ After all bug fixes are committed:
    - Update business rule descriptions that no longer match the code
    - Do **not** rewrite accurate sections just to refresh them
 
-3. If the project maintains test-count metrics or coverage summaries in documentation, update those numbers.
+3. If the project maintains test-count metrics or coverage summaries in documentation, update those numbers. **Scan the entire repository**, not just the module directory — test counts are often tracked in multiple documentation files outside the module. Use the format you discovered while reading the project's docs to identify what to grep for, then find all files containing that stale count and update them all.
 
 4. Commit doc updates **separately** from code fixes with a message like `docs(<module>): update after <bug-name> fix`.
 
