@@ -2,7 +2,7 @@
 """Stop hook: block khi logic-audit phase gates chưa hoàn tất.
 
 State file: ${CLAUDE_PROJECT_DIR}/.claude/logic-audit-state.json
-  {"findings_confirmed": false, "phase5_gate": false, "phase6_gate": false}
+  {"findings_confirmed": false, "phase4_gate": false, "phase5_gate": false, "phase6_gate": false, "phase7_gate": false}
 
 - File không tồn tại  → không đang chạy logic-audit → allow (exit 0)
 - File tồn tại, gates chưa done → block (exit 2, print reminder)
@@ -51,22 +51,31 @@ def main() -> int:
         return 0  # Lỗi đọc file → không block
 
     missing = []
+    if not state.get("phase4_gate"):
+        missing.append("Phase 4 Exit Gate  (completeness check — document all dismissed findings)")
     if not state.get("phase5_gate"):
         missing.append("Phase 5 Exit Gate  (verification agent + full test suite + 1 commit/bug)")
     if not state.get("phase6_gate"):
         missing.append("Phase 6 Exit Gate  (stale documentation update)")
+    if not state.get("phase7_gate"):
+        missing.append("Phase 7 Exit Gate  (summary + /pipeline-retrospective)")
 
     if missing:
         lines = ["[logic-audit] Gates chua hoan tat - hoan thanh truoc khi ket thuc:"]
         for m in missing:
             lines.append(f"  - [ ] {m}")
         lines.append("")
-        # Incremental hint: chỉ set gate tiếp theo cần làm, không set cả phase6
-        # khi phase5 vẫn còn missing — tránh executor copy-paste bỏ qua Phase 6.
-        if not state.get("phase5_gate"):
-            hint = '{"findings_confirmed": true, "phase5_gate": true, "phase6_gate": false}'
+        # Incremental hint: chỉ show next gate cần làm — tránh executor
+        # copy-paste final state và bỏ qua các phase ở giữa.
+        fc = "true" if state.get("findings_confirmed") else "false"
+        if not state.get("phase4_gate"):
+            hint = f'{{"findings_confirmed": {fc}, "phase4_gate": true, "phase5_gate": false, "phase6_gate": false, "phase7_gate": false}}'
+        elif not state.get("phase5_gate"):
+            hint = f'{{"findings_confirmed": true, "phase4_gate": true, "phase5_gate": true, "phase6_gate": false, "phase7_gate": false}}'
+        elif not state.get("phase6_gate"):
+            hint = f'{{"findings_confirmed": true, "phase4_gate": true, "phase5_gate": true, "phase6_gate": true, "phase7_gate": false}}'
         else:
-            hint = '{"findings_confirmed": true, "phase5_gate": true, "phase6_gate": true}'
+            hint = f'{{"findings_confirmed": true, "phase4_gate": true, "phase5_gate": true, "phase6_gate": true, "phase7_gate": true}}'
         lines.append(f"Cap nhat .claude/logic-audit-state.json -> {hint}")
         msg = "\n".join(lines) + "\n"
         os.write(2, msg.encode("utf-8"))  # fd 2 = stderr — hiện trong Stop hook feedback

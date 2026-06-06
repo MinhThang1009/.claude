@@ -1,7 +1,7 @@
 ---
 name: logic-audit
 description: This skill should be used when the user asks to "audit logic bugs", "read all source files and find bugs", "gate tầng 0", "logic check a module", "verify module correctness", "find business logic bugs", "audit this module before drawing diagrams", or says "read every line of code". Works on any module, language, or framework — discovers tests, docs, and project structure at runtime.
-version: 0.7.0
+version: 0.8.0
 argument-hint: <module-path-or-directory>
 allowed-tools: [Read, Grep, Glob, Bash, Edit, Write]
 ---
@@ -22,9 +22,9 @@ Perform a systematic, line-by-line logic audit of the target module. The goal is
 
 3. **Create gate state file** — use the Write tool to create `.claude/logic-audit-state.json` at the project root:
    ```json
-   {"findings_confirmed": false, "phase5_gate": false, "phase6_gate": false}
+   {"findings_confirmed": false, "phase4_gate": false, "phase5_gate": false, "phase6_gate": false, "phase7_gate": false}
    ```
-   The Stop hook reads this file and blocks if gates are incomplete. Delete the file at the end of Phase 7.
+   The Stop hook reads this file and blocks if gates are incomplete. Delete the file after Phase 7 retrospective completes.
 
 4. Identify and run the existing test suite for this module to establish a **green baseline**:
    - Find the test runner and config (jest.config, pytest.ini, go test, etc.)
@@ -102,13 +102,13 @@ Classify each confirmed issue:
 
 **If the user does not reply in the same turn** (e.g., a stop hook fires forcing Phase 5): proceed for MEDIUM/HIGH findings only — invoking the audit is implicit approval. Print: "Proceeding with implicit approval for MEDIUM/HIGH findings." Update the state file:
 ```json
-{"findings_confirmed": true, "phase5_gate": false, "phase6_gate": false}
+{"findings_confirmed": true, "phase4_gate": false, "phase5_gate": false, "phase6_gate": false, "phase7_gate": false}
 ```
 Then continue through Phase 4 (Completeness Check) before Phase 5 (Fix) — do not skip Phase 4.
 
 **After the user confirms** (explicit reply): update the state file to the same JSON before starting Phase 5:
 ```json
-{"findings_confirmed": true, "phase5_gate": false, "phase6_gate": false}
+{"findings_confirmed": true, "phase4_gate": false, "phase5_gate": false, "phase6_gate": false, "phase7_gate": false}
 ```
 
 ---
@@ -134,7 +134,7 @@ This step exists because "Document what you don't fix" is a ground rule, but wit
 - [ ] Every dismissed finding from Phase 2 running list is tracked with an explicit reason, OR "No dismissed findings." is stated
 - [ ] Nothing silently dropped — if unsure whether an item counts, include it in Phase 7 deferred
 
-No state file update needed for this phase. Proceed to Phase 5.
+**After completing all items:** update `.claude/logic-audit-state.json` → `{"findings_confirmed": true, "phase4_gate": true, "phase5_gate": false, "phase6_gate": false, "phase7_gate": false}`
 
 ---
 
@@ -201,7 +201,7 @@ Before proceeding to Phase 6, confirm every item below. Do not skip or defer sil
 - [ ] No fix was batched — each bug has its own commit
 - [ ] Phase 6 (stale documentation) is next — do not jump to Phase 7
 
-**After completing all items:** update `.claude/logic-audit-state.json` → `{"findings_confirmed": true, "phase5_gate": true, "phase6_gate": false}`
+**After completing all items:** update `.claude/logic-audit-state.json` → `{"findings_confirmed": true, "phase4_gate": true, "phase5_gate": true, "phase6_gate": false, "phase7_gate": false}`
 
 ---
 
@@ -226,7 +226,7 @@ After all bug fixes are committed:
 - [ ] Test-count metrics in documentation updated if the project tracks them
 - [ ] If no doc updates were needed, state explicitly why (not silence)
 
-**After completing all items:** update `.claude/logic-audit-state.json` → `{"findings_confirmed": true, "phase5_gate": true, "phase6_gate": true}`
+**After completing all items:** update `.claude/logic-audit-state.json` → `{"findings_confirmed": true, "phase4_gate": true, "phase5_gate": true, "phase6_gate": true, "phase7_gate": false}`
 
 ---
 
@@ -238,9 +238,11 @@ Print a final summary:
 - Documentation files updated
 - Items deferred: issues found but not fixed, with explicit reason for each (out of scope, by design, requires environment to verify, user decision to defer)
 
-**After printing the summary:** delete `.claude/logic-audit-state.json` (cleanup — allows the Stop hook to pass).
+**After printing the summary:**
 
-**Then run `/pipeline-retrospective`** to evaluate this audit run and write improvement proposals to the plugin directory. This is mandatory — not optional. An ad-hoc retrospective in chat is not a substitute.
+1. Run `/pipeline-retrospective` to evaluate this audit run and write improvement proposals to the plugin directory. This is mandatory — not optional. An ad-hoc retrospective in chat is not a substitute.
+2. Update `.claude/logic-audit-state.json` → `{"findings_confirmed": true, "phase4_gate": true, "phase5_gate": true, "phase6_gate": true, "phase7_gate": true}`
+3. Delete `.claude/logic-audit-state.json` (cleanup — allows the Stop hook to pass).
 
 ---
 
