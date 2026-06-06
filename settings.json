@@ -256,6 +256,11 @@
             "type": "command",
             "command": "bash \"$HOME/.claude/hooks/self-review-nudge.sh\"",
             "shell": "bash"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/logic-audit-gate.sh\"",
+            "shell": "bash"
           }
         ]
       }
@@ -265,19 +270,7 @@
     "type": "command",
     "command": "$HOME/.claude/hooks/statusline.sh"
   },
-  "enabledPlugins": {
-    "plan-workflow@minhthang-plugins": true,
-    "subagent-system@minhthang-plugins": true,
-    "debug@minhthang-plugins": true,
-    "feature-dev@minhthang-plugins": true,
-    "commit-commands@minhthang-plugins": true,
-    "hookify@minhthang-plugins": true,
-    "code-review@minhthang-plugins": true,
-    "pr-review-toolkit@minhthang-plugins": true,
-    "audit-plan@minhthang-plugins": true,
-    "session@minhthang-plugins": true,
-    "verify-then-draw@minhthang-plugins": true
-  },
+  "enabledPlugins": {},
   "extraKnownMarketplaces": {
     "minhthang-plugins": {
       "source": {
