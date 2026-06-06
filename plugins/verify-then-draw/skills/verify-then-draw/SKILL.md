@@ -22,7 +22,7 @@ T0 code-is-business-correct ──gate──► T1 diagram-matches-code ──ga
 |---|---|---|
 | **T0** | Audit business correctness: parallel multi-lens finders → adversarial verifier → fix → tests assert OUTCOME | (a) human/spec invariants `WHEN…THEN…` + (b) run-real-code RAW + mutation + property |
 | **T1** | Diagram covers code: completeness enumerate **cross-module** → draw → adversarial subagent diff diagram-vs-code → fix → loop | (c) structural denominator (route table / enum set / AST) |
-| **T2** | Render → vision-check (node/logic/notation/no-overlap/no-clutter/A4-readable/...) → fix | vision-check + human GATE-D |
+| **T2** | Render → spawn **fresh `diagram-verifier` agent** (zero context of how diagram was drawn) to vision-check PNG → fix → loop until 0 findings | vision-check (independent agent) + human GATE-D |
 
 **Stop loop only when all 3 hold:** ≥2 consecutive 0-finding rounds (rotate lens) **and** coverage-ledger meets threshold **and** 0 unexplained mutation survivors in critical scope.
 
@@ -38,9 +38,9 @@ This skill is **generic**. Each project keeps an instance folder `verify-workflo
 
 Steps when invoked with a module/diagram arg:
 1. **Init/locate** `verify-workflow/` (create from templates if absent). Run `lint-config.mjs --gate`.
-2. **T0**: confirm invariants for the module are approved (`check-invariants-approved.mjs --gate --id-prefix <X>`). Audit logic (multi-lens finder + adversarial verifier), fix, add integration/property tests asserting OUTCOME. Run mutation on critical scope (break-threshold ≠ null).
+2. **T0**: confirm invariants for the module are approved (`check-invariants-approved.mjs --gate --id-prefix <X>`). Audit logic with **≥2 independent lenses** (e.g. correctness + race-condition; correctness + boundary-validation) — minimum even for simple modules; 1-endpoint modules still need at least: (a) validate field names match DB schema/ENUM, (b) check error handling is not silently swallowed. Fix bugs found, add integration/property tests asserting OUTCOME. Run mutation on critical scope (break-threshold ≠ null). Skip mutation only when module has 0 state-mutating paths (document why).
 3. **T1**: completeness-grep cross-module → draw the diagram → spawn the `diagram-verifier` agent to diff diagram-vs-code → fix → loop until dry.
-4. **T2**: render → vision-check the PNG (read it) against the checklist → fix until it passes → stop for human GATE-D sign-off.
+4. **T2**: render → spawn a **fresh `diagram-verifier` agent** with zero context of how the diagram was drawn — give it only the PNG path + full 9-point checklist from project memory (`feedback_diagram_vision_checklist.md`: node/logic/notation/no-overlap/no-clutter/A4-readable/UTF-8-diacritics/terminology/B&W-print) → agent reads PNG and reports issues **with evidence (quoted text or described visual element)** → for each finding: cross-check against PUML source before treating as real (PNG at small resolution produces false positives — a finding with no PUML evidence is suspect) → fix confirmed findings → re-render → loop until agent returns 0 confirmed findings → stop for human GATE-D sign-off. **NEVER self-review T2** (same agent that drew the diagram cannot reliably catch its own blind spots).
 5. Update `diagram-manifest.yaml` status; run `check-ledger.mjs`.
 
 ## Honest limits
