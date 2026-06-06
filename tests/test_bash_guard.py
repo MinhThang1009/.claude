@@ -150,14 +150,24 @@ class TestForcePushVariant:
         [
             "git push --force origin main",
             "git push -f origin main",
-            "git push --force-with-lease origin main",
+            "git push origin +main",  # +ref refspec
+            "git -c push.default=current push",  # inline config override
         ],
     )
     def test_block(self, bash_guard, cmd):
         assert bash_guard.is_force_push_variant(cmd) is True
 
-    def test_allow_normal_push(self, bash_guard):
-        assert bash_guard.is_force_push_variant("git push origin main") is False
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "git push origin main",
+            # --force-with-lease/-if-includes an toàn (lease check) → cho phép trên feature branch
+            "git push --force-with-lease origin main",
+            "git push --force-if-includes origin main",
+        ],
+    )
+    def test_allow(self, bash_guard, cmd):
+        assert bash_guard.is_force_push_variant(cmd) is False
 
 
 # ---------- is_fork_bomb ----------

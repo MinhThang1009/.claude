@@ -294,7 +294,7 @@
   "spinnerTipsEnabled": true,
   "syntaxHighlightingDisabled": false,
   "alwaysThinkingEnabled": false,
-  "effortLevel": "high",
+  "effortLevel": "max",
   "fastModePerSessionOptIn": false,
   "awaySummaryEnabled": true,
   "autoUpdatesChannel": "latest",

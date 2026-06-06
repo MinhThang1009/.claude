@@ -10,7 +10,8 @@ PLUGIN_SRC="$DOTCLAUDE_ROOT/plugins/$PLUGIN"
 INSTALL_COMMANDS="$HOME/.claude/commands"
 INSTALL_AGENTS="$HOME/.claude/agents"
 INSTALL_SKILLS="$HOME/.claude/skills"
-MARKETPLACE="$HOME/.claude/plugins/marketplaces/minhthang-plugins/plugins/$PLUGIN"
+MARKETPLACE_ROOT="$HOME/.claude/plugins/marketplaces/minhthang-plugins"
+MARKETPLACE="$MARKETPLACE_ROOT/plugins/$PLUGIN"
 
 # Files changed in this commit
 CHANGED=$(git diff-tree --no-commit-id -r --name-only HEAD 2>/dev/null | grep "plugins/$PLUGIN/")
@@ -38,7 +39,7 @@ for f in $CHANGED; do
 done
 
 # Commit marketplace changes nếu có
-if git -C "$MARKETPLACE/.." status --short | grep -q "plugins/$PLUGIN" 2>/dev/null; then
-  git -C "$MARKETPLACE/.." add "plugins/$PLUGIN/" 2>/dev/null
-  git -C "$MARKETPLACE/.." commit -m "sync: update $PLUGIN from dotclaude" 2>/dev/null && echo "  ✓ marketplace committed"
+if [ -d "$MARKETPLACE" ] && git -C "$MARKETPLACE_ROOT" status --short 2>/dev/null | grep -q "plugins/$PLUGIN"; then
+  git -C "$MARKETPLACE_ROOT" add "plugins/$PLUGIN/" 2>/dev/null
+  git -C "$MARKETPLACE_ROOT" commit -m "sync: update $PLUGIN from dotclaude" 2>/dev/null && echo "  ✓ marketplace committed"
 fi
