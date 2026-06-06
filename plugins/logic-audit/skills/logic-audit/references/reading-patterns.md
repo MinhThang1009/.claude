@@ -26,6 +26,11 @@ The most common class of logic bug across all languages:
 - Comparing values of different numeric types: float precision loss, overflow when casting large integers
 - String comparison that is case-sensitive when the spec requires case-insensitive (or vice versa)
 
+**Aggregate functions on empty collections:**
+- Calling `min`, `max`, `sum`, `average` on an empty list produces a sentinel or throws — always check whether the collection could be empty after filtering
+- In most languages (Python, Java, Go) aggregating an empty collection raises an explicit error — easy to catch
+- **JS-specific silent trap:** `Math.min(...[])` = `Infinity`, `Math.max(...[])` = `-Infinity` — no error, just a wrong sentinel value. Any downstream `> 0` or `!== null` check silently passes. Same for `reduce()` without initial value → `TypeError` on empty. **Verify:** add `.length > 0` guard before `Math.min/max(...)` spread, or use `reduce` with an explicit initial value.
+
 ---
 
 ## Off-By-One Errors
@@ -118,7 +123,7 @@ The most common class of logic bug across all languages:
 
 **Before marking something as dead, verify:**
 - Grep the entire codebase (not just this module) for all callers
-- Check for dynamic access: `obj[methodName]()`, `require(dynamicPath)`, reflection/eval
+- Check for dynamic access: `obj[methodName]()`, dynamic import/require (`require(dynamicPath)`, `import(path)`), reflection/eval
 - Check if it's part of a public API used by external consumers
 - Check if it's exported but the export itself is unused
 
@@ -126,7 +131,7 @@ The most common class of logic bug across all languages:
 - Function defined but never called from any production path
 - Exported symbol that nothing imports
 - Constant defined but only referenced in a stale comment
-- Error message in a language no user will see (hardcoded EN string in a VI-only API, or vice versa)
+- Error message in a language no user will see (hardcoded string in the wrong locale for this deployment)
 - DTO/model field populated on every write but never read by any consumer
 
 ---
@@ -154,10 +159,10 @@ The most common class of logic bug across all languages:
 When an endpoint returns data consumed by a known caller (FE, mobile, another service), verify the response fields are semantically correct for that caller:
 
 - **Ambiguous field names**: `stockQuantity`, `total`, `price`, `count` — does the field represent the entity the caller thinks it does? (e.g., product-level total stock vs variant-level stock)
-- **Unit mismatch**: returning variant stock when product total stock was written to DB; returning cents when caller expects VND
+- **Unit mismatch**: returning variant stock when product total stock was written to DB; returning cents when caller expects dollars (or the project's base currency unit)
 - **Stale vs fresh value**: returning the pre-update value from the in-memory instance instead of the post-update value from DB
 - **Multiple representations of the same concept** in one response (e.g., `qty` and `total` both valid but representing different things with the same field name across code paths)
 
-**How to check:** Grep the FE feature directory for the endpoint path and look at how `data.<field>` is used after the response. If the FE refetches unconditionally, the response value may be unused — still worth fixing for API correctness and third-party consumers.
+**How to check:** Grep the consumer codebase (frontend, mobile app, or downstream service) for the endpoint path and look at how `data.<field>` is used after the response. If the consumer refetches unconditionally after every mutation, the response value may be unused — still worth fixing for API correctness and third-party consumers.
 
 **Common pattern that hides this:** Caller calls `refetch()` after every mutation → response body never read → mismatch goes undetected for months.
