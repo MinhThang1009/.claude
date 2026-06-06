@@ -1,7 +1,7 @@
 ---
 name: logic-audit
 description: This skill should be used when the user asks to "audit logic bugs", "read all source files and find bugs", "gate tầng 0", "logic check a module", "verify module correctness", "find business logic bugs", "audit this module before drawing diagrams", or says "read every line of code". Works on any module, language, or framework — discovers tests, docs, and project structure at runtime.
-version: 0.8.0
+version: 0.9.0
 argument-hint: <module-path-or-directory>
 allowed-tools: [Read, Grep, Glob, Bash, Edit, Write]
 ---
@@ -85,18 +85,23 @@ After reading all files, review the running issue list. For each item, determine
 
 4. **Is it provable from source code alone?** Can the bug be demonstrated by tracing the project's own source, without relying on assumptions about how a third-party framework or library behaves internally?
    - If **yes** → proceed with classification.
-   - If **no** → verify the library behavior first: grep its source, check official docs, or run a minimal Bash script (`node -e "..."`) to confirm. Do not classify as HIGH without this verification. If verification is not possible in this environment, tag the finding `[NEEDS-RUNTIME-VERIFY]` and cap severity at MEDIUM.
+   - If **no** → verify the library behavior first: grep its source, check official docs, or run a minimal script in the project's language (`node -e "..."`, `python -c "..."`, `go run`, etc.) to confirm. Do not classify as HIGH without this verification. If verification is not possible in this environment, tag the finding `[NEEDS-RUNTIME-VERIFY]` and cap severity at MEDIUM.
 
 5. **What is the minimal fix?** Before touching any file, run a pre-flight check:
    - Grep test files for assertions on the affected symbol, function, or variable.
    - Determine whether existing tests assert **wrong behavior** (test needs updating) or **correct intent** (the code documents something meaningful even if it has no runtime effect — do not remove it).
    - If more than 3 test files assert the current behavior and the severity is INFO or MEDIUM: defer. Fix cost exceeds benefit.
+   - If severity is HIGH: do NOT defer based on test count — fix it, update the tests, and document why each test change was needed. High test count means the fix was impactful, not that it should be skipped.
    - Only after this check: state the exact change, including which test files need updating.
 
 Classify each confirmed issue:
-- 🔴 **HIGH** — data integrity, security, race condition, incorrect business rule that affects money/stock/orders
-- 🟡 **MEDIUM** — UX confusion, validation missing in one code path but present in equivalent paths, partial cleanup on failure
+- 🔴 **HIGH** — wrong data written to DB, security bypass, race condition that causes incorrect state to persist, business rule not enforced in a path that affects money/stock/orders
+- 🟡 **MEDIUM** — UX confusion, validation missing in one code path but present in equivalent paths, partial cleanup on failure, race condition that causes a request to **fail/500** (no wrong data persisted)
 - 🔵 **INFO** — dead code, misplaced/stale comment, minor inconsistency with no user-visible impact
+
+**Severity calibration for race conditions:** Ask "what is the worst-case outcome?"
+- Two concurrent requests → one writes wrong value to DB (oversell, wrong total, duplicate record) → **HIGH**
+- Two concurrent requests → one gets a DB constraint error / 500, no data is corrupted → **MEDIUM at most, consider INFO** if the scenario requires simultaneous manual operations (e.g., two admins cloning the same product at the same millisecond)
 
 **Present the classified findings to the user and wait for confirmation before touching any file.** Use `examples/finding-report-template.md` as the format template — each finding must include: file + line, concrete reproduction steps, minimal fix description, and test name. The user decides which severity levels to fix, and in what order.
 
@@ -144,6 +149,12 @@ For each confirmed bug, in severity order (HIGH first):
 
 1. Apply the **minimal surgical fix** — change only what is necessary to fix this specific bug. Do not refactor adjacent code, rename variables, or improve style in the same commit.
 
+   **Before touching any file:** if the fix adds, removes, or renames a parameter in a function that is called from other files (repository methods, service functions, utilities), grep test files for assertions on the current call signature using whatever assertion syntax the project uses (e.g. `toHaveBeenCalledWith`, `assert.calledWith`, `expect(...).toBeCalledWith`, `verify(mock).method(args)`):
+   ```
+   grep -r "<assertion_matcher>" <test_dirs> | grep "<function_name>"
+   ```
+   Count how many test assertions use the current call signature. If more than 3, note upfront that test assertion updates will be needed and which files contain them — this prevents discovering test failures mid-fix and having to context-switch back to understand why they fail.
+
 2. Write or update tests. Default: **REGRESSION** — would have failed before the fix, passes after. Exception: **DOCUMENTATION** — only for INFO fixes where behavior is genuinely unchanged (cosmetic/intent-clarification); must label explicitly in commit message. See Exit Gate for labeling requirements.
    - Would have **failed** with the old code, OR is explicitly labeled DOCUMENTATION
    - **Pass** with the fix (verifies the correct behavior)
@@ -151,10 +162,10 @@ For each confirmed bug, in severity order (HIGH first):
    - Are named to describe the scenario, not the code path
    - **For `[UNIT-TEST-BLIND]` fixes:** unit test updates only document intent — mocks accept any argument so they cannot verify real DB/integration behavior. You must also:
      1. Note in the commit message: "Unit tests document fix; integration/API test required for full verification."
-     2. **Always write an integration or API test placeholder** in the project's integration test directory — even if it cannot run without a real DB. Use `test.skip` (or the framework's equivalent) with a comment explaining what it verifies and why it requires a real environment. This is not optional: without this placeholder, the atomicity/correctness guarantee has no safety net for future CI runs.
+     2. **Always write an integration or API test placeholder** in the appropriate test directory for this project (discovered in Phase 1 — check where integration/API/e2e tests live). Choose based on bug type: DB-level behavior → integration test directory; middleware/validator/request-response behavior → API/HTTP test directory. Even if it cannot run without a real DB/server. Use `test.skip` (or the framework's equivalent) with a comment explaining what it verifies and why it requires a real environment. This is not optional: without this placeholder, the correctness guarantee has no safety net for future test runs in the appropriate environment.
         ```js
         // Verifies [BUG-X]: [description of what the test proves]
-        test.skip('[BUG-X] integration test — requires MySQL', async () => { ... });
+        test.skip('[BUG-X] integration test — requires real DB/service', async () => { ... });
         ```
 
 3. Run the test suite for this module. Expected: previously passing tests still pass, the new/updated test passes. If unrelated tests break:
@@ -166,7 +177,7 @@ For each confirmed bug, in severity order (HIGH first):
 
 5. Run the project's linter/formatter if one exists and is configured.
 
-6. **Spawn an independent verification agent.** Give it only the list of changed files — no description of what was fixed or why. **Do NOT write a custom prompt.** Use the exact template below, replacing only `[list changed files]`:
+6. **Spawn an independent verification agent** — unless the fix is trivially small. Skip the agent and do a manual read instead when ALL of the following are true: (1) fix changes ≤ 3 lines in 1 file, (2) fix does NOT add/remove a function parameter visible to callers, (3) the changed function has no downstream callers in other modules. For anything larger, spawn the agent. **Do NOT write a custom prompt.** Use the exact template below, replacing only `[list changed files]`:
 
    ```
    Read these files: [list changed files]
@@ -195,8 +206,8 @@ Before proceeding to Phase 6, confirm every item below. Do not skip or defer sil
 - [ ] Test written or updated for each fix — must be one of two labeled types:
   - **REGRESSION**: would have FAILED before the fix, passes after. This is the default.
   - **DOCUMENTATION**: fix does not change behavior (cosmetic/intent-clarification only) — test confirms existing behavior. Must write "DOCUMENTATION TEST: fix does not change behavior" explicitly in the commit message. Cannot use this label for MEDIUM or HIGH severity bugs.
-  - For `[UNIT-TEST-BLIND]` fixes: the unit test passes; **integration test placeholder written** (`test.skip` with `// Verifies [BUG-X]` comment) — this is mandatory, not optional.
-- [ ] Independent verification agent run for every fix (Phase 5 step 6)
+  - For `[UNIT-TEST-BLIND]` fixes: the unit test passes; **integration or API test placeholder written** (`test.skip` with `// Verifies [BUG-X]` comment) — this is mandatory, not optional.
+- [ ] Independent verification agent run for every fix, OR manual re-read for fixes that meet all skip conditions in step 6
 - [ ] Full project test suite passes (not just module tests)
 - [ ] No fix was batched — each bug has its own commit
 - [ ] Phase 6 (stale documentation) is next — do not jump to Phase 7

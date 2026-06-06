@@ -1,5 +1,58 @@
 # Logic-Audit Plugin Improvement Proposals
-Generated: 2026-06-06
+Generated: 2026-06-06 (latest: wishlist v0.8.0 — 6th run, GOOD)
+wishlist: 1 MEDIUM found+fixed (null.toJSON crash on soft-deleted product). 6 consecutive runs GOOD.
+
+---
+
+Generated: 2026-06-06 (users v0.8.0 — 5th run, CLEAN MODULE, all GOOD)
+5 consecutive clean runs. users module had 0 bugs — audit correctly identified clean codebase.
+
+---
+
+Generated: 2026-06-06 (reviews v0.8.0 — 4th run, all GOOD)
+4 consecutive clean runs. Skill stable.
+
+---
+
+Generated: 2026-06-06 (discount-code v0.8.0 — 3rd run, all GOOD)
+
+## v0.8.0 3rd Run (discount-code)
+All 6 dimensions GOOD. No new proposals. 3 consecutive clean runs confirms v0.8.0 stability.
+
+---
+
+Generated: 2026-06-06 (cart v0.8.0 — 2nd run)
+Source: logic-audit v0.8.0 run on backend/src/modules/cart — CLEAN RUN, no new proposals
+
+## v0.8.0 2nd Run Result (cart module — HIGH + MEDIUM bugs found)
+| Dimension | Score | Evidence |
+|-----------|-------|---------|
+| D1 Coverage | GOOD | 10 source + 10 test suites read; reading-patterns.md loaded ✓ |
+| D2 Finding quality | GOOD | 1 HIGH (addToCart duplicate CartItems) + 1 MEDIUM (getCart merge no cap). Agent surfaced 9/9 pre-existing — executor correctly filtered. |
+| D3 Completion | GOOD | 7 phases + 2 commits + docs + retrospective complete |
+| D4 Pipeline health | GOOD | Phase 7 gate blocked until retrospective — v0.8.0 enforcement working ✓ |
+| D5 Fix quality | GOOD | Surgical commits, no scope spill |
+| D6 Skill triggering | GOOD | All mandatory steps triggered correctly |
+
+**No new improvements needed for v0.9.0.**
+
+---
+
+## v0.8.0 Benchmark Result (inventory module)
+| Dimension | Score | Evidence |
+|-----------|-------|---------|
+| D1 Coverage | GOOD | All 7 source + 4 test files read; reading-patterns.md loaded pre-Phase 2 ✓ |
+| D2 Finding quality | GOOD | 1 MEDIUM real, 4 agent false positives correctly dismissed ✓ |
+| D3 Completion | GOOD | All 7 phases complete including Phase 4 completeness check ✓ |
+| D4 Pipeline health | GOOD | Phase 4 gate enforced; incremental hint correct; no stalls ✓ |
+| D5 Fix quality | GOOD | Surgical: 2 files + separate doc commit ✓ |
+| D6 Skill triggering | GOOD | reading-patterns.md ✓; Phase 4 ✓; pipeline-retrospective ✓ |
+
+**No new improvements needed for v0.8.0. All gates working correctly.**
+
+---
+
+# Previous Proposals (payment module — v0.5.0 baseline)
 Source: logic-audit run on backend/src/modules/payment (TechStore e-commerce)
 
 ## Performance Summary

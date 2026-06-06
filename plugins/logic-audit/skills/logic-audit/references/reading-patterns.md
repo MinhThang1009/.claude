@@ -146,3 +146,18 @@ The most common class of logic bug across all languages:
 - Constructor side effect that throws in test environments but not in production (or vice versa)
 - Default configuration value that is unsafe for production (debug mode, open CORS, no auth)
 - Required configuration value that has a silently wrong default instead of failing loudly when missing
+
+---
+
+## Response Format vs Consumer Alignment
+
+When an endpoint returns data consumed by a known caller (FE, mobile, another service), verify the response fields are semantically correct for that caller:
+
+- **Ambiguous field names**: `stockQuantity`, `total`, `price`, `count` — does the field represent the entity the caller thinks it does? (e.g., product-level total stock vs variant-level stock)
+- **Unit mismatch**: returning variant stock when product total stock was written to DB; returning cents when caller expects VND
+- **Stale vs fresh value**: returning the pre-update value from the in-memory instance instead of the post-update value from DB
+- **Multiple representations of the same concept** in one response (e.g., `qty` and `total` both valid but representing different things with the same field name across code paths)
+
+**How to check:** Grep the FE feature directory for the endpoint path and look at how `data.<field>` is used after the response. If the FE refetches unconditionally, the response value may be unused — still worth fixing for API correctness and third-party consumers.
+
+**Common pattern that hides this:** Caller calls `refetch()` after every mutation → response body never read → mismatch goes undetected for months.
