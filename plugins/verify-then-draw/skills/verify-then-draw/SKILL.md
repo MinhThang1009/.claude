@@ -1,6 +1,6 @@
 ---
 name: verify-then-draw
-description: "This skill should be used when the user asks to draw, create, update, or fix a diagram from a codebase — use case / sequence / state / component / ERD / deployment / pipeline (UML or other notation), especially for a thesis/report or documentation that must match real code. Enforces a 3-tier gated pipeline so a diagram never depicts buggy or incompletely-understood code. Also trigger on: 'vẽ sơ đồ', 'verify then draw', 'audit code before diagramming'."
+description: "This skill should be used when the user asks to draw, create, update, or fix a diagram from a codebase — use case / sequence / state / component / ERD / deployment / pipeline (UML or other notation), especially for a thesis/report or documentation that must match real code. Enforces a 3-tier gated pipeline so a diagram never depicts buggy or incompletely-understood code. Also trigger on: 'vẽ sơ đồ', 'verify then draw', 'draw diagrams from verified code'. Diagram-producing only — when the user wants a logic audit WITHOUT drawing (e.g. 'audit this module before drawing diagrams'), use /audit-logic instead."
 disable-model-invocation: false
 allowed-tools: Read Grep Glob Bash Write Edit TodoWrite Agent
 argument-hint: <module-or-diagram-name>
