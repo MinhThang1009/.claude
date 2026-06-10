@@ -1,6 +1,6 @@
 {
   "name": "audit-plan",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Audit plan files against codebase — gap detection, dead code verification, test coverage checks. Sub-commands: gaps, verify, tests.",
   "author": {
     "name": "Minh Thang"
