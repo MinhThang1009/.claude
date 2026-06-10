@@ -7,17 +7,8 @@
 #   !name               → exclude agent/skill theo tên (áp dụng mọi plugin)
 # File trống → load TẤT CẢ plugins.
 
-subagent-system
-commit-commands
-debug
-feature-dev
-pr-review-toolkit
-hookify
-claude-md-management
-session
-plan-workflow
-pptx
-audit-logic
-audit-plugin
-verify-then-draw
-code-review
+# Cơ chế junction đã NGHỈ HƯU — mọi plugin load qua marketplace (enabledPlugins
+# trong settings.json). KHÔNG để file này trống: trống = load TẤT CẢ (CI dùng
+# hành vi đó). Sentinel "none" dưới đây không match plugin nào → 0 junction.
+# Muốn junction lại một plugin chưa enable: thay "none" bằng tên plugin.
+none
