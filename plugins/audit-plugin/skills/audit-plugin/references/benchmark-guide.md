@@ -52,9 +52,9 @@ Cross-check the transcript (`~/.claude/projects/<fixture-slug>/<session>.jsonl`)
 | D5 Fix quality | Run the tests yourself after the fixes; `git log` follows the audited project's commit conventions (its repo rules/CLAUDE.md — not this repo's); do regression tests prove failure-on-old-code? |
 | D6 Skill triggering | Did the full skill content load (grep the transcript for distinctive SKILL.md markers)? |
 
-## 4. After the benchmark
+## 4. Costs & cleanup (read the costs BEFORE running)
 
 - Learnings + proposals → the audited plugin's `improvement-proposals.md` (Stage 7).
 - Clean up the fixture: `shutil.rmtree` with an `onexc` handler (Python ≥ 3.12; `onerror` on older versions) that clears read-only flags on `.git` objects on Windows (`os.chmod(path, stat.S_IWRITE)`).
 - Leave the benchmark transcripts in `~/.claude/projects/` — `cleanupPeriodDays` cleans them up.
-- Reference cost: ~$2–5 per stage depending on fixture size; ~$7–9 total for a 2-stage benchmark. (Canonical cost figures — SKILL.md points here; this file wins on divergence.)
+- Reference cost: ~$2–5 per stage depending on fixture size — ~$4–10 total for a clean 2-stage run (observed real-world total ≈ $8.6 including one failed attempt). (Canonical cost figures — SKILL.md points here; this file wins on divergence.)

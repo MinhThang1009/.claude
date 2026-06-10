@@ -8,7 +8,9 @@ Multi-round independent quality audit for Claude Code plugins.
 
 Audits a plugin's content (plugin.json, SKILL.md, references, examples, hooks, commands) through multiple independent review rounds: 7-criteria deep review → independent finding validation → user-approved scope → fixes → fresh-reviewer convergence loop (hard cap 4 rounds) → headless benchmark (executable workflow plugins only, user-approved — it costs real money) → learnings recorded into improvement-proposals.md.
 
-The criteria list is self-updating: any defect found outside the 7 criteria (tagged `[OUT-OF-CRITERIA]`) must produce a proposal to extend this plugin's own criteria — a fixed criteria set is a systematic blind spot shared by every future review round.
+The criteria list is self-updating: any defect found outside the 7 criteria (tagged `[OUT-OF-CRITERIA]`) must produce a proposal to extend this plugin's own criteria — a fixed criteria set is a systematic blind spot shared by every future review round. Pending proposals are applied (or declined) at the start of the next audit (Stage 0 step 5).
+
+During an audit the skill writes `.claude/audit-plugin-ledger.md` at the **audited project's** root — resume-safe state (findings, statuses, round counter, classification) and concurrency lock; deleted when the audit closes.
 
 Core principles: every claim carries a quote + `file:line`; finders maximize coverage and a validator filters false positives afterward; the fixer never self-certifies; the user settles every design decision.
 

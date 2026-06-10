@@ -1,6 +1,6 @@
 {
   "name": "audit-plugin",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Multi-round independent quality audit for Claude Code plugins: deep 7-criteria review with self-updating criteria, finding validation, user-gated fixes, fresh-reviewer convergence loop with hard cap, optional headless benchmark.",
   "author": {
     "name": "Minh Thang"

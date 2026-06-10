@@ -54,8 +54,9 @@ LOW = polish (wording, style, minor inconsistency with no behavioral effect).
 
 Scope: read within [plugin-path]; for criterion 3 you may ALSO read, read-only: other
 plugins' SKILL.md frontmatter/description lines, the repo's plugin-loading configs
-(marketplace.json, load lists, settings enabledPlugins), and the user-level skills
-directory listing (if present). Edit nothing anywhere.
+(marketplace.json, load lists, settings enabledPlugins), junction/symlink targets under
+the user-level plugins and skills directories, and the user-level skills directory
+listing (each: if present). Edit nothing anywhere.
 
 Output format: a findings list — each finding: file + line (verbatim quote as evidence),
 description, severity (HIGH/MEDIUM/LOW). Suspected but unconfirmed → still report,
@@ -81,8 +82,9 @@ Findings to verify:
 [F1. <file> line ~<n>: <claim>]
 [F2. ...]
 
-Scope: only read files under [repo-root] — plus, for criterion-3 findings that cite it,
-the user-level skills directory. Do not edit anything.
+Scope: only read files under [repo-root] — plus, for findings that cite them, the
+user-level plugin/skill configs and directories (settings, plugin cache, skills).
+Do not edit anything.
 Done criteria: all [N] findings have a verdict + verbatim evidence quote with file:line.
 ```
 
@@ -91,4 +93,4 @@ Done criteria: all [N] findings have a verdict + verbatim evidence quote with fi
 - Fresh reviewer: zero chat history, zero prior findings, zero description of changes. Path + criteria only.
 - Validator: receives the findings but not the overall conclusions (no verdict biasing).
 - Every agent output → verify yourself with Read/Grep before relaying to the user or acting on it.
-- After any agent returns (when the repo has git) → check `git status`/diff: if a read-only agent ran and the working tree changed in unexpected files, investigate before continuing. No git → compare key files by content. (Process rule — canonical copy in SKILL.md Ground Rules.)
+- After any dispatched agent returns (when the repo has git) → check `git status`/`git diff` — unexpected working-tree changes from a read-only agent mean stop and investigate before continuing. No git → compare key files by content. (Process rule — canonical copy in SKILL.md Ground Rules; that wording wins.)

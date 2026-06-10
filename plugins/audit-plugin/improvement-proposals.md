@@ -2,6 +2,28 @@
 
 > Self-audit log. Per SKILL.md Stage 7, every `[OUT-OF-CRITERIA]` finding must produce a criteria-update proposal here.
 
+Generated: 2026-06-10 (v1.0.2 — dogfood round 4, FINAL per hard cap)
+
+## Dogfood Round 4 Result — audit CLOSED at hard cap
+
+**0 HIGH (3rd consecutive round)**, 7 MEDIUM (2 [UNCERTAIN]), 9 LOW. Per the hard-cap rule: confirmed MEDIUMs fixed, then STOP — no 5th round. Fixes: M1 LOW-only confirmation round now routes as clean; M2 ledger now persists round counter + Stage 0 classification (resume actually works); M3 HIGH-at-cap passes the user gate like everything else; M4 ledger status vocabulary completed with Stage 2 verdict mapping (confirmed-pending / unfixed-at-cap added); **M5 self-update loop CLOSED — Stage 0 step 5 now applies/declines PROPOSED criteria updates at the start of every audit**; M7 invalid-argument path covered. LOWs: cost arithmetic made consistent, drifted pointered duplicate re-synced, stale "pending" note fixed, README documents the ledger artifact. M6 remains a USER action: refresh the installed cache (stale 1.0.0 copy) — bump to 1.0.2 makes the divergence unambiguous.
+
+**Honest closure note:** this final fix batch (round 4 MEDIUMs/LOWs) has NOT passed an independent review round — the hard cap forbids a 5th. Risk assessed low (definitional/wording changes, each traceable to a quoted finding). Convergence series: 2H+9M → 0H+5M → 0H+5M → 0H+7M with severity composition shifting from architecture (round 1) to lifecycle bookkeeping (round 4). Per round 4's own [OUT-OF-CRITERIA] items, P-3/P-4 remain PROPOSED below — they will be offered for application at the next audit's Stage 0 step 5.
+
+---
+
+Generated: 2026-06-10 (v1.0.1 — dogfood round 3)
+
+## Dogfood Round 3 Result
+
+**0 HIGH** (2nd consecutive round), 5 MEDIUM, 13 LOW — MEDIUMs all fixed same-session: M1 round-≥2 findings now ALWAYS pass the Stage 3 user gate (closed the "needs no decision → edit without approval" bypass); M2 zero-findings path now routes through Stage 6 when applicable; M3 HIGH-at-cap branch defined (fix + targeted validator pass, no 5th round); M5 Stage 0 structural findings carry into the ledger; **M4 CONFIRMED by direct diff — the installed cache copy at `~/.claude/plugins/cache/.../audit-plugin/1.0.0` was the stale pre-round-2 content under the same version → bumped to 1.0.1 (user must update/reinstall the plugin so the cache refreshes).** Cheap LOWs fixed (fast-path named, token-cost canonical home, temp-dir clause pointer, scope grants for junctions + user-level configs, Task-unavailable stop rule, Stage 2 verdicts→ledger, no-test-harness branch, §4 retitled). Round-2 canonicalization verified working: "the duplicates that still exist all match verbatim today".
+
+**Criteria-update proposals (from round-3 [OUT-OF-CRITERIA]):**
+- **P-3:** extend criterion 5's boundary — duplication checks must include plugin-adjacent registry copies (e.g. plugin.json description verbatim-duplicated in marketplace.json) — same blind-spot class as P-1.
+- **P-4:** extend criterion 3 — detect dual-loading: the same skill reachable through two mechanisms at once (e.g. junction-synced user-level copy + marketplace plugin) duplicates the trigger surface.
+
+---
+
 Generated: 2026-06-10 (v1.0.0 — dogfood round 2)
 
 ## Dogfood Round 2 Result
