@@ -4,6 +4,27 @@
 >
 > This file is a historical archive shipped with the plugin — distinct from the **project-level** `.claude/improvement-proposals.md` that `/pipeline-retrospective` writes during a run.
 
+Generated: 2026-06-11 (v1.0.1 — benchmark fixture wallet, headless 2-stage, sau audit-plugin convergence 3 rounds)
+
+## v1.0.1 Benchmark (fixture wallet: 1 HIGH + 1 MEDIUM + 1 INFO gài, model claude-sonnet-4-6)
+| Dimension | Score | Evidence |
+|-----------|-------|---------|
+| D1 Coverage | GOOD | 6/6 file đọc đủ; "Reading patterns loaded" + coverage summary in đúng |
+| D2 Finding quality | PARTIAL | 2/2 HIGH+MEDIUM gài tìm thấy, 0 false positive. **MISS INFO dead-code lần 2 liên tiếp** (validate_wallet: không production caller + comment "checkout" trỏ flow không tồn tại — executor phân tích semantics rồi dismiss "by design", bullet self-check P-7 có trong skill text nhưng không được THỰC THI). **Severity miscalibration:** pagination bug (chỉ trả sai dữ liệu hiển thị, không ghi sai DB) bị xếp HIGH thay vì MEDIUM theo rubric |
+| D3 Completion | GOOD | 7/7 phase; Phase 4 completeness table; Phase 7 Exception (mở rộng v1.0.1 "installed but fails to run") fired đúng khi /pipeline-retrospective lỗi headless |
+| D4 Pipeline health | GOOD | Stage A dừng THẬT ở gate Phase 3 (tree sạch); headless fallback v1.0.1 (track gates trong report khi Write .claude/ bị deny) hoạt động; clean-tree check trước Phase 5 (fix V11) fired |
+| D5 Fix quality | GOOD− | 1 commit/bug, message đạt what/why/change, tests mới assert đúng items (không chỉ len); verification agent dùng template nguyên văn, intent-blind, 2 lần. Minus: KHÔNG chứng minh empirically test fail trên code cũ (không dùng git stash dù được grant) |
+| D6 Skill triggering | GOOD | SKILL.md v1.0.1 load đủ (quote được text mới: orphan guard, headless fallback, no-git pointers) |
+
+Chi phí: Stage A $0.42 (15 turns) + Stage B $0.90 (21 turns) ≈ $1.32.
+
+**Đề xuất từ benchmark (cả 3 APPLIED 2026-06-11 cùng session, user duyệt):**
+- **P-9 (MEDIUM, recall):** INFO dead-code miss tái diễn dù rule P-7 đã có trong Phase 2 self-check — rule tồn tại nhưng không được thực thi dạng prose. Đề xuất: Phase 2 self-check bắt buộc in BẢNG per-public-function: `| function | production caller(s) | unit test | gaps |` — hàng nào cột caller trống → tự động vào running issue list (INFO). Bảng ép thực thi tốt hơn bullet. **Status: APPLIED 2026-06-11** (Phase 2 self-check — bảng bắt buộc, cấm dismiss bằng semantics).
+- **P-10 (LOW, calibration):** thêm 1 dòng vào Phase 3 severity calibration: "Dữ liệu SAI được TRẢ VỀ (display/response) nhưng không GHI sai vào storage → MEDIUM tối đa" — benchmark xếp pagination bug HIGH vì lý do 'UX tài chính nghiêm trọng'. **Status: APPLIED 2026-06-11** (Phase 3 — calibration mới cho read-path bugs).
+- **P-11 (LOW, verification):** Phase 5 step 2: khi project có git, yêu cầu chứng minh REGRESSION label bằng cách chạy test trên code cũ (git stash / checkout tạm) thay vì chỉ suy luận — run này label đúng nhưng không chứng minh. **Status: APPLIED 2026-06-11** (Phase 5 step 2 — git stash proof bắt buộc khi có git).
+
+---
+
 Generated: 2026-06-10 (v1.0.0 — benchmark fixture có kiểm soát, headless 2-stage, 7/7 phase)
 
 ## v1.0.0 Benchmark (fixture cart 3 bug gài, headless -p + resume)
