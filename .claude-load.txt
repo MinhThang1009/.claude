@@ -15,9 +15,7 @@ pr-review-toolkit
 hookify
 claude-md-management
 session
-audit-plan
 plan-workflow
-session-report
 pptx
 audit-logic
 audit-plugin

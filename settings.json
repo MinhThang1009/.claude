@@ -294,7 +294,7 @@
     "claude-api@minhthang-plugins": false,
     "webapp-testing@minhthang-plugins": true,
     "web-artifacts-builder@minhthang-plugins": false,
-    "session-report@minhthang-plugins": false,
+    "session-report@minhthang-plugins": true,
     "code-review@minhthang-plugins": true,
     "pdf@minhthang-plugins": false,
     "pptx@minhthang-plugins": false,
@@ -351,5 +351,6 @@
   "autoScrollEnabled": true,
   "showTurnDuration": true,
   "terminalProgressBarEnabled": true,
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "model": "claude-fable-5[1m]"
 }
