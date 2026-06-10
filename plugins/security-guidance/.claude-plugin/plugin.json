@@ -1,5 +1,6 @@
 {
   "name": "security-guidance",
+  "version": "1.0.0",
   "description": "Senior security engineer agent for finding vulnerabilities including injection, auth flaws, insecure crypto, SSRF, XSS, and common CWEs",
   "author": {
     "name": "Minh Thang"

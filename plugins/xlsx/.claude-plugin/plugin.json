@@ -1,5 +1,6 @@
 {
   "name": "xlsx",
+  "version": "1.0.0",
   "description": "Open, read, edit, and create spreadsheets (.xlsx/.csv/.tsv)",
   "author": { "name": "Minh Thang" }
 }

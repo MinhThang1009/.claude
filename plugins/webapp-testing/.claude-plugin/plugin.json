@@ -1,5 +1,6 @@
 {
   "name": "webapp-testing",
+  "version": "1.0.0",
   "description": "Test local web applications with Playwright, taking screenshots, checking console logs, and automating browser interactions",
   "author": { "name": "Minh Thang" }
 }

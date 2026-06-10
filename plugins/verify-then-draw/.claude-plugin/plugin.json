@@ -1,6 +1,6 @@
 {
   "name": "verify-then-draw",
-  "version": "1.0.6",
+  "version": "1.0.0",
   "description": "Draw UML/architecture diagrams from a codebase with minimal error through a 3-tier hard-gated pipeline (code-is-business-correct -> diagram-matches-code -> notation + readability), anchored on out-of-model oracles and human gates. Ships a skill, a guided slash command, and an adversarial diagram-verifier subagent.",
   "author": {
     "name": "Minh Thang"

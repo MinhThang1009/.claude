@@ -1,5 +1,6 @@
 {
   "name": "code-modernization",
+  "version": "1.0.0",
   "description": "Architecture review and code modernization with adversarial analysis",
   "author": {
     "name": "Minh Thang"

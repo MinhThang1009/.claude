@@ -1,5 +1,6 @@
 {
   "name": "performance",
+  "version": "1.0.0",
   "description": "Performance profiling, optimization, and dependency audit agents",
   "author": {
     "name": "Minh Thang"

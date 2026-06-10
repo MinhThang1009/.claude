@@ -1,5 +1,6 @@
 {
   "name": "mcp-builder",
+  "version": "1.0.0",
   "description": "Build high-quality MCP servers using FastMCP or the MCP SDK",
   "author": { "name": "Minh Thang" }
 }

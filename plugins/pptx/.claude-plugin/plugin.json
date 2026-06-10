@@ -1,5 +1,6 @@
 {
   "name": "pptx",
+  "version": "1.0.0",
   "description": "Create, read, edit, and manipulate PowerPoint presentations (.pptx files)",
   "author": { "name": "Minh Thang" }
 }

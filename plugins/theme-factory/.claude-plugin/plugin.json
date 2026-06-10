@@ -1,5 +1,6 @@
 {
   "name": "theme-factory",
+  "version": "1.0.0",
   "description": "Toolkit for styling artifacts (slides, docs, HTML) with themes. 10 pre-set themes with custom color palettes, typography, and design patterns.",
   "author": { "name": "Minh Thang" }
 }

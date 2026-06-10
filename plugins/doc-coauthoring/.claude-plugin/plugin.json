@@ -1,5 +1,6 @@
 {
   "name": "doc-coauthoring",
+  "version": "1.0.0",
   "description": "Guide users through a structured workflow for co-authoring documentation, proposals, technical specs, and decision docs.",
   "author": { "name": "Minh Thang" }
 }

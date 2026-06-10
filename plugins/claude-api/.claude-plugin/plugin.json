@@ -1,5 +1,6 @@
 {
   "name": "claude-api",
+  "version": "1.0.0",
   "description": "Build, debug, and optimize Claude API and Anthropic SDK applications",
   "author": { "name": "Minh Thang" }
 }

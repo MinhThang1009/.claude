@@ -1,5 +1,6 @@
 {
   "name": "session-report",
+  "version": "1.0.0",
   "description": "Generates a visual HTML report summarizing Claude Code session activity, time spent, and key decisions",
   "author": { "name": "Minh Thang" }
 }
