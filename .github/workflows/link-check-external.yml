@@ -25,12 +25,18 @@ jobs:
           # Skip private/local URLs để tránh false positive.
           # KHÔNG dùng --exclude-mail: flag bị xóa khỏi lychee (mail đã exclude
           # mặc định) — flag lạ làm lychee chết ngay → issue báo động giả mỗi tuần.
+          # --accept 403/429: site chặn bot (claude.ai) / rate-limit (gnu.org) vẫn là
+          # link sống với người thật — 404 vẫn bị bắt bình thường.
+          # --exclude c21d3c10...: URL ví dụ minh hoạ format trong SKILL.md vendored
+          # (anthropics/claude-code, claude-cli-internal) — cố ý không resolve được.
           args: >-
             --verbose
             --no-progress
             --max-retries 2
             --retry-wait-time 5
             --timeout 20
+            --accept '200..=299, 403, 429'
+            --exclude 'c21d3c10bc8e898b7ac1a2d745bdc9bc4e423afe'
             --exclude-loopback
             --exclude-private
             "**/*.md"
