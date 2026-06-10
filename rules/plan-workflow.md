@@ -16,7 +16,15 @@
 
 ## When to Create a Plan
 
-Create a plan when: >3 files touched, crosses a layer boundary, shared interface affected, session needs /compact, or rollback would be non-trivial. Otherwise: edit directly, run tests, done.
+> **Single source of truth** for the plan threshold — CLAUDE.md and coding-standards.md link here. Changing the threshold → change it in this ONE place.
+
+Create a plan when ANY of:
+
+- **>3 files with logic changes** — trivial batches (format, rename, version bump) don't count, regardless of file count;
+- touches **architecture**: new module, DB schema change, public API refactor, cross-codebase pattern change, layer boundary, shared interface;
+- session will need `/compact` mid-task, or rollback would be non-trivial.
+
+Otherwise: edit directly, run tests, done. Small isolated fixes (typo, variable rename, add log, 1–2 files) never need a plan.
 
 ## Always
 

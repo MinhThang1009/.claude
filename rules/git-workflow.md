@@ -59,7 +59,7 @@ Examples: `feat/google-oauth`, `fix/218-avatar-fallback`, `refactor/auth-middlew
 
 ## Workflow
 
-- **Before committing**: `git diff --staged` to review what's about to be committed. Never commit blind. Phát hiện file staged không liên quan → unstage ngay, báo user trước khi tiếp tục.
+- **Before committing**: `git diff --staged` to review what's about to be committed. Never commit blind. Unrelated file found staged → unstage it immediately and tell the user before continuing.
 - **Stage files individually**, NOT `git add .` (easy to include junk files).
 - **Small, frequent commits** > one large end-of-day commit. Each commit should be one logical unit that can be reverted independently.
 - **Pull/rebase before push**. `git pull --rebase` on feature branches.

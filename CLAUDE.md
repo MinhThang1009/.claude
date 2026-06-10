@@ -10,7 +10,7 @@
 
 ## Phong cách làm việc
 
-- Sắp sửa **>3 file có thay đổi logic** hoặc đụng **kiến trúc** (thêm module, đổi DB schema, refactor public API, đổi pattern xuyên codebase) → **lập plan, đợi tôi duyệt**. Plan mỗi bước có dạng: `[Step] → verify: [check]`. Batch trivial (format, rename, version bump) thì làm luôn dù nhiều file. Fix nhỏ (typo, đổi tên biến, thêm log, sửa 1-2 file isolated) cũng làm luôn.
+- Khi nào cần plan → ngưỡng duy nhất tại [`plan-workflow.md` §When to Create a Plan](rules/plan-workflow.md). Cần plan → **lập plan, đợi tôi duyệt**; mỗi bước dạng `[Step] → verify: [check]`.
 - Không chắc intent → **HỎI**, đừng đoán. Một câu hỏi tốt hơn 10 phút sửa sai.
 - Sau khi sửa → **TỰ KIỂM TRA** test/lint/typecheck nếu có. Đừng báo "xong" khi chưa verify.
 - Tôi nói "ultrathink" → keyword chính thức, Claude Code thêm in-context instruction request deeper reasoning cho turn đó (effort level KHÔNG đổi). Các cụm "think"/"think hard"/"think more" KHÔNG phải keyword — đối xử như plain text.

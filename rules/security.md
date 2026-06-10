@@ -31,24 +31,7 @@
 ## Input Validation & Injection Prevention
 
 - Never trust input from users/network/files. Validate type, range, and format before use. Output: escape/encode properly; never build strings via concatenation.
-
-| Vulnerability     | Prevention                                                              |
-| ----------------- | ----------------------------------------------------------------------- |
-| SQL injection     | Prepared statements / ORM with binding                                  |
-| Command injection | No `eval`, no `shell=True` with user input                              |
-| Path traversal    | Resolve with `path.resolve()`, check prefix is within allowed dir       |
-| XSS               | Escape output, use template engines with auto-escaping                  |
-| SSRF              | Validate URL host, allowlist domains, deny private IP ranges            |
-| XXE               | Disable external entities in XML parser                                 |
-| Deserialization   | No `pickle.loads`, `yaml.load` (use `safe_load`), `unserialize`, `Marshal.load` from untrusted sources |
-
-## Cryptography
-
-- Do NOT invent algorithms. Use standard libraries (`crypto`, `cryptography`, `bcrypt`, `argon2`, `libsodium`).
-- Password hashing: `argon2id` (preferred) or `scrypt`. `bcrypt` with cost ≥10 only for **legacy systems** where Argon2/scrypt isn't available. Never bare MD5/SHA1/SHA256. Source: [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html).
-- Symmetric encryption: AES-GCM or ChaCha20-Poly1305 with a random nonce. Never ECB.
-- Randomness: `secrets` (Python), `crypto.randomBytes` (Node), `/dev/urandom`. Never `Math.random()` for security-sensitive purposes.
-- TLS: minimum 1.2, prefer 1.3. Certificate pinning only when required (not by default).
+- Per-vulnerability prevention table (SQLi, command injection, path traversal, XSS, SSRF, XXE, deserialization), cryptography standards, and the auth/authz checklist: moved to the `/quick-audit` command (`plugins/subagent-system/commands/quick-audit.md` §Security checklist) — loaded on demand when auditing instead of every session.
 
 ## Dependencies
 
@@ -61,14 +44,6 @@
 - Log **request id, user id, action, result** — do NOT log request bodies containing PII or secrets.
 - User-facing error messages: generic, no stack traces or internal info exposed to the client (language format: see coding-standards.md §Error Handling).
 - Never log full request/response for payments, auth flows, or file uploads.
-
-## Authentication & Authorization
-
-- Authentication ≠ Authorization. Verify both at every endpoint.
-- Session tokens: random ≥128 bits, `HttpOnly` + `Secure` + `SameSite` cookie or `Authorization` header.
-- JWT: signed (RS256/EdDSA preferred over HS256), verify expiry + audience + issuer.
-- Rate limit: login, password reset, OTP, and public API endpoints.
-- Default-deny: if no explicit allow rule → deny.
 
 ## Dangerous Commands — Never Run
 

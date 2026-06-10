@@ -161,6 +161,7 @@
     "defaultMode": "acceptEdits",
     "additionalDirectories": []
   },
+  "model": "claude-fable-5[1m]",
   "hooks": {
     "WorktreeCreate": [
       {
@@ -245,6 +246,11 @@
             "type": "command",
             "command": "bash \"$HOME/.claude/hooks/handoff-auto-move.sh\"",
             "shell": "bash"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/hardlink-check.sh\"",
+            "shell": "bash"
           }
         ]
       }
@@ -256,11 +262,6 @@
             "type": "command",
             "command": "bash \"$HOME/.claude/hooks/self-review-nudge.sh\"",
             "shell": "bash"
-          },
-          {
-            "type": "command",
-            "command": "bash \"$HOME/.claude/hooks/logic-audit-gate.sh\"",
-            "shell": "bash"
           }
         ]
       }
@@ -270,7 +271,10 @@
     "type": "command",
     "command": "$HOME/.claude/hooks/statusline.sh"
   },
-  "enabledPlugins": {},
+  "enabledPlugins": {
+    "docx@minhthang-plugins": true,
+    "logic-audit@minhthang-plugins": true
+  },
   "extraKnownMarketplaces": {
     "minhthang-plugins": {
       "source": {
@@ -287,7 +291,7 @@
   "spinnerTipsEnabled": true,
   "syntaxHighlightingDisabled": false,
   "alwaysThinkingEnabled": false,
-  "effortLevel": "max",
+  "effortLevel": "high",
   "fastModePerSessionOptIn": false,
   "awaySummaryEnabled": true,
   "autoUpdatesChannel": "latest",
@@ -307,9 +311,9 @@
   ],
   "editorMode": "normal",
   "preferredNotifChannel": "auto",
+  "switchModelsOnFlag": false,
   "autoScrollEnabled": true,
   "showTurnDuration": true,
   "terminalProgressBarEnabled": true,
-  "agentPushNotifEnabled": true,
-  "model": "claude-sonnet-4-6[1m]"
+  "agentPushNotifEnabled": true
 }

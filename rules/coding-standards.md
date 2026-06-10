@@ -96,6 +96,6 @@ Confirm with the user before:
 - Changing a DB schema / running a migration.
 - Modifying production config / deployment config.
 - Editing a shared file (used by >3 modules) in a way that changes behavior.
-- Cross-cutting refactor (>5 files).
+- Cross-cutting refactor (>5 files) — this is the STOP-AND-ASK threshold; the (lower) plan threshold lives in plan-workflow.md §When to Create a Plan.
 - Changing a public API signature.
 - Deleting files/code you're not 100% certain is dead.
