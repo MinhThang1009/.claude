@@ -59,6 +59,10 @@ fetch-tasks.md
 .commit-msg-tmp.txt
 .commit-msg-*.txt
 
+# Session-report output — nhúng preview prompts + project/session ids, không commit
+session-report-*.html
+session-report-data-*.json
+
 # Python bytecode + tool caches
 __pycache__/
 *.pyc
