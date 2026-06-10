@@ -8,11 +8,11 @@ REPO="$HOME/dotclaude"
 LIVE="$HOME/.claude"
 FILES="CLAUDE.md settings.json"
 
-[ -d "$REPO" ] && [ -d "$LIVE" ] || exit 0
+if [ ! -d "$REPO" ] || [ ! -d "$LIVE" ]; then exit 0; fi
 
 for f in $FILES; do
   rf="$REPO/$f"; lf="$LIVE/$f"
-  [ -f "$rf" ] && [ -f "$lf" ] || continue
+  if [ ! -f "$rf" ] || [ ! -f "$lf" ]; then continue; fi
   [ "$(stat -c %i "$rf")" = "$(stat -c %i "$lf")" ] && continue
 
   # Link đứt → chọn bản mới hơn làm nguồn, xóa bản kia rồi mklink lại

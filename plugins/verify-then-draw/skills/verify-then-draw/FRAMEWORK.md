@@ -2,7 +2,7 @@
 
 > Khung **generic** để vẽ sơ đồ (hoặc audit code) từ codebase với sai sót tối thiểu.
 > Hạn chế tối đa tên tool/module cụ thể trong file này; **ví dụ minh hoạ stack-specific để ở**
-> [`PROJECT.yaml`](PROJECT.yaml), [`invariants.<domain>.md`](invariants.ecommerce.md), [`diagram-manifest.yaml`](diagram-manifest.yaml).
+> `PROJECT.yaml`, `invariants.<domain>.md`, `diagram-manifest.yaml` (tạo trong project đích — xem mẫu [`PROJECT.example.yaml`](PROJECT.example.yaml)).
 > Vài thuật ngữ chung (quét văn bản, message bus, AST) là **khái niệm**, không phải tool — giữ generic.
 > Copy thư mục này sang project khác → chỉ sửa 3 file kia + `PROJECT.<stack>.example.yaml`, **giữ nguyên FRAMEWORK.md**.
 

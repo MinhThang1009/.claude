@@ -280,3 +280,95 @@ class TestMain:
     def test_nested_json_no_command(self, bash_guard):
         code, _ = self._run_main(bash_guard, '{"tool_input": {"file_path": "/tmp/x"}}')
         assert code == 0
+
+    def test_ask_path_outputs_permission_decision(self, bash_guard):
+        import io
+        import json
+        import unittest.mock as mock
+
+        captured_stdout = io.StringIO()
+        with (
+            mock.patch(
+                "sys.stdin",
+                io.StringIO('{"tool_input": {"command": "cat ~/.npmrc"}}'),
+            ),
+            mock.patch("sys.stdout", captured_stdout),
+            mock.patch("sys.exit", side_effect=SystemExit),
+        ):
+            try:
+                bash_guard.main()
+            except SystemExit:
+                pass
+        payload = json.loads(captured_stdout.getvalue())["hookSpecificOutput"]
+        assert payload["permissionDecision"] == "ask"
+        assert payload["hookEventName"] == "PreToolUse"
+
+
+# ---------- safe CLI prefix ----------
+
+
+class TestSafeCliPrefix:
+    def test_gh_command_skips_checks(self, bash_guard):
+        # Prefix `gh ` nằm trong _SAFE_CLI_PREFIXES → bỏ qua mọi pattern check
+        blocked, reason = bash_guard.check_command("gh pr list --limit 5")
+        assert blocked is False
+        assert reason is None
+
+
+# ---------- is_windows_destructive ----------
+
+
+class TestWindowsDestructive:
+    def test_format_volume_blocked(self, bash_guard):
+        assert bash_guard.is_windows_destructive("Format-Volume -DriveLetter C") is True
+
+    def test_reg_delete_hklm_blocked(self, bash_guard):
+        assert bash_guard.is_windows_destructive("reg delete HKLM\\Software") is True
+
+    def test_reg_delete_hkey_local_machine_blocked(self, bash_guard):
+        assert (
+            bash_guard.is_windows_destructive(
+                'reg delete "HKEY_LOCAL_MACHINE\\SOFTWARE"'
+            )
+            is True
+        )
+
+    def test_remove_item_drive_root_blocked(self, bash_guard):
+        assert (
+            bash_guard.is_windows_destructive("Remove-Item -Recurse -Force C:\\")
+            is True
+        )
+
+    def test_remove_item_windows_dir_blocked(self, bash_guard):
+        assert (
+            bash_guard.is_windows_destructive("Remove-Item C:\\Windows -Recurse -Force")
+            is True
+        )
+
+    def test_remove_item_systemroot_blocked(self, bash_guard):
+        assert (
+            bash_guard.is_windows_destructive(
+                "Remove-Item -Recurse -Force $env:SystemRoot"
+            )
+            is True
+        )
+
+    def test_remove_item_without_force_allowed(self, bash_guard):
+        assert bash_guard.is_windows_destructive("Remove-Item -Recurse C:\\") is False
+
+    def test_remove_item_project_dir_allowed(self, bash_guard):
+        assert (
+            bash_guard.is_windows_destructive(
+                "Remove-Item -Recurse -Force .\\node_modules"
+            )
+            is False
+        )
+
+    def test_normal_command_allowed(self, bash_guard):
+        assert bash_guard.is_windows_destructive("Get-ChildItem C:\\") is False
+
+    def test_wired_into_check_command(self, bash_guard):
+        # End-to-end: hook thật sự BLOCK chứ không chỉ helper hoạt động đơn lẻ
+        blocked, reason = bash_guard.check_command("Format-Volume -DriveLetter C")
+        assert blocked is True
+        assert "Windows" in reason

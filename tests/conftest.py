@@ -50,6 +50,12 @@ _format_on_edit = _load_module("format_on_edit", HOOKS_DIR / "format-on-edit.py"
 _handoff_auto_move = _load_module(
     "handoff_auto_move", HOOKS_DIR / "handoff-auto-move.py"
 )
+_self_review_nudge = _load_module(
+    "self_review_nudge", HOOKS_DIR / "self-review-nudge.py"
+)
+_subagent_edit_surface = _load_module(
+    "subagent_edit_surface", HOOKS_DIR / "subagent-edit-surface.py"
+)
 
 
 @pytest.fixture
@@ -76,3 +82,17 @@ def format_on_edit():
     if _format_on_edit is None:
         pytest.skip("format-on-edit.py không tồn tại trên branch này")
     return _format_on_edit
+
+
+@pytest.fixture
+def self_review_nudge():
+    if _self_review_nudge is None:
+        pytest.skip("self-review-nudge.py không tồn tại trên branch này")
+    return _self_review_nudge
+
+
+@pytest.fixture
+def subagent_edit_surface():
+    if _subagent_edit_surface is None:
+        pytest.skip("subagent-edit-surface.py không tồn tại trên branch này")
+    return _subagent_edit_surface

@@ -327,6 +327,12 @@ def check_command(cmd: str):
         ),
         (is_fork_bomb, "fork bomb pattern — sẽ làm máy treo."),
         (is_dd_to_disk, "dd ghi vào disk device — risk wipe ổ cứng."),
+        (
+            is_windows_destructive,
+            "lệnh huỷ diệt Windows (Format-Volume, reg delete HKLM, "
+            "Remove-Item -Recurse -Force nhắm drive root/Windows dir) — "
+            "security.md §Dangerous Commands.",
+        ),
     ]
 
     for check_fn, reason in checks:

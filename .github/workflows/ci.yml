@@ -198,21 +198,30 @@ jobs:
           # CI: clear .claude-load.txt để load tất cả plugins → verify full count
           : > .claude-load.txt
           bash scripts/create-symlinks.sh
-      - name: Verify agents (29 files)
+      # Expected count tính động từ repo (unique basename — script dedup khi trùng tên),
+      # không hardcode để khỏi stale mỗi lần thêm/bớt agent/skill/command.
+      - name: Verify agents (count từ repo)
         run: |
+          expected=$(find plugins/*/agents -maxdepth 1 -name "*.md" 2>/dev/null -exec basename {} \; | sort -u | wc -l)
           count=$(find ~/.claude/agents -maxdepth 1 -name "*.md" | wc -l)
-          echo "agents: $count"
-          [ "$count" -eq 29 ] || { echo "Expected 29, got $count"; exit 1; }
-      - name: Verify skills (59 dirs)
+          echo "agents: $count (expected: $expected)"
+          [ "$expected" -gt 0 ] || { echo "Repo không có agent nào — nghi glob sai"; exit 1; }
+          [ "$count" -eq "$expected" ] || { echo "Expected $expected, got $count"; exit 1; }
+      - name: Verify skills (count từ repo)
         run: |
+          expected=$({ find plugins/*/skills -mindepth 1 -maxdepth 1 -type d 2>/dev/null; find .claude/skills -mindepth 1 -maxdepth 1 -type d 2>/dev/null; } | xargs -n1 basename | sort -u | wc -l)
           count=$(find -L ~/.claude/skills -maxdepth 1 -mindepth 1 -type d | wc -l)
-          echo "skills: $count"
-          [ "$count" -eq 59 ] || { echo "Expected 59, got $count"; exit 1; }
-      - name: Verify commands (29 files)
+          echo "skills: $count (expected: $expected)"
+          [ "$expected" -gt 0 ] || { echo "Repo không có skill nào — nghi glob sai"; exit 1; }
+          [ "$count" -eq "$expected" ] || { echo "Expected $expected, got $count"; exit 1; }
+      # Không guard expected>0: repo hiện 0 commands là hợp lệ (commands đã chuyển
+      # thành skills) — check tự kích hoạt lại khi plugin nào đó thêm commands/.
+      - name: Verify commands (count từ repo)
         run: |
+          expected=$(find plugins/*/commands -maxdepth 1 -name "*.md" 2>/dev/null -exec basename {} \; | sort -u | wc -l)
           count=$(find ~/.claude/commands -maxdepth 1 -name "*.md" | wc -l)
-          echo "commands: $count"
-          [ "$count" -eq 29 ] || { echo "Expected 29, got $count"; exit 1; }
+          echo "commands: $count (expected: $expected)"
+          [ "$count" -eq "$expected" ] || { echo "Expected $expected, got $count"; exit 1; }
 
   symlinks-test-windows:
     name: Test create-symlinks.ps1 (Windows)
@@ -225,21 +234,30 @@ jobs:
           # CI: clear .claude-load.txt để load tất cả plugins
           Set-Content .claude-load.txt ""
           powershell -File scripts/create-symlinks.ps1
-      - name: Verify agents (29 files)
+      # Expected count tính động từ repo (unique Name — mklink fail khi trùng tên → dedup),
+      # không hardcode để khỏi stale mỗi lần thêm/bớt agent/skill/command.
+      - name: Verify agents (count từ repo)
         shell: pwsh
         run: |
+          $expected = (Get-ChildItem plugins\*\agents\*.md -ErrorAction SilentlyContinue | Group-Object Name).Count
           $count = (Get-ChildItem "$env:USERPROFILE\.claude\agents" -Filter "*.md" -ErrorAction SilentlyContinue).Count
-          Write-Host "agents: $count"
-          if ($count -ne 29) { Write-Error "Expected 29, got $count"; exit 1 }
-      - name: Verify skills (59 dirs)
+          Write-Host "agents: $count (expected: $expected)"
+          if ($expected -eq 0) { Write-Error "Repo không có agent nào — nghi glob sai"; exit 1 }
+          if ($count -ne $expected) { Write-Error "Expected $expected, got $count"; exit 1 }
+      - name: Verify skills (count từ repo)
         shell: pwsh
         run: |
+          $expected = (Get-ChildItem plugins\*\skills -Directory -ErrorAction SilentlyContinue | Group-Object Name).Count
           $count = (Get-ChildItem "$env:USERPROFILE\.claude\skills" -ErrorAction SilentlyContinue).Count
-          Write-Host "skills: $count"
-          if ($count -ne 59) { Write-Error "Expected 59, got $count"; exit 1 }
-      - name: Verify commands (29 files)
+          Write-Host "skills: $count (expected: $expected)"
+          if ($expected -eq 0) { Write-Error "Repo không có skill nào — nghi glob sai"; exit 1 }
+          if ($count -ne $expected) { Write-Error "Expected $expected, got $count"; exit 1 }
+      # Không guard expected>0: repo hiện 0 commands là hợp lệ (commands đã chuyển
+      # thành skills) — check tự kích hoạt lại khi plugin nào đó thêm commands/.
+      - name: Verify commands (count từ repo)
         shell: pwsh
         run: |
+          $expected = (Get-ChildItem plugins\*\commands\*.md -ErrorAction SilentlyContinue | Group-Object Name).Count
           $count = (Get-ChildItem "$env:USERPROFILE\.claude\commands" -Filter "*.md" -ErrorAction SilentlyContinue).Count
-          Write-Host "commands: $count"
-          if ($count -ne 29) { Write-Error "Expected 29, got $count"; exit 1 }
+          Write-Host "commands: $count (expected: $expected)"
+          if ($count -ne $expected) { Write-Error "Expected $expected, got $count"; exit 1 }
