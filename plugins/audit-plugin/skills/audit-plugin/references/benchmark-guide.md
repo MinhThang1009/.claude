@@ -10,6 +10,7 @@ Applies only to plugins that are **executable workflows**. Goal: measure real ef
 - Plant **controlled cases** matching the exact patterns the plugin claims to handle (at least one per severity level). Record the answer key before running.
 - If the plugin expects a test framework: write **green** happy-path tests that mask the planted cases — this measures the ability to see through "tests pass".
 - Path gotcha: under Git Bash, `/tmp` = `%TEMP%` (`C:\Users\<user>\AppData\Local\Temp`), NOT `C:\tmp`. Write files using real Windows paths.
+- **Keep adversarial/injection cases in a SEPARATE minimal fixture (or separate stage)** — a fixture whose plan/codebase body contains injection strings (e.g. `; echo ... > pwned.txt`, sensitive paths like `.ssh`) can be rejected wholesale by model safety filters in headless runs, blocking the non-adversarial dimensions too. Run the sanitized fixture for the main dimensions; probe injection handling in its own isolated run. (Observed 2026-06: a Stage-B run was safety-rejected until the fixture was sanitized; the stage that needed those lines had already completed.)
 
 ## 2. Two-stage headless run (respect the human gate)
 
@@ -38,6 +39,7 @@ claude -p --resume <session_id> "Approved: <specific decisions>. Continue the re
 - Headless cannot create files under the fixture's `.claude/` (permission auto-deny) → any hook-armed gate mechanism in the plugin will not arm; score that part with a separate smoke test: pre-place the state/resource, open a fresh headless session, and observe whether the hook fires.
 - Tools outside the allowlist are auto-denied — anticipate what the plugin needs (`rm`, non-allowlisted test runners, …) and pass them via `--allowedTools`.
 - A skill-invoke result that is a stub `"Execute skill: X"` with `is_error: true` means the skill did not load — that run measured the "bare model", MUST be excluded from the benchmark data and rerun.
+- Model safety filters can reject a run even on a SANITIZED fixture (observed 2026-06: Fable 5 rejected a plain verify-mode run; the rerun on `--model claude-sonnet-4-6` passed). Prefer a less-filtered model for benchmark runs, record which model was used in the benchmark report, and treat a safety rejection as excluded-then-rerun (on another model if needed) — not as a fixture bug.
 
 ## 3. Scoring — verify by hand, never trust self-reports
 

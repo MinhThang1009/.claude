@@ -21,7 +21,10 @@ What: find every remaining defect against 7 criteria:
 (2) internal contradictions across files or within a file (phase/step numbers,
     terminology, prompt templates, severity rubrics, state/lifecycle,
     actual script behavior vs SKILL.md/README descriptions);
-(3) plugin structure vs best practice (frontmatter follows conventions; third-person
+(3) plugin structure vs best practice (frontmatter follows conventions — note:
+    frontmatter `allowed-tools` accepts space-separated, comma-separated, or YAML-list
+    forms per the docs, so do NOT report the separator style alone as a defect;
+    third-person
     trigger description with concrete trigger phrases — including non-English ones the
     user actually uses — and no trigger-phrase collision with OTHER installed skills'
     descriptions; hooks bundled in hooks/hooks.json using ${CLAUDE_PLUGIN_ROOT}; tool
@@ -43,7 +46,8 @@ What: find every remaining defect against 7 criteria:
     docstrings claim, dangerous command patterns, fail-open vs fail-closed vs
     documented intent, secret/PII leakage into logs or stderr; you may run the test
     suite and probe the scripts with adversarial input via Bash (in a temp dir only —
-    test artifacts like caches are acceptable; never modify tracked plugin files);
+    test artifacts like caches are acceptable; delete the temp dir when the probe is
+    done; never modify tracked plugin files);
 (7) conciseness & consistency — context bloat (content inlined in SKILL.md that belongs
     in references, overlong description, redundant repetition), and stylistic
     consistency (one language policy, uniform tone/formatting/terminology across files).

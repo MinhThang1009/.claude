@@ -2,15 +2,40 @@
 
 > Self-audit log. Per SKILL.md Stage 7, every `[OUT-OF-CRITERIA]` finding must produce a criteria-update proposal here.
 
-Generated: 2026-06-10 (first external audit: plugins/audit-plan — 4 rounds + benchmark)
+Generated: 2026-06-11 (session-report audit — first audit of a plugin with non-trivial bundled scripts)
+
+## session-report audit learnings
+
+P-7/P-9/P-10 + P-8(b) were APPLIED at Stage 0 step 5 and all held up: probe temp dirs were cleaned by reviewers unprompted (P-10 wording reached dispatched agents via the canonical prompt), USER ACTIONs carry as-of dates (P-9), the split rule routed operator notes to `.claude/audit-plugin-proposals.md` (P-8).
+
+**Criteria-update proposals:**
+- **P-11 (deployment staleness recurred for the 3rd time):** Stage 0 should ALWAYS record the installed-cache version and diff it against the repo copy of the target plugin — even when the plugin is disabled. session-report's stale 1.0.0 cache surfaced as a finding in 3 of 4 fresh rounds (burning finder/validator cycles each time) because Stage 0 skipped the cache check for a disabled plugin. One early check converts a recurring finding into a single USER ACTION. Status: PROPOSED.
+- **P-12 (from round-4 [OUT-OF-CRITERIA] "no test suite"):** extend criterion 6 — a plugin shipping non-trivial bundled scripts (heuristic: >100 lines or >2 documented edge cases) with NO automated tests is reportable (LOW): every probe-verified behavior is guarded only by comments, and this audit showed each fix batch introduced a new defect that only fresh probing caught. Status: PROPOSED.
+- **Observation (no proposal):** the fixer-introduces-defects loop fired twice this audit (batch 2's build-report `$`-pattern HIGH; batch 3's incomplete R4-F3 denominator fix caught by lead verification). The existing architecture (fresh rounds + lead probes) caught both — evidence the convergence design works, but also that fix batches on script-bearing plugins should always rerun the regression suite (this audit did so; consider making it a Stage 4 requirement for scripts — it already is via the "written or updated test that passes" rule, reaffirmed here).
+
+---
+
+Generated: 2026-06-10 (second audit of plugins/audit-plan — 4 rounds at hard cap + 4-run benchmark)
+
+## Second audit-plan audit learnings
+
+P-5 and P-6 were APPLIED at this audit's Stage 0 step 5. P-6 worked as intended (zero allowed-tools-separator false positives across 4 rounds). P-5's separate-adversarial-fixture rule was followed and the injection stage passed cleanly — but the safety-filter risk turned out broader than P-5 assumed (see P-7).
+
+**Criteria-update proposals:**
+- **P-7 (from the Fable safety-filter rejection on a SANITIZED fixture):** benchmark-guide §2 should state that headless benchmark runs may be rejected by model safety filters even on sanitized fixtures (observed: Fable 5 rejected a plain verify-mode run; rerun on `--model claude-sonnet-4-6` succeeded). Recommend: pick a non-frontier/less-filtered model for benchmark runs by default, record the model used in the benchmark report, and treat a safety rejection as "excluded + rerun on another model", not as a fixture bug. **Status: APPLIED 2026-06-10** (benchmark-guide §2 bullet; session-report audit Stage 0 step 5).
+- **P-8 (from round-1 [OUT-OF-CRITERIA] R-F13, re-reported rounds 2 & 4):** `improvement-proposals.md` written to the audited plugin's root ships with every install (confirmed present in the installed cache). Stage 7 should either (a) note this as accepted-by-design in SKILL.md (the file is the plugin's public audit trail), or (b) prefer the project-level `.claude/audit-plugin-proposals.md` for internal-only content (costs, operator USER ACTIONs) and keep only user-relevant learnings in the plugin root. Decision needed once; recurring re-report otherwise burns a finding slot every audit. **Status: DECIDED (b) + APPLIED 2026-06-10** — user chose the split: plugin-root file = user-relevant only; internal-only (costs, operator USER ACTIONs) → project-level `.claude/audit-plugin-proposals.md` (SKILL.md Stage 7 split rule).
+- **P-9 (process observation, no criteria change):** USER ACTION items recorded in a plugin's improvement-proposals.md go stale and become misinformation once acted on (the "1.0.1 cache" note survived two audits as a false claim under the never-edit-historical rule). Stage 7 template should require USER ACTION lines to carry an as-of timestamp + "superseded by newer entries" framing, and each new audit's entry must explicitly close or restate prior USER ACTIONs (this audit did so manually). **Status: APPLIED 2026-06-10** (SKILL.md Stage 7 USER ACTION rule; session-report audit Stage 0 step 5).
+- **P-10 (from a real leak, user-reported):** the audit process creates temp artifacts beyond the benchmark fixtures — Stage 1 adversarial-probe dirs (`mktemp -d`), e2e fixtures, scratch files — and nothing in SKILL.md requires cleaning them up; benchmark-guide §4 covers only the fixture itself. Observed: a grep-probe temp dir survived the audit-plan audit until the user asked about leftover files. Fix: Stage 7 gains a cleanup item — "delete every temp dir/file the audit created (fixtures, probe dirs, scratch outputs); track paths at creation time" — and Stage 1's temp-dir clause gains "and delete it when the probe is done". **Status: APPLIED 2026-06-10** (SKILL.md Stage 1 + Stage 7 sweep item + canonical criterion 6; session-report audit Stage 0 step 5).
+
+---
 
 ## External-audit learnings (audit-plan run)
 
 P-3 and P-4 were APPLIED to the canonical block at this audit's Stage 0 step 5 — the self-update loop completed its first full cycle (propose → apply → criteria caught real findings: P-3 caught the drifted plugin.json/marketplace.json description pair in round 0).
 
 **Criteria-update proposals:**
-- **P-5 (from the benchmark's safety-filter rejection):** benchmark-guide §1/§2 should advise keeping adversarial/injection cases in a SEPARATE minimal fixture or stage — a plan/codebase containing injection strings can be rejected wholesale by model safety filters in headless runs, blocking the non-adversarial dimensions too. Observed: Stage B rejected until the fixture was sanitized; Stage A (which needed those lines) had already completed. Status: PROPOSED.
-- **P-6 (recurring false positive):** two consecutive fresh rounds re-raised "space-separated `allowed-tools` may not parse", refuted both times by the docs ("Accepts a space- or comma-separated string, or a YAML list"). Add one line to the canonical prompt's criterion 3: frontmatter `allowed-tools` accepts space/comma/YAML-list forms — do not report the separator style alone as a defect. Saves a validator cycle every future audit. Status: PROPOSED.
+- **P-5 (from the benchmark's safety-filter rejection):** benchmark-guide §1/§2 should advise keeping adversarial/injection cases in a SEPARATE minimal fixture or stage — a plan/codebase containing injection strings can be rejected wholesale by model safety filters in headless runs, blocking the non-adversarial dimensions too. Observed: Stage B rejected until the fixture was sanitized; Stage A (which needed those lines) had already completed. **Status: APPLIED 2026-06-10** (benchmark-guide §1 bullet added; second audit-plan audit, Stage 0 step 5).
+- **P-6 (recurring false positive):** two consecutive fresh rounds re-raised "space-separated `allowed-tools` may not parse", refuted both times by the docs ("Accepts a space- or comma-separated string, or a YAML list"). Add one line to the canonical prompt's criterion 3: frontmatter `allowed-tools` accepts space/comma/YAML-list forms — do not report the separator style alone as a defect. Saves a validator cycle every future audit. **Status: APPLIED 2026-06-10** (canonical block criterion 3 updated; second audit-plan audit, Stage 0 step 5).
 
 ---
 
