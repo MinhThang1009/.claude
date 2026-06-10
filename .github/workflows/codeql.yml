@@ -24,12 +24,11 @@ jobs:
         language: [python]
 
     steps:
-      # CHỐT v5 cho riêng workflow này (FINAL DECISION 2026-06-10, 2 thực nghiệm):
-      # checkout v6 làm codeql-action lỗi "Requires authentication" khi gọi API
-      # (cả init lẫn upload SARIF), kể cả với persist-credentials: false.
-      # KHÔNG bump lên v6 (close PR Dependabot nếu có) tới khi codeql-action công bố
-      # tương thích checkout v6 — khi đó thử lại 1 commit là biết.
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      # Lưu ý sự cố 2026-06-10: loạt run CodeQL fail "Requires authentication"
+      # 15:19-15:53 UTC là do GitHub incident (sporadic auth failures ~15% API),
+      # KHÔNG phải do checkout v6 — đừng downgrade nếu gặp lại lỗi này, check
+      # githubstatus.com trước.
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2
