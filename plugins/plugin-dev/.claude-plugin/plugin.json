@@ -1,6 +1,6 @@
 {
   "name": "plugin-dev",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Comprehensive toolkit for developing Claude Code plugins including hooks, MCP integration, commands, agents, and skills",
   "author": {
     "name": "Minh Thang"

@@ -1,6 +1,6 @@
 {
   "name": "debug",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Systematic debugging workflow: reproduce first, write failing test, then fix",
   "author": {
     "name": "Minh Thang"
