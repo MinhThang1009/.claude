@@ -24,7 +24,10 @@ jobs:
         language: [python]
 
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      # checkout v6 đổi cơ chế persist-credentials → CodeQL upload SARIF fail
+      # "Requires authentication" (xác nhận bằng thực nghiệm run 15:19 vs 14:55).
+      # Giữ v5 riêng cho workflow này tới khi codeql-action tương thích v6.
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2
