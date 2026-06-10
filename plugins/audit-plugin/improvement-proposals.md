@@ -2,6 +2,18 @@
 
 > Self-audit log. Per SKILL.md Stage 7, every `[OUT-OF-CRITERIA]` finding must produce a criteria-update proposal here.
 
+Generated: 2026-06-10 (first external audit: plugins/audit-plan — 4 rounds + benchmark)
+
+## External-audit learnings (audit-plan run)
+
+P-3 and P-4 were APPLIED to the canonical block at this audit's Stage 0 step 5 — the self-update loop completed its first full cycle (propose → apply → criteria caught real findings: P-3 caught the drifted plugin.json/marketplace.json description pair in round 0).
+
+**Criteria-update proposals:**
+- **P-5 (from the benchmark's safety-filter rejection):** benchmark-guide §1/§2 should advise keeping adversarial/injection cases in a SEPARATE minimal fixture or stage — a plan/codebase containing injection strings can be rejected wholesale by model safety filters in headless runs, blocking the non-adversarial dimensions too. Observed: Stage B rejected until the fixture was sanitized; Stage A (which needed those lines) had already completed. Status: PROPOSED.
+- **P-6 (recurring false positive):** two consecutive fresh rounds re-raised "space-separated `allowed-tools` may not parse", refuted both times by the docs ("Accepts a space- or comma-separated string, or a YAML list"). Add one line to the canonical prompt's criterion 3: frontmatter `allowed-tools` accepts space/comma/YAML-list forms — do not report the separator style alone as a defect. Saves a validator cycle every future audit. Status: PROPOSED.
+
+---
+
 Generated: 2026-06-10 (v1.0.2 — dogfood round 4, FINAL per hard cap)
 
 ## Dogfood Round 4 Result — audit CLOSED at hard cap
@@ -19,8 +31,8 @@ Generated: 2026-06-10 (v1.0.1 — dogfood round 3)
 **0 HIGH** (2nd consecutive round), 5 MEDIUM, 13 LOW — MEDIUMs all fixed same-session: M1 round-≥2 findings now ALWAYS pass the Stage 3 user gate (closed the "needs no decision → edit without approval" bypass); M2 zero-findings path now routes through Stage 6 when applicable; M3 HIGH-at-cap branch defined (fix + targeted validator pass, no 5th round); M5 Stage 0 structural findings carry into the ledger; **M4 CONFIRMED by direct diff — the installed cache copy at `~/.claude/plugins/cache/.../audit-plugin/1.0.0` was the stale pre-round-2 content under the same version → bumped to 1.0.1 (user must update/reinstall the plugin so the cache refreshes).** Cheap LOWs fixed (fast-path named, token-cost canonical home, temp-dir clause pointer, scope grants for junctions + user-level configs, Task-unavailable stop rule, Stage 2 verdicts→ledger, no-test-harness branch, §4 retitled). Round-2 canonicalization verified working: "the duplicates that still exist all match verbatim today".
 
 **Criteria-update proposals (from round-3 [OUT-OF-CRITERIA]):**
-- **P-3:** extend criterion 5's boundary — duplication checks must include plugin-adjacent registry copies (e.g. plugin.json description verbatim-duplicated in marketplace.json) — same blind-spot class as P-1.
-- **P-4:** extend criterion 3 — detect dual-loading: the same skill reachable through two mechanisms at once (e.g. junction-synced user-level copy + marketplace plugin) duplicates the trigger surface.
+- **P-3:** extend criterion 5's boundary — duplication checks must include plugin-adjacent registry copies (e.g. plugin.json description verbatim-duplicated in marketplace.json) — same blind-spot class as P-1. **Status: APPLIED 2026-06-10** (Stage 0 step 5 of the audit-plan audit; canonical block updated).
+- **P-4:** extend criterion 3 — detect dual-loading: the same skill reachable through two mechanisms at once (e.g. junction-synced user-level copy + marketplace plugin) duplicates the trigger surface. **Status: APPLIED 2026-06-10** (same session).
 
 ---
 

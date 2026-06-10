@@ -27,12 +27,17 @@ What: find every remaining defect against 7 criteria:
     descriptions; hooks bundled in hooks/hooks.json using ${CLAUDE_PLUGIN_ROOT}; tool
     list matching the workflow's steps; cross-plugin dependencies declared in the
     README; reachability through every loading mechanism the repo actually uses —
-    marketplace registration, load lists, settings enabledPlugins, junctions/symlinks);
+    marketplace registration, load lists, settings enabledPlugins, junctions/symlinks —
+    AND no dual-loading: the same skill reachable through two mechanisms at once, e.g.
+    a junction-synced user-level copy plus a marketplace plugin, duplicates the trigger
+    surface);
 (4) exception paths that are uncovered or covered contradictorily (abort, orphaned
     state/resources, multi-session, missing dependency, zero-input/zero-findings,
     missing environment such as no test framework or no git);
 (5) duplication between any two files of the plugin lacking a canonical pointer (drift
-    risk) — and whether existing duplicates still match verbatim;
+    risk) — including plugin-adjacent registry copies (e.g. plugin.json description
+    verbatim-duplicated in marketplace.json) — and whether existing duplicates still
+    match verbatim;
 (6) technical defects AND security in bundled scripts — logic, paths (Windows vs
     POSIX), encoding (BOM, UTF-8), exit codes, whether fail-safe behavior matches what
     docstrings claim, dangerous command patterns, fail-open vs fail-closed vs
