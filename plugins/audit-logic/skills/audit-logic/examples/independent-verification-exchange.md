@@ -1,4 +1,4 @@
-# Example: Independent Verification Agent Exchange (Phase 4, Step 6)
+# Example: Independent Verification Agent Exchange (Phase 5, Step 6)
 
 This shows the correct way to run independent verification and interpret its output.
 
@@ -6,7 +6,7 @@ This shows the correct way to run independent verification and interpret its out
 
 ## What to Send the Agent
 
-After fixing a bug, spawn a verification agent with **only** this — no context about what was changed:
+After fixing a bug, spawn a verification agent with **only** this — no context about what was changed. (Canonical template: SKILL.md Phase 5 step 6 — if this example ever diverges, SKILL.md wins.)
 
 ```
 Read these files:
@@ -16,9 +16,10 @@ Read these files:
 For each file, determine:
 1. Is the logic correct? Are all business rules properly enforced?
 2. Are there race conditions, data integrity risks, or missing validation?
-3. Any edge cases not handled?
+3. Are there edge cases where the code produces incorrect output?
 
-Do NOT look at git history or commit messages. Read the current code only.
+Do NOT look at git history, commit messages, or any description of what was changed.
+Read the current code only.
 Report findings with specific file and line number references.
 ```
 
@@ -51,7 +52,7 @@ Line 203: validateCart not called from addItem — appears intentional by contex
 
 **"Finds a remaining issue"** → Line 178 is a NEW finding the verification agent surfaced. This is the point of independent verification — it found something you missed.
 
-**Action:** Investigate line 178. Decide: is `updateQuantity` also supposed to enforce variant stock? If yes, fix it. If no, document why. Either way, don't ignore it.
+**Action:** Investigate line 178. Determine: is `updateQuantity` also supposed to enforce variant stock? If it is a real finding, present it to the user for approval first — the Phase 3 rule applies (the user decides what gets fixed). If not, document why. Either way, don't ignore it.
 
 ---
 

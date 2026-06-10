@@ -19,6 +19,7 @@ audit-plan
 plan-workflow
 session-report
 pptx
-logic-audit
+audit-logic
+audit-plugin
 verify-then-draw
 code-review

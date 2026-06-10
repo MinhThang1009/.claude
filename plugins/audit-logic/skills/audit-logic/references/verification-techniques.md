@@ -1,6 +1,6 @@
 # Verification Techniques
 
-Reference for Phases 3–5 of the logic-audit skill.
+Reference for Phases 3–6 of the audit-logic skill.
 
 ---
 
@@ -17,10 +17,12 @@ Before adding an issue to the confirmed list:
 
 ## Independent Verification Agent Prompt
 
-When spawning an independent verifier (Phase 4, step 6), give the agent **exactly this prompt** with no additional context about what you changed or why:
+When spawning an independent verifier (Phase 5, step 6), give the agent **exactly this prompt** with no additional context about what you changed or why:
+
+> The canonical copy of this template lives in SKILL.md Phase 5 step 6 — if the two ever diverge, SKILL.md wins.
 
 ```
-Read these files: [paste list of changed files]
+Read these files: [list changed files]
 
 For each file, determine:
 1. Is the logic correct? Are all business rules properly enforced?
@@ -37,6 +39,8 @@ Report findings with specific file and line number references.
 ---
 
 ## Test Strategy for Bug Fixes
+
+> Canonical criteria live in SKILL.md Phase 5 step 2 — if the two ever diverge, SKILL.md wins.
 
 A good bug-fix test:
 - **Fails** on the unfixed code (reproduces the bug)
@@ -55,7 +59,7 @@ A good bug-fix test:
 
 **When no test runner is available:**
 - Document the expected behavior as a comment in the fix commit
-- Note in the Phase 6 summary that the fix needs environment-level verification
+- Note in the Phase 7 summary that the fix needs environment-level verification
 - Do not claim the fix is verified — it is not
 
 **For race conditions:**
@@ -89,6 +93,8 @@ After fixing bugs, find documentation that now states incorrect behavior:
 
 ## Severity Classification
 
+> The canonical rubric — including the race-condition calibration (wrong data persisted = HIGH; failed request/500 with no wrong data = MEDIUM at most) — lives in SKILL.md Phase 3. If this section and SKILL.md ever diverge, SKILL.md wins.
+
 **🔴 HIGH — fix immediately:**
 - Data written to the database can be wrong, duplicated, or missing
 - Security: authentication bypass, privilege escalation, sensitive data exposed
@@ -99,7 +105,8 @@ After fixing bugs, find documentation that now states incorrect behavior:
 - Feature behaves differently than documented in a way users will notice
 - Validation enforced on one code path but missing on an equivalent path (same operation, different entry point)
 - Partial cleanup on failure that accumulates over time (orphaned files, dangling records)
-- Inconsistency with how the same pattern is handled elsewhere in the codebase
+- Inconsistency with how the same pattern is handled elsewhere in the codebase, with potential user-visible or risk-bearing impact (purely cosmetic inconsistency with no user-visible impact is INFO per SKILL.md)
+- Race condition whose worst case is a failed request / 500 with no wrong data persisted
 
 **🔵 INFO — document, defer if appropriate:**
 - Dead code with no production caller (remove, or document explicitly as intentional)
@@ -118,6 +125,8 @@ After fixing bugs, find documentation that now states incorrect behavior:
 ## Commit Message Format
 
 Each fix commit answers three questions: what was wrong, why it was wrong, what changed.
+
+Follow the **target project's** commit conventions (language, scope format, footer). The examples below use English subjects — if the project's convention mandates another language or format, the project wins.
 
 ```
 fix(<module>): <what was wrong — short, present tense>

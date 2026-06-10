@@ -1,14 +1,14 @@
 ---
-name: logic-audit
+name: audit-logic
 description: This skill should be used when the user asks to "audit logic bugs", "read all source files and find bugs", "gate tầng 0", "logic check a module", "verify module correctness", "find business logic bugs", "audit this module before drawing diagrams", or says "read every line of code". Works on any module, language, or framework — discovers tests, docs, and project structure at runtime.
-version: 0.9.0
+version: 1.0.0
 argument-hint: <module-path-or-directory>
-allowed-tools: [Read, Grep, Glob, Bash, Edit, Write]
+allowed-tools: [Read, Grep, Glob, Bash, Edit, Write, Task, Skill, WebFetch, WebSearch]
 ---
 
-# Logic Audit Skill
+# Audit Logic Skill
 
-Perform a systematic, line-by-line logic audit of the target module. The goal is to find **real bugs** — not style issues, not theoretical edge cases — bugs that cause wrong behavior, data corruption, race conditions, or incorrect business rule enforcement in production.
+Perform a systematic, line-by-line logic audit of the target module. The target is the path passed as the skill argument (`<module-path-or-directory>`); if no argument was given, ask the user for the target before starting. The goal is to find **real bugs** — not style issues, not theoretical edge cases — bugs that cause wrong behavior, data corruption, race conditions, or incorrect business rule enforcement in production.
 
 **Language-agnostic and framework-agnostic.** Adapt discovery, test commands, and doc search to whatever stack exists in the target directory.
 
@@ -16,22 +16,22 @@ Perform a systematic, line-by-line logic audit of the target module. The goal is
 
 ## Phase 1 — Discover
 
-1. List every source file in the target directory (exclude test files, generated files, build artifacts, lock files). Print the full list so the user sees the audit scope before proceeding.
+1. List every source file in the target directory (exclude test files, generated files, build artifacts, lock files). Print the full list — and note alongside it which test files will also be read in Phase 2 — so the user sees the true audit scope before proceeding.
 
 2. Find the project's primary documentation (CLAUDE.md, README.md, architecture docs, or equivalent). Read the section describing what this module does and what business rules it must enforce. This establishes the expected behavior to audit against.
 
-3. **Create gate state file** — use the Write tool to create `.claude/logic-audit-state.json` at the project root:
-   ```json
-   {"findings_confirmed": false, "phase4_gate": false, "phase5_gate": false, "phase6_gate": false, "phase7_gate": false}
-   ```
-   The Stop hook reads this file and blocks if gates are incomplete. Delete the file after Phase 7 retrospective completes.
-
-4. Identify and run the existing test suite for this module to establish a **green baseline**:
+3. Identify and run the existing test suite for this module to establish a **green baseline**:
    - Find the test runner and config (jest.config, pytest.ini, go test, etc.)
    - Run only the tests relevant to this module if possible
    - If **no test files exist** → note this explicitly. Proceed with code-only analysis. All fixes will be unverified by automated tests — flag this prominently in the Phase 7 summary.
    - If tests are **already failing before any changes** → stop, report the failures, and ask the user whether to continue with code-only analysis
    - If tests **cannot be run** (missing environment, requires external services, CI-only) → note this explicitly and proceed with code-only analysis. Flag at the end that fixes should be verified in the appropriate environment.
+
+4. **Create gate state file** — only after the baseline outcome is settled (green baseline, no-tests noted, or the user approved continuing despite failures). Use the Write tool to create `.claude/audit-logic-state.json` at the **project root** (the directory Claude Code was started in — same as `${CLAUDE_PROJECT_DIR}`, which is where the Stop hook reads it; not the cwd if they differ):
+   ```json
+   {"findings_confirmed": false, "phase4_gate": false, "phase5_gate": false, "phase6_gate": false, "phase7_gate": false}
+   ```
+   The Stop hook (bundled with this plugin — `hooks/hooks.json` → `audit-logic-gate.sh` → `audit-logic-gate.py`) reads this file and blocks if gates are incomplete. Creating it after step 3 keeps the "stop and ask the user" path for a red baseline unblocked. Delete the file after Phase 7 retrospective completes — or immediately if the user aborts the audit at any point (see Ground Rules).
 
 ---
 
@@ -66,9 +66,10 @@ Apply these rules while reading:
 
 **What to look for** — consult `references/reading-patterns.md` while reading each file. Key patterns: race conditions, missing transactions, aggregate-vs-per-item checks, null/undefined boundary failures, guard clauses that can be bypassed, dead code, type coercion bugs, off-by-one errors, and business rules enforced in one path but missing in another.
 
-**Phase 2 self-check before proceeding to Phase 3:** Confirm all of the following:
+**Phase 2 self-check before proceeding to Phase 3:** Print a brief coverage summary (visible to the user — not a silent mental check) confirming all of the following:
 - For each source file: which unit test file(s) cover it, what they assert about each public method, and what they do NOT assert (gaps).
 - Which higher-level test files (integration, API HTTP, invariant) were read and what business rules they assert that unit tests cannot verify.
+- For each public function/method: which **production** code path calls it. A public symbol with NO production caller — only tests call it, or a comment references a flow that does not exist in the codebase — goes on the running issue list as a dead-code candidate (INFO). Test coverage of a function is NOT evidence it is alive.
 
 Simply listing file names is not sufficient — you must demonstrate you read the content. If you cannot answer "what does TC-X assert about method Y?" for key methods, or "what business rule does the integration test for this module verify?", you have not completed Phase 2.
 
@@ -85,7 +86,7 @@ After reading all files, review the running issue list. For each item, determine
 
 4. **Is it provable from source code alone?** Can the bug be demonstrated by tracing the project's own source, without relying on assumptions about how a third-party framework or library behaves internally?
    - If **yes** → proceed with classification.
-   - If **no** → verify the library behavior first: grep its source, check official docs, or run a minimal script in the project's language (`node -e "..."`, `python -c "..."`, `go run`, etc.) to confirm. Do not classify as HIGH without this verification. If verification is not possible in this environment, tag the finding `[NEEDS-RUNTIME-VERIFY]` and cap severity at MEDIUM.
+   - If **no** → verify the library behavior first: grep its source, check official docs (WebFetch/WebSearch), or run a minimal script in the project's language (`node -e "..."`, `python -c "..."`, `go run`, etc.) to confirm. Do not classify as HIGH without this verification. If verification is not possible in this environment, tag the finding `[NEEDS-RUNTIME-VERIFY]` and cap severity at MEDIUM. Unless the user explicitly approves fixing it anyway, a `[NEEDS-RUNTIME-VERIFY]` finding defaults to deferred — it must appear in the Phase 7 deferred list with reason "requires runtime verification".
 
 5. **What is the minimal fix?** Before touching any file, run a pre-flight check:
    - Grep test files for assertions on the affected symbol, function, or variable.
@@ -103,18 +104,18 @@ Classify each confirmed issue:
 - Two concurrent requests → one writes wrong value to DB (oversell, wrong total, duplicate record) → **HIGH**
 - Two concurrent requests → one gets a DB constraint error / 500, no data is corrupted → **MEDIUM at most, consider INFO** if the scenario requires simultaneous manual operations (e.g., two admins cloning the same product at the same millisecond)
 
-**Present the classified findings to the user and wait for confirmation before touching any file.** Use `examples/finding-report-template.md` as the format template — each finding must include: file + line, concrete reproduction steps, minimal fix description, and test name. The user decides which severity levels to fix, and in what order.
+**Present the classified findings to the user and wait for confirmation before touching any file.** Use `examples/finding-report-template.md` as the format template — each HIGH/MEDIUM finding must include: file + line, concrete reproduction steps, minimal fix description, and test name; INFO findings may use a lighter format (file + line, observation, recommended action). The user decides which severity levels to fix, and in what order.
 
-**If the user does not reply in the same turn** (e.g., a stop hook fires forcing Phase 5): proceed for MEDIUM/HIGH findings only — invoking the audit is implicit approval. Print: "Proceeding with implicit approval for MEDIUM/HIGH findings." Update the state file:
+**While waiting, the Stop gate hook will block the first attempt to end the turn** (the state file still has `phase4_gate: false` — this is expected, NOT a signal to proceed). When that happens: print "Waiting for user confirmation of findings — ending the turn." and end the turn again; the hook allows the second stop attempt. Do NOT treat the hook firing as implicit approval. Do NOT proceed to Phase 4 or Phase 5 without an explicit user reply.
+
+**After the user confirms** (explicit reply): update the state file, then continue to Phase 4 (Completeness Check) — do not skip Phase 4:
 ```json
 {"findings_confirmed": true, "phase4_gate": false, "phase5_gate": false, "phase6_gate": false, "phase7_gate": false}
 ```
-Then continue through Phase 4 (Completeness Check) before Phase 5 (Fix) — do not skip Phase 4.
 
-**After the user confirms** (explicit reply): update the state file to the same JSON before starting Phase 5:
-```json
-{"findings_confirmed": true, "phase4_gate": false, "phase5_gate": false, "phase6_gate": false, "phase7_gate": false}
-```
+This is the ONLY place `findings_confirmed` is set to `true` (besides the zero-findings rule below). Exit gates in later phases change their own gate field only — never this one.
+
+**If there are zero findings** (clean module): report "No findings — module clean." to the user, set `"findings_confirmed": true` in the state file (nothing to approve — record "zero findings" as the reason in the Phase 7 summary), and continue. Phases 4–6 will be vacuous — state so explicitly at each gate instead of staying silent.
 
 ---
 
@@ -130,6 +131,8 @@ For every item you considered but did NOT include in Phase 3 findings, track it 
 
 If nothing was dismissed: note "No dismissed findings." explicitly.
 
+If a dismissed item on second look deserves to be a finding (you dismissed it too quickly), surface it to the user NOW — before Phase 5 runs — and wait for their decision (same waiting rule as Phase 3: the user decides whether it joins the fix list). Do not silently park it in the deferred list, and do not fix it without approval.
+
 **Rule: every item that appeared in the Phase 2 running issue list must appear in either Phase 3 findings or Phase 7 deferred. Silent disappearance is not allowed.**
 
 This step exists because "Document what you don't fix" is a ground rule, but without a checkpoint it is easy to skip. This is the checkpoint.
@@ -139,11 +142,15 @@ This step exists because "Document what you don't fix" is a ground rule, but wit
 - [ ] Every dismissed finding from Phase 2 running list is tracked with an explicit reason, OR "No dismissed findings." is stated
 - [ ] Nothing silently dropped — if unsure whether an item counts, include it in Phase 7 deferred
 
-**After completing all items:** update `.claude/logic-audit-state.json` → `{"findings_confirmed": true, "phase4_gate": true, "phase5_gate": false, "phase6_gate": false, "phase7_gate": false}`
+**After completing all items:** set `"phase4_gate": true` in `.claude/audit-logic-state.json` — change only this field; `findings_confirmed` is owned by Phase 3.
 
 ---
 
 ## Phase 5 — Fix (One Bug Per Commit)
+
+**If the user approved zero fixes** (every finding deferred): print "No fixes approved — Phase 5 skipped.", set the Phase 5 gate, and proceed to Phase 6. The exit-gate checklist below is then vacuously satisfied — state so explicitly instead of leaving it unaddressed.
+
+**Commits:** invoking this skill counts as explicit authorization for the Phase 5 per-bug fix commits and Phase 6 doc commits — no additional confirmation is needed beyond the Phase 3 findings approval. If the target project is **not a git repository**: skip all commit steps, record each fix in the Phase 7 summary instead, and recommend the user initialize version control.
 
 For each confirmed bug, in severity order (HIGH first):
 
@@ -153,13 +160,17 @@ For each confirmed bug, in severity order (HIGH first):
    ```
    grep -r "<assertion_matcher>" <test_dirs> | grep "<function_name>"
    ```
-   Count how many test assertions use the current call signature. If more than 3, note upfront that test assertion updates will be needed and which files contain them — this prevents discovering test failures mid-fix and having to context-switch back to understand why they fail.
+   Count how many test assertions use the current call signature (this counts assertions, not files — distinct from the Phase 3 step 5 deferral rule, which counts test files). If more than 3, note upfront that test assertion updates will be needed and which files contain them — this prevents discovering test failures mid-fix and having to context-switch back to understand why they fail.
 
 2. Write or update tests. Default: **REGRESSION** — would have failed before the fix, passes after. Exception: **DOCUMENTATION** — only for INFO fixes where behavior is genuinely unchanged (cosmetic/intent-clarification); must label explicitly in commit message. See Exit Gate for labeling requirements.
-   - Would have **failed** with the old code, OR is explicitly labeled DOCUMENTATION
+
+   **If the project has no test framework** (established in Phase 1): skip test-writing and follow "When no test runner is available" in `references/verification-techniques.md` — document the expected behavior in the commit message and mark the fix explicitly as unverified. Steps 3–4 below also do not apply; state this instead of staying silent.
+
+   The test must:
+   - Have **failed** with the old code, OR be explicitly labeled DOCUMENTATION
    - **Pass** with the fix (verifies the correct behavior)
    - Assert the outcome, not the implementation detail
-   - Are named to describe the scenario, not the code path
+   - Be named to describe the scenario, not the code path
    - **For `[UNIT-TEST-BLIND]` fixes:** unit test updates only document intent — mocks accept any argument so they cannot verify real DB/integration behavior. You must also:
      1. Note in the commit message: "Unit tests document fix; integration/API test required for full verification."
      2. **Always write an integration or API test placeholder** in the appropriate test directory for this project (discovered in Phase 1 — check where integration/API/e2e tests live). Choose based on bug type: DB-level behavior → integration test directory; middleware/validator/request-response behavior → API/HTTP test directory. Even if it cannot run without a real DB/server. Use `test.skip` (or the framework's equivalent) with a comment explaining what it verifies and why it requires a real environment. This is not optional: without this placeholder, the correctness guarantee has no safety net for future test runs in the appropriate environment.
@@ -193,7 +204,7 @@ For each confirmed bug, in severity order (HIGH first):
    ```
 
    The agent must not know your intent; that context biases it toward confirming rather than finding remaining issues. Compare its findings against your fix.
-   - **If the agent surfaces new findings** (unrelated to the fix): verify each one yourself with grep/Read before reporting to the user. Do NOT relay subagent output directly — agents can hallucinate line numbers or misread context. Apply the same provability standard as Phase 3 step 4. Before queuing any of these findings for fixing, run the Phase 3 step 5 pre-flight check (test assertion grep + fix cost assessment) on each one — do not skip directly to Phase 5 step 1.
+   - **If the agent surfaces new findings** (unrelated to the fix): verify each one yourself with grep/Read before reporting to the user. New findings follow the same approval rule as Phase 3 — present them and wait for the user's decision; do NOT fix an unapproved finding. Do NOT relay subagent output directly — agents can hallucinate line numbers or misread context. Apply the same provability standard as Phase 3 step 4. Before queuing any of these findings for fixing, run the Phase 3 step 5 pre-flight check (test assertion grep + fix cost assessment) on each one — do not skip directly to Phase 5 step 1.
 
 7. Commit with a message that answers three questions: what was wrong, why it was wrong, what changed. Use the commit format in `references/verification-techniques.md`.
 
@@ -203,16 +214,16 @@ For each confirmed bug, in severity order (HIGH first):
 
 Before proceeding to Phase 6, confirm every item below. Do not skip or defer silently — if an item cannot be done, state the reason explicitly.
 
-- [ ] Test written or updated for each fix — must be one of two labeled types:
+- [ ] Test written or updated for each fix (exception — project has no test framework per Phase 1: record "no test framework — fix unverified by tests" for each fix instead). When tests exist, each must be one of two labeled types:
   - **REGRESSION**: would have FAILED before the fix, passes after. This is the default.
   - **DOCUMENTATION**: fix does not change behavior (cosmetic/intent-clarification only) — test confirms existing behavior. Must write "DOCUMENTATION TEST: fix does not change behavior" explicitly in the commit message. Cannot use this label for MEDIUM or HIGH severity bugs.
   - For `[UNIT-TEST-BLIND]` fixes: the unit test passes; **integration or API test placeholder written** (`test.skip` with `// Verifies [BUG-X]` comment) — this is mandatory, not optional.
 - [ ] Independent verification agent run for every fix, OR manual re-read for fixes that meet all skip conditions in step 6
-- [ ] Full project test suite passes (not just module tests)
+- [ ] Full project test suite passes (not just module tests). Exception — if the Phase 1 baseline was already red or tests cannot run (user-approved code-only continuation): no NEW failures versus the baseline, and the unchanged pre-existing failures are listed explicitly
 - [ ] No fix was batched — each bug has its own commit
 - [ ] Phase 6 (stale documentation) is next — do not jump to Phase 7
 
-**After completing all items:** update `.claude/logic-audit-state.json` → `{"findings_confirmed": true, "phase4_gate": true, "phase5_gate": true, "phase6_gate": false, "phase7_gate": false}`
+**After completing all items:** set `"phase5_gate": true` in `.claude/audit-logic-state.json` — change only this field.
 
 ---
 
@@ -237,7 +248,7 @@ After all bug fixes are committed:
 - [ ] Test-count metrics in documentation updated if the project tracks them
 - [ ] If no doc updates were needed, state explicitly why (not silence)
 
-**After completing all items:** update `.claude/logic-audit-state.json` → `{"findings_confirmed": true, "phase4_gate": true, "phase5_gate": true, "phase6_gate": true, "phase7_gate": false}`
+**After completing all items:** set `"phase6_gate": true` in `.claude/audit-logic-state.json` — change only this field.
 
 ---
 
@@ -247,13 +258,19 @@ Print a final summary:
 - Bugs found and fixed, with short description and commit hash for each
 - Files read (total count)
 - Documentation files updated
-- Items deferred: issues found but not fixed, with explicit reason for each (out of scope, by design, requires environment to verify, user decision to defer)
+- Items deferred: issues found but not fixed, with explicit reason for each (out of scope, by design, requires environment to verify, user decision to defer). Include every `[NEEDS-RUNTIME-VERIFY]` finding here unless the user approved fixing it.
 
 **After printing the summary:**
 
-1. Run `/pipeline-retrospective` to evaluate this audit run and write improvement proposals to the plugin directory. This is mandatory — not optional. An ad-hoc retrospective in chat is not a substitute.
-2. Update `.claude/logic-audit-state.json` → `{"findings_confirmed": true, "phase4_gate": true, "phase5_gate": true, "phase6_gate": true, "phase7_gate": true}`
-3. Delete `.claude/logic-audit-state.json` (cleanup — allows the Stop hook to pass).
+1. Run `/pipeline-retrospective` (provided by the `subagent-system` plugin) to evaluate this audit run — it writes improvement proposals to `.claude/improvement-proposals.md` at the project root. This is mandatory — not optional. An ad-hoc retrospective in chat is not a substitute. **Exception:** if the skill is not installed, state this in the summary, record that the retrospective was skipped for that reason, and continue closing the gates — a missing dependency must not leave the session permanently blocked.
+2. Set `"phase7_gate": true` in `.claude/audit-logic-state.json` — change only this field (safety net: keeps the Stop hook passing even if step 3 fails).
+3. Delete `.claude/audit-logic-state.json` (cleanup — allows the Stop hook to pass).
+
+### Phase 7 Exit Gate
+
+- [ ] Summary printed (bugs, files read, docs updated, deferred items with reasons)
+- [ ] `/pipeline-retrospective` run — or its absence recorded with reason (see step 1 Exception)
+- [ ] `.claude/audit-logic-state.json` deleted
 
 ---
 
@@ -266,7 +283,9 @@ Print a final summary:
 - **Verify before and after every fix.** Run the test suite before touching the code (baseline), and again after (regression check).
 - **One bug = one commit.** Each commit must be independently revertable. If you discover two bugs, fix them in two separate commits.
 - **Document what you don't fix.** If something is wrong but out of scope, confirmed by design, or requires an environment you don't have — say so explicitly in the Phase 7 summary. Silence is not acceptable.
-- **For very large modules (50+ source files):** Do not attempt to finish in one session if the context window cannot hold all files. Instead: (1) audit the highest-priority layer (service/business logic) in this session, commit findings and fixes, (2) report clearly what was covered and what remains, (3) continue in a fresh session. Partial coverage with honest scope is better than shallow coverage of everything.
+- **Abort = cleanup.** If the user cancels the audit at any phase, delete `.claude/audit-logic-state.json` before ending the turn. An orphaned state file blocks the first stop attempt of every turn in every future session of this project.
+- **Waiting for user input mid-audit (any phase):** the Stop gate hook blocks the first attempt to end the turn while gates are incomplete. When intentionally stopping to wait for the user, print that you are waiting and end the turn again — the hook allows the second consecutive stop. Never set a gate to true just to satisfy the hook.
+- **For very large modules (50+ source files):** Do not attempt to finish in one session if the context window cannot hold all files. Instead: (1) audit the highest-priority layer (service/business logic) in this session, commit findings and fixes, (2) report clearly what was covered and what remains, (3) continue in a fresh session. Partial coverage with honest scope is better than shallow coverage of everything. **State file across sessions:** run the full Phase 3–7 cycle (gates + state-file deletion) for the layer covered in THIS session — closing the gates for an honestly-scoped partial audit is legitimate, not "setting a gate just to satisfy the hook". Never carry an open state file into the next session; that session starts again at Phase 1 scoped to the remaining layers.
 
 ---
 

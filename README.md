@@ -484,10 +484,10 @@ Sau đó install plugin muốn dùng:
 claude plugin install pr-review-toolkit@minhthang-plugins
 claude plugin install feature-dev@minhthang-plugins
 claude plugin install plan-workflow@minhthang-plugins
-# ... hoặc bất kỳ plugin nào trong 38 plugins
+# ... hoặc bất kỳ plugin nào trong 39 plugins
 ```
 
-**38 plugins hiện có** (xem `.claude-plugin/marketplace.json` để đầy đủ):
+**39 plugins hiện có** (xem `.claude-plugin/marketplace.json` để đầy đủ):
 
 | Plugin | Loại | Mô tả ngắn |
 | --- | --- | --- |
@@ -527,7 +527,8 @@ claude plugin install plan-workflow@minhthang-plugins
 | `plan-workflow` | skills | 8-phase implementation plan workflow với 3 human gates |
 | `subagent-system` | agents + skills | Pipeline multi-agent: checkpoint, chain-verifier, task-partitioner |
 | `audit-plan` | skills | Audit plan file: gap detection, dead code, test coverage |
-| `logic-audit` | skills + hooks | Audit logic: đọc từng dòng code, tìm bug thật, fix kèm test |
+| `audit-logic` | skills + hooks | Audit logic: đọc từng dòng code, tìm bug thật, fix kèm test |
+| `audit-plugin` | skills | Audit chất lượng plugin Claude Code: multi-round review, independent validation |
 | `verify-then-draw` | agents + skills | Vẽ sơ đồ UML/kiến trúc khớp code thật qua 3 tier gate |
 
 ## 10. Cấu trúc nội bộ — lý do thiết kế

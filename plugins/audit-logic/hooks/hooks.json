@@ -1,0 +1,15 @@
+{
+  "description": "Stop gate: chặn lần kết thúc lượt (turn) đầu tiên khi audit-logic phase gates trong .claude/audit-logic-state.json chưa hoàn tất",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/audit-logic-gate.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}

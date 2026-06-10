@@ -244,6 +244,13 @@
       "category": "development"
     },
     {
+      "name": "audit-plugin",
+      "description": "Multi-round independent quality audit for Claude Code plugins: deep 7-criteria review with self-updating criteria, finding validation, user-gated fixes, fresh-reviewer convergence loop with hard cap, optional headless benchmark.",
+      "author": { "name": "Minh Thang" },
+      "source": "./plugins/audit-plugin",
+      "category": "development"
+    },
+    {
       "name": "subagent-system",
       "description": "Prevent 22 subagent failure modes: task planning, output auditing, pipeline review, and checkpoint recovery for multi-agent workflows",
       "author": { "name": "Minh Thang" },
@@ -258,10 +265,10 @@
       "category": "development"
     },
     {
-      "name": "logic-audit",
+      "name": "audit-logic",
       "description": "Systematic logic audit: read every line of source code, find real logic bugs, fix with tests, update stale docs, commit. Language and framework agnostic.",
       "author": { "name": "Minh Thang" },
-      "source": "./plugins/logic-audit",
+      "source": "./plugins/audit-logic",
       "category": "development"
     },
     {

@@ -1,6 +1,6 @@
 # Reading Patterns — Systematic Code Analysis
 
-Reference for Phase 2 of the logic-audit skill. Load while reading each source file.
+Reference for Phase 2 of the audit-logic skill. Load while reading each source file.
 
 ---
 
@@ -9,7 +9,7 @@ Reference for Phase 2 of the logic-audit skill. Load while reading each source f
 The most common class of logic bug across all languages:
 
 - Function assumes input is non-null but no guard exists at the entry point
-- Optional chaining (`?.`, `&.`, `?.`) hides a null that should be an error
+- Optional chaining (`?.`, `&.`) hides a null that should be an error
 - Default value masks a missing required field: `x || defaultValue` silently accepts invalid input
 - Array/list index access without bounds check: `items[0]` when `items` might be empty
 - Map/dict access without existence check: `obj[key]` when key might be absent
@@ -28,7 +28,7 @@ The most common class of logic bug across all languages:
 
 **Aggregate functions on empty collections:**
 - Calling `min`, `max`, `sum`, `average` on an empty list produces a sentinel or throws — always check whether the collection could be empty after filtering
-- In most languages (Python, Java, Go) aggregating an empty collection raises an explicit error — easy to catch
+- In some languages (Python `max([])`, Java `Stream.max()` on empty without `orElse`) aggregating an empty collection raises an explicit error — easy to catch. In Go there is no builtin aggregate: hand-rolled loops silently yield the zero value on an empty slice — check the length explicitly
 - **JS-specific silent trap:** `Math.min(...[])` = `Infinity`, `Math.max(...[])` = `-Infinity` — no error, just a wrong sentinel value. Any downstream `> 0` or `!== null` check silently passes. Same for `reduce()` without initial value → `TypeError` on empty. **Verify:** add `.length > 0` guard before `Math.min/max(...)` spread, or use `reduce` with an explicit initial value.
 
 ---

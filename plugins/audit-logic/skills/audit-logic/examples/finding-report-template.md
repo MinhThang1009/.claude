@@ -4,7 +4,7 @@ This is what a well-structured Phase 3 findings presentation looks like after re
 
 ---
 
-## Logic Audit — Findings for `src/modules/cart`
+## Audit Logic — Findings for `src/modules/cart`
 
 Files read: 6 source files, 4 test files.
 
@@ -23,13 +23,13 @@ if (totalStock <= 0) throw new AppError('Out of stock', 400);
 // Bug: totalStock=5 but the specific requested variant has stock=0
 ```
 
-**Minimal fix:** After the total-stock check, add: `if (variantId) { const v = variants.find(v => v.id === variantId); if (v && v.stockQuantity <= 0) throw ... }`
+**Minimal fix:** After the total-stock check, add: `if (variantId) { const v = variants.find(v => v.id === variantId); if (!v) throw new AppError('Variant not found', 404); if (v.stockQuantity <= 0) throw ... }` (the `!v` guard matters — without it an unknown variantId silently passes the stock check)
 
 **Test needed:** "addItem with out-of-stock variant throws 400 even when other variants have stock"
 
 ---
 
-### 🟡 MEDIUM — `removeItem` silently ignores items not belonging to current user
+### 🔴 HIGH — `removeItem` deletes items belonging to other users (missing ownership check)
 
 **File:** `services/cart-service.js`, line 156
 **Reproduction:** User A calls `DELETE /cart/items/123` where item 123 belongs to User B. The service calls `CartItem.findByPk(id)` without checking `userId`, then deletes it.
@@ -57,6 +57,8 @@ await item.destroy();
 
 ---
 
-**3 findings total: 1 HIGH, 1 MEDIUM, 1 INFO**
+**3 findings total: 2 HIGH, 1 INFO**
 
-Confirm which to fix? Recommended: fix HIGH and MEDIUM now, defer INFO for documentation.
+Confirm which to fix? Recommended: fix both HIGH now, defer INFO for documentation.
+
+> Severity note: cross-user data deletion is HIGH per the rubric (security bypass + wrong data in DB), not MEDIUM — even though the per-request symptom looks like "just a missing check".
