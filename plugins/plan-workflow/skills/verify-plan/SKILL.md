@@ -1,6 +1,6 @@
 ---
 name: verify-plan
-description: This skill should be used when the user asks to "verify the plan", "check the plan", "validate plan claims", or at Phase 5 of the /plan-refactor workflow before implementation begins. Independently verifies every factual claim in a plan against the actual codebase. Catches wrong locations, missed files, and incorrect counts before they cause failures.
+description: This skill should be used when the user asks to "verify the plan", "check the plan", "validate plan claims", or at Phase 5 of the /plan-refactor workflow before implementation begins. Independently verifies every factual claim in a plan against the actual codebase. Catches wrong locations, missed files, and incorrect counts before they cause failures. For gap-tracking plans (### Gap entries + cleanup grep checklist) use /audit-plan:audit-plan instead.
 ---
 
 # Plan Verification
