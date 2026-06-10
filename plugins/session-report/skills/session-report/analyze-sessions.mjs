@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable */
 /**
- * analyze-sessions.js
+ * analyze-sessions.mjs
  *
  * Scans ~/.claude/projects/**.jsonl transcript files and reports token usage,
  * message counts, runtime, cache breaks, subagent and skill activity.
@@ -9,7 +9,7 @@
  * Output is human-readable text by default; pass --json for machine-readable.
  *
  * Usage:
- *   node scripts/analyze-sessions.js [--dir <projects-dir>] [--json] [--since <ISO|7d|24h>] [--top N]
+ *   node analyze-sessions.mjs [--dir <projects-dir>] [--json] [--since <ISO|7d|24h>] [--top N] [--cache-break N]
  *
  * Notes on JSONL structure (discovered empirically):
  *  - One API response is split into MULTIPLE `type:"assistant"` entries (one per
@@ -44,20 +44,51 @@ function flag(name, dflt) {
 }
 const ROOT = flag('--dir', path.join(os.homedir(), '.claude', 'projects'))
 const AS_JSON = argv.includes('--json')
-const TOP_N = parseInt(flag('--top', '15'), 10)
+const TOP_N = parseIntFlag('--top', '15')
 const SINCE = parseSince(flag('--since', null))
-const CACHE_BREAK_THRESHOLD = parseInt(flag('--cache-break', '100000'), 10)
+const CACHE_BREAK_THRESHOLD = parseIntFlag('--cache-break', '100000')
 const IDLE_GAP_MS = 5 * 60 * 1000 // gaps >5min don't count toward "active" time
+
+if (ROOT === true) {
+  // bare --dir would otherwise walk(true) → swallowed readdir error → empty report, exit 0
+  console.error('--dir requires a value — a projects directory path')
+  process.exit(1)
+}
+
+// Fail loudly on bad numeric flags — a NaN would silently empty top-N lists
+// and disable cache-break detection (NaN comparisons are always false).
+function parseIntFlag(name, dflt) {
+  const raw = flag(name, dflt)
+  // strict digits-only — parseInt would silently accept "15abc" as 15, "1e6" as 1
+  if (!/^\d+$/.test(String(raw))) {
+    console.error(`invalid ${name} value: "${raw}" — expected a number`)
+    process.exit(1)
+  }
+  return parseInt(raw, 10)
+}
 
 function parseSince(s) {
   if (!s) return null
+  if (s === true) {
+    // flag() returns boolean true for a valueless --since; new Date(true)
+    // is a VALID epoch date → without this guard it silently scans all-time.
+    console.error('--since requires a value — use Nd (days), Nh (hours), or an ISO date')
+    process.exit(1)
+  }
   const m = /^(\d+)([dh])$/.exec(s)
   if (m) {
     const ms = m[2] === 'd' ? 86400000 : 3600000
     return new Date(Date.now() - parseInt(m[1], 10) * ms)
   }
   const d = new Date(s)
-  return isNaN(d) ? null : d
+  if (isNaN(d)) {
+    // Silent fallback would scan ALL TIME when the user asked for a window.
+    console.error(
+      `invalid --since value: "${s}" — use Nd (days), Nh (hours), or an ISO date`,
+    )
+    process.exit(1)
+  }
+  return d
 }
 
 // ---------------------------------------------------------------------------
@@ -214,8 +245,10 @@ async function processFile(p, info, buckets) {
   const subagent = buckets.subagent // may be null
   const skillStats = buckets.skillStats // map name -> stats
 
-  for await (const line of rl) {
+  for await (let line of rl) {
     if (!line) continue
+    // a leading BOM makes JSON.parse fail → first entry silently lost
+    if (line.charCodeAt(0) === 0xfeff) line = line.slice(1)
     let e
     try {
       e = JSON.parse(line)
@@ -241,7 +274,11 @@ async function processFile(p, info, buckets) {
         }
         prevTs = ts
         lastTs = ts
+      } else if (SINCE) {
+        continue // unparseable timestamp → cannot place in window, exclude
       }
+    } else if (SINCE) {
+      continue // no timestamp → cannot place in window, exclude
     }
 
     if (e.type === 'user') {
@@ -286,9 +323,13 @@ async function processFile(p, info, buckets) {
           if (c && c.type === 'tool_use') {
             if (c.name === 'Skill' && c.input && c.input.skill) {
               const sk = String(c.input.skill)
-              bumpSkill(overall, sk)
-              bumpSkill(project, sk)
-              if (subagent) bumpSkill(subagent, sk)
+              // skip the bump when a slash command already attributed this
+              // skill for the turn — one logical invocation, one count
+              if (sk !== currentSkill) {
+                bumpSkill(overall, sk)
+                bumpSkill(project, sk)
+                if (subagent) bumpSkill(subagent, sk)
+              }
               currentSkill = sk
             }
             if (c.name === 'Agent' || c.name === 'Task') {
@@ -451,9 +492,12 @@ function handleUser(
     const m = /<command-(?:name|message)>\/?([^<]+)<\/command-/.exec(text)
     if (m) {
       slashCmd = m[1].trim()
-      bumpSkill(overall, slashCmd)
-      bumpSkill(project, slashCmd)
-      if (subagent) bumpSkill(subagent, slashCmd)
+      // sidechain replays of command text are not new invocations
+      if (!e.isSidechain) {
+        bumpSkill(overall, slashCmd)
+        bumpSkill(project, slashCmd)
+        if (subagent) bumpSkill(subagent, slashCmd)
+      }
       setSkill(slashCmd)
     } else {
       setSkill(null) // plain human message resets skill attribution
@@ -479,10 +523,18 @@ function handleUser(
   }
 }
 
+// Mask secret-like patterns before prompt text reaches the report
+// (the report is written into the cwd — which may be a git repo).
+const SECRET_RE =
+  /\b(?:sk-ant-|sk_live_|pk_live_|ghp_|github_pat_|gho_|ghu_|ghs_|ghr_|AKIA|ASIA|AIza|xox[abprs]-)[A-Za-z0-9_\-./+=]+|\bsk-[A-Za-z0-9_-]{16,}|\beyJ[A-Za-z0-9_-]{10,}(?:\.[A-Za-z0-9_-]+){0,2}|\bBearer\s+[A-Za-z0-9_\-./+=]{8,}|-----BEGIN [A-Z ]+-----/g
+function maskSecrets(t) {
+  return t.replace(SECRET_RE, m => m.slice(0, 6) + '…[masked]')
+}
+
 function promptPreview(text, slashCmd) {
   if (slashCmd) return `/${slashCmd}`
   if (!text) return '(non-text)'
-  const t = text
+  const t = maskSecrets(text)
     .replace(/<[^>]+>/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
@@ -590,6 +642,13 @@ async function main() {
     }
   }
 
+  if (overall.apiCalls === 0) {
+    // "no data" and "wrong --dir" are indistinguishable here → warn loudly
+    process.stderr.write(
+      `warning: no API calls found under ${ROOT}${SINCE ? ` since ${SINCE.toISOString()}` : ''} — empty report (check --dir / --since)\n`,
+    )
+  }
+
   if (AS_JSON) {
     printJson({ overall, perProject, perSubagent, perSkill })
   } else {
@@ -629,7 +688,7 @@ function summarize(s) {
     output_tokens: s.outputTokens,
     human_messages: s.humanMessages,
     hours: { wall_clock: +hrs(s.wallClockMs), active: +hrs(s.activeMs) },
-    cache_breaks_over_100k: s.cacheBreaks.length,
+    cache_breaks_over_threshold: s.cacheBreaks.length,
     subagent: {
       calls: s.subagentCalls,
       total_tokens: s.subagentTokens,
@@ -649,17 +708,14 @@ function summarize(s) {
 }
 
 function printJson({ overall, perProject, perSubagent, perSkill }) {
+  // Key order matters for agents skimming the file with a line-limited Read:
+  // small summary tables first, the two big drill-down arrays last.
   const out = {
     root: ROOT,
     generated_at: new Date().toISOString(),
+    since: SINCE ? SINCE.toISOString() : null,
+    cache_break_threshold: CACHE_BREAK_THRESHOLD,
     overall: summarize(overall),
-    cache_breaks: overall.cacheBreaks
-      .sort((a, b) => b.uncached - a.uncached)
-      .slice(0, 100)
-      .map(({ prompt, ...b }) => ({
-        ...b,
-        context: prompt ? buildContext(prompt) : null,
-      })),
     by_project: Object.fromEntries(
       [...perProject].map(([k, v]) => [k, summarize(v)]),
     ),
@@ -669,10 +725,21 @@ function printJson({ overall, perProject, perSubagent, perSkill }) {
     by_skill: Object.fromEntries(
       [...perSkill].map(([k, v]) => [k, summarize(v)]),
     ),
-    top_prompts: topPrompts(100),
     by_day: buildByDay(),
+    top_prompts: topPrompts(100),
+    cache_breaks: overall.cacheBreaks
+      .sort((a, b) => b.uncached - a.uncached)
+      .slice(0, 100)
+      .map(({ prompt, ...b }) => ({
+        ...b,
+        context: prompt ? buildContext(prompt) : null,
+      })),
   }
-  process.stdout.write(JSON.stringify(out, null, 2) + '\n')
+  // Escape "<" so transcript text (e.g. an unclosed "</script") cannot
+  // terminate the <script id="report-data"> element when the blob is embedded.
+  process.stdout.write(
+    JSON.stringify(out, null, 2).replace(/</g, '\\u003c') + '\n',
+  )
 }
 
 // Group sessions into local-date buckets for the timeline view. A session is

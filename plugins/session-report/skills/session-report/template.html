@@ -253,7 +253,8 @@
     </section>
 
     <!-- ====================================================================
-         Everything below renders automatically from #report-data.
+         Everything below renders automatically from #report-data — except
+         the AGENT: optimizations block near the bottom (agent-filled).
          ==================================================================== -->
     <section>
       <div class="hr"></div>
@@ -290,7 +291,7 @@
 
     <section>
       <div class="hr"></div>
-      <h2>cache breaks<span class="hint">&gt;100k uncached · click for context</span></h2>
+      <h2>cache breaks<span class="hint" id="cb-hint">&gt;100k uncached · click for context</span></h2>
       <div class="section-body drill" id="cache-breaks"></div>
     </section>
 
@@ -331,7 +332,8 @@
 </div>
 
 <!-- ========================================================================
-     DATA — agent replaces the {} below with the full --json output.
+     DATA — build-report.mjs replaces the {} below with the analyzer's
+     --json output. Do NOT paste the blob in manually via Edit.
      ======================================================================== -->
 <script id="report-data" type="application/json">{}</script>
 
@@ -344,7 +346,7 @@
   const pct = (a,b) => b>0 ? ((100*a/b).toFixed(1)+'%') : '—';
   const esc = s => String(s).replace(/[&<>"]/g, c =>
     ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  const short = p => String(p||'').replace(/^-Users-[^-]+-/,'').replace(/^code-/,'');
+  const short = p => String(p||'').replace(/^[A-Za-z]--Users-[^-]+-/,'').replace(/^-Users-[^-]+-/,'').replace(/^code-/,'');
   const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const niceDate = iso => { const d = new Date(iso); return isNaN(d) ? '' :
     `${MON[d.getMonth()]} ${d.getDate()} · ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
@@ -353,6 +355,9 @@
 
   // header + hero
   const o = DATA.overall, it = o.input_tokens;
+  // cache-break threshold is configurable (--cache-break) — render it, don't hardcode 100k
+  const CBT = '>' + fmt(DATA.cache_break_threshold || 100000) + ' uncached';
+  $('cb-hint').textContent = CBT + ' · click for context';
   const GRAND = it.total + o.output_tokens;
   const share = n => GRAND>0 ? (100*n/GRAND).toFixed(1)+'%' : '—';
   const span = o.span;
@@ -379,7 +384,7 @@
     ['api calls', o.api_calls],
     ['human msgs', o.human_messages],
     ['active hours', o.hours.active, `${o.hours.wall_clock} wall-clock`],
-    ['cache breaks', o.cache_breaks_over_100k, '>100k uncached'],
+    ['cache breaks', o.cache_breaks_over_threshold, CBT],
     ['subagent calls', o.subagent.calls, `avg ${fmt(o.subagent.avg_tokens_per_call)}`],
   ].map(([l,v,d]) =>
     `<div class="stat"><div class="label">${l}</div>`+
@@ -390,9 +395,10 @@
   (function() {
     const days = (DATA.by_day||[]).slice(-14);
     if (!days.length) { $('timeline-section').style.display='none'; return; }
+    if ((DATA.by_day||[]).length > 14)
+      document.querySelector('#timeline-section .hint').textContent += ' · last 14 days shown';
     const PCOL = ['rgb(177,185,249)','rgb(78,186,101)','#D97757','rgb(255,193,7)',
                   'rgb(255,107,128)','#9b8cff','#6ec1d6','#c792ea'];
-    const dayTotal = days.reduce((a,d)=>a+d.tokens,0) || 1;
     const tokMax = Math.max(...days.map(d=>d.tokens));
     const projects = [...new Set(days.flatMap(d=>d.sessions.map(s=>s.project)))];
     const colorOf = p => PCOL[projects.indexOf(p)%PCOL.length];
@@ -406,7 +412,7 @@
         `<button class="dpill${d.tokens===tokMax?' heaviest':''}${i===sel?' sel':''}" data-i="${i}">`+
         `<span class="dow">${esc(d.dow)}</span>`+
         `<span class="date">${esc(md(d.date))}</span>`+
-        `<span class="pct">${(100*d.tokens/dayTotal).toFixed(1)}%</span>`+
+        `<span class="pct">${(100*d.tokens/GRAND).toFixed(1)}%</span>`+
         `<span class="ns">${d.sessions.length} sess</span></button>`
       ).join('');
       $('day-pills').querySelectorAll('.dpill').forEach(el=>
@@ -549,7 +555,7 @@
       short(k), GRAND>0 ? 100*(v.input_tokens.total+v.output_tokens)/GRAND : 0,
       v.sessions, v.api_calls, v.human_messages,
       v.input_tokens.total, v.input_tokens.pct_cached, v.output_tokens,
-      v.hours.active, v.cache_breaks_over_100k,
+      v.hours.active, v.cache_breaks_over_threshold,
       v.subagent.calls, v.subagent.avg_tokens_per_call,
     ]);
   }

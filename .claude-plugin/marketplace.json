@@ -161,7 +161,7 @@
     },
     {
       "name": "session-report",
-      "description": "Generates a visual HTML report summarizing Claude Code session activity, time spent, and key decisions",
+      "description": "Generates a visual HTML report summarizing Claude Code session activity, time spent, and usage anomalies",
       "author": { "name": "Minh Thang" },
       "source": "./plugins/session-report",
       "category": "productivity"
