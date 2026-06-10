@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Cảnh báo khi hardlink giữa repo dotclaude và ~/.claude bị đứt.
-# Nguyên nhân đứt thường gặp: git checkout/pull/stash/reset chạm vào file phía repo,
-# hoặc tool ghi kiểu atomic-write (ghi file tạm rồi rename) → tạo inode mới một phía.
-# So inode hai bên: khác nhau = link đứt → in cảnh báo kèm lệnh khôi phục.
+# Tự sửa hardlink giữa repo dotclaude và ~/.claude khi bị đứt.
+# Nguyên nhân đứt thường gặp: git checkout/pull/stash chạm file phía repo, hoặc
+# tool ghi kiểu atomic-write (Claude Code CLI ghi settings.json, Edit tool...) →
+# tạo inode mới một phía. Quy tắc sửa: bản có mtime MỚI HƠN thắng, relink bản kia.
 
 REPO="$HOME/dotclaude"
 LIVE="$HOME/.claude"
@@ -11,12 +11,22 @@ FILES="CLAUDE.md settings.json"
 [ -d "$REPO" ] && [ -d "$LIVE" ] || exit 0
 
 for f in $FILES; do
-  [ -f "$REPO/$f" ] && [ -f "$LIVE/$f" ] || continue
-  if [ "$(stat -c %i "$REPO/$f")" != "$(stat -c %i "$LIVE/$f")" ]; then
-    win_live=$(cygpath -w "$LIVE/$f" 2>/dev/null || echo "$LIVE/$f")
-    win_repo=$(cygpath -w "$REPO/$f" 2>/dev/null || echo "$REPO/$f")
-    echo "⚠️ HARDLINK ĐỨT: $f — repo và ~/.claude đang là 2 file riêng (sửa 1 bên sẽ KHÔNG sync)."
-    echo "   Khôi phục (xem bản nào mới hơn trước, rồi): rm \"$LIVE/$f\" && cmd //c 'mklink /H $win_live $win_repo'"
+  rf="$REPO/$f"; lf="$LIVE/$f"
+  [ -f "$rf" ] && [ -f "$lf" ] || continue
+  [ "$(stat -c %i "$rf")" = "$(stat -c %i "$lf")" ] && continue
+
+  # Link đứt → chọn bản mới hơn làm nguồn, xóa bản kia rồi mklink lại
+  if [ "$(stat -c %Y "$rf")" -ge "$(stat -c %Y "$lf")" ]; then
+    src="$rf"; dst="$lf"
+  else
+    src="$lf"; dst="$rf"
+  fi
+  win_src=$(cygpath -w "$src" 2>/dev/null || echo "$src")
+  win_dst=$(cygpath -w "$dst" 2>/dev/null || echo "$dst")
+  if rm -f "$dst" && cmd //c "mklink /H $win_dst $win_src" >/dev/null 2>&1; then
+    echo "🔗 HARDLINK $f đứt → đã tự relink (nguồn: bản mới hơn $win_src)."
+  else
+    echo "⚠️ HARDLINK $f đứt, tự relink THẤT BẠI. Sửa tay: rm \"$dst\" && cmd //c 'mklink /H $win_dst $win_src'"
   fi
 done
 exit 0
