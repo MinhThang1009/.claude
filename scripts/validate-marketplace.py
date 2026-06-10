@@ -86,8 +86,8 @@ def main():
 
     if errors:
         print(f"{len(errors)} error(s):", file=sys.stderr)
-        for e in errors:
-            print(e, file=sys.stderr)
+        for err in errors:
+            print(err, file=sys.stderr)
         sys.exit(1)
 
     print(f"marketplace.json valid — {len(plugins)} plugins OK")

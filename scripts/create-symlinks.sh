@@ -42,7 +42,7 @@ LOAD_ALL=false
 if $LOAD_ALL; then
     echo "Loading ALL plugins"
 else
-    echo "Load config: ${!LOAD_MAP[@]}"
+    echo "Load config: ${!LOAD_MAP[*]}"
 fi
 
 should_load_type() {
@@ -56,7 +56,7 @@ should_load_type() {
 
 # --- Dirs symlinked as whole ---
 for d in .claude-plugin docs hooks output-styles rules templates; do
-    rm -rf "$DST/$d"
+    rm -rf "${DST:?}/$d"
     ln -s "$SRC/$d" "$DST/$d"
     echo "OK dir: $d"
 done

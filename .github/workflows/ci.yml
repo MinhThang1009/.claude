@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+# GITHUB_TOKEN chỉ cần đọc repo — hardening theo least-privilege
+permissions:
+  contents: read
+
 # Đảm bảo workflow run cũ bị cancel khi push commit mới vào cùng PR/branch
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -20,7 +24,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup ~/.claude/hooks
         shell: bash
         run: |
@@ -35,7 +39,7 @@ jobs:
     name: JSON syntax + schema validate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
@@ -61,7 +65,7 @@ jobs:
     name: Markdown link check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run lychee (offline mode — chỉ check relative links nội bộ)
         uses: lycheeverse/lychee-action@v2
         with:
@@ -79,18 +83,51 @@ jobs:
     name: Shell script lint (shellcheck)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run shellcheck
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq shellcheck
+          # hooks/: strict (mọi severity) — code chạy trong session thật
           shellcheck hooks/*.sh
+          # Các .sh còn lại (scripts/, tests/, plugins/): mức warning trở lên
+          find . -name "*.sh" -not -path "./.git/*" -not -path "./hooks/*" -print0 \
+            | xargs -0 shellcheck --severity=warning
+
+  powershell-lint:
+    name: PowerShell lint (PSScriptAnalyzer)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+          $results = Invoke-ScriptAnalyzer -Path scripts -Recurse -Severity Warning,Error
+          if ($results) { $results | Format-Table RuleName,Severity,ScriptName,Line -AutoSize | Out-String -Width 200 | Write-Output }
+          # Warning chỉ in tham khảo (Write-Host hợp lệ với CLI script) — fail khi có Error
+          $errors = @($results | Where-Object Severity -eq 'Error')
+          if ($errors.Count -gt 0) { Write-Error "PSScriptAnalyzer: $($errors.Count) error"; exit 1 }
+
+  python-typecheck:
+    name: Python type check (mypy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install mypy + type stubs
+        run: pip install --quiet mypy types-PyYAML types-jsonschema
+      - name: Type check hooks/ and scripts/
+        run: mypy hooks/ scripts/
 
   python-lint:
     name: Python lint (ruff)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -114,7 +151,7 @@ jobs:
         python-version: ['3.10', '3.x']
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -143,7 +180,7 @@ jobs:
     name: Markdown style lint (markdownlint)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run markdownlint-cli2
         uses: DavidAnson/markdownlint-cli2-action@v23
         with:
@@ -153,14 +190,14 @@ jobs:
     name: GitHub Actions YAML lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: raven-actions/actionlint@v2
 
   frontmatter-validate:
     name: Frontmatter schema (skills/agents/output-styles)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -174,7 +211,7 @@ jobs:
     name: Marketplace JSON validation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -189,7 +226,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install Bash 4+ (macOS)
         if: runner.os == 'macOS'
         run: brew install bash
@@ -202,7 +239,7 @@ jobs:
       # không hardcode để khỏi stale mỗi lần thêm/bớt agent/skill/command.
       - name: Verify agents (count từ repo)
         run: |
-          expected=$(find plugins/*/agents -maxdepth 1 -name "*.md" 2>/dev/null -exec basename {} \; | sort -u | wc -l)
+          expected=$(find plugins/*/agents -maxdepth 1 -name "*.md" -exec basename {} \; 2>/dev/null | sort -u | wc -l)
           count=$(find ~/.claude/agents -maxdepth 1 -name "*.md" | wc -l)
           echo "agents: $count (expected: $expected)"
           [ "$expected" -gt 0 ] || { echo "Repo không có agent nào — nghi glob sai"; exit 1; }
@@ -218,7 +255,7 @@ jobs:
       # thành skills) — check tự kích hoạt lại khi plugin nào đó thêm commands/.
       - name: Verify commands (count từ repo)
         run: |
-          expected=$(find plugins/*/commands -maxdepth 1 -name "*.md" 2>/dev/null -exec basename {} \; | sort -u | wc -l)
+          expected=$(find plugins/*/commands -maxdepth 1 -name "*.md" -exec basename {} \; 2>/dev/null | sort -u | wc -l)
           count=$(find ~/.claude/commands -maxdepth 1 -name "*.md" | wc -l)
           echo "commands: $count (expected: $expected)"
           [ "$count" -eq "$expected" ] || { echo "Expected $expected, got $count"; exit 1; }
@@ -227,7 +264,7 @@ jobs:
     name: Test create-symlinks.ps1 (Windows)
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run create-symlinks.ps1 (load all plugins)
         shell: pwsh
         run: |
@@ -247,7 +284,7 @@ jobs:
       - name: Verify skills (count từ repo)
         shell: pwsh
         run: |
-          $expected = (Get-ChildItem plugins\*\skills -Directory -ErrorAction SilentlyContinue | Group-Object Name).Count
+          $expected = (Get-ChildItem plugins\*\skills\* -Directory -ErrorAction SilentlyContinue | Group-Object Name).Count
           $count = (Get-ChildItem "$env:USERPROFILE\.claude\skills" -ErrorAction SilentlyContinue).Count
           Write-Host "skills: $count (expected: $expected)"
           if ($expected -eq 0) { Write-Error "Repo không có skill nào — nghi glob sai"; exit 1 }

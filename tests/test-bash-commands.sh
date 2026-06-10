@@ -30,7 +30,7 @@ echo "# CLAUDE.md" > "$MOCK_HOME/.claude/CLAUDE.md"
 
 # Create mock project
 mkdir -p "$MOCK_PROJECT/.claude/"{checkpoints,progress,alerts,tmp}
-cd "$MOCK_PROJECT"
+cd "$MOCK_PROJECT" || exit 1
 git init -q
 git config user.email "test@test.com"
 git config user.name "Test"
