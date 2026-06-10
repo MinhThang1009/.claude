@@ -33,7 +33,8 @@ What: find every remaining defect against 7 criteria:
     marketplace registration, load lists, settings enabledPlugins, junctions/symlinks —
     AND no dual-loading: the same skill reachable through two mechanisms at once, e.g.
     a junction-synced user-level copy plus a marketplace plugin, duplicates the trigger
-    surface);
+    surface; AND no artifact-name collision: output/state files this plugin writes must
+    not collide with artifact names other installed plugins document writing);
 (4) exception paths that are uncovered or covered contradictorily (abort, orphaned
     state/resources, multi-session, missing dependency, zero-input/zero-findings,
     missing environment such as no test framework or no git);
@@ -47,7 +48,9 @@ What: find every remaining defect against 7 criteria:
     documented intent, secret/PII leakage into logs or stderr; you may run the test
     suite and probe the scripts with adversarial input via Bash (in a temp dir only —
     test artifacts like caches are acceptable; delete the temp dir when the probe is
-    done; never modify tracked plugin files);
+    done; never modify tracked plugin files); a plugin shipping non-trivial bundled
+    scripts (heuristic: >100 lines or >2 documented edge cases) with NO automated tests
+    is reportable as LOW;
 (7) conciseness & consistency — context bloat (content inlined in SKILL.md that belongs
     in references, overlong description, redundant repetition), and stylistic
     consistency (one language policy, uniform tone/formatting/terminology across files).

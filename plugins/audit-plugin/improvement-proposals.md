@@ -2,6 +2,19 @@
 
 > Self-audit log. Per SKILL.md Stage 7, every `[OUT-OF-CRITERIA]` finding must produce a criteria-update proposal here.
 
+Generated: 2026-06-11 (audit-logic audit — convergence 3 rounds + benchmark wallet)
+
+## audit-logic audit learnings
+
+P-1/P-11/P-12 APPLIED tại Stage 0 step 5 và đều hữu dụng: P-11 (diff cache) biến stale-cache thành đúng 1 finding + 1 USER ACTION thay vì tái diễn mỗi round; P-12 không fire (plugin có test suite — đúng kỳ vọng); P-1 không phát hiện collision (đúng — `.claude/audit-logic-state.json` unique).
+
+**Criteria-update proposals:**
+- **P-13 (từ 2 fixture flaws do operator):** benchmark-guide §1 nên thêm: (a) fixture phải có `.gitignore` cho build artifacts (`__pycache__`, `node_modules`…) trước baseline commit — pycache bị commit làm bẩn diff khi executor chạy test; (b) run output (`runA.json`…) phải ghi NGOÀI fixture dir — ghi bên trong làm bẩn working tree đúng lúc đang chấm D4 "clean tree". Status: PROPOSED.
+- **Observation (không cần đổi criteria):** fixer-introduces-defect fired lần 3 (batch 1 thêm claim sai "verify-then-draw runs this skill as its tier-0 gate" — round 1 fresh review bắt được, grep 0 match). Kiến trúc convergence tiếp tục chứng minh giá trị; lưu ý cho lead: MỌI factual claim thêm vào khi fix (kể cả 1 mệnh đề phụ) phải được grep-verify như finding.
+- **Observation (reviewer false positive mới):** round 3 báo "mojibake U+FFFD" trong marketplace.json — thực tế là U+2014 hợp lệ, tooling của reviewer render sai. Lead nên verify encoding claims bằng codepoint check (python ord), không tin render của console/agent.
+
+---
+
 Generated: 2026-06-11 (session-report audit — first audit of a plugin with non-trivial bundled scripts)
 
 ## session-report audit learnings
@@ -9,8 +22,8 @@ Generated: 2026-06-11 (session-report audit — first audit of a plugin with non
 P-7/P-9/P-10 + P-8(b) were APPLIED at Stage 0 step 5 and all held up: probe temp dirs were cleaned by reviewers unprompted (P-10 wording reached dispatched agents via the canonical prompt), USER ACTIONs carry as-of dates (P-9), the split rule routed operator notes to `.claude/audit-plugin-proposals.md` (P-8).
 
 **Criteria-update proposals:**
-- **P-11 (deployment staleness recurred for the 3rd time):** Stage 0 should ALWAYS record the installed-cache version and diff it against the repo copy of the target plugin — even when the plugin is disabled. session-report's stale 1.0.0 cache surfaced as a finding in 3 of 4 fresh rounds (burning finder/validator cycles each time) because Stage 0 skipped the cache check for a disabled plugin. One early check converts a recurring finding into a single USER ACTION. Status: PROPOSED.
-- **P-12 (from round-4 [OUT-OF-CRITERIA] "no test suite"):** extend criterion 6 — a plugin shipping non-trivial bundled scripts (heuristic: >100 lines or >2 documented edge cases) with NO automated tests is reportable (LOW): every probe-verified behavior is guarded only by comments, and this audit showed each fix batch introduced a new defect that only fresh probing caught. Status: PROPOSED.
+- **P-11 (deployment staleness recurred for the 3rd time):** Stage 0 should ALWAYS record the installed-cache version and diff it against the repo copy of the target plugin — even when the plugin is disabled. session-report's stale 1.0.0 cache surfaced as a finding in 3 of 4 fresh rounds (burning finder/validator cycles each time) because Stage 0 skipped the cache check for a disabled plugin. One early check converts a recurring finding into a single USER ACTION. **Status: APPLIED 2026-06-11** (SKILL.md Stage 0 step 3; audit-logic audit Stage 0 step 5).
+- **P-12 (from round-4 [OUT-OF-CRITERIA] "no test suite"):** extend criterion 6 — a plugin shipping non-trivial bundled scripts (heuristic: >100 lines or >2 documented edge cases) with NO automated tests is reportable (LOW): every probe-verified behavior is guarded only by comments, and this audit showed each fix batch introduced a new defect that only fresh probing caught. **Status: APPLIED 2026-06-11** (canonical block criterion 6; audit-logic audit Stage 0 step 5).
 - **Observation (no proposal):** the fixer-introduces-defects loop fired twice this audit (batch 2's build-report `$`-pattern HIGH; batch 3's incomplete R4-F3 denominator fix caught by lead verification). The existing architecture (fresh rounds + lead probes) caught both — evidence the convergence design works, but also that fix batches on script-bearing plugins should always rerun the regression suite (this audit did so; consider making it a Stage 4 requirement for scripts — it already is via the "written or updated test that passes" rule, reaffirmed here).
 
 ---
@@ -85,5 +98,5 @@ Generated: 2026-06-10 (v1.0.0 — dogfood round 1, fresh reviewer with the plugi
 
 ## Criteria-update proposals (from [OUT-OF-CRITERIA] findings)
 
-- **P-1 (from F25, name collision `improvement-proposals.md` vs pipeline-retrospective's project-level file):** extend criterion 3 with **artifact-name collision** — output files/state files a plugin writes must not collide with other installed plugins' artifacts (compare against the artifact names other plugins document). Status: PROPOSED — immediate symptom fixed via Stage 7 note; criterion extension pending next criteria revision.
+- **P-1 (from F25, name collision `improvement-proposals.md` vs pipeline-retrospective's project-level file):** extend criterion 3 with **artifact-name collision** — output files/state files a plugin writes must not collide with other installed plugins' artifacts (compare against the artifact names other plugins document). **Status: APPLIED 2026-06-11** (canonical block criterion 3 artifact-name collision clause; audit-logic audit Stage 0 step 5) — immediate symptom had been fixed via Stage 7 note.
 - **P-2 (from F24, deprecated `onerror`):** no criteria change needed — deprecated-API usage in bundled scripts/examples already fits criterion 6; recorded here as a reminder that examples count as "scripts" for criterion 6 purposes.
