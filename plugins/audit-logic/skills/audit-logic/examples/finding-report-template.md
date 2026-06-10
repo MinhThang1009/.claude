@@ -42,7 +42,7 @@ await item.destroy();
 // Should verify: item.userId === currentUserId
 ```
 
-**Minimal fix:** Add `if (item.userId !== userId) throw new AppError('Not authorized', 403)` after the findByPk.
+**Minimal fix:** Add `if (!item) throw new AppError('Item not found', 404); if (item.userId !== userId) throw new AppError('Not authorized', 403)` after the findByPk (the `!item` guard matters — `findByPk` returns null for an unknown itemId; without it the ownership check itself crashes with a TypeError).
 
 **Test needed:** "removeItem throws 403 when item belongs to different user"
 

@@ -43,7 +43,7 @@ Report findings with specific file and line number references.
 > Canonical criteria live in SKILL.md Phase 5 step 2 — if the two ever diverge, SKILL.md wins.
 
 A good bug-fix test:
-- **Fails** on the unfixed code (reproduces the bug)
+- **Fails** on the unfixed code (reproduces the bug) — or is explicitly labeled DOCUMENTATION per SKILL.md Phase 5 step 2 (INFO-severity, behavior-unchanged fixes only)
 - **Passes** on the fixed code
 - Asserts the **outcome**, not the implementation detail (do not test internal state)
 - Is **named** to describe the scenario, not the code path
@@ -61,6 +61,19 @@ A good bug-fix test:
 - Document the expected behavior as a comment in the fix commit
 - Note in the Phase 7 summary that the fix needs environment-level verification
 - Do not claim the fix is verified — it is not
+
+**Code snippets for Phase 5** (canonical rules live in SKILL.md Phase 5; these are only the format examples):
+
+Call-signature assertion grep (Phase 5 step 1 pre-flight):
+```
+grep -r "<assertion_matcher>" <test_dirs> | grep "<function_name>"
+```
+
+Integration/API test placeholder for `[UNIT-TEST-BLIND]` fixes (Phase 5 step 2):
+```js
+// Verifies [BUG-X]: [description of what the test proves]
+test.skip('[BUG-X] integration test — requires real DB/service', async () => { ... });
+```
 
 **For race conditions:**
 - Unit tests can mock concurrency order but cannot prove atomicity

@@ -266,7 +266,7 @@
     },
     {
       "name": "audit-logic",
-      "description": "Systematic logic audit: read every line of source code, find real logic bugs, fix with tests, update stale docs, commit. Language and framework agnostic.",
+      "description": "Systematic logic audit workflow: read every line of source code, find logic bugs, fix, update tests and docs, commit. Language and framework agnostic.",
       "author": { "name": "Minh Thang" },
       "source": "./plugins/audit-logic",
       "category": "development"

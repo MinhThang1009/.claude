@@ -1,6 +1,6 @@
 {
   "name": "audit-logic",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Systematic logic audit workflow: read every line of source code, find logic bugs, fix, update tests and docs, commit. Language and framework agnostic.",
   "author": {
     "name": "Minh Thang"

@@ -31,8 +31,14 @@ Example: `/audit-logic backend/src/modules/orders`
 
 ## Requirements
 
-- **Stop gate hook** — bundled with this plugin (`hooks/hooks.json` → `audit-logic-gate.sh` → `audit-logic-gate.py`). Blocks the **first** attempt to end the turn while phase gates in `.claude/audit-logic-state.json` are incomplete; a second consecutive stop is allowed (soft block — this is how the executor pauses to wait for user input; if another plugin's Stop hook blocked first, this gate may pass that cycle and re-arms next turn). Loads automatically when the plugin is enabled; requires `bash` and Python ≥ 3.6 on PATH (silently skips if Python is missing). If an audit is aborted midway, delete `.claude/audit-logic-state.json` — an orphaned state file re-triggers the block on the first stop of **every turn** in later sessions of that project. Before deleting, check no other concurrent session of the same project is mid-audit (the file may be theirs, not an orphan).
+- **Stop gate hook** — bundled with this plugin (`hooks/hooks.json` → `audit-logic-gate.sh` → `audit-logic-gate.py`). Blocks the **first** attempt to end the turn while phase gates in `.claude/audit-logic-state.json` are incomplete; a second consecutive stop is allowed (soft block — this is how the executor pauses to wait for user input; if another plugin's Stop hook blocked first, this gate may pass that cycle and re-arms next turn). Canonical wording of this soft-block contract lives in SKILL.md (Phase 3 waiting rule + Ground Rules) — if descriptions diverge, SKILL.md wins. Loads automatically when the plugin is enabled; requires `bash` and Python ≥ 3.6 on PATH (silently skips if Python is missing). If `bash` itself is missing (Windows without Git Bash), the hook command fails on every stop — noisy but non-blocking, and the gate never arms; install Git Bash or disable the plugin. If an audit is aborted midway, delete `.claude/audit-logic-state.json` — an orphaned state file re-triggers the block on the first stop of **every turn** in later sessions of that project. Before deleting, check no other concurrent session of the same project is mid-audit (the file may be theirs, not an orphan).
+- **Related, NOT a dependency:** `verify-then-draw` — the trigger phrase "gate tầng 0" refers to running this audit as the tier-0 (logic-correctness) gate before drawing diagrams; the full diagram pipeline is `/verify-then-draw`. audit-logic works standalone without it.
 - **`/pipeline-retrospective`** — provided by the `subagent-system` plugin, required by Phase 7. If it is not installed, the skill records the skip in the summary and still closes the gates (see SKILL.md Phase 7, Exception) — the session is never left permanently blocked.
+
+## Maintenance
+
+- The `description` in `.claude-plugin/plugin.json` is **canonical**; the `audit-logic` entry in the repo's `.claude-plugin/marketplace.json` must match it verbatim.
+- Version bump checklist (required for ANY content change — the installed cache only refreshes on a bump): update `version` in `.claude-plugin/plugin.json` AND in `skills/audit-logic/SKILL.md` frontmatter, then update/reinstall the plugin.
 
 ## Headless / Windows notes
 

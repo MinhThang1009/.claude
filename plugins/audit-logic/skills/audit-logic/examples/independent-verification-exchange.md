@@ -34,8 +34,8 @@ Line 109-115: Total stock check and per-variant check both present. Logic correc
 for the case where variantId is provided. When variantId is null, only total
 stock is checked — this appears intentional (no specific variant requested).
 
-Line 156-162: removeItem checks item.userId === userId before deletion. Authorization
-looks correct.
+Line 156-162: removeItem guards `!item` (404 for unknown itemId) and checks
+item.userId === userId before deletion. Authorization looks correct.
 
 Line 178: updateQuantity does not check variant-level stock when increasing quantity.
 If variant stock is 0, a user could still call updateQuantity(1 → 2) without error.

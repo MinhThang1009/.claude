@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Test suite cho audit-logic-gate.py
 # Chạy: bash plugins/audit-logic/hooks/test-audit-logic-gate.sh
+# Windows: chạy qua Git Bash/MSYS — suite dựa vào MSYS tự chuyển path POSIX trong
+# CLAUDE_PROJECT_DIR sang dạng Windows khi spawn python.exe native (không có python3).
+# Bash thiếu cơ chế đó sẽ làm hook nhìn thấy path không tồn tại → kết quả sai.
 HOOK="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/audit-logic-gate.sh"
 STATE_DIR=$(mktemp -d)
 mkdir -p "${STATE_DIR}/.claude"
@@ -48,6 +51,18 @@ run "phase4=true, phase5=true, 6/7 thiếu → BLOCK" '{"phase4_gate":true,"phas
 echo ""
 echo "--- All 4 gates complete ---"
 run "cả 4 gates true → PASS"                      '{"findings_confirmed":true,"phase4_gate":true,"phase5_gate":true,"phase6_gate":true,"phase7_gate":true}' "Stop" "PASS"
+
+echo ""
+echo "--- Gates đã đóng hết → PASS kèm nhắc xóa state file ---"
+echo '{"findings_confirmed":true,"phase4_gate":true,"phase5_gate":true,"phase6_gate":true,"phase7_gate":true}' > "$STATE_FILE"
+out=$(echo '{"hook_event_name":"Stop"}' | CLAUDE_PROJECT_DIR="$STATE_DIR" bash "$HOOK" 2>&1)
+code=$?
+if [ $code -eq 0 ] && echo "$out" | grep -q "Xoa .claude/audit-logic-state.json"; then
+  PASS=$((PASS+1)); printf "  OK   [PASS ] all-true → PASS + nhắc xóa state file (chống orphan đã đóng gate)\n"
+else
+  FAIL=$((FAIL+1)); printf "  MISS [code=%d] expected PASS + nhắc xóa state file\n" "$code"
+  echo "    out: $out"
+fi
 
 echo ""
 echo "--- Hint không bao giờ gợi ý findings_confirmed: true ---"
@@ -123,6 +138,22 @@ if [ $code -eq 2 ]; then
 else
   FAIL=$((FAIL+1)); printf "  MISS [code=%d] BOM làm gate âm thầm tắt — expected BLOCK\n" "$code"
   echo "    out: $out"
+fi
+
+echo ""
+echo "--- State file UTF-16LE (PowerShell 5.1 redirect mặc định) → fail-open theo thiết kế ---"
+if command -v iconv >/dev/null 2>&1; then
+  printf '%s' '{"findings_confirmed":false,"phase4_gate":false,"phase5_gate":false,"phase6_gate":false,"phase7_gate":false}' | iconv -f UTF-8 -t UTF-16LE > "$STATE_FILE"
+  out=$(echo '{"hook_event_name":"Stop"}' | CLAUDE_PROJECT_DIR="$STATE_DIR" bash "$HOOK" 2>&1)
+  code=$?
+  if [ $code -eq 0 ]; then
+    PASS=$((PASS+1)); printf "  OK   [PASS ] UTF-16LE → fail-open PASS (gate tắt — hành vi fail-safe documented)\n"
+  else
+    FAIL=$((FAIL+1)); printf "  MISS [code=%d] UTF-16LE expected fail-open PASS\n" "$code"
+    echo "    out: $out"
+  fi
+else
+  printf "  SKIP iconv không có trên môi trường này — bỏ qua case UTF-16LE\n"
 fi
 
 echo ""

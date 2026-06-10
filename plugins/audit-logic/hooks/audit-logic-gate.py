@@ -3,10 +3,11 @@
 
 State file: ${CLAUDE_PROJECT_DIR}/.claude/audit-logic-state.json
   {"findings_confirmed": false, "phase4_gate": false, "phase5_gate": false, "phase6_gate": false, "phase7_gate": false}
+  (JSON shape canonical: SKILL.md Phase 1 step 4 — nếu hai bên lệch, SKILL.md wins.)
 
 - File không tồn tại  → không đang chạy audit-logic → allow (exit 0)
 - File tồn tại, gates chưa done → block (exit 2, print reminder)
-- File tồn tại, tất cả done → allow (exit 0)
+- File tồn tại, tất cả done → allow (exit 0, kèm nhắc xóa file — Phase 7 step 3)
 
 Fail-safe: mọi lỗi parse/IO đều exit 0 (không block session).
 """
@@ -42,6 +43,9 @@ def main() -> int:
         # utf-8-sig: chấp nhận cả file có BOM (PowerShell/notepad trên Windows
         # dễ thêm BOM khi user sửa tay) — BOM với utf-8 thuần gây JSONDecodeError
         # → fail-safe exit 0 → gate âm thầm tắt.
+        # Lưu ý: file UTF-16 (mặc định của redirect `>` trên Windows PowerShell 5.1)
+        # vẫn fail parse → fail-open (exit 0) đúng thiết kế fail-safe; test suite
+        # có case UTF-16LE ghi nhận hành vi này.
         with open(state_file, encoding="utf-8-sig") as f:
             state = json.load(f)
     except (json.JSONDecodeError, UnicodeDecodeError, OSError):
@@ -54,7 +58,7 @@ def main() -> int:
     GATE_LABELS = (
         (
             "phase4_gate",
-            "Phase 4 Exit Gate  (completeness check — document all dismissed findings)",
+            "Phase 4 Exit Gate  (completeness check - document all dismissed findings)",
         ),
         (
             "phase5_gate",
@@ -70,6 +74,9 @@ def main() -> int:
         (gate, label) for gate, label in GATE_LABELS if state.get(gate) is not True
     ]
 
+    # Mọi chuỗi message runtime (os.write bên dưới) cố ý KHÔNG dấu (ASCII-only):
+    # stderr của hook hiển thị trên console Windows codepage không phải UTF-8
+    # (cp1252/cp437) sẽ garble bytes UTF-8 có dấu. Đừng "sửa" thêm dấu vào chúng.
     if missing:
         lines = ["[audit-logic] Gates chua hoan tat - hoan thanh truoc khi ket thuc:"]
         for _, label in missing:
@@ -103,6 +110,11 @@ def main() -> int:
     if state.get("findings_confirmed") is not True:
         warn = "[audit-logic] WARNING: tat ca gates da true nhung findings chua tung duoc user xac nhan (findings_confirmed: false). Phase 3 yeu cau xac nhan truc tiep - kiem tra lai voi user truoc khi dong audit.\n"
         os.write(2, warn.encode("utf-8"))
+
+    # Nhắc xóa (non-blocking): file đã đóng hết gate là file Phase 7 step 3 quên xóa —
+    # không chặn, nhưng nhắc mỗi lần stop để không thành rác vĩnh viễn.
+    note = "[audit-logic] Tat ca gates da true - audit da xong. Xoa .claude/audit-logic-state.json (Phase 7 step 3) neu chua xoa.\n"
+    os.write(2, note.encode("utf-8"))
 
     return 0
 
