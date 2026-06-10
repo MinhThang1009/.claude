@@ -15,11 +15,11 @@ jobs:
     name: Lychee external links (online)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Run lychee (online mode)
         id: lychee
-        uses: lycheeverse/lychee-action@v2
+        uses: lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411 # v2.8.0
         with:
           # Check tất cả .md, online mode (không có --offline)
           # Skip private/local URLs để tránh false positive
@@ -37,7 +37,7 @@ jobs:
           output: ./lychee-report.md
 
       - name: Upload report artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
           name: lychee-external-link-report
@@ -46,7 +46,7 @@ jobs:
 
       - name: Open issue nếu phát hiện broken link
         if: steps.lychee.outputs.exit_code != 0
-        uses: peter-evans/create-issue-from-file@v5
+        uses: peter-evans/create-issue-from-file@e8ef132d6df98ed982188e460ebb3b5d4ef3a9cd # v5.0.1
         with:
           title: "External link check: phát hiện URL hỏng (${{ github.run_id }})"
           content-filepath: ./lychee-report.md
