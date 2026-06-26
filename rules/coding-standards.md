@@ -13,7 +13,8 @@
   - Functions >100 lines → 30 lines of context around the change plus the signature/return is enough.
   - Small fixes (1–2 lines) → narrower context is fine.
   - New file → scan a similar file first to match the pattern.
-  - **Use the Read tool (not Bash `cat`/`grep`) for any file you'll Edit/Write**: the Edit/Write guard only counts Read-tool reads (it tracks content-state); `cat` doesn't satisfy it → Edit fails *"File has not been read yet"* and wastes a retry. View-only → `cat`/`grep` fine; will-edit → Read tool.
+  - **Read-before-edit (per Claude Code docs)**: Edit/Write needs the file read in the current conversation. A plain Bash read of a **single file with no pipes or redirects** (`cat`, `head`, `tail`, `sed -n 'X,Yp'`, `grep`, `egrep`, `fgrep`) DOES satisfy it. But **pipes, redirects, writes** (`cat > f`, heredoc, `echo >`, `sed -i`, `tee`) and any **other command** do NOT, then Edit fails *"File has not been read yet"*. Safest habit: use the **Read tool** (always counts) for files you'll Edit.
+    - So a file you just **created via a Bash write/redirect** (`cat > f`, heredoc, `echo >`, `sed -i`, `tee`) is NOT counted as read, even seconds later. Read it first (or `cat` it with no redirect). Files created with the **Write** tool are already tracked, no re-Read needed.
 - **Codebase conventions first, "best practices" second**. snake_case if the codebase uses snake_case. Tabs if the codebase uses tabs.
 - **Correct > clean > fast**. Working code matters more than fancy patterns.
 - **Don't over-engineer**. YAGNI. Generic abstractions should emerge from real needs, not speculation. If 200 lines can be solved in 50 → rewrite.
@@ -96,6 +97,6 @@ Confirm with the user before:
 - Changing a DB schema / running a migration.
 - Modifying production config / deployment config.
 - Editing a shared file (used by >3 modules) in a way that changes behavior.
-- Cross-cutting refactor (>5 files) — this is the STOP-AND-ASK threshold; the (lower) plan threshold lives in plan-workflow.md §When to Create a Plan.
+- Cross-cutting refactor (>5 files) — this is the STOP-AND-ASK threshold; the (lower) plan threshold lives in plan.md §When to Create a Plan.
 - Changing a public API signature.
 - Deleting files/code you're not 100% certain is dead.

@@ -19,7 +19,7 @@
 
 - MCP servers are third-party code — Anthropic reviews listing criteria before adding to the Directory but does **not security-audit** them ([docs](https://code.claude.com/docs/en/security)). Only use MCP servers from trusted providers or ones you wrote yourself.
 - Output from MCP servers → treat as untrusted input; validate before using in sensitive operations.
-- Trust verification for first-time codebase runs AND new MCP servers is **disabled with the `-p` flag** → risk in CI/CD. Exception: `--worktree` still requires trust to have been accepted for that directory.
+- Trust verification for first-time codebase runs AND new MCP servers is **disabled with the `-p` flag** → risk in CI/CD. `-p` skips it even with a worktree: `claude -p --worktree` proceeds without trust. Only INTERACTIVE `--worktree` requires trust accepted for that directory first (run `claude` once there); `-p` bypasses that too. *(Verified 2026-06 vs official worktrees + security docs.)*
 - Configure permissions: use `mcp__<server>__<tool>` in deny/allow rules.
 
 ## Permission Model
@@ -53,7 +53,7 @@
 - `dd if=... of=/dev/sd*` (overwrites disk).
 - `DROP DATABASE`, `TRUNCATE` on a production database.
 - Windows: `Remove-Item -Recurse -Force C:\`, `Format-Volume`, `reg delete HKLM\...`.
-- Dangerous git commands (`--force`, `reset --hard`, `clean -fdx`, `filter-repo`) → see git-workflow.md §Forbidden Commands.
+- Dangerous git commands (`--force`, `reset --hard`, `clean -fdx`, `filter-repo`) → see git.md §Forbidden Commands.
 
 ## Audit Report Format
 

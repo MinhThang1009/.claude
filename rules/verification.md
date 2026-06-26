@@ -23,19 +23,19 @@
 - Custom named subagents **DO load** the full memory hierarchy: `~/.claude/CLAUDE.md`, project rules (`.claude/rules/*.md`), `CLAUDE.local.md`, managed policy files.
 - Exception: built-in **Explore and Plan** skip CLAUDE.md and git status.
 - Two fork mechanisms:
-  - `CLAUDE_CODE_FORK_SUBAGENT=1` (env var, experimental — reportedly Claude Code v2.1.117+) → inherits full history + system prompt + tools *(unverified — not found in changelog ≥2.1.126; recorded 2026-06)*.
+  - `CLAUDE_CODE_FORK_SUBAGENT=1` (env var, experimental, reportedly v2.1.117+) → inherits full history + system prompt + tools. *(Forked subagents are real: official changelog v2.1.178 references them re depth tracking. But this exact env-var name/version/behavior is NOT in the official changelog, only community blogs; treat as unverified. Recorded 2026-06.)*
   - `context: fork` (skill frontmatter) → runs in isolation, **does NOT inherit history**; skill content becomes the prompt; CLAUDE.md still loads (except Explore/Plan) *(confirmed — Claude Code skills docs)*.
 
-**Background subagents auto-deny** any tool call that would otherwise prompt.
+**Background subagents (v2.1.186+) surface permission prompts to the main session** instead of auto-denying; the dialog shows which agent is asking, Esc denies just that tool *(confirmed vs official changelog v2.1.186; before that they auto-denied)*.
 
-- A needed clarifying-question call fails, but the subagent continues.
-- Unexpected results (few findings, empty output) → suspect silently denied tools. Retry in the foreground for full permission prompts.
+- A denied or un-approved tool call fails, but the subagent continues.
+- Unexpected results (few findings, empty output) → check whether a tool was denied; retry in the foreground if needed.
 
 **Separate FINDING from VERIFICATION** (audit/review).
 
 - A finder's job is **coverage**: report every candidate, including uncertain and low-severity ones, each tagged with a confidence level.
 - A fresh **verifier** (finding-validator / pipeline-reviewer) filters false positives afterward.
-- Do NOT tell finders to "be conservative" or "only report high-severity" — newer models follow that literally, dropping recall *(Anthropic — prompt best-practices, §Code review harnesses)*.
+- Do NOT tell finders to "be conservative" or "only report high-severity"; newer models follow that literally, dropping recall *(citation unverified: a "Code review harnesses" section was not found in official Anthropic prompt docs as of 2026-06; the principle still holds)*.
 
 **Consolidating multiple subagents' output.**
 
@@ -48,8 +48,8 @@
 
 - Audit spec changes mid-run → **re-dispatch** with the new spec; don't re-evaluate old findings from memory (produced under the old spec).
 - Subagents **miss content** when files are long or the task is overloaded (e.g. fetch URLs + read files + evaluate + report all at once) → don't trust coverage ratings; "not covered" → **grep-verify** first. Limit each to ≤10 files or ≤3 complex tasks *(heuristic — not in Anthropic's docs)*; split rather than overload.
-- **Resume** a subagent instead of re-spawning: ask Claude naturally or call `SendMessage`. It retains full history + tool calls. *(The old `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` requirement is gone — GA since ~v2.1.161; verified 2026-06 via changelog + in-session observation.)*
-- **Subagents cannot spawn subagents** — nesting is fully blocked. Use Skills or chain subagents from the main conversation.
+- **Resume** a subagent instead of re-spawning: call `SendMessage` with its agent ID (retains full history + tool calls; a stopped subagent auto-resumes in the background). Resuming does NOT require agent teams. *(Separately, the agent-teams feature, structured team-protocol messaging + spawning teammates via the Agent `name` param, is still experimental behind `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` per changelog v2.1.178. Corrected 2026-06 vs official docs.)*
+- **Subagent nesting is allowed, up to 5 levels deep** (official changelog v2.1.172; forked/resumed subagents count toward the cap, v2.1.178). Older versions blocked it entirely. Still prefer shallow chains from the main conversation for clarity. *(Corrected 2026-06 vs official changelog.)*
 - **Persistent memory**: `memory: user|project|local` frontmatter → `~/.claude/agent-memory/<name>/`, `.claude/agent-memory/<name>/`, `.claude/agent-memory-local/<name>/`. Separate from main agent memory.
 
 **Startup content ≠ current disk state.** CLAUDE.md, memory, and environment info load at session start and don't auto-refresh when disk changes.

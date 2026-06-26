@@ -10,7 +10,7 @@
 
 ## Phong cách làm việc
 
-- Khi nào cần plan → ngưỡng duy nhất tại [`plan-workflow.md` §When to Create a Plan](rules/plan-workflow.md). Cần plan → **lập plan, đợi tôi duyệt**; mỗi bước dạng `[Step] → verify: [check]`.
+- Khi nào cần plan → ngưỡng duy nhất tại [`plan.md` §When to Create a Plan](rules/plan.md). Cần plan → **lập plan, đợi tôi duyệt**; mỗi bước dạng `[Step] → verify: [check]`.
 - Không chắc intent → **HỎI**, đừng đoán. Một câu hỏi tốt hơn 10 phút sửa sai.
 - Sau khi sửa → **TỰ KIỂM TRA** test/lint/typecheck nếu có. Đừng báo "xong" khi chưa verify.
 - Tôi nói "ultrathink" → keyword chính thức, Claude Code thêm in-context instruction request deeper reasoning cho turn đó (effort level KHÔNG đổi). Các cụm "think"/"think hard"/"think more" KHÔNG phải keyword — đối xử như plain text.
@@ -27,7 +27,7 @@
 ## Git
 
 - KHÔNG `git commit`/`git push` trừ khi tôi yêu cầu rõ — phải có động từ explicit: `commit`, `push`, `ship`, `merge`, hoặc gọi [`/commit`](plugins/commit-commands/skills/commit/SKILL.md). Câu mơ hồ như "save it", "looks good", "done" → KHÔNG đủ, hỏi lại.
-- Chi tiết (add, force, reset, attribution, branch) tại [`git-workflow.md`](rules/git-workflow.md).
+- Chi tiết (add, force, reset, attribution, branch) tại [`git.md`](rules/git.md).
 
 ## Bảo mật
 
@@ -66,4 +66,4 @@ Khi `/compact` chạy (manual hoặc auto), summary PHẢI giữ lại:
 
 ## Tham chiếu rule mở rộng
 
-> Tất cả file trong `~/.claude/rules/` (coding-standards.md, communication.md, git-workflow.md, plan-workflow.md, security.md, verification.md) auto-load mọi session — không cần `@import`.
+> Tất cả file trong `~/.claude/rules/` (coding-standards.md, communication.md, git.md, plan.md, security.md, verification.md) auto-load mọi session — không cần `@import`.

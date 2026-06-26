@@ -7,11 +7,11 @@
 **Format**: Conventional Commits, **subject in VIETNAMESE**.
 
 ```text
-<type>(<scope>): <short description in Vietnamese, no trailing period, ≤72 chars>
+<type>(<scope>): <short description in Vietnamese, no trailing period, ≤50 chars>
 
-<body — explain WHY, can be multiple paragraphs, Vietnamese>
+<body: explain WHY, can be multiple paragraphs, wrap lines at ~72 chars, Vietnamese>
 
-<footer — issue/breaking change references, in English>
+<footer: issue/breaking change references, in English>
 ```
 
 **Type** (keep in English so tools can parse): `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.

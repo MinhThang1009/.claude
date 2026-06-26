@@ -34,8 +34,8 @@
 │   ├── security.md                 # ✅ Auto-import (essential mọi task)
 │   ├── verification.md             # ✅ Auto-import (verify & avoid past mistakes)
 │   ├── coding-standards.md         # ✅ Auto-import (coding conventions)
-│   ├── git-workflow.md             # ✅ Auto-import (git workflow)
-│   └── plan-workflow.md            # ✅ Auto-import (8 principles for any implementation plan)
+│   ├── git.md                      # ✅ Auto-import (git workflow)
+│   └── plan.md                     # ✅ Auto-import (8 principles for any implementation plan)
 ├── plugins/                        # 36 plugins (mỗi plugin có agents/ và/hoặc skills/ bên trong)
 │   ├── pr-review-toolkit/          # PR review: code-reviewer, silent-failure-hunter, type-design-analyzer...
 │   │   ├── .claude-plugin/
@@ -108,7 +108,7 @@
 **Ghi chú**:
 - Vietnamese tokenize ~2.3 chars/token cho prose (ước lượng empirical, đo bằng `/context` trên tokenizer Claude — Anthropic không publish ratio chính thức cho từng ngôn ngữ); kém hiệu quả hơn English ~4 chars/token; baseline ~46k cao hơn config English (~10-15k) là expected.
 - Agents và skills giờ nằm trong `plugins/` — chỉ load descriptions tại session start, body load khi spawn agent/invoke skill.
-- 5 rules auto-load mọi session (communication, security, verification, coding-standards, git-workflow).
+- 5 rules auto-load mọi session (communication, security, verification, coding-standards, git).
 - Autocompact buffer 33k reserved (không tính vào used) — Claude Code dành chỗ cho compact summary khi context đầy.
 
 ## 2. Cài đặt
@@ -537,7 +537,7 @@ Câu hỏi thường gặp:
 
 ### 10.1 Tại sao tất cả rules đều auto-load?
 
-5 rules (`communication`, `security`, `verification`, `coding-standards`, `git-workflow`) auto-load mọi session. Coding conventions và git workflow áp dụng cho hầu hết mọi task nên đưa vào rules/ thay vì để user `@`-reference thủ công.
+5 rules (`communication`, `security`, `verification`, `coding-standards`, `git`) auto-load mọi session. Coding conventions và git workflow áp dụng cho hầu hết mọi task nên đưa vào rules/ thay vì để user `@`-reference thủ công.
 
 ### 10.2 Tại sao [REFERENCE.md](docs/REFERENCE.md) không auto-load vào [CLAUDE.md](CLAUDE.md)?
 

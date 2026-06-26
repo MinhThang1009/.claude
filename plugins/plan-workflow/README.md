@@ -20,7 +20,7 @@ claude plugin install plan-workflow@minhthang-plugins
 
 ### Rules
 
-Pairs with `rules/plan-workflow.md` (auto-loaded every session) — provides the 8 principles summary and "always/never" guardrails.
+Pairs with `rules/plan.md` (auto-loaded every session) — provides the 8 principles summary and "always/never" guardrails.
 
 ## The 8 Principles
 
