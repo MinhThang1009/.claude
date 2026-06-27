@@ -39,6 +39,7 @@
 - **Vietnamese** for comments explaining logic/rationale (fully English project → English).
 - **English** for TODO/FIXME tags (so tools can grep them): `// TODO(name): Short description`.
 - Docstrings/JSDoc: Vietnamese for the description, but keep standard format (`@param`, `@returns`, `@throws`).
+- **Comments explain the code, not the process that produced it.** Strip workflow/meta references: anything that only makes sense to someone who saw the audit, plan, review, or issue tracker. The test: a reader with no context beyond the code must fully understand the comment. Rewrite such references to the plain intent they encode. (`TODO`/`FIXME` tags are the deliberate exception, kept as above.)
 
 Good example:
 ```python
