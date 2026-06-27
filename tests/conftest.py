@@ -22,10 +22,10 @@ def _find_hooks_dir() -> Path:
         REPO_ROOT / "plugins" / "dotclaude" / "hooks",
     ]
     for c in candidates:
-        if (c / "bash-guard.py").is_file():
+        if (c / "bash_guard.py").is_file():
             return c
     raise FileNotFoundError(
-        f"bash-guard.py không tìm thấy ở: {[str(c) for c in candidates]}"
+        f"bash_guard.py không tìm thấy ở: {[str(c) for c in candidates]}"
     )
 
 
@@ -44,7 +44,7 @@ def _load_module(name: str, path: Path):
     return module
 
 
-_bash_guard = _load_module("bash_guard", HOOKS_DIR / "bash-guard.py")
+_bash_guard = _load_module("bash_guard", HOOKS_DIR / "bash_guard.py")
 _statusline = _load_module("statusline", HOOKS_DIR / "statusline.py")
 _format_on_edit = _load_module("format_on_edit", HOOKS_DIR / "format-on-edit.py")
 _handoff_auto_move = _load_module(

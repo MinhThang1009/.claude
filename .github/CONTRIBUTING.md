@@ -52,7 +52,7 @@ Tham khảo workflow fact-check trong commit history (search `docs: fix .* fact-
 1. Fork repo → tạo branch `fix/...` hoặc `feat/...`.
 2. Sửa, **verify** local trước khi push:
    - Markdown: render preview check link không broken (`markdownlint-cli2 "**/*.md"` nếu cài).
-   - Hooks: chạy `bash hooks/test-bash-guard.sh` (119 test case, must 119/119 PASS).
+   - Hooks: chạy `bash hooks/test_bash_guard.sh` (119 test case, must 119/119 PASS).
    - JSON: validate syntax (`python -m json.tool settings.json` hoặc `jq . settings.json`).
    - Shell: `shellcheck hooks/*.sh` (nếu cài).
    - Python: `ruff check hooks/` (nếu cài).
@@ -120,7 +120,7 @@ git clone https://github.com/<your-fork>/dotclaude.git
 cd dotclaude
 
 # Test hooks (119 case)
-bash hooks/test-bash-guard.sh
+bash hooks/test_bash_guard.sh
 
 # Validate frontmatter (cần PyYAML)
 pip install pyyaml
@@ -140,7 +140,7 @@ pre-commit install
 ```
 
 Sau đó mỗi `git commit` sẽ chạy:
-- `bash-guard-tests` (nếu có thay đổi trong `hooks/`)
+- `bash_guard-tests` (nếu có thay đổi trong `hooks/`)
 - `frontmatter-validate` (nếu có thay đổi skill/agent/output-style)
 - `shellcheck`, `ruff`, `markdownlint-cli2` cho file tương ứng
 - Built-in: trailing whitespace, EOF newline, JSON/YAML syntax, merge conflict, private key detection

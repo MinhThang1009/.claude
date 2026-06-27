@@ -23,9 +23,9 @@ repos:
   # Local hooks: tận dụng tool đã có trong repo
   - repo: local
     hooks:
-      - id: bash-guard-tests
-        name: Run bash-guard test suite (119 cases)
-        entry: bash hooks/test-bash-guard.sh
+      - id: bash_guard-tests
+        name: Run bash_guard test suite (119 cases)
+        entry: bash hooks/test_bash_guard.sh
         language: system
         pass_filenames: false
         files: ^hooks/

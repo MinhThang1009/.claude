@@ -33,7 +33,7 @@ Closes #
 
 <!-- Tick toàn bộ trước khi mark "Ready for review" -->
 
-- [ ] Đã chạy `bash hooks/test-bash-guard.sh` local, 119/119 PASS
+- [ ] Đã chạy `bash hooks/test_bash_guard.sh` local, 119/119 PASS
 - [ ] Nếu sửa skill / agent / output-style: đã chạy `python scripts/validate-frontmatter.py`
 - [ ] Đã verify markdown link không broken (preview render)
 - [ ] Commit message tuân Conventional Commits, subject tiếng Việt

@@ -1,6 +1,6 @@
-"""Unit tests cho hooks/bash-guard.py — 8 check functions + check_command.
+"""Unit tests cho hooks/bash_guard.py — 8 check functions + check_command.
 
-Bổ sung integration test bash hooks/test-bash-guard.sh (119 cases).
+Bổ sung integration test bash hooks/test_bash_guard.sh (119 cases).
 """
 
 from __future__ import annotations

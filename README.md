@@ -65,13 +65,13 @@
 ├── output-styles/
 │   └── concise-vietnamese.md       # Style tiếng Việt ngắn gọn
 ├── hooks/                          # Hook scripts (gọi từ settings.json)
-│   ├── bash-guard.py               # Engine pattern matching (Python) — defense layer chính
-│   ├── bash-guard.sh               # Wrapper minimal gọi python
+│   ├── bash_guard.py               # Engine pattern matching (Python) — defense layer chính
+│   ├── bash_guard.sh               # Wrapper minimal gọi python
 │   ├── format-on-edit.py           # Engine: prettier/ruff/gofmt/rustfmt + RCE detection
 │   ├── format-on-edit.sh           # Wrapper minimal gọi python
 │   ├── statusline.py               # StatusLine update script
 │   ├── statusline.sh               # Wrapper cho statusline
-│   └── test-bash-guard.sh          # Regression test 119 case (dev-only, có thể xóa)
+│   └── test_bash_guard.sh          # Regression test 119 case (dev-only, có thể xóa)
 └── templates/                      # Template COPY vào TỪNG project / skill mới
     ├── project-CLAUDE.md           # → <project>/CLAUDE.md
     ├── project-CLAUDE.local.md     # → <project>/CLAUDE.local.md
@@ -405,9 +405,9 @@ which bash python git    # macOS/Linux
 where.exe bash python git    # Windows
 ```
 
-### 7.3 Defense layers — coverage hook bash-guard
+### 7.3 Defense layers — coverage hook bash_guard
 
-Hook `bash-guard.py` chặn các pattern nguy hiểm sau (verified bằng 119 test case):
+Hook `bash_guard.py` chặn các pattern nguy hiểm sau (verified bằng 119 test case):
 
 | Threat | Coverage | Vector ví dụ |
 |---|---|---|
@@ -434,7 +434,7 @@ Hook `bash-guard.py` chặn các pattern nguy hiểm sau (verified bằng 119 te
 
 Verify hook coverage tại máy local:
 ```bash
-bash ~/.claude/hooks/test-bash-guard.sh    # Expect: Total 119, PASS 119, FAIL 0
+bash ~/.claude/hooks/test_bash_guard.sh    # Expect: Total 119, PASS 119, FAIL 0
 ```
 
 ### 7.4 Eval-driven skill optimization (optional)

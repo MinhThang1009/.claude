@@ -31,9 +31,9 @@ jobs:
           mkdir -p "$HOME/.claude/hooks"
           cp hooks/*.py hooks/*.sh "$HOME/.claude/hooks/"
           chmod +x "$HOME/.claude/hooks"/*.sh
-      - name: Run test-bash-guard.sh
+      - name: Run test_bash_guard.sh
         shell: bash
-        run: bash hooks/test-bash-guard.sh
+        run: bash hooks/test_bash_guard.sh
 
   json-validate:
     name: JSON syntax + schema validate

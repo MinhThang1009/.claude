@@ -190,7 +190,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$HOME/.claude/hooks/bash-guard.sh\"",
+            "command": "bash \"$HOME/.claude/hooks/bash_guard.sh\"",
             "shell": "bash"
           }
         ]
@@ -307,9 +307,9 @@
     "subagent-system@minhthang-plugins": true,
     "plan-workflow@minhthang-plugins": true,
     "audit-plan@minhthang-plugins": true,
-    "verify-then-draw@minhthang-plugins": true,
+    "audit-plugin@minhthang-plugins": true,
     "audit-logic@minhthang-plugins": true,
-    "audit-plugin@minhthang-plugins": true
+    "verify-then-draw@minhthang-plugins": true
   },
   "extraKnownMarketplaces": {
     "minhthang-plugins": {
@@ -327,7 +327,7 @@
   "spinnerTipsEnabled": true,
   "syntaxHighlightingDisabled": false,
   "alwaysThinkingEnabled": false,
-  "effortLevel": "high",
+  "effortLevel": "xhigh",
   "fastModePerSessionOptIn": false,
   "awaySummaryEnabled": true,
   "autoUpdatesChannel": "latest",
@@ -351,6 +351,5 @@
   "autoScrollEnabled": true,
   "showTurnDuration": true,
   "terminalProgressBarEnabled": true,
-  "agentPushNotifEnabled": true,
-  "model": "claude-fable-5[1m]"
+  "agentPushNotifEnabled": true
 }

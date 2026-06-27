@@ -176,7 +176,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$HOME/.claude/hooks/bash-guard.sh\"",
+            "command": "bash \"$HOME/.claude/hooks/bash_guard.sh\"",
             "shell": "bash"
           }
         ]

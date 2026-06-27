@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Test suite cho bash-guard.py.
-# Chạy: bash ~/.claude/hooks/test-bash-guard.sh
-HOOK="$HOME/.claude/hooks/bash-guard.sh"
+# Test suite cho bash_guard.py.
+# Chạy: bash ~/.claude/hooks/test_bash_guard.sh
+HOOK="$HOME/.claude/hooks/bash_guard.sh"
 PASS=0
 FAIL=0
 FAIL_DETAILS=""

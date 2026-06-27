@@ -123,8 +123,20 @@ def is_ask_path_access(cmd: str) -> bool:
 
 
 def is_raw_network_tool(cmd: str) -> bool:
-    """nc/ncat/socat/telnet — block all uses (rare legitimate use in dev)."""
-    return bool(re.search(r"(?:^|[\s;|&])(?:nc|ncat|socat|telnet)\b", cmd))
+    """nc/ncat/socat/telnet ở VỊ TRÍ LỆNH — block (rare legitimate use in dev).
+
+    Chỉ chặn khi tool là LỆNH THỰC THI: tách command thành segments theo ; | & newline
+    backtick $(, rồi check từ ĐẦU mỗi segment (bỏ qua sudo/env/xargs/exec prefix).
+    "nc" trong argument/text/biến (grep 'nc|ncat', tên biến Python nc, commit message)
+    KHÔNG bao giờ bị chặn. Strip quoted strings trước để pipe trong 'nc|ncat'
+    không bị coi là separator. Loại trừ phép gán (nc=...) bằng negative lookahead.
+    """
+    stripped = re.sub(r"'[^']*'|\"[^\"]*\"", " ", cmd)
+    segments = re.split(r"[;|&\n`]|\$\(", stripped)
+    head_re = re.compile(
+        r"^\s*(?:(?:sudo|env|xargs|exec)\s+)*(?:nc|ncat|socat|telnet)\b(?!\s*=)"
+    )
+    return any(head_re.match(segment) for segment in segments)
 
 
 def is_curl_wget_exfil(cmd: str) -> bool:
@@ -216,7 +228,7 @@ def is_force_push_variant(cmd: str) -> bool:
     """git push force NGUY HIỂM: --force/-f trần, +ref, git -c override.
 
     CHO PHÉP --force-with-lease / --force-if-includes: chúng từ chối ghi đè nếu
-    remote đã đổi (an toàn cho feature branch — đúng git-workflow.md). Chỉ chặn
+    remote đã đổi (an toàn cho feature branch — đúng git.md). Chỉ chặn
     --force trần (ghi đè vô điều kiện) và -f short flag.
     """
     patterns = [

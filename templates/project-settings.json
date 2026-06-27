@@ -49,7 +49,7 @@
       "Bash(go get:*)"
     ],
 
-    "_comment_deny": "Lệnh CHẶN tuyệt đối — KHÔNG bao giờ chạy. Lưu ý: permission rule match TỪNG SUBCOMMAND riêng (per docs), KHÔNG match compound như 'curl | bash' — defense thật cho compound nằm ở hook PreToolUse bash-guard.py bên dưới (is_pipe_to_shell, is_dangerous_rm, is_dd_to_disk, is_fork_bomb).",
+    "_comment_deny": "Lệnh CHẶN tuyệt đối — KHÔNG bao giờ chạy. Lưu ý: permission rule match TỪNG SUBCOMMAND riêng (per docs), KHÔNG match compound như 'curl | bash' — defense thật cho compound nằm ở hook PreToolUse bash_guard.py bên dưới (is_pipe_to_shell, is_dangerous_rm, is_dd_to_disk, is_fork_bomb).",
     "deny": [
       "Bash(rm -rf /*)",
       "Bash(rm -rf ~)",
@@ -81,7 +81,7 @@
     ]
   },
 
-  "_comment_hooks": "Hook chạy DETERMINISTIC — KHÔNG phụ thuộc Claude nhớ rule. Reference script global ở ~/.claude/hooks/bash-guard.sh (cài qua dotclaude). Script dùng python parse JSON (không cần jq).",
+  "_comment_hooks": "Hook chạy DETERMINISTIC — KHÔNG phụ thuộc Claude nhớ rule. Reference script global ở ~/.claude/hooks/bash_guard.sh (cài qua dotclaude). Script dùng python parse JSON (không cần jq).",
   "hooks": {
     "PreToolUse": [
       {
@@ -91,7 +91,7 @@
           {
             "type": "command",
             "shell": "bash",
-            "command": "bash \"$HOME/.claude/hooks/bash-guard.sh\"",
+            "command": "bash \"$HOME/.claude/hooks/bash_guard.sh\"",
             "timeout": 5
           }
         ]

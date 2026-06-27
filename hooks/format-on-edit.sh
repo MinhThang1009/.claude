@@ -8,5 +8,5 @@ for PY in python3 python; do
   fi
 done
 # Format-on-edit là PostToolUse hook — silent skip nếu Python thiếu
-# (không block tool call như bash-guard PreToolUse).
+# (không block tool call như bash_guard PreToolUse).
 exit 0

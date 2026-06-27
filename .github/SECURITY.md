@@ -2,7 +2,7 @@
 
 ## Phạm vi áp dụng
 
-Repo `dotclaude` cung cấp cấu hình `~/.claude/` cho Claude Code, bao gồm `hooks/bash-guard.py` (defense layer chặn lệnh nguy hiểm) và permission rules trong `settings.json`. Vấn đề bảo mật trong các thành phần này được xử lý ưu tiên.
+Repo `dotclaude` cung cấp cấu hình `~/.claude/` cho Claude Code, bao gồm `hooks/bash_guard.py` (defense layer chặn lệnh nguy hiểm) và permission rules trong `settings.json`. Vấn đề bảo mật trong các thành phần này được xử lý ưu tiên.
 
 ## Phiên bản được hỗ trợ
 
@@ -18,7 +18,7 @@ Mọi fix bảo mật được apply trên `main`. Người dùng pin commit cũ
 
 ### Lỗ hổng nghiêm trọng (CRITICAL / HIGH)
 
-Các vấn đề có khả năng gây RCE, command injection bypass, secret exfiltration, hoặc bypass `bash-guard.py`:
+Các vấn đề có khả năng gây RCE, command injection bypass, secret exfiltration, hoặc bypass `bash_guard.py`:
 
 1. **KHÔNG mở public issue** — tránh exposing chi tiết trước khi fix.
 2. Sử dụng [GitHub Private Vulnerability Reporting](https://github.com/MinhThang1009/dotclaude/security/advisories/new) — báo cáo riêng tư qua GitHub Security tab.
@@ -58,10 +58,10 @@ Repo này KHÔNG xử lý vấn đề bảo mật của:
 
 Để cộng đồng tham khảo và đánh giá:
 
-- **`hooks/bash-guard.py`**: Pattern matching engine, chặn 8 vector — sensitive path access, raw network exfil, curl/wget data upload, pipe-to-shell, dangerous rm, force push, fork bomb, dd-to-disk.
+- **`hooks/bash_guard.py`**: Pattern matching engine, chặn 8 vector — sensitive path access, raw network exfil, curl/wget data upload, pipe-to-shell, dangerous rm, force push, fork bomb, dd-to-disk.
 - **`hooks/format-on-edit.sh`**: Skip prettier khi config có thể chứa executable code (`.prettierrc.js`, `package.json` plugins).
 - **`settings.json` permission rules**: Read deny cho `.env`, `*.pem`, `*.key`, SSH keys, AWS credentials, etc.
-- **Test suite**: 119 regression test trong `hooks/test-bash-guard.sh`.
+- **Test suite**: 119 regression test trong `hooks/test_bash_guard.sh`.
 
 Vector đã biết bypass (documented, không phải zero-day):
 
