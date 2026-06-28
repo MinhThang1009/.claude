@@ -73,9 +73,13 @@ jobs:
           # External URL checking fragile trong CI (rate-limit, redirect, auth, transient
           # network) — không phản ánh repo health. Internal link mới là regression catch.
           # External link recheck nên là separate scheduled job nếu cần.
+          # Bỏ qua template assets của repo-scaffold: link trong đó (CODE_OF_CONDUCT.md,
+          # .github/CODEOWNERS, LICENSE) cố ý trỏ tới file repo ĐÍCH sau khi scaffold, và
+          # README-header.md chứa {{OWNER}}/{{REPO}} — link-check tại chỗ là false positive.
           args: >-
             --no-progress
             --offline
+            --exclude-path 'plugins/repo-scaffold/skills/repo-scaffold/assets/'
             './**/*.md'
           fail: true
 
