@@ -309,7 +309,8 @@
     "audit-plan@minhthang-plugins": true,
     "audit-plugin@minhthang-plugins": true,
     "audit-logic@minhthang-plugins": true,
-    "verify-then-draw@minhthang-plugins": true
+    "verify-then-draw@minhthang-plugins": true,
+    "repo-scaffold@minhthang-plugins": true
   },
   "extraKnownMarketplaces": {
     "minhthang-plugins": {
