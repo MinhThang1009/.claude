@@ -45,7 +45,11 @@ gh label create "help wanted"      --color 008672 --description "Extra attention
 gh label create "question"         --color d876e3 --description "Further information is requested" --force
 ```
 
-`bug`, `enhancement`, and `documentation` usually exist by default. Create `question` because SUPPORT.md and the issue-template chooser reference it.
+`bug`, `enhancement`, and `documentation` usually exist by default. Create `question` because SUPPORT.md and the issue-template chooser reference it. If you ship the label-gated `auto-merge.yml` workflow, also create its trigger label:
+
+```bash
+gh label create "automerge" --color 0e8a16 --description "Auto-merge when CI is green" --force
+```
 
 ## Dependabot
 
@@ -82,7 +86,16 @@ gh repo edit OWNER/REPO \
   --enable-auto-merge
 ```
 
-`--enable-auto-merge` is required for the Dependabot auto-merge workflow (`gh pr merge --auto`) to work.
+`--enable-auto-merge` is required for any auto-merge workflow (`gh pr merge --auto`) to work — both Dependabot auto-merge and the label-gated `auto-merge.yml`.
+
+## release-please token (RELEASE_PLEASE_TOKEN)
+
+Only when the repo ships `release-please.yml` (or `auto-merge.yml`, which prefers this token). release-please needs a token whose pushes **trigger downstream workflows** — the default `GITHUB_TOKEN` does NOT, so the tag/Release it creates would never fire `release.yml` to build artifacts. Use a fine-grained PAT instead:
+
+1. Create the PAT (GitHub UI → Settings → Developer settings → Fine-grained tokens, or `gh` if available). Scope it least-privilege: **only this repository**, permissions **Contents: Read and write** + **Pull requests: Read and write** (add **Issues: Read and write** if release-please manages issues). Nothing else.
+2. Add it as a repository secret named **exactly** `RELEASE_PLEASE_TOKEN` (Settings → Secrets and variables → Actions → New repository secret). The name must match the `secrets.RELEASE_PLEASE_TOKEN` reference in the workflows character-for-character — secret names allow only letters, digits, and underscores (no hyphens/spaces), so a mismatch makes the action fail with "Input required: token".
+
+Never paste the token value into a chat, commit, or log. If one is ever exposed, revoke it immediately and create a new one.
 
 ## Verify
 

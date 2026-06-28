@@ -1,6 +1,6 @@
 # README structure
 
-Generate the README from the real project (do not invent features). Place it in the repo root — GitHub surfaces a README in `.github`, the root, or `docs/`, and the root takes precedence over `docs/`.
+Generate the README from the real project (do not invent features). Place it in the repo root — GitHub surfaces a README from `.github`, the root, or `docs/`, in that order of precedence (`.github` > root > `docs/`). The root is the conventional choice.
 
 ## Required content
 
@@ -38,7 +38,15 @@ For a long README, add a manual table of contents near the top (just below the h
 - [1. Overview](#1-overview)
 - [2. Requirements](#2-requirements)
 - [3. Installation](#3-installation)
-- [4. Usage](#4-usage)
+- [4. Configuration](#4-configuration)
+  - [4.1 General settings](#41-general-settings)
+  - [4.2 Advanced options](#42-advanced-options)
 ```
 
+When a section has numbered subsections (4.1, 4.2…), nest them under their parent as indented bullets so the TOC mirrors the document outline. The anchor for a numbered subsection follows the same rule — the period is stripped, so `### 4.1 General settings` becomes `#41-general-settings` (no dot between `4` and `1`).
+
 For a short README, skip the manual TOC and rely on GitHub's auto-generated table of contents (the outline menu in the rendered view).
+
+## Links and images
+
+Use relative links to other files in the repo (e.g. `[Contributing](CONTRIBUTING.md)`, `docs/CONTRIBUTING.md`), not absolute `https://github.com/...` URLs — GitHub recommends relative links so they keep working in clones, forks, and on other hosts. The same applies to embedded images: reference repo files relatively (`docs/screenshot.png`). External resources (the project site, CI badge endpoints) stay absolute.

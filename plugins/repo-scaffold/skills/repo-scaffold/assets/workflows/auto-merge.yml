@@ -1,0 +1,33 @@
+name: Auto-merge (label-gated)
+
+# Opt-in auto-merge for human PRs: add the 'automerge' label (and mark the PR ready,
+# not draft) -> this enables auto-merge (squash). GitHub then squash-merges the moment
+# the required 'ci-success' check goes green. A PR without the label is never auto-merged
+# (so WIP/draft PRs are safe). This complements dependabot-auto-merge.yml, which only
+# covers Dependabot PRs.
+#
+# Token: prefer a PAT (RELEASE_PLEASE_TOKEN) so the auto-merge commit still triggers
+# downstream workflows (e.g. release-please) -- a push made with the default GITHUB_TOKEN
+# does NOT trigger other workflows. Falls back to GITHUB_TOKEN when no PAT is set (fine
+# for repos without release-please).
+#
+# Requires: branch protection ("Require status checks to pass", check = ci-success) and
+# the repo's "Allow auto-merge" setting (gh repo edit --enable-auto-merge).
+on:
+  pull_request:
+    types: [labeled, opened, reopened, ready_for_review, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'automerge') && !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enable auto-merge (squash)
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN || secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: gh pr merge --auto --squash "$PR_URL"
