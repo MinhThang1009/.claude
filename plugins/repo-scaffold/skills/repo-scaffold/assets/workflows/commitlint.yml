@@ -1,0 +1,20 @@
+name: Commitlint
+
+# Enforce Conventional Commits on pull requests. release-please derives the version
+# bump and CHANGELOG from these messages, so a malformed commit would break versioning.
+# Needs a commitlint config at the repo root (commitlint.config.js).
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  commitlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: wagoid/commitlint-github-action@v6

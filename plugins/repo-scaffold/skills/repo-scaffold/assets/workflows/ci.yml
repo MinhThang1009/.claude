@@ -1,0 +1,54 @@
+name: CI
+
+# Generic CI skeleton. Replace the TODO steps with the project's real toolchain,
+# install, lint, and test commands. Keep the ci-success aggregate job: branch
+# protection should require ONLY `ci-success` (it passes only if every matrix job did).
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Versions the project supports — latest LTS first, optionally `latest` too.
+        version: ['lts/*']
+    steps:
+      - uses: actions/checkout@v7
+
+      # Replace with the stack's setup (pin the action's current major) + enable cache:
+      #   - uses: actions/setup-node@v6
+      #     with: { node-version: ${{ matrix.version }}, cache: npm }
+      #   - uses: actions/setup-python@v6
+      #     with: { python-version: ${{ matrix.version }}, cache: pip }
+
+      - name: Install dependencies
+        run: |
+          echo "TODO: install (e.g. npm ci / composer install / pip install -r requirements.txt)"
+      - name: Lint
+        run: |
+          echo "TODO: lint"
+      - name: Test
+        run: |
+          echo "TODO: test"
+
+  # Aggregate gate: require this single check in branch protection instead of each
+  # matrix combo. It is green only when every `test` matrix job succeeded.
+  ci-success:
+    name: ci-success
+    needs: [test]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify all matrix jobs passed
+        run: |
+          if [ "${{ needs.test.result }}" != "success" ]; then
+            echo "A matrix job failed: ${{ needs.test.result }}"; exit 1
+          fi
+          echo "All matrix jobs passed."

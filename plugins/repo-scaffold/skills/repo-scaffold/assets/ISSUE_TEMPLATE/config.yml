@@ -1,0 +1,10 @@
+blank_issues_enabled: false
+contact_links:
+  # Keep this link only if Discussions is enabled on the repo; otherwise remove it
+  # (a disabled Discussions tab makes the chooser show a dead link).
+  - name: Questions & Discussions
+    url: https://github.com/{{OWNER}}/{{REPO}}/discussions
+    about: Ask questions and discuss ideas here.
+  - name: Security report
+    url: https://github.com/{{OWNER}}/{{REPO}}/security/policy
+    about: Report security vulnerabilities privately, not as a public issue.

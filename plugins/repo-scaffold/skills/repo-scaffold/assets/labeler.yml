@@ -1,0 +1,10 @@
+# actions/labeler v6 config (v5+ schema: label -> changed-file globs). Copy to .github/labeler.yml.
+documentation:
+  - changed-files:
+      - any-glob-to-any-file: ['*.md', 'docs/**']
+ci:
+  - changed-files:
+      - any-glob-to-any-file: '.github/workflows/**'
+tests:
+  - changed-files:
+      - any-glob-to-any-file: ['**/tests/**', '**/*.test.*', '**/*_test.*']

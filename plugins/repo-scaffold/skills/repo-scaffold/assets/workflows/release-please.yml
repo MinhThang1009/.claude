@@ -1,0 +1,30 @@
+name: release-please
+
+# On every push to main, release-please opens/updates a "release PR" that bumps the
+# version and CHANGELOG from Conventional Commits. Merging that PR creates the git tag
+# and GitHub Release — which triggers release.yml to build and attach artifacts.
+#
+# Pinned to the current major @v5 (v5 only bumped the action runtime to node24; the
+# config interface is unchanged from v4). Verify the latest major at the action repo.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v5
+        with:
+          # release-type: node | python | php | go | rust | java | dart | helm | simple
+          release-type: "{{RELEASE_TYPE}}"
+          # Use a PAT (repo secret), NOT the default GITHUB_TOKEN, so the tag/release this
+          # creates can trigger downstream workflows like release.yml. (GITHUB_TOKEN-created
+          # events do not trigger other workflows, by design.) Omit only if no downstream
+          # build is needed — release-please can publish the Release on its own.
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}

@@ -1,0 +1,11 @@
+{
+  "name": "repo-scaffold",
+  "description": "Scaffold a new repository to production GitHub standard: generate community-health files (README, CONTRIBUTING, SECURITY, CODE_OF_CONDUCT, LICENSE, CODEOWNERS, issue/PR templates, dependabot, .gitignore, .gitattributes) tailored to the project, add CI and release workflows, and configure GitHub (description, branch protection, labels).",
+  "version": "0.1.0",
+  "author": {
+    "name": "Minh Thang",
+    "url": "https://github.com/MinhThang1009"
+  },
+  "license": "MIT",
+  "keywords": ["scaffold", "repository", "github", "community-health", "ci", "release", "automation"]
+}

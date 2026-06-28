@@ -277,6 +277,13 @@
       "author": { "name": "Minh Thang" },
       "source": "./plugins/verify-then-draw",
       "category": "development"
+    },
+    {
+      "name": "repo-scaffold",
+      "description": "Scaffold a new repository to production GitHub standard: community-health files, CI/release workflows, and GitHub configuration tailored to the project",
+      "author": { "name": "Minh Thang" },
+      "source": "./plugins/repo-scaffold",
+      "category": "productivity"
     }
   ]
 }

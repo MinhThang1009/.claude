@@ -1,0 +1,42 @@
+name: Release
+
+# Build and publish a GitHub Release when a version tag (v*) is pushed.
+# GitHub Releases are based on Git tags. Customize the build step for the project.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Build artifact
+        # Default: archive the tracked source tree (git archive respects
+        # .gitattributes `export-ignore`). Replace with the real build for the
+        # project (compile a binary, package a plugin, bundle assets, etc.).
+        run: |
+          mkdir -p dist
+          git archive --format=zip --output "dist/{{PROJECT_NAME}}-${GITHUB_REF_NAME}.zip" HEAD
+
+      - name: Publish or update the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # If a release for this tag already exists (e.g. release-please published it),
+        # attach the artifacts to it; otherwise create it (manual-tag flow). Works whether
+        # or not release-please is used. Only the existence probe suppresses output, so
+        # real create/upload errors (auth, network) still fail loudly.
+        run: |
+          set -euo pipefail
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            gh release upload "${GITHUB_REF_NAME}" dist/*.zip --clobber
+          else
+            gh release create "${GITHUB_REF_NAME}" dist/*.zip \
+              --title "${GITHUB_REF_NAME}" --generate-notes
+          fi

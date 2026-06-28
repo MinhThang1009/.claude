@@ -1,0 +1,17 @@
+name: Labeler
+
+# Auto-label PRs by the files they change, using the rules in .github/labeler.yml.
+# Uses pull_request_target so labels apply to PRs from forks too. Safe here because
+# actions/labeler reads its config from the base ref and never checks out PR code —
+# do NOT add an `actions/checkout` of the PR head to this workflow.
+on: [pull_request_target]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/labeler@v6
