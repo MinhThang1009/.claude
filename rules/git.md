@@ -57,7 +57,7 @@ Examples: `feat/google-oauth`, `fix/218-avatar-fallback`, `refactor/auth-middlew
 ## PR Title & Description
 
 - **PR title**: Vietnamese, Conventional Commits format — keep the `type(scope):` prefix in English so tools (Linear/Jira/GitHub) can parse it (`feat`, `fix`, `ci`…), write the subject in Vietnamese with full diacritics (same convention as commit messages).
-- **PR title doubles as the squash-merge commit subject**: with "Squash and merge", GitHub uses the PR title (plus the PR number) as the squashed commit's subject when the PR has multiple commits, so a clean title lands directly in `main`'s history.
+- **PR title doubles as the squash-merge commit subject**: with "Squash and merge", GitHub uses the PR title (plus the PR number) as the squashed commit's subject when the PR has multiple commits, so a clean title lands directly in `main`'s history. (When the PR has a **single commit**, the default subject is that commit's own title plus the PR number — not the PR title — so keep that commit's subject clean too.)
 - **PR description**: Vietnamese (reviewed within a Vietnamese team). Include: purpose (1–2 sentences), key changes (bullets), how to test, screenshots/video for UI changes, breaking changes if any.
 - **Auto-close issues**: a closing keyword (`Closes` / `Fixes` / `Resolves`, also `close/closed`, `fix/fixed`, `resolve/resolved`) followed by `#N` in the PR description (or in a commit) auto-closes the linked issue, but ONLY when the PR is merged into the repository's **default branch**.
 
@@ -72,13 +72,13 @@ Examples: `feat/google-oauth`, `fix/218-avatar-fallback`, `refactor/auth-middlew
 - **Keep the feature branch current**: rebase (or merge) `main` into it regularly to avoid drift and to satisfy a `strict` / "up to date before merge" protection rule. Rebase only while the branch is unshared.
 - **Merge strategy**: default to **squash** for feature PRs (one clean commit on `main`; the PR title becomes the subject). Use a **merge commit** to preserve the branch's individual commits; avoid **rebase-and-merge** when commits are signed (it does not preserve signatures). Always squash away "WIP" / "fix typo" noise.
 - **After a PR merges**, prune stale refs: `git fetch --prune` removes remote-tracking refs deleted on the remote; then delete the local branch (`git branch -d <name>`).
-- **Switch context mid-change** without committing: `git stash` (alias `git stash push`) saves uncommitted work and reverts the tree to HEAD; `git stash pop` restores it and removes the entry (`git stash drop` discards without applying).
+- **Switch context mid-change** without committing: `git stash` (alias `git stash push`) saves uncommitted work and reverts the tree to HEAD; `git stash pop` restores it and removes the entry (`git stash drop` discards without applying). By default `git stash` only stashes **tracked** changes — newly created (untracked) files stay behind unless you pass `-u`/`--include-untracked` (`-a`/`--all` also includes ignored files).
 - **Backport one commit** (e.g. a fix onto a `hotfix/` branch) without merging the whole branch: `git cherry-pick <sha>` applies that commit's change as a new commit; needs a clean working tree.
 
 ## Tags & Releases
 
 - **Tag with SemVer**: `vMAJOR.MINOR.PATCH` (e.g. `v1.2.0`). Use **annotated** tags — `git tag -a v1.2.0 -m "Mô tả bản phát hành"` — not lightweight tags.
-- **Push tags explicitly**: `git push origin v1.2.0`. A plain `git push` does NOT push tags.
+- **Push tags explicitly**: `git push origin v1.2.0`. A plain `git push` does NOT push tags. `git push --follow-tags` pushes the commits plus any **annotated** tags reachable from them (lightweight tags are still skipped) — convenient since we tag annotated.
 - Tag only from a merged, CI-green `main` commit, never from a feature branch.
 - If a release-on-tag workflow builds artifacts/GitHub Releases, bump the version in the manifest (e.g. `version.php`) and commit it BEFORE tagging so the tag matches the shipped version.
 
@@ -102,8 +102,8 @@ Examples: `feat/google-oauth`, `fix/218-avatar-fallback`, `refactor/auth-middlew
 
 ## Recovery & Debugging
 
-- **`git reflog` is the safety net** for "lost" commits: it records every move of `HEAD` and branch tips in the local repo. After a mistaken `reset --hard`, `rebase`, or `branch -D`, find the prior state (`HEAD@{2}`, `<branch>@{1}`, …) and recover with `git reset --hard HEAD@{2}` or `git branch <name> <reflog-sha>`. Always try reflog BEFORE concluding work is gone.
-- **Undo a merged PR on `main`** without rewriting history: a squash/normal commit reverts with `git revert <sha>`; a merge commit needs `git revert -m 1 <merge-sha>` (`-m 1` keeps the first parent = `main` as the mainline). Safer than force-pushing `main`.
+- **`git reflog` is the safety net** for "lost" commits: it records every move of `HEAD` and branch tips in the local repo. After a mistaken `reset --hard`, `rebase`, or `branch -D`, find the prior state (`HEAD@{2}`, `<branch>@{1}`, …) and recover with `git reset --hard HEAD@{2}` or `git branch <name> <reflog-sha>`. Always try reflog BEFORE concluding work is gone. Caveat: the reflog is **local-only** (a fresh clone has none) and entries expire — `gc.reflogExpire` defaults to **90 days** (reachable) and `gc.reflogExpireUnreachable` to **30 days** (commits orphaned by `amend`/`rebase`) — so recover promptly.
+- **Undo a merged PR on `main`** without rewriting history: a squash/normal commit reverts with `git revert <sha>`; a merge commit needs `git revert -m 1 <merge-sha>` (`-m 1` keeps the first parent = `main` as the mainline). Safer than force-pushing `main`. Caveat for the merge-commit case: reverting a merge declares you never want that branch's tree changes, so **re-merging the same branch later will NOT bring them back** — you must revert the revert first.
 - **Find the commit that introduced a regression**: `git bisect start` → `git bisect bad` (current) → `git bisect good <old-sha>`, test each step and mark `good`/`bad`, then `git bisect reset` to finish.
 
 ## Attribution
