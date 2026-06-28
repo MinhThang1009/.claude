@@ -147,7 +147,7 @@ thinking: budget_tokens=10000, max_tokens=16000
 - Temporary Anthropic service issue
 - Bug in API processing
 
-**Fix:** Retry with exponential backoff. If persistent, check [status.anthropic.com](https://status.anthropic.com).
+**Fix:** Retry with exponential backoff. If persistent, check [status.claude.com](https://status.claude.com).
 
 ---
 
