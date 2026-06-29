@@ -16,7 +16,7 @@
 
 **Body** (free-form): prose paragraphs by default; use `-` bullets when listing 3+ discrete changes, a numbered list only when order matters (steps/sequence). A blank line separates title / each paragraph / footer.
 
-**Type** (keep in English so tools can parse): the spec only *requires* `feat` and `fix`; the rest are conventional (Angular/commitlint): `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
+**Type** (English, so tools can parse): the spec requires only `feat`/`fix`; the rest are conventional — `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
 
 **Breaking change**: append `!` after the type/scope (`feat(api)!: …`) and/or add a `BREAKING CHANGE: <mô tả>` footer (in English). Signals a major version bump under SemVer.
 
@@ -59,36 +59,39 @@ Examples: `feat/google-oauth`, `fix/218-avatar-fallback`, `refactor/auth-middlew
 ## PR Title & Description
 
 - **PR title**: Vietnamese, Conventional Commits format — keep the `type(scope):` prefix in English so tools (Linear/Jira/GitHub) can parse it (`feat`, `fix`, `ci`…), write the subject in Vietnamese with full diacritics (same convention as commit messages).
-- **PR title doubles as the squash-merge commit subject**: with "Squash and merge", GitHub uses the PR title (plus the PR number) as the squashed commit's subject when the PR has multiple commits, so a clean title lands directly in `main`'s history. (When the PR has a **single commit**, the default subject is that commit's own title plus the PR number — not the PR title — so keep that commit's subject clean too.)
+- **PR title doubles as the squash-merge commit subject** (multi-commit PR): with "Squash and merge", GitHub uses the PR title plus the PR number as the squashed commit's subject, so a clean title lands directly in `main`'s history.
+- **Single-commit PR exception**: the subject defaults to that commit's own title plus the PR number — not the PR title — so keep that commit's subject clean too.
 - **PR description**: Vietnamese (reviewed within a Vietnamese team). Include: purpose (1–2 sentences), key changes (bullets), how to test, screenshots/video for UI changes, breaking changes if any.
 - **Auto-close issues**: a closing keyword (`Closes` / `Fixes` / `Resolves`, also `close/closed`, `fix/fixed`, `resolve/resolved`) followed by `#N` in the PR description (or in a commit) auto-closes the linked issue, but ONLY when the PR is merged into the repository's **default branch**.
+- **Drive PRs with the `gh` CLI** (the documented GitHub mechanism, not manual web steps): `gh pr create` to open, `gh pr view` / `gh pr checks` to inspect, `gh pr merge --squash --delete-branch` to merge and clean up. Scriptable and reviewable.
+- **Fill the PR body**: `gh pr create --fill-first` reuses a single commit's title/body; otherwise write the Vietnamese title/body explicitly — plain `--fill` copies English commit subjects. Use `--draft` for work-in-progress.
 
 ## Workflow
 
 - **Work on a feature branch + open a PR** (GitHub Flow: branch from `main` → commit → open PR → review → merge → **delete the branch**). Do NOT push directly to `main` or any protected branch. Direct pushes to `main` are acceptable only on a throwaway solo scratch repo; even then a PR keeps `main` always-green.
-- **Drive PRs with the `gh` CLI** (the documented GitHub mechanism, not manual web steps): `gh pr create` to open, `gh pr view` / `gh pr checks` to inspect, `gh pr merge --squash --delete-branch` to merge and clean up. Scriptable and reviewable; respects the same merge strategies below.
-- **Fill the PR body**: `gh pr create --fill-first` reuses a single commit's title/body; otherwise write the Vietnamese title/body explicitly — plain `--fill` copies English commit subjects. Use `--draft` for work-in-progress.
 - **Protect `main` to enforce the flow**: requiring CI-green or approvals BEFORE merge is NOT part of GitHub Flow itself; it comes from **branch protection rules** or the newer **rulesets** (GitHub's modern alternative: multiple rulesets can apply at once, are viewable with read access, and can also restrict commit metadata). Rulesets and classic branch protection coexist; the most restrictive rule wins.
 - **Before committing**: `git diff --staged` to review what's about to be committed. Never commit blind. Unrelated file found staged → unstage it immediately and tell the user before continuing.
 - **Stage files individually**, NOT `git add .` (easy to include junk files).
 - **Small, frequent commits** > one large end-of-day commit. Each commit should be one logical unit that can be reverted independently.
-- **Pull/rebase before push**. `git pull --rebase` on feature branches. A plain `git pull` defaults to **`--ff-only`** and FAILS on a diverged branch ("Need to specify how to reconcile divergent branches") until a method is chosen — we use `--rebase`.
+- **Pull/rebase before push**: `git pull --rebase` on feature branches. Plain `git pull` is `--ff-only` by default and FAILS on a diverged branch until you choose a method — we use `--rebase`.
 - **Keep the feature branch current**: rebase (or merge) `main` into it regularly to avoid drift and to satisfy a `strict` / "up to date before merge" protection rule. Rebase only while the branch is unshared.
-- **Merge strategy**: default to **squash** for feature PRs (one clean commit on `main`; the PR title becomes the subject). Use a **merge commit** to preserve the branch's individual commits; avoid **rebase-and-merge** when commits are signed (it does not preserve signatures). Always squash away "WIP" / "fix typo" noise.
+- **Merge strategy**: default to **squash** for feature PRs (one clean commit on `main`). Use a **merge commit** to preserve the branch's individual commits; avoid **rebase-and-merge** for signed commits (see Commit Signing). Always squash away "WIP" / "fix typo" noise.
 - **After a PR merges**, prune stale refs: `git fetch --prune` removes remote-tracking refs deleted on the remote; then delete the local branch (`git branch -d <name>`).
 - **Switch context mid-change** without committing: `git stash` (alias `git stash push`) saves uncommitted work and reverts the tree to HEAD; `git stash pop` restores it and removes the entry (`git stash drop` discards without applying). By default `git stash` only stashes **tracked** changes — newly created (untracked) files stay behind unless you pass `-u`/`--include-untracked` (`-a`/`--all` also includes ignored files).
 - **Backport one commit** (e.g. a fix onto a `hotfix/` branch) without merging the whole branch: `git cherry-pick <sha>` applies that commit's change as a new commit; needs a clean working tree.
 
 ## Tags & Releases
 
-- **Tag with SemVer**: `MAJOR.MINOR.PATCH` (e.g. `1.2.0`); prefix the **git tag** with `v` (`v1.2.0`) by convention — the `v` is a tagging convention, not part of the SemVer string itself. Use **annotated** tags — `git tag -a v1.2.0 -m "Mô tả bản phát hành"` — not lightweight tags. For a release tag that should show the **Verified** badge, sign it: `git tag -s` (or `-as` for signed + annotated); GitHub verifies tag signatures the same way it verifies commit signatures.
+- **Tag with SemVer** `MAJOR.MINOR.PATCH` (e.g. `1.2.0`); prefix the **git tag** with `v` (`v1.2.0`) by convention — the `v` is a tagging convention, not part of the SemVer string itself.
+- **Use annotated tags** — `git tag -a v1.2.0 -m "Mô tả bản phát hành"` — not lightweight tags.
+- **Verified badge on a tag**: sign it with `git tag -s` (or `-as` for signed + annotated); GitHub verifies tag signatures the same way as commit signatures.
 - **Push tags explicitly**: `git push origin v1.2.0`. A plain `git push` does NOT push tags. `git push --follow-tags` pushes the commits plus any **annotated** tags reachable from them (lightweight tags are still skipped) — convenient since we tag annotated.
 - Tag only from a merged, CI-green `main` commit, never from a feature branch.
 - If a release-on-tag workflow builds artifacts/GitHub Releases, bump the version in the manifest (e.g. `version.php`) and commit it BEFORE tagging so the tag matches the shipped version.
 
 ## Forbidden Commands (never run without explicit user request)
 
-- `git push --force` (or `-f`) to shared branches: `main`, `master`, `develop`, `release/*`. On your own feature branch → use `--force-with-lease` instead. Caveat: a background `git fetch` (e.g. an IDE auto-fetch) that advances the remote-tracking ref can defeat the lease; add `--force-if-includes` to also require those remote updates were integrated locally first — it must be passed explicitly, `--force-with-lease` alone does not enable it.
+- `git push --force` (or `-f`) to shared branches: `main`, `master`, `develop`, `release/*`. On your own feature branch → use `--force-with-lease`. A background `git fetch` can defeat the lease; add `--force-if-includes` to also require remote updates were integrated locally first (must be passed explicitly).
 - `git reset --hard` when current work is not stashed/committed.
 - `git clean -fdx` on a repo where you don't know 100% of what will be deleted.
 - `git rebase` when commits have already been pulled by someone else.
