@@ -14,7 +14,9 @@
 <footer: issue/breaking change references, in English>
 ```
 
-**Type** (keep in English so tools can parse): `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
+**Body** (free-form): prose paragraphs by default; use `-` bullets when listing 3+ discrete changes, a numbered list only when order matters (steps/sequence). A blank line separates title / each paragraph / footer.
+
+**Type** (keep in English so tools can parse): the spec only *requires* `feat` and `fix`; the rest are conventional (Angular/commitlint): `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
 
 **Breaking change**: append `!` after the type/scope (`feat(api)!: …`) and/or add a `BREAKING CHANGE: <mô tả>` footer (in English). Signals a major version bump under SemVer.
 
@@ -64,11 +66,12 @@ Examples: `feat/google-oauth`, `fix/218-avatar-fallback`, `refactor/auth-middlew
 ## Workflow
 
 - **Work on a feature branch + open a PR** (GitHub Flow: branch from `main` → commit → open PR → review → merge → **delete the branch**). Do NOT push directly to `main` or any protected branch. Direct pushes to `main` are acceptable only on a throwaway solo scratch repo; even then a PR keeps `main` always-green.
+- **Drive PRs with the `gh` CLI** (the documented GitHub mechanism, not manual web steps): `gh pr create` to open, `gh pr view` / `gh pr checks` to inspect, `gh pr merge --squash --delete-branch` to merge and clean up. Scriptable and reviewable; respects the same merge strategies below. Populate the body with `--fill-first` (single-commit PR: reuse that commit's title/body) or write the Vietnamese title/body explicitly — `--fill` copies English commit subjects; use `--draft` for work-in-progress.
 - **Protect `main` to enforce the flow**: requiring CI-green or approvals BEFORE merge is NOT part of GitHub Flow itself; it comes from **branch protection rules** or the newer **rulesets** (GitHub's modern alternative: multiple rulesets can apply at once, are viewable with read access, and can also restrict commit metadata). Rulesets and classic branch protection coexist; the most restrictive rule wins.
 - **Before committing**: `git diff --staged` to review what's about to be committed. Never commit blind. Unrelated file found staged → unstage it immediately and tell the user before continuing.
 - **Stage files individually**, NOT `git add .` (easy to include junk files).
 - **Small, frequent commits** > one large end-of-day commit. Each commit should be one logical unit that can be reverted independently.
-- **Pull/rebase before push**. `git pull --rebase` on feature branches.
+- **Pull/rebase before push**. `git pull --rebase` on feature branches. A plain `git pull` defaults to **`--ff-only`** and FAILS on a diverged branch ("Need to specify how to reconcile divergent branches") until a method is chosen — we use `--rebase`.
 - **Keep the feature branch current**: rebase (or merge) `main` into it regularly to avoid drift and to satisfy a `strict` / "up to date before merge" protection rule. Rebase only while the branch is unshared.
 - **Merge strategy**: default to **squash** for feature PRs (one clean commit on `main`; the PR title becomes the subject). Use a **merge commit** to preserve the branch's individual commits; avoid **rebase-and-merge** when commits are signed (it does not preserve signatures). Always squash away "WIP" / "fix typo" noise.
 - **After a PR merges**, prune stale refs: `git fetch --prune` removes remote-tracking refs deleted on the remote; then delete the local branch (`git branch -d <name>`).
@@ -77,14 +80,14 @@ Examples: `feat/google-oauth`, `fix/218-avatar-fallback`, `refactor/auth-middlew
 
 ## Tags & Releases
 
-- **Tag with SemVer**: `vMAJOR.MINOR.PATCH` (e.g. `v1.2.0`). Use **annotated** tags — `git tag -a v1.2.0 -m "Mô tả bản phát hành"` — not lightweight tags.
+- **Tag with SemVer**: `MAJOR.MINOR.PATCH` (e.g. `1.2.0`); prefix the **git tag** with `v` (`v1.2.0`) by convention — the `v` is a tagging convention, not part of the SemVer string itself. Use **annotated** tags — `git tag -a v1.2.0 -m "Mô tả bản phát hành"` — not lightweight tags. For a release tag that should show the **Verified** badge, sign it: `git tag -s` (or `-as` for signed + annotated); GitHub verifies tag signatures the same way it verifies commit signatures.
 - **Push tags explicitly**: `git push origin v1.2.0`. A plain `git push` does NOT push tags. `git push --follow-tags` pushes the commits plus any **annotated** tags reachable from them (lightweight tags are still skipped) — convenient since we tag annotated.
 - Tag only from a merged, CI-green `main` commit, never from a feature branch.
 - If a release-on-tag workflow builds artifacts/GitHub Releases, bump the version in the manifest (e.g. `version.php`) and commit it BEFORE tagging so the tag matches the shipped version.
 
 ## Forbidden Commands (never run without explicit user request)
 
-- `git push --force` (or `-f`) to shared branches: `main`, `master`, `develop`, `release/*`. On your own feature branch → use `--force-with-lease` instead.
+- `git push --force` (or `-f`) to shared branches: `main`, `master`, `develop`, `release/*`. On your own feature branch → use `--force-with-lease` instead. Caveat: a background `git fetch` (e.g. an IDE auto-fetch) that advances the remote-tracking ref can defeat the lease; add `--force-if-includes` to also require those remote updates were integrated locally first — it must be passed explicitly, `--force-with-lease` alone does not enable it.
 - `git reset --hard` when current work is not stashed/committed.
 - `git clean -fdx` on a repo where you don't know 100% of what will be deleted.
 - `git rebase` when commits have already been pulled by someone else.
@@ -125,6 +128,6 @@ Examples: `feat/google-oauth`, `fix/218-avatar-fallback`, `refactor/auth-middlew
 
 ## Merge Conflicts
 
-- `git merge` conflict → read both sides carefully, do NOT auto-resolve by pattern. Ask the user if unsure which side is correct.
+- `git merge` conflict → read both sides carefully, do NOT auto-resolve by pattern. Ask the user if unsure which side is correct. Can't resolve cleanly → `git merge --abort` restores the pre-merge state (commit/stash first — it can't always reconstruct uncommitted changes).
 - `git rebase` conflict → fix the files, `git add` them, then `git rebase --continue` (NOT `git commit`). `git rebase --abort` restores the pre-rebase state; `git rebase --skip` drops the current conflicting commit (use with care).
 - After resolving → run tests before committing the merge.
