@@ -69,7 +69,8 @@ Examples: `feat/google-oauth`, `fix/218-avatar-fallback`, `refactor/auth-middlew
 ## Workflow
 
 - **Work on a feature branch + open a PR** (GitHub Flow: branch from `main` → commit → open PR → review → merge → **delete the branch**). Do NOT push directly to `main` or any protected branch. Direct pushes to `main` are acceptable only on a throwaway solo scratch repo; even then a PR keeps `main` always-green.
-- **Protect `main` to enforce the flow**: requiring CI-green or approvals BEFORE merge is NOT part of GitHub Flow itself; it comes from **branch protection rules** or the newer **rulesets** (GitHub's modern alternative: multiple rulesets can apply at once, are viewable with read access, and can also restrict commit metadata). Rulesets and classic branch protection coexist; the most restrictive rule wins.
+- **Protect `main` to enforce the flow**: requiring CI-green or approvals BEFORE merge is NOT part of GitHub Flow itself — it comes from **branch protection rules** (classic) or **rulesets** (the modern alternative).
+- **Rulesets** (modern): multiple can apply at once, are viewable with read access, and can restrict commit metadata. They coexist with classic branch protection; the most restrictive rule wins.
 - **Before committing**: `git diff --staged` to review what's about to be committed. Never commit blind. Unrelated file found staged → unstage it immediately and tell the user before continuing.
 - **Stage files individually**, NOT `git add .` (easy to include junk files).
 - **Small, frequent commits** > one large end-of-day commit. Each commit should be one logical unit that can be reverted independently.
