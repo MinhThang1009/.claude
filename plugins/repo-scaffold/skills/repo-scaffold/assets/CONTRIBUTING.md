@@ -21,4 +21,5 @@ Use the matching issue template (Bug report / Feature request).
 
 ## Code of Conduct
 
+<!-- Scaffold note: if no CODE_OF_CONDUCT.md is generated (e.g. the Contributor Covenant fetch failed), remove the line below so this file ships no dead link. -->
 This project follows its [Code of Conduct](CODE_OF_CONDUCT.md).

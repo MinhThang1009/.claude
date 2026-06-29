@@ -7,7 +7,7 @@ A Claude Code plugin that scaffolds a new repository to production GitHub standa
 Provides the `repo-scaffold` skill, which Claude activates when you ask to set up a new repository's standard files. It:
 
 - Generates community-health files tailored to the project: README, CONTRIBUTING, SECURITY, CODE_OF_CONDUCT, LICENSE, CODEOWNERS, issue/PR templates, dependabot, `.gitignore`, `.gitattributes`.
-- Adds GitHub Actions workflows: a CI workflow tailored to the detected stack and a release-on-tag workflow.
+- Adds GitHub Actions workflows: a CI workflow tailored to the detected stack and a release-on-tag workflow, plus optional ones (release-please, dependency review, Dependabot and label-gated auto-merge, commitlint, stale, labeler).
 - Configures the GitHub side: repository description, branch protection (or ruleset), and labels.
 
 Content follows GitHub's community-standards format and is pulled from canonical sources where possible (LICENSE and `.gitignore` via the GitHub API, Code of Conduct from Contributor Covenant), with project-specific content generated from the repository itself.
@@ -58,7 +58,7 @@ repo-scaffold/
         │   └── github-setup.md    # exact gh configuration commands
         └── assets/                # community-health files + config files (commitlint, labeler, release-config)
             └── workflows/         # ci, release, release-please, dependency-review,
-                                   # dependabot-auto-merge, commitlint, stale, labeler
+                                   # dependabot-auto-merge, auto-merge, commitlint, stale, labeler
 ```
 
 SKILL.md → Resources lists every generated file.

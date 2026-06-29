@@ -2,6 +2,35 @@
 
 > Audit log (audit-plugin). User-relevant learnings + deferred polish.
 
+Generated: 2026-06-29 (2nd audit-plugin run — content-only, Stage 6 N/A; converged in 1 fresh-review round)
+
+## Result (2nd audit)
+
+0 HIGH, 0 surviving MEDIUM. Round 1 fresh review returned 0 verified-new HIGH/MEDIUM → converged in a single round (the plugin was already clean from the 1st audit). The lone reviewer MEDIUM (CoC dead-link) was downgraded to LOW on verification — the recovery instruction already exists at `SKILL.md:45`. A reviewer LOW (`fetch-metadata@v3` "behind current major") was refuted — v3.1.0 IS the current major.
+
+## Fixed
+
+- F1 (MEDIUM): README structure-tree workflow list now includes `auto-merge` (was drifted vs SKILL.md Resources).
+- F3 (LOW): README "What it does" now enumerates the optional workflow set (was only CI + release-on-tag).
+- F2 (LOW, security): SKILL.md step 4 now notes SHA-pinning as the hardened action-pin option (templates keep readable major tags; Dependabot updates both forms).
+- R1-F2 (LOW): CONTRIBUTING.md asset gained a scaffold-note comment to drop the CoC link when no CODE_OF_CONDUCT.md is generated (belt-and-suspenders with SKILL.md:45).
+- Version bumped 0.1.0 → 0.1.1 (plugin.json + SKILL.md) to disambiguate the stale install cache.
+
+## Deferred / accepted (unchanged from 1st audit)
+
+- DEF-1 `{{RELEASE_TYPE}}` in the step-3 fill set (only used by step-4 release-please.yml; harmless).
+- DEF-2 plugin.json vs marketplace.json `description` differ (both accurate; registry duplication).
+- DEF-3 references/readme.md vs README-header.md align-element lists differ (both correct).
+- DEF-4 SECURITY.md "latest release on `main`" phrasing.
+- DEF-5 no automated tests for workflow templates (they are templates; shell blocks probed manually).
+- R1-F6 `.gitattributes` export-ignore leaves root community docs in the `git archive` release zip — acceptable-by-design (asset comment "Adjust per project").
+
+## Honest closure
+
+The final LOW fix (R1-F2 CONTRIBUTING comment) was applied AFTER round 1 converged and was NOT put through a further fresh round — it is a single invisible HTML comment; risk negligible. All HIGH/MEDIUM-relevant content passed the round-1 zero-context review. USER ACTION (refresh install cache to 0.1.1) is recorded in the project-level `.claude/audit-plugin-proposals.md`.
+
+---
+
 Generated: 2026-06-28 (first audit-plugin run — 4 fresh-review rounds at the hard cap; content-only, Stage 6 benchmark N/A)
 
 ## Result
