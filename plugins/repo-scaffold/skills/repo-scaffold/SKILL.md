@@ -1,7 +1,7 @@
 ---
 name: repo-scaffold
 description: This skill should be used when the user asks to "scaffold a repo", "set up a repo to production standard", "create the standard repo files", "add community health files", "dựng repo chuẩn github", "tạo file chuẩn cho repo", or initializes a new repository that needs README, CONTRIBUTING, SECURITY, CODE_OF_CONDUCT, LICENSE, CODEOWNERS, issue/PR templates, dependabot, .gitignore, and .gitattributes plus GitHub configuration (description, branch protection, labels).
-version: 0.1.1
+version: 1.0.0
 ---
 
 # Repo Scaffold
