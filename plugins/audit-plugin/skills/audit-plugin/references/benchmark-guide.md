@@ -7,6 +7,8 @@ Applies only to plugins that are **executable workflows**. Goal: measure real ef
 ## 1. Fixture design
 
 - Create a **dedicated temp dir** (`mktemp -d`), init its own git repo, commit a baseline — never benchmark against a real repo.
+- **Commit a `.gitignore` for build artifacts** (`__pycache__/`, `node_modules/`, `*.pyc`, …) in the baseline — otherwise running the plugin's tests generates artifacts that dirty the diff and corrupt the D4 "clean working tree" check.
+- **Write run output OUTSIDE the fixture dir** (`runA.json`/`runB.json` to a sibling runs-dir, not under `<fixture>`) — writing them inside the fixture dirties the working tree exactly when D4 scores whether the pipeline left a clean tree.
 - Plant **controlled cases** matching the exact patterns the plugin claims to handle (at least one per severity level). Record the answer key before running.
 - If the plugin expects a test framework: write **green** happy-path tests that mask the planted cases — this measures the ability to see through "tests pass".
 - Path gotcha: under Git Bash, `/tmp` = `%TEMP%` (`C:\Users\<user>\AppData\Local\Temp`), NOT `C:\tmp`. Write files using real Windows paths.
@@ -22,13 +24,14 @@ A plugin with a wait-for-approval gate cannot finish in one command. Run two sta
 # Stage A — expect the plugin to STOP at the approval gate (the stop itself is a scored item)
 # Prompt via stdin — avoids the MSYS mangling of "/<skill> ..." described in the caveats below.
 # Multiple --allowedTools rules go comma-separated in ONE argument.
+# <runs-dir> is OUTSIDE <fixture> (see §1) so run output never dirties the fixture's tree.
 cd <fixture> && printf '%s' "/<skill> <args>" | claude -p --output-format json \
-  --allowedTools "Bash(python -m pytest *)" > runA.json
+  --allowedTools "Bash(python -m pytest *)" > "<runs-dir>/runA.json"
 
-# Extract session_id from runA.json, then:
+# Extract session_id from <runs-dir>/runA.json, then:
 # Stage B — resume with a real approval (no leading slash → safe as a plain argument)
 claude -p --resume <session_id> "Approved: <specific decisions>. Continue the remaining phases." \
-  --output-format json > runB.json
+  --output-format json > "<runs-dir>/runB.json"
 ```
 
 **Never grant unrestricted deletion (`Bash(rm *)`) to a headless run** — a misbehaving run can delete outside the fixture with no prompt. Prefer omitting the grant and scoring how gracefully the plugin handles the denied deletion (that handling is itself a benchmark item). If deletion must work, scope the pattern to the fixture path and verify your CLI version's pattern support first.

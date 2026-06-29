@@ -2,6 +2,19 @@
 
 > Self-audit log. Per SKILL.md Stage 7, every `[OUT-OF-CRITERIA]` finding must produce a criteria-update proposal here.
 
+Generated: 2026-06-29 (repo-scaffold 2nd audit — P-13 APPLIED at Stage 0 step 5)
+
+## repo-scaffold 2nd-audit learnings
+
+P-13 APPLIED at Stage 0 step 5 (benchmark-guide §1 fixture rules + §2 `<runs-dir>` example). repo-scaffold is content-only so P-13 did not affect this run, but the self-update loop closed.
+
+**Criteria-update proposals:**
+- **P-14 (from the lead's `[OUT-OF-CRITERIA]` action-pinning finding):** criterion 6 ("security in bundled scripts") does not explicitly cover GitHub Actions VERSION PINNING in shipped workflow templates — mutable major-tag pins (`@v7`) vs commit-SHA pins are a supply-chain property, relevant when a plugin ships CI/workflow templates that claim a "production/security standard." Consider adding to criterion 6: "for plugins that ship workflow/CI templates, flag GitHub Actions pinned to mutable major tags rather than commit SHA when the plugin targets production/security hardening." Narrow (scaffold-type plugins only). **Status: PROPOSED.**
+- **Observation (reviewer false positive, no criteria change):** round 1 flagged `dependabot/fetch-metadata@v3` as possibly behind the current major; `releases/latest` showed v3.1.0 IS current → false positive. Lead should WebFetch the action repo to confirm "behind current major" claims (cheap to refute, easy to over-report).
+- **Observation (reviewer severity inflation, no criteria change):** round 1 rated the CoC dead-link MEDIUM on the premise "no clean recovery step," but `SKILL.md:45` carries exactly that recovery; lead downgraded to LOW. Reinforces verifying a reviewer's *premise* against disk before accepting its severity.
+
+---
+
 Generated: 2026-06-11 (audit-logic audit — convergence 3 rounds + benchmark wallet)
 
 ## audit-logic audit learnings
@@ -9,7 +22,7 @@ Generated: 2026-06-11 (audit-logic audit — convergence 3 rounds + benchmark wa
 P-1/P-11/P-12 APPLIED tại Stage 0 step 5 và đều hữu dụng: P-11 (diff cache) biến stale-cache thành đúng 1 finding + 1 USER ACTION thay vì tái diễn mỗi round; P-12 không fire (plugin có test suite — đúng kỳ vọng); P-1 không phát hiện collision (đúng — `.claude/audit-logic-state.json` unique).
 
 **Criteria-update proposals:**
-- **P-13 (từ 2 fixture flaws do operator):** benchmark-guide §1 nên thêm: (a) fixture phải có `.gitignore` cho build artifacts (`__pycache__`, `node_modules`…) trước baseline commit — pycache bị commit làm bẩn diff khi executor chạy test; (b) run output (`runA.json`…) phải ghi NGOÀI fixture dir — ghi bên trong làm bẩn working tree đúng lúc đang chấm D4 "clean tree". Status: PROPOSED.
+- **P-13 (từ 2 fixture flaws do operator):** benchmark-guide §1 nên thêm: (a) fixture phải có `.gitignore` cho build artifacts (`__pycache__`, `node_modules`…) trước baseline commit — pycache bị commit làm bẩn diff khi executor chạy test; (b) run output (`runA.json`…) phải ghi NGOÀI fixture dir — ghi bên trong làm bẩn working tree đúng lúc đang chấm D4 "clean tree". **Status: APPLIED 2026-06-29** (benchmark-guide §1 bullets + §2 example dùng `<runs-dir>` ngoài fixture; repo-scaffold audit Stage 0 step 5).
 - **Observation (không cần đổi criteria):** fixer-introduces-defect fired lần 3 (batch 1 thêm claim sai "verify-then-draw runs this skill as its tier-0 gate" — round 1 fresh review bắt được, grep 0 match). Kiến trúc convergence tiếp tục chứng minh giá trị; lưu ý cho lead: MỌI factual claim thêm vào khi fix (kể cả 1 mệnh đề phụ) phải được grep-verify như finding.
 - **Observation (reviewer false positive mới):** round 3 báo "mojibake U+FFFD" trong marketplace.json — thực tế là U+2014 hợp lệ, tooling của reviewer render sai. Lead nên verify encoding claims bằng codepoint check (python ord), không tin render của console/agent.
 
