@@ -47,7 +47,8 @@
 **Other subagent rules.**
 
 - Audit spec changes mid-run → **re-dispatch** with the new spec; don't re-evaluate old findings from memory (produced under the old spec).
-- Subagents **miss content** when files are long or the task is overloaded (e.g. fetch URLs + read files + evaluate + report all at once) → don't trust coverage ratings; "not covered" → **grep-verify** first. Limit each to ≤10 files or ≤3 complex tasks *(heuristic — not in Anthropic's docs)*; split rather than overload.
+- Subagents **miss content** when files are long or the task is overloaded (e.g. fetch URLs + read files + evaluate + report all at once) → don't trust coverage ratings; "not covered" → **grep-verify** first.
+- Limit each subagent to **≤10 files or ≤3 complex tasks**; split rather than overload *(heuristic — not in Anthropic's docs)*.
 - **Resume** a subagent instead of re-spawning: call `SendMessage` with its agent ID (retains full history + tool calls; a stopped subagent auto-resumes in the background). Resuming does NOT require agent teams.
 - **Agent teams** (distinct feature): structured team-protocol messaging + spawning teammates via the Agent `name` param; experimental, behind `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (v2.1.178). *(Verified 2026-06 vs code.claude.com/docs/en/agent-teams.)*
 - **Subagent nesting is allowed, up to 5 levels deep** (v2.1.172; depth-5 gets no Agent tool, limit fixed). Forks and other spawned types count toward the cap; a background subagent's depth is **fixed when spawned, unchanged on resume** (v2.1.187, not v2.1.178). Older versions blocked nesting entirely. Prefer shallow chains. *(Corrected 2026-06 vs sub-agents docs §Spawn nested subagents.)*
@@ -90,7 +91,8 @@
 
 > Only when the project has a git repo. No git → use the filesystem directly.
 
-- Before git operations → **verify the current branch** with `git branch --show-current`. Startup git state reflects the most recent SessionStart hook (only if that hook runs git commands) — it fires on new session, `/resume`, `/clear`, `/compact` (source `"startup"`/`"resume"`/`"clear"`/`"compact"`). Stale if git changed since without re-triggering.
+- Before git operations → **verify the current branch** with `git branch --show-current`. Startup git state can be stale — don't trust it blindly.
+- Startup git state reflects the most recent **SessionStart hook** (only if that hook runs git commands) — it fires on new session, `/resume`, `/clear`, `/compact` (source `"startup"`/`"resume"`/`"clear"`/`"compact"`). Stale if git changed since without re-triggering.
 - Checking another branch → use `git ls-tree` / `git show branch:path`, **NOT** `ls`/`find` (the working tree only reflects the current branch).
 
 ## External Dependencies
