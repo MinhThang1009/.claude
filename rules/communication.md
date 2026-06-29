@@ -1,6 +1,6 @@
 # Communication Rules
 
-> Supplements "Phong cách trả lời" in [`CLAUDE.md`](../CLAUDE.md).
+> Supplements "Response Style" in [`CLAUDE.md`](../CLAUDE.md).
 
 ## Answering Questions
 

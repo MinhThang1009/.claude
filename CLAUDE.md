@@ -1,69 +1,69 @@
-# Hướng dẫn cá nhân (Global)
+# Personal Guidelines (Global)
 
-> Load vào MỌI session. Giữ ngắn — nếu xóa 1 dòng mà Claude vẫn làm đúng → dòng đó nên xóa.
+> Loaded into EVERY session. Keep it short — if removing a line still leaves Claude doing the right thing, that line should go.
 
-> 📝 **Quy ước first-person template**: File này là user-config được Claude Code load vào MỌI session. Đại từ "tôi" trong nội dung dưới đây = **USER** (người copy file này vào `~/.claude/CLAUDE.md`), "bạn" = **Claude**. First-person voice là intentional theo Claude Code prompt convention — giúp Claude hiểu instructions như nói với chính mình. Khi đọc repo lần đầu (chưa copy), tự thay "tôi" = bản thân để hiểu đúng intent.
+> 📝 **First-person template convention**: This file is user-config that Claude Code loads into EVERY session. The pronoun "I" in the content below = the **USER** (whoever copies this file into `~/.claude/CLAUDE.md`), "you" = **Claude**. The first-person voice is intentional, following the Claude Code prompt convention — it helps Claude read the instructions as if speaking to itself. When reading the repo for the first time (before copying), substitute "I" = yourself to grasp the intent correctly.
 
-## Ngôn ngữ
+## Language
 
-- Mặc định **tiếng Việt**, thuật ngữ kỹ thuật giữ tiếng Anh. Chi tiết tại [`communication.md` §Tiếng Việt vs Anh](rules/communication.md).
+- Default **Vietnamese**, keep technical terms in English. Details in [`communication.md` §Vietnamese vs English](rules/communication.md).
 
-## Phong cách làm việc
+## Working Style
 
-- Khi nào cần plan → ngưỡng duy nhất tại [`plan.md` §When to Create a Plan](rules/plan.md). Cần plan → **lập plan, đợi tôi duyệt**; mỗi bước dạng `[Step] → verify: [check]`.
-- Không chắc intent → **HỎI**, đừng đoán. Một câu hỏi tốt hơn 10 phút sửa sai.
-- Sau khi sửa → **TỰ KIỂM TRA** test/lint/typecheck nếu có. Đừng báo "xong" khi chưa verify.
-- Tôi nói "ultrathink" → keyword chính thức, Claude Code thêm in-context instruction request deeper reasoning cho turn đó (effort level KHÔNG đổi). Các cụm "think"/"think hard"/"think more" KHÔNG phải keyword — đối xử như plain text.
-- Subagent results, git state, external deps → xem chi tiết [`verification.md`](rules/verification.md).
+- When a plan is needed → the single threshold lives in [`plan.md` §When to Create a Plan](rules/plan.md). Plan needed → **draft the plan, wait for my approval**; each step in the form `[Step] → verify: [check]`.
+- Unsure of intent → **ASK**, don't guess. One question beats 10 minutes of fixing the wrong thing.
+- After a change → **SELF-CHECK** test/lint/typecheck if available. Don't report "done" before verifying.
+- I say "ultrathink" → an official keyword; Claude Code adds an in-context instruction requesting deeper reasoning for that turn (the effort level does NOT change). The phrases "think"/"think hard"/"think more" are NOT keywords — treat them as plain text.
+- Subagent results, git state, external deps → see details in [`verification.md`](rules/verification.md).
 
-## Phong cách trả lời
+## Response Style
 
-- **Ngắn gọn**. Diff/code TRƯỚC, giải thích SAU. Chi tiết tại [`communication.md`](rules/communication.md).
+- **Concise**. Diff/code FIRST, explanation AFTER. Details in [`communication.md`](rules/communication.md).
 
 ## Code
 
-- Chi tiết tại [`coding-standards.md`](rules/coding-standards.md). Tóm tắt: đọc trước khi viết, theo convention codebase, YAGNI, surgical changes, không thêm dependency mà không hỏi.
+- Details in [`coding-standards.md`](rules/coding-standards.md). Summary: read before writing, follow codebase conventions, YAGNI, surgical changes, don't add a dependency without asking.
 
 ## Git
 
-- KHÔNG `git commit`/`git push` trừ khi tôi yêu cầu rõ — phải có động từ explicit: `commit`, `push`, `ship`, `merge`, hoặc gọi [`/commit`](plugins/commit-commands/skills/commit/SKILL.md). Câu mơ hồ như "save it", "looks good", "done" → KHÔNG đủ, hỏi lại.
-- Chi tiết (add, force, reset, attribution, branch) tại [`git.md`](rules/git.md).
+- Do NOT `git commit`/`git push` unless I ask explicitly — there must be an explicit verb: `commit`, `push`, `ship`, `merge`, or invoking [`/commit`](plugins/commit-commands/skills/commit/SKILL.md). Vague phrases like "save it", "looks good", "done" → NOT enough, ask again.
+- Details (add, force, reset, attribution, branch) in [`git.md`](rules/git.md).
 
-## Bảo mật
+## Security
 
-- Chi tiết tại [`security.md`](rules/security.md).
+- Details in [`security.md`](rules/security.md).
 
-## Workflow ưu tiên
+## Preferred Workflow
 
-- Khi cần plan (theo rule ["Phong cách làm việc"](#phong-cách-làm-việc) ở trên) → ưu tiên đề xuất Plan Mode (`Shift+Tab×2 từ default mode`) hoặc `/plan` thay vì viết plan inline trong response.
-- Investigate codebase rộng → đề xuất subagent ("use a subagent to investigate ...") để giữ context chính sạch. Nếu không dùng subagent → scope narrow (chỉ đọc file/dir cần thiết, không explore toàn bộ).
-- Khi spawn subagent → prompt PHẢI có đủ 4 thành phần: **what** (task cụ thể), **scope** (files/dirs nào, không đụng gì), **output format** (trả về dạng nào), **done criteria** (thế nào là xong).
-- Refactor lớn → tách commit nhỏ revert được độc lập.
-- Bug khó → reproduce trước, viết failing test, mới fix (chi tiết tại coding-standards.md §Testing, §Verification During Refactoring).
+- When a plan is needed (per the ["Working Style"](#working-style) rule above) → prefer proposing Plan Mode (`Shift+Tab×2 from default mode`) or `/plan` over writing the plan inline in the response.
+- Investigating a broad codebase → propose a subagent ("use a subagent to investigate ...") to keep the main context clean. If not using a subagent → narrow the scope (read only the files/dirs needed, don't explore everything).
+- When spawning a subagent → the prompt MUST contain all 4 components: **what** (the specific task), **scope** (which files/dirs, what not to touch), **output format** (what shape to return), **done criteria** (what counts as finished).
+- Large refactor → split into small, independently revertable commits.
+- Hard bug → reproduce first, write a failing test, then fix (details in coding-standards.md §Testing, §Verification During Refactoring).
 
-## Khi gặp lỗi
+## When Errors Occur
 
-- Đọc kỹ error message TRƯỚC khi đoán.
-- Sửa 2 lần vẫn sai → DỪNG, đề xuất `/clear` + reprompt với context đã học. Đừng spam correction vào context bẩn.
+- Read the error message carefully BEFORE guessing.
+- Two failed fixes in a row → STOP, propose `/clear` + reprompt with what you've learned. Don't spam corrections into a dirty context.
 
-## Quản lý context window
+## Context Window Management
 
-- Theo dõi `/context` thường xuyên. **<40% an toàn (30-40% sweet spot)**, **40-60% dumb zone bắt đầu**, **60-77% wrap up actively**, **>77% sau auto-compact PHẢI act**. Ngưỡng community-curated, chi tiết + source tại [`docs/REFERENCE.md` §16.2](docs/REFERENCE.md).
-- Hoàn thành 1 phase (auth xong, refactor xong) → đề xuất `/compact` ngay, đừng đợi auto-compact firing (~77% của 200k window = ~155k tokens, theo [Boris Cherny — Anthropic, Claude Code lead](https://x.com/bcherny/status/1977163445205450783); docs mới ghi default ~95% — có thể đã thay đổi qua versions).
-- Trước khi compact/clear → tôi sẽ yêu cầu bạn viết handoff brief; bạn dùng skill [`/handoff`](plugins/session/skills/handoff/SKILL.md).
-- Câu hỏi nhanh không cần lưu history → tôi dùng `/btw`.
+- Watch `/context` regularly. **<40% safe (30-40% sweet spot)**, **40-60% dumb zone begins**, **60-77% wrap up actively**, **>77% after auto-compact you MUST act**. Community-curated thresholds; details + source in [`docs/REFERENCE.md` §16.2](docs/REFERENCE.md).
+- Finished a phase (auth done, refactor done) → propose `/compact` right away, don't wait for auto-compact to fire (~77% of the 200k window = ~155k tokens, per [Boris Cherny — Anthropic, Claude Code lead](https://x.com/bcherny/status/1977163445205450783); newer docs say default ~95% — may have changed across versions).
+- Before compact/clear → I'll ask you to write a handoff brief; use the [`/handoff`](plugins/session/skills/handoff/SKILL.md) skill.
+- Quick question that doesn't need to be saved to history → I use `/btw`.
 
 ## Compact Instructions
 
-Khi `/compact` chạy (manual hoặc auto), summary PHẢI giữ lại:
+When `/compact` runs (manual or auto), the summary MUST keep:
 
-1. **Files đã sửa** (full path) và **lý do sửa** từng file.
-2. **Quyết định kiến trúc** đã chốt (kèm rationale 1 câu).
-3. **Lệnh build/test/lint** đã xác định work với project này.
-4. **Constraint** (performance, compatibility, security) đã được thiết lập.
-5. **Việc đang dở dang** + **bước tiếp theo** rõ ràng.
-6. Bỏ: tool output dài, dead-end debugging, các đoạn rephrase qua lại.
+1. **Files changed** (full path) and the **reason** for each.
+2. **Architectural decisions** settled (with a one-sentence rationale).
+3. **Build/test/lint commands** confirmed to work with this project.
+4. **Constraints** (performance, compatibility, security) that have been established.
+5. **Work in progress** + a clear **next step**.
+6. Drop: long tool output, dead-end debugging, back-and-forth rephrasing.
 
-## Tham chiếu rule mở rộng
+## Extended Rule References
 
-> Tất cả file trong `~/.claude/rules/` (coding-standards.md, communication.md, git.md, plan.md, security.md, verification.md) auto-load mọi session — không cần `@import`.
+> Every file in `~/.claude/rules/` (coding-standards.md, communication.md, git.md, plan.md, security.md, verification.md) auto-loads every session — no `@import` needed.
