@@ -74,6 +74,7 @@ Examples: `feat/google-oauth`, `fix/218-avatar-fallback`, `refactor/auth-middlew
 - **Before committing**: `git diff --staged` to review what's about to be committed. Never commit blind. Unrelated file found staged → unstage it immediately and tell the user before continuing.
 - **Stage files individually**, NOT `git add .` (easy to include junk files).
 - **Small, frequent commits** > one large end-of-day commit. Each commit should be one logical unit that can be reverted independently.
+- **Clean up local commits before pushing**: `git rebase -i <base>` (or `--autosquash` with `fixup!`/`squash!` commits) to squash/reword your own work into logical units, dropping "WIP" / "fix typo" noise. Only while the branch is **unpushed/unshared** — never rewrite commits others may have pulled (see Forbidden Commands).
 - **Pull/rebase before push**: `git pull --rebase` on feature branches. Plain `git pull` is `--ff-only` by default and FAILS on a diverged branch until you choose a method — we use `--rebase`.
 - **Keep the feature branch current**: rebase (or merge) `main` into it regularly to avoid drift and to satisfy a `strict` / "up to date before merge" protection rule. Rebase only while the branch is unshared.
 - **Merge strategy**: default to **squash** for feature PRs (one clean commit on `main`). Use a **merge commit** to preserve the branch's individual commits; avoid **rebase-and-merge** for signed commits (see Commit Signing). Always squash away "WIP" / "fix typo" noise.
