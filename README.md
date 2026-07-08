@@ -5,7 +5,7 @@
 [![CI](https://github.com/MinhThang1009/dotclaude/actions/workflows/ci.yml/badge.svg)](https://github.com/MinhThang1009/dotclaude/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/MinhThang1009/dotclaude/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.6%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Bash](https://img.shields.io/badge/bash-4%2B-4EAA25?logo=gnubash&logoColor=white)](https://www.gnu.org/software/bash/)
+[![Bash](https://img.shields.io/badge/bash-4%2B-4EAA25?logo=gnubash&logoColor=white)](#requirements)
 [![Markdown](https://img.shields.io/badge/markdown-CommonMark-000000?logo=markdown&logoColor=white)](https://commonmark.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Last Commit](https://img.shields.io/github/last-commit/MinhThang1009/dotclaude?logo=git&logoColor=white)](https://github.com/MinhThang1009/dotclaude/commits/main)
