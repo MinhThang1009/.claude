@@ -6,6 +6,10 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+    groups:
+      codeql-action:
+        patterns:
+          - "github/codeql-action*"
     open-pull-requests-limit: 5
     commit-message:
       # `include: scope` auto-thêm "(deps)" -> dùng prefix "chore" tránh double "(deps)(deps)"

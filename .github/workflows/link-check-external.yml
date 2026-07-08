@@ -29,6 +29,8 @@ jobs:
           # link sống với người thật — 404 vẫn bị bắt bình thường.
           # --exclude c21d3c10...: URL ví dụ minh hoạ format trong SKILL.md vendored
           # (anthropics/claude-code, claude-cli-internal) — cố ý không resolve được.
+          # Bỏ qua template assets của repo-scaffold: link trong đó chỉ hợp lệ sau khi
+          # scaffold vào repo đích, còn {{OWNER}}/{{REPO}} là placeholder intentional.
           args: >-
             --verbose
             --no-progress
@@ -37,6 +39,7 @@ jobs:
             --timeout 20
             --accept '200..=299, 403, 429'
             --exclude 'c21d3c10bc8e898b7ac1a2d745bdc9bc4e423afe'
+            --exclude-path 'plugins/repo-scaffold/skills/repo-scaffold/assets/'
             --exclude-loopback
             --exclude-private
             "**/*.md"
