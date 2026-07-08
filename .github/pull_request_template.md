@@ -8,7 +8,7 @@
 
 <!-- Nếu PR đóng issue: `Closes #123`. Nếu refer mà không đóng: `Refs #123` -->
 
-Closes #
+<!-- Closes #123 hoặc Refs #123; xóa dòng này nếu không có issue liên quan. -->
 
 ## Loại thay đổi
 
