@@ -47,6 +47,7 @@
 <!-- Mô tả cách verify thay đổi work đúng -->
 
 - [ ] Manual test: ...
+- [ ] Docs-only: preview render hoặc markdownlint file đã sửa
 - [ ] CI sẽ run: hook tests, JSON validate, link check, lint, frontmatter
 
 ## Notes (optional)
